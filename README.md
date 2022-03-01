@@ -1,3 +1,3 @@
 # vite-plugin-monkey
 
-will support tampermonkey and Violentmonkey and greasemonkey
+will support Tampermonkey and Violentmonkey and Greasemonkey

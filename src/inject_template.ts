@@ -42,7 +42,7 @@ export const serverInjectTemplate = ({
     }
   });
   if (apiInjectSuccessFul) {
-    console.log('vite-plugin-tampermonkey-plus: inject GM_* to unsafeWindow');
+    console.log('vite-plugin-monkey: inject GM_* to unsafeWindow');
   }
 
   // /__vite_ping
@@ -54,28 +54,26 @@ export const serverInjectTemplate = ({
     }
     return fetchBackup.call(this, input, init);
   };
-  console.log(
-    `vite-plugin-tampermonkey-plus: redirect /__vite to ${origin}/__vite`
-  );
+  console.log(`vite-plugin-monkey: redirect /__vite to ${origin}/__vite`);
 
   const createScript = (src: string) => {
     const el = document.createElement('script');
     el.src = src;
     el.type = 'module';
-    el.dataset.source = 'vite-plugin-tampermonkey-plus';
+    el.dataset.source = 'vite-plugin-monkey';
     return el;
   };
   [`${origin}/@vite/client`, `${origin}/${entry}`].forEach((s) => {
     document.head.appendChild(createScript(s));
   });
-  console.log('vite-plugin-tampermonkey-plus: inject module to document.head');
+  console.log('vite-plugin-monkey: inject module to document.head');
 };
 
 export const cssInjectTemplate = ({ cssTextList = [] as string[] }) => {
   cssTextList.forEach((s) => {
     const style = document.createElement('style');
     style.innerText = s;
-    style.dataset.source = 'vite-plugin-tampermonkey-plus';
+    style.dataset.source = 'vite-plugin-monkey';
     document.head.appendChild(style);
   });
 };

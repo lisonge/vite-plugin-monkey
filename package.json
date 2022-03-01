@@ -1,7 +1,7 @@
 {
-  "name": "vite-plugin-tampermonkey-plus",
+  "name": "vite-plugin-monkey",
   "version": "0.0.1",
-  "description": "vite plugin tampermonkey",
+  "description": "vite plugin for Tampermonkey, Violentmonkey and Greasemonkey",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -27,7 +27,9 @@
   "keywords": [
     "vite",
     "vite-plugin",
-    "tampermonkey"
+    "Tampermonkey",
+    "Violentmonkey",
+    "Greasemonkey"
   ],
   "author": "lisonge",
   "license": "MIT",

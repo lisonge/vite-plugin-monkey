@@ -12,7 +12,7 @@ import { buildUserScript, GrantValueList } from './user_script';
 import { isRestart } from './_restart';
 export { GrantValueList };
 
-export interface TampermonkeyPlusOption {
+export interface MonkeyOption {
   entry: string;
   userscript: UserScript;
   server?: {
@@ -44,15 +44,15 @@ export interface TampermonkeyPlusOption {
   };
 }
 
-const devPath = '/__vite-plugin-tampermonkey-plus.install.user.js';
-const cachePath = '/__vite-plugin-tampermonkey-plus.cache.user.js';
+const devPath = '/__vite-plugin-monkey.install.user.js';
+const cachePath = '/__vite-plugin-monkey.cache.user.js';
 
 /**
  * litmit: host must be only one
  */
-export default (option: TampermonkeyPlusOption): Plugin => {
+export default (option: MonkeyOption): Plugin => {
   const { host = '127.0.0.1' } = option.server ?? {};
-  const logger = createLogger('plugin-tampermonkey-plus');
+  const logger = createLogger('plugin-monkey');
   const external: string[] = [];
   const globals: Record<string, string> = {};
   const cdnList: string[] = [];
@@ -82,7 +82,7 @@ export default (option: TampermonkeyPlusOption): Plugin => {
   let origin = '';
   let installUrl = '';
   return {
-    name: 'tampermonkey-plus',
+    name: 'monkey',
     enforce: 'post',
     config(config, { command }) {
       isServe = command == 'serve';
@@ -100,11 +100,9 @@ export default (option: TampermonkeyPlusOption): Plugin => {
             entry: option.entry,
             formats: ['iife'],
             fileName: () => {
-              return option.build?.fileName ?? 'tampermonkey.user.js';
+              return option.build?.fileName ?? 'monkey.user.js';
             },
-            name:
-              'vite_plugin_tampermonkey_plus_' +
-              Math.random().toString(16).slice(2),
+            name: 'vite_plugin_monkey_' + Math.random().toString(16).slice(2),
           },
         },
         server: {

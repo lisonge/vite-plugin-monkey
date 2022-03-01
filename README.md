@@ -1,3 +1,3 @@
-# vite-plugin-tampermonkey-plus
+# vite-plugin-monkey
 
-like name
+will support tampermonkey and Violentmonkey and greasemonkey

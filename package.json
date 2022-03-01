@@ -68,5 +68,8 @@
     "cross-spawn": "^7.0.3",
     "open": "^8.4.0",
     "picocolors": "^1.0.0"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
   }
 }

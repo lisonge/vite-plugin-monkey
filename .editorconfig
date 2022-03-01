@@ -1,0 +1,8 @@
+# 当前配置文件语言为 toml
+root = true #表示是最顶层的配置文件，设为 true 时，停止向上查找
+[*]
+charset = utf-8 # 字符集
+indent_style = space # 设置为tab或space
+indent_size = 2  # 缩进级别的列数
+trim_trailing_whitespace = true # 删除文件中换行符之前的所有空白字符
+insert_final_newline = true # 使文件以一个空白行结尾

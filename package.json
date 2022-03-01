@@ -1,0 +1,72 @@
+{
+  "name": "vite-plugin-tampermonkey-plus",
+  "version": "0.0.1",
+  "description": "vite plugin tampermonkey",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src",
+    "dist",
+    "pnpm-lock.yaml",
+    "tsup.config.ts",
+    "tsconfig.json"
+  ],
+  "scripts": {
+    "prepare": "husky install",
+    "preinstall": "npx only-allow pnpm",
+    "build": "tsup"
+  },
+  "keywords": [
+    "vite",
+    "vite-plugin",
+    "tampermonkey"
+  ],
+  "author": "lisonge",
+  "license": "MIT",
+  "devDependencies": {
+    "@commitlint/cli": "^16.2.1",
+    "@commitlint/config-conventional": "^16.2.1",
+    "@types/cross-spawn": "^6.0.2",
+    "@types/jest": "^27.4.1",
+    "@types/node": "14.18.12",
+    "@types/tampermonkey": "^4.0.5",
+    "@typescript-eslint/eslint-plugin": "^5.12.0",
+    "@typescript-eslint/parser": "^5.12.0",
+    "eslint": "^8.9.0",
+    "eslint-config-prettier": "^8.4.0",
+    "husky": "^7.0.4",
+    "jest": "^27.5.1",
+    "lint-staged": "^12.3.4",
+    "prettier": "^2.5.1",
+    "ts-node": "^10.5.0",
+    "tsup": "^5.11.13",
+    "typescript": "^4.5.5",
+    "vite": "^2.8.4"
+  },
+  "peerDependencies": {
+    "@types/tampermonkey": "^4.0.5",
+    "vite": "^2.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@types/tampermonkey": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "pnpm": "^6.0.0",
+    "node": "^14.13.1 || >= 16"
+  },
+  "dependencies": {
+    "cross-spawn": "^7.0.3",
+    "open": "^8.4.0",
+    "picocolors": "^1.0.0"
+  }
+}

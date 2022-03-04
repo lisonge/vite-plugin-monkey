@@ -1,8 +1,10 @@
 name: release
 on:
   push:
-    branches:
-      - main
+    # branches:
+    #   - main
+    tags:
+      - 'v*'
 
 jobs:
   main:
@@ -10,8 +12,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        with:
-          persist-credentials: false
 
       - name: Setup Node.js environment
         uses: actions/setup-node@v3.0.0
@@ -24,13 +24,21 @@ jobs:
           version: 6
 
       - run: pnpm install --registry=https://registry.npmmirror.com/
-      - run: pnpm run build
 
-    # - name: publish
-    #   uses: actions/setup-node@v1
-    #     with:
-    #       node-version: 14
-    #       registry-url: https://registry.npmjs.org/
-    #   - run: npm publish
-    #     env:
-    #       NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+      - run: pnpm run build
+      - run: pnpm pack
+      - name: publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+        run: pnpm publish --registry=https://registry.npmjs.org/
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            Please refer to [CHANGELOG.md](https://github.com/vitejs/vite/blob/${{ github.ref_name }}/packages/${{ steps.tag.outputs.pkgName }}/CHANGELOG.md) for details.

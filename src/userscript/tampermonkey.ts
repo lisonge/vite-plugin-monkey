@@ -1,18 +1,13 @@
-export type IArray<T = unknown> = T | T[];
+import { Format, IArray, LocaleType } from './common';
 
-/**
- * @see https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
- */
-export type LocaleType<T = unknown> = Record<string, T>;
-
-export type RunAtType =
+export type TamperRunAt =
   | 'document-start'
   | 'document-body'
   | 'document-end'
   | 'document-idle'
   | 'context-menu';
 
-export type GrantType =
+export type TamperGrant =
   | 'unsafeWindow'
   | 'window.close'
   | 'window.focus'
@@ -40,7 +35,7 @@ export type GrantType =
   | 'GM_setClipboard'
   | 'GM_info';
 
-export const GrantValueList: GrantType[] = [
+export const TamperGrantValueList: TamperGrant[] = [
   'unsafeWindow',
   'window.close',
   'window.focus',
@@ -78,7 +73,7 @@ export type AntifeatureType = {
 /**
  * @see https://www.tampermonkey.net/documentation.php
  */
-export interface UserScriptHeader {
+export interface TampermonkeyUserScript {
   /**
    * @see https://www.tampermonkey.net/documentation.php#_name
    */
@@ -197,14 +192,14 @@ export interface UserScriptHeader {
   /**
    * @see https://www.tampermonkey.net/documentation.php#_run_at
    */
-  'run-at'?: RunAtType;
+  'run-at'?: TamperRunAt;
 
   /**
    * @see https://www.tampermonkey.net/documentation.php#_grant
    *
    * @example {grant:'*'} // equal to {grant: GrantValueList}
    */
-  grant?: IArray<GrantType> | 'none' | '*';
+  grant?: IArray<TamperGrant> | 'none' | '*';
 
   /**
    * @see https://www.tampermonkey.net/documentation.php#_antifeature
@@ -215,22 +210,16 @@ export interface UserScriptHeader {
    * @see https://www.tampermonkey.net/documentation.php#_noframes
    */
   noframes?: boolean;
+
+  extra?: [string, string][] | Record<string, IArray<string>>;
 }
 
-export type AlignFuncType = (
-  p0: [string, ...string[]][]
-) => [string, ...string[]][];
+export type UserScript = Format & TampermonkeyUserScript;
 
-export type UserScript = {
-  extra?: [string, string][] | Record<string, IArray<string>>;
-  /**
-   * @description need note the character width
-   * @default 2, true
-   */
-  align?: number | boolean | AlignFuncType;
-} & UserScriptHeader;
-
-export const buildUserScript = (userscript: UserScript) => {
+export const userscript2comment4tampermonkey = (
+  userscript: TampermonkeyUserScript,
+  format: Format = {}
+) => {
   let attrList: [string, ...string[]][] = [];
   const {
     name,
@@ -259,9 +248,10 @@ export const buildUserScript = (userscript: UserScript) => {
     grant,
     antifeature,
     noframes,
+    extra,
   } = userscript;
 
-  let { align, extra } = userscript;
+  let { align } = format;
 
   {
     // name
@@ -362,7 +352,7 @@ export const buildUserScript = (userscript: UserScript) => {
 
   if (typeof grant == 'string') {
     if (grant == '*') {
-      GrantValueList.forEach((s) => {
+      TamperGrantValueList.forEach((s) => {
         attrList.push(['grant', s]);
       });
     } else {

@@ -1,9 +1,9 @@
-import path from 'path';
-import open from 'open';
-import spawn from 'cross-spawn';
-import colors from 'picocolors';
 import { execSync } from 'child_process';
-import type { Logger } from './logger';
+import spawn from 'cross-spawn';
+import open from 'open';
+import path from 'path';
+import colors from 'picocolors';
+import type { Logger } from './_logger';
 
 // https://github.com/sindresorhus/open#app
 const OSX_CHROME = 'google chrome';

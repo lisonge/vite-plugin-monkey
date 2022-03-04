@@ -21,10 +21,12 @@ export default defineConfig({
           'zh-CN': '描述',
         },
         include: ['https://dev.songe.li/*', /^https:\/\/www\.songe\.li\/.*$/],
-        align: 2,
         extra: {
           note: ['2017.05.12-V8.4z', '2017.05.05-V8.3'],
         },
+      },
+      format: {
+        align: 2,
       },
       server: {
         open: true,

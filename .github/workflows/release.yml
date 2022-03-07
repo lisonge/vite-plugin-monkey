@@ -26,10 +26,10 @@ jobs:
       - run: pnpm install --registry=https://registry.npmmirror.com/
 
       - run: pnpm run build
-      - name: publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
-        run: npm publish --registry=https://registry.npmjs.org/
+
+      - uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
 
       - name: Create Release
         id: create_release

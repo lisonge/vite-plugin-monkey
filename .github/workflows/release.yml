@@ -26,7 +26,6 @@ jobs:
       - run: pnpm install --registry=https://registry.npmmirror.com/
 
       - run: pnpm run build
-      - run: pnpm pack
       - name: publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
@@ -41,4 +40,4 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
           body: |
-            Please refer to [CHANGELOG.md](https://github.com/vitejs/vite/blob/${{ github.ref_name }}/packages/${{ steps.tag.outputs.pkgName }}/CHANGELOG.md) for details.
+            Please refer to [CHANGELOG.md](https://github.com/lisonge/vite-plugin-monkey/blob/${{ github.ref_name }}/CHANGELOG.md) for details.

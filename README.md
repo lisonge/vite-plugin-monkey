@@ -83,4 +83,4 @@ so if host enable [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP), 
 
 - chrome - [Disable Content-Security-Policy](https://chrome.google.com/webstore/detail/disable-content-security/ieelmcmcagommplceebfedjlakkhpden/)
 - edge - [Disable Content-Security-Policy](https://microsoftedge.microsoft.com/addons/detail/disable-contentsecurity/ecmfamimnofkleckfamjbphegacljmbp?hl=zh-CN)
-- firefox - disable `security.csp.enable` in the [about:config](about:config) menu
+- firefox - disable `security.csp.enable` in the `about:config` menu

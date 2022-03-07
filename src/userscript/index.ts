@@ -35,7 +35,7 @@ export type CommonmonkeyUserScript =
 
 export const userscript2comment = (
   userscript: CommonmonkeyUserScript,
-  format: Format = {}
+  format: Format = { align: 2 }
 ) => {
   if (userscript.monkey == 'grease') {
     return userscript2comment4greasemonkey(userscript, format);

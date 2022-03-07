@@ -176,7 +176,7 @@ export default (pluginOption: MonkeyOption): Plugin => {
     },
     configureServer(server) {
       // prefix name
-      const prefix = pluginOption.server?.prefix ?? 'dev/';
+      const prefix = pluginOption.server?.prefix ?? 'dev:';
       const { name } = pluginOption.userscript;
       if (typeof prefix == 'string') {
         if (typeof name == 'string') {

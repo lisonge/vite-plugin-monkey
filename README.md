@@ -1,6 +1,6 @@
 # vite-plugin-monkey
 
-vite plugin server and build \*.user.js for Tampermonkey and Violentmonkey and Greasemonkey
+vite plugin server and build \*.user.js for [Tampermonkey](https://www.tampermonkey.net/) and [Violentmonkey](https://violentmonkey.github.io/) and [Greasemonkey](https://www.greasespot.net/)
 
 ## feature
 
@@ -53,12 +53,17 @@ export interface MonkeyOption {
      * {
      *  vue:'Vue',
      *  // need manually set userscript.require = ['https://unpkg.com/vue@3.0.0/dist/vue.global.js']
-     *  vuex:['Vuex', 'https://unpkg.com/vuex@4.0.0/dist/vuex.global.js']
+     *  vuex:['Vuex', 'https://unpkg.com/vuex@4.0.0/dist/vuex.global.js'],
      *  // recommended this, plugin will auto add this url to userscript.require
+     *  vuex:['Vuex', (version)=>`https://unpkg.com/vuex@${version}/dist/vuex.global.js`],
+     *  // better recommended this
      * }
      *
      */
-    externalGlobals?: Record<string, string | [string, string]>;
+    externalGlobals?: Record<
+      string,
+      string | [string, string | ((version: string) => string)]
+    >;
 
     /**
      * according to final code bundle, auto inject GM_* or GM.* to userscript comment grant
@@ -69,6 +74,48 @@ export interface MonkeyOption {
     autoGrant?: boolean;
   };
 }
+```
+
+[CommonmonkeyUserScript](./src/userscript/index.ts#L25)
+
+```ts
+export type CommonmonkeyUserScript =
+  | (GreasemonkeyUserScript & {
+      /**
+       *
+       * @default 'common'
+       */
+      monkey?: 'grease' | 'common';
+    })
+  | (TampermonkeyUserScript & {
+      monkey?: 'tamper' | 'common';
+    })
+  | (ViolentmonkeyUserScript & {
+      monkey?: 'violent' | 'common';
+    });
+```
+
+- [GreasemonkeyUserScript](./src/userscript/greasemonkey.ts#L37)
+- [TampermonkeyUserScript](./src/userscript/tampermonkey.ts#L76)
+- [ViolentmonkeyUserScript](./src/userscript/violentmonkey.ts#L80)
+
+[Format](./src/userscript/common.ts#L12)
+
+```ts
+/**
+ * format userscript comment
+ */
+export type Format = {
+  /**
+   * @description note font_width/font_family, suggest fixed-width font
+   * @default 2, true
+   */
+  align?: number | boolean | AlignFunc;
+};
+
+export type AlignFunc = (
+  p0: [string, ...string[]][]
+) => [string, ...string[]][];
 ```
 
 ## example

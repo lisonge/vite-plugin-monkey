@@ -31,6 +31,15 @@ export default defineConfig({
       server: {
         open: true,
       },
+      build: {
+        externalGlobals: {
+          'blueimp-md5': [
+            'md5',
+            (version) =>
+              `https://cdn.jsdelivr.net/npm/blueimp-md5@${version}/js/md5.min.js`,
+          ],
+        },
+      },
     }),
     ViteRestart({
       restart: ['../../src/index.ts'],

@@ -1,13 +1,19 @@
 lockfileVersion: 5.3
 
 specifiers:
+  '@types/blueimp-md5': ^2.18.0
   '@types/tampermonkey': ^4.0.5
+  blueimp-md5: ^2.19.0
   typescript: ^4.5.5
   vite: ^2.8.4
   vite-plugin-inspect: ^0.3.14
   vite-plugin-restart: ^0.1.1
 
+dependencies:
+  blueimp-md5: 2.19.0
+
 devDependencies:
+  '@types/blueimp-md5': 2.18.0
   '@types/tampermonkey': 4.0.5
   typescript: 4.5.5
   vite: 2.8.4
@@ -28,9 +34,17 @@ packages:
       picomatch: 2.3.1
     dev: true
 
+  /@types/blueimp-md5/2.18.0:
+    resolution: {integrity: sha512-f4A+++lGZGJvVSgeyMkqA7BEf2BVQli6F+qEykKb49c5ieWQBkfpn6CP5c1IZr2Yi2Ofl6Fj+v0e1fN18Z8Cnw==}
+    dev: true
+
   /@types/tampermonkey/4.0.5:
     resolution: {integrity: sha512-FGPo7d+qZkDF7vyrwY1WNhcUnfDyVpt2uyL7krAu3WKCUMCfIUzOuvt8aSk8N2axHT8XPr9stAEDGVHLvag6Pw==}
     dev: true
+
+  /blueimp-md5/2.19.0:
+    resolution: {integrity: sha512-DRQrD6gJyy8FbiE4s+bDoXS9hiW3Vbx5uCdwvcCf3zLHL+Iv7LtGHLpr+GZV8rHG8tK766FGYBwRbu8pELTt+w==}
+    dev: false
 
   /braces/3.0.2:
     resolution: {integrity: sha512-b8um+L1RzM3WDSzvhm6gIz1yfTbBt6YTlcEKAvsmqCZZFw46z626lVj9j1yEPW33H5H+lBQpZMP1k8l+78Ha0A==}

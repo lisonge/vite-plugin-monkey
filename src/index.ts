@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { Plugin, ResolvedConfig } from 'vite';
+import type { Plugin, ResolvedConfig } from 'vite';
 import {
   cssInjectTemplate,
   serverInjectTemplate,
@@ -58,12 +58,17 @@ export interface MonkeyOption {
      * {
      *  vue:'Vue',
      *  // need manually set userscript.require = ['https://unpkg.com/vue@3.0.0/dist/vue.global.js']
-     *  vuex:['Vuex', 'https://unpkg.com/vuex@4.0.0/dist/vuex.global.js']
+     *  vuex:['Vuex', 'https://unpkg.com/vuex@4.0.0/dist/vuex.global.js'],
      *  // recommended this, plugin will auto add this url to userscript.require
+     *  vuex:['Vuex', (version)=>`https://unpkg.com/vuex@${version}/dist/vuex.global.js`],
+     *  // better recommended this
      * }
      *
      */
-    externalGlobals?: Record<string, string | [string, string]>;
+    externalGlobals?: Record<
+      string,
+      string | [string, string | ((version: string) => string)]
+    >;
 
     /**
      * according to final code bundle, auto inject GM_* or GM.* to userscript comment grant
@@ -83,17 +88,6 @@ export default (pluginOption: MonkeyOption): Plugin => {
   const external: string[] = [];
   const globals: Record<string, string> = {};
   const cdnList: string[] = [];
-  Object.entries(pluginOption.build?.externalGlobals ?? {}).forEach(
-    ([k, v]) => {
-      external.push(k);
-      if (typeof v == 'string') {
-        globals[k] = v;
-      } else {
-        globals[k] = v[0];
-        cdnList.push(v[1]);
-      }
-    }
-  );
 
   let config: ResolvedConfig;
   let isServe = true;
@@ -123,7 +117,9 @@ export default (pluginOption: MonkeyOption): Plugin => {
       if (packageJson.name) {
         fileName = packageJson.name + '.user.js';
       }
-    } catch {}
+    } catch {
+      logger.warn(`not found package.json, fileName use ${fileName}`);
+    }
   }
 
   const GM_keyword_set = new Set(GM_keywords);
@@ -132,8 +128,37 @@ export default (pluginOption: MonkeyOption): Plugin => {
   return {
     name: 'monkey',
     enforce: 'post',
-    config(config, { command }) {
+    async config(config, { command }) {
       isServe = command == 'serve';
+      for (const kv of Object.entries(
+        pluginOption.build?.externalGlobals ?? {}
+      )) {
+        const [k, v] = kv;
+        external.push(k);
+        if (typeof v == 'string') {
+          globals[k] = v;
+        } else if (typeof v[1] == 'string') {
+          globals[k] = v[0];
+          cdnList.push(v[1]);
+        } else if (typeof v[1] == 'function') {
+          globals[k] = v[0];
+          let version: string | undefined = undefined;
+          try {
+            const filePath = require.resolve(`${k}/package.json`);
+            const modulePack: { version?: string } = JSON.parse(
+              fs.readFileSync(filePath, 'utf-8')
+            );
+            version = modulePack.version;
+          } catch {
+            logger.warn(`not found module ${k} version, use ${k}@latest`);
+            version = 'latest';
+          }
+          if (version) {
+            cdnList.push(v[1](version));
+          }
+        }
+      }
+
       return {
         build: {
           sourcemap: false,

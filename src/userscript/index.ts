@@ -24,6 +24,10 @@ export type {
 
 export type CommonmonkeyUserScript =
   | (GreasemonkeyUserScript & {
+      /**
+       *
+       * @default 'common'
+       */
       monkey?: 'grease' | 'common';
     })
   | (TampermonkeyUserScript & {

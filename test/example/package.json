@@ -1,7 +1,9 @@
 {
-  "name": "example",
+  "name": "example-project",
   "version": "1.0.0",
   "main": "index.js",
+  "author": "lisonge",
+  "license": "MIT",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

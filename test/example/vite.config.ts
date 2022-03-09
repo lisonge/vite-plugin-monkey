@@ -8,8 +8,8 @@ export default defineConfig({
     CustomPlugin({
       entry: 'src/main.ts',
       userscript: {
-        author: 'lisonge',
-        name: 'op-wiki-plus',
+        // author: 'lisonge',
+        // name: 'op-wiki-plus',
         namespace: 'https://dev.songe.li',
         version: '1.1.2',
         icon: 'https://vitejs.dev/logo.svg',

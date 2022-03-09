@@ -1,4 +1,5 @@
 import { readFileSync } from 'fs';
+import path from 'path';
 
 export const delay = async (n = 0) => {
   await new Promise<void>((res) => {
@@ -90,9 +91,8 @@ type PackageJson = {
 export const packageJson = (() => {
   let target: Record<string, string> = {};
   try {
-    // path.resolve(process.cwd(), 'package.json')
     target = JSON.parse(
-      readFileSync(require.resolve('./package.json'), 'utf-8')
+      readFileSync(path.resolve(process.cwd(), 'package.json'), 'utf-8')
     );
   } catch {
     target = {};

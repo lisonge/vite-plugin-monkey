@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.2.5
+
+### Bug Fixes
+
+- Cannot find module './package.json' ([5b7aa08c](https://github.com/lisonge/vite-plugin-monkey/commit/bd63a06491c46af64109a3f9dcf2202d5b7aa08c))
+
 ## 0.2.4
 
 ### Features

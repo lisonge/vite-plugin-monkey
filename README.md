@@ -8,7 +8,7 @@ vite plugin server and build \*.user.js for [Tampermonkey](https://www.tampermon
 - inject userscript comment to build bundle
 - auto open \*.user.js in default browser when userscript change
 - external cdn url inject to userscript @require
-- full typescript support
+- full typescript support and vite feature
 
 ## install
 
@@ -26,7 +26,7 @@ export interface MonkeyOption {
    * userscript entry file path
    */
   entry: string;
-  userscript: CommonmonkeyUserScript;
+  userscript: MonkeyUserScript;
   format?: Format;
   server?: {
     /**
@@ -76,28 +76,24 @@ export interface MonkeyOption {
 }
 ```
 
-[CommonmonkeyUserScript](./src/userscript/index.ts#L25)
+[MonkeyUserScript](./src/userscript/index.ts#L119)
 
 ```ts
-export type CommonmonkeyUserScript =
-  | (GreasemonkeyUserScript & {
-      /**
-       *
-       * @default 'common'
-       */
-      monkey?: 'grease' | 'common';
-    })
-  | (TampermonkeyUserScript & {
-      monkey?: 'tamper' | 'common';
-    })
-  | (ViolentmonkeyUserScript & {
-      monkey?: 'violent' | 'common';
-    });
+/**
+ * UserScript, merge metadata from Greasemonkey, Tampermonkey, Violentmonkey, Greasyfork
+ */
+export type MonkeyUserScript = GreasemonkeyUserScript &
+  TampermonkeyUserScript &
+  ViolentmonkeyUserScript &
+  GreasyforkUserScript &
+  MergemonkeyUserScript;
 ```
 
-- [GreasemonkeyUserScript](./src/userscript/greasemonkey.ts#L37)
-- [TampermonkeyUserScript](./src/userscript/tampermonkey.ts#L76)
-- [ViolentmonkeyUserScript](./src/userscript/violentmonkey.ts#L80)
+- [GreasemonkeyUserScript](./src/userscript/greasemonkey.ts#L38)
+- [TampermonkeyUserScript](./src/userscript/tampermonkey.ts#L77)
+- [ViolentmonkeyUserScript](./src/userscript/violentmonkey.ts#L81)
+- [GreasyforkUserScript](./src/userscript/index.ts#L32)
+- [MergemonkeyUserScript](./src/userscript/index.ts#L59)
 
 [Format](./src/userscript/common.ts#L12)
 

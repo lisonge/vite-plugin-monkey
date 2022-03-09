@@ -8,7 +8,7 @@ import {
 } from './inject_template';
 import { openBrowser } from './open_browser';
 import type {
-  CommonmonkeyUserScript,
+  MonkeyUserScript,
   Format,
   GreasemonkeyUserScript,
   TampermonkeyUserScript,
@@ -16,10 +16,10 @@ import type {
 } from './userscript';
 import { userscript2comment } from './userscript';
 import { createLogger } from './_logger';
-import { GM_keywords, isRestart } from './_util';
+import { GM_keywords, isRestart, packageJson } from './_util';
 
 export type {
-  CommonmonkeyUserScript,
+  MonkeyUserScript,
   TampermonkeyUserScript,
   ViolentmonkeyUserScript,
   GreasemonkeyUserScript,
@@ -31,7 +31,7 @@ export interface MonkeyOption {
    * userscript entry file path
    */
   entry: string;
-  userscript: CommonmonkeyUserScript;
+  userscript: MonkeyUserScript;
   format?: Format;
   server?: {
     /**
@@ -110,16 +110,17 @@ export default (pluginOption: MonkeyOption): Plugin => {
   if (pluginOption.build?.fileName) {
     fileName = pluginOption.build?.fileName;
   } else {
-    try {
-      const packageJson: { name?: string } = JSON.parse(
-        fs.readFileSync(path.resolve(process.cwd(), 'package.json'), 'utf-8')
-      );
-      if (packageJson.name) {
-        fileName = packageJson.name + '.user.js';
-      }
-    } catch {
-      logger.warn(`not found package.json, fileName use ${fileName}`);
-    }
+    fileName = packageJson.name + '.user.js';
+    // try {
+    //   const packageJson: { name?: string } = JSON.parse(
+    //     fs.readFileSync(path.resolve(process.cwd(), 'package.json'), 'utf-8')
+    //   );
+    //   if (packageJson.name) {
+
+    //   }
+    // } catch {
+    //   logger.warn(`not found package.json, fileName use ${fileName}`);
+    // }
   }
 
   const GM_keyword_set = new Set(GM_keywords);
@@ -202,7 +203,7 @@ export default (pluginOption: MonkeyOption): Plugin => {
     configureServer(server) {
       // prefix name
       const prefix = pluginOption.server?.prefix ?? 'dev:';
-      const { name } = pluginOption.userscript;
+      const { name = packageJson.name } = pluginOption.userscript;
       if (typeof prefix == 'string') {
         if (typeof name == 'string') {
           pluginOption.userscript.name = prefix + name;

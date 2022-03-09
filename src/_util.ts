@@ -1,3 +1,5 @@
+import { readFileSync } from 'fs';
+
 export const delay = async (n = 0) => {
   await new Promise<void>((res) => {
     setTimeout(res, n);
@@ -76,3 +78,33 @@ export const GM_keywords = [
   'window.focus',
   'window.onurlchange',
 ];
+type PackageJson = {
+  name: string;
+  version: string;
+  description?: string;
+  license?: string;
+  author: string;
+  homepage?: string;
+};
+
+export const packageJson = (() => {
+  let target: Record<string, string> = {};
+  try {
+    // path.resolve(process.cwd(), 'package.json')
+    target = JSON.parse(
+      readFileSync(require.resolve('./package.json'), 'utf-8')
+    );
+  } catch {
+    target = {};
+  }
+  Object.entries<string>({
+    name: 'monkey',
+    version: '1.0.0',
+    author: 'monkey',
+  }).forEach(([k, v]) => {
+    if (typeof target[k] != 'string') {
+      target[k] = v;
+    }
+  });
+  return target as PackageJson;
+})();

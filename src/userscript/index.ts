@@ -1,18 +1,22 @@
-import { Format } from './common';
+import { Format, IArray, LocaleType } from './common';
 import {
+  GreaseGrant,
   GreaseGrantValueList,
   GreasemonkeyUserScript,
-  userscript2comment4greasemonkey,
+  GreaseRunAt,
 } from './greasemonkey';
 import {
+  TamperGrant,
   TamperGrantValueList,
   TampermonkeyUserScript,
-  userscript2comment4tampermonkey,
+  TamperRunAt,
 } from './tampermonkey';
+import { packageJson } from '../_util';
 import {
-  userscript2comment4violentmonkey,
+  ViolentGrant,
   ViolentGrantValueList,
   ViolentmonkeyUserScript,
+  ViolentRunAt,
 } from './violentmonkey';
 
 export type {
@@ -22,43 +26,148 @@ export type {
   Format,
 };
 
-export type CommonmonkeyUserScript =
-  | (GreasemonkeyUserScript & {
-      /**
-       *
-       * @default 'common'
-       */
-      monkey?: 'grease' | 'common';
-    })
-  | (TampermonkeyUserScript & {
-      monkey?: 'tamper' | 'common';
-    })
-  | (ViolentmonkeyUserScript & {
-      monkey?: 'violent' | 'common';
-    });
+/**
+ * @see https://greasyfork.org/help/meta-keys
+ */
+type GreasyforkUserScript = {
+  /**
+   * @see https://greasyfork.org/help/meta-keys
+   */
+  license?: string;
+
+  /**
+   * @see https://greasyfork.org/help/meta-keys
+   */
+  contributionURL?: string;
+
+  /**
+   * @see https://greasyfork.org/help/meta-keys
+   */
+  contributionAmount?: string;
+
+  /**
+   * @see https://greasyfork.org/help/meta-keys
+   */
+  compatible?: string;
+
+  /**
+   * @see https://greasyfork.org/help/meta-keys
+   */
+  incompatible?: string;
+};
+
+type MergemonkeyUserScript = {
+  /**
+   * @default package.json.name??'monkey'
+   */
+  name?: string | LocaleType<string>;
+
+  /**
+   * @default package.json.version??'1.0.0'
+   */
+  version?: string;
+
+  /**
+   * @default package.json.description
+   */
+  description?: string | LocaleType<string>;
+
+  /**
+   * @default package.json.author??'monkey'
+   */
+  author?: string;
+
+  /**
+   * @default package.json.homepage
+   */
+  homepage?: string;
+
+  /**
+   * @default package.json.homepage
+   */
+  homepageURL?: string;
+
+  /**
+   * @see https://wiki.greasespot.net/Metadata_Block#.40run-at
+   *
+   * @see https://www.tampermonkey.net/documentation.php#_run_at
+   *
+   * @see https://violentmonkey.github.io/api/metadata-block/#run-at
+   *
+   */
+  'run-at'?: GreaseRunAt | TamperRunAt | ViolentRunAt;
+
+  /**
+   * @see https://wiki.greasespot.net/Metadata_Block#.40grant
+   *
+   * @see https://www.tampermonkey.net/documentation.php#_grant
+   *
+   * @see https://violentmonkey.github.io/api/metadata-block/#grant
+   *
+   * if set '\*', will add all GM_* to UserScript
+   */
+  grant?: IArray<GreaseGrant | TamperGrant | ViolentGrant> | 'none' | '*';
+
+  /**
+   * custom extra meta
+   */
+  extra?: [string, string][] | Record<string, IArray<string>>;
+};
+
+/**
+ * UserScript, merge metadata from Greasemonkey, Tampermonkey, Violentmonkey, Greasyfork
+ */
+export type MonkeyUserScript = GreasemonkeyUserScript &
+  TampermonkeyUserScript &
+  ViolentmonkeyUserScript &
+  GreasyforkUserScript &
+  MergemonkeyUserScript;
 
 export const userscript2comment = (
-  userscript: CommonmonkeyUserScript,
+  userscript: MonkeyUserScript,
   format: Format = { align: 2 }
 ) => {
-  if (userscript.monkey == 'grease') {
-    return userscript2comment4greasemonkey(userscript, format);
-  } else if (userscript.monkey == 'tamper') {
-    return userscript2comment4tampermonkey(userscript, format);
-  } else if (userscript.monkey == 'violent') {
-    return userscript2comment4violentmonkey(userscript, format);
-  }
   let attrList: [string, ...string[]][] = [];
   const {
-    name,
+    name = packageJson.name,
     namespace,
-    version,
-    description,
+    version = packageJson.version,
+    author = packageJson.author,
+    description = packageJson.description,
+    license = packageJson.license,
+
     icon,
+    iconURL,
+    icon64,
+    icon64URL,
+    defaulticon,
+
+    homepage = packageJson.homepage,
+    homepageURL = packageJson.homepage,
+    website,
+    source,
+
+    supportURL,
+    downloadURL,
+    updateURL,
+
     include,
     match,
     exclude,
     require,
+    'exclude-match': excludeMatch,
+
+    'inject-into': injectInto,
+    'run-at': runAt,
+
+    compatible,
+    incompatible,
+
+    antifeature,
+    contributionAmount,
+    contributionURL,
+
+    connect,
     resource,
     grant,
     noframes,
@@ -67,70 +176,70 @@ export const userscript2comment = (
 
   let { align } = format;
 
-  {
-    // name
-    if (typeof name == 'string') {
-      attrList.push(['name', name]);
-    } else if (name && typeof name == 'object') {
-      Object.entries(name).forEach(([k, v]) => {
-        if (k.length == 0) {
-          attrList.push(['name', v]);
+  Object.entries<string | undefined>({
+    namespace,
+    version,
+    author,
+    license,
+    icon,
+    iconURL,
+    icon64,
+    icon64URL,
+    defaulticon,
+    homepage,
+    homepageURL,
+    website,
+    source,
+    supportURL,
+    downloadURL,
+    updateURL,
+    'inject-into': injectInto,
+    'run-at': runAt,
+    compatible,
+    incompatible,
+    contributionAmount,
+    contributionURL,
+  }).forEach(([k, v]) => {
+    if (typeof v == 'string') {
+      attrList.push([k, v]);
+    }
+  });
+
+  Object.entries({ name, description }).forEach(([k, v]) => {
+    if (typeof v == 'string') {
+      attrList.push([k, v]);
+    } else if (v && typeof v == 'object') {
+      Object.entries(v).forEach(([k2, v2]) => {
+        if (k2.length == 0) {
+          attrList.push([k, v2]);
         } else {
-          attrList.push(['name:' + k, v]);
+          attrList.push([k + k2, v2]);
         }
       });
     }
-  }
-  {
-    // namespace
-    attrList.push(['namespace', namespace]);
+  });
 
-    // version
-    attrList.push(['version', version]);
-  }
-
-  {
-    // description
-    if (typeof description == 'string') {
-      attrList.push(['description', description]);
-    } else if (description && typeof description == 'object') {
-      Object.entries(description).forEach(([k, v]) => {
-        if (k.length == 0) {
-          attrList.push(['description', v]);
-        } else {
-          attrList.push(['description:' + k, v]);
+  Object.entries({
+    include,
+    match,
+    exclude,
+    require,
+    'exclude-match': excludeMatch,
+  }).forEach(([k, v]) => {
+    if (v instanceof Array) {
+      v.forEach((s) => {
+        if (s instanceof RegExp) {
+          attrList.push([k, s.source]);
+        } else if (typeof s == 'string') {
+          attrList.push([k, s]);
         }
       });
+    } else if (typeof v == 'string') {
+      attrList.push([k, v]);
+    } else if (v instanceof RegExp) {
+      attrList.push([k, v.source]);
     }
-  }
-
-  {
-    Object.entries({
-      icon,
-    }).forEach(([k, v]) => {
-      if (typeof v == 'string') {
-        attrList.push([k, v]);
-      }
-    });
-  }
-
-  {
-    Object.entries({ include, match, exclude, require }).forEach(([k, v]) => {
-      if (v instanceof Array) {
-        v.forEach((s) => {
-          if (s instanceof RegExp) {
-            attrList.push([k, s.source]);
-          } else if (typeof s == 'string') {
-            attrList.push([k, s]);
-          }
-        });
-      } else if (typeof v == 'string') {
-        attrList.push([k, v]);
-      } else if (v instanceof RegExp) {
-        attrList.push([k, v.source]);
-      }
-    });
-  }
+  });
 
   if (resource) {
     Object.entries(resource).forEach(([k, v]) => {
@@ -138,8 +247,29 @@ export const userscript2comment = (
     });
   }
 
-  if (typeof userscript['run-at'] == 'string') {
-    attrList.push(['run-at', userscript['run-at']]);
+  if (typeof connect == 'string') {
+    attrList.push(['connect', connect]);
+  } else if (connect instanceof Array) {
+    connect.forEach((s) => {
+      attrList.push(['connect', s]);
+    });
+  }
+
+  if (antifeature instanceof Array) {
+    antifeature.forEach(({ tag, type, description }) => {
+      if (tag) {
+        attrList.push(['antifeature:' + tag, type, description]);
+      } else {
+        attrList.push(['antifeature', type, description]);
+      }
+    });
+  } else if (antifeature && typeof antifeature == 'object') {
+    const { tag, type, description } = antifeature;
+    if (tag) {
+      attrList.push(['antifeature:' + tag, type, description]);
+    } else {
+      attrList.push(['antifeature', type, description]);
+    }
   }
 
   if (typeof grant == 'string') {
@@ -164,6 +294,62 @@ export const userscript2comment = (
     attrList.push(['noframes']);
   }
 
+  const orderMap = (() => {
+    const map: Record<string, number> = {};
+    [
+      'name',
+      'namespace',
+      'version',
+      'author',
+      'description',
+      'license',
+
+      'icon',
+      'iconURL',
+      'icon64',
+      'icon64URL',
+      'defaulticon',
+
+      'homepage',
+      'homepageURL',
+      'website',
+      'source',
+
+      'supportURL',
+      'downloadURL',
+      'updateURL',
+
+      'include',
+      'match',
+      'exclude',
+      'require',
+      'exclude-match',
+
+      'connect',
+      'resource',
+      'grant',
+
+      'inject-into',
+      'run-at',
+
+      'compatible',
+      'incompatible',
+
+      'antifeature',
+      'contributionAmount',
+      'contributionURL',
+
+      'noframes',
+    ].forEach((v, i) => {
+      map[v] = i;
+    });
+    return map;
+  })();
+
+  attrList.sort((a, b) => {
+    return orderMap[a[0]] - orderMap[b[0]];
+  });
+
   if (extra instanceof Array) {
     attrList.push(...extra);
   } else if (extra && typeof extra == 'object') {
@@ -181,6 +367,7 @@ export const userscript2comment = (
   if (align === true) {
     align = 2;
   }
+
   // format
   if (typeof align == 'number' && Number.isInteger(align) && align >= 1) {
     let maxLen = 0;

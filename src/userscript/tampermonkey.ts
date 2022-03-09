@@ -1,3 +1,4 @@
+import { packageJson } from '../_util';
 import { Format, IArray, LocaleType } from './common';
 
 export type TamperRunAt =
@@ -76,8 +77,9 @@ export type AntifeatureType = {
 export interface TampermonkeyUserScript {
   /**
    * @see https://www.tampermonkey.net/documentation.php#_name
+   *
    */
-  name: string | LocaleType<string>;
+  name?: string | LocaleType<string>;
 
   /**
    * @see https://www.tampermonkey.net/documentation.php#_namespace
@@ -86,26 +88,31 @@ export interface TampermonkeyUserScript {
 
   /**
    * @see https://www.tampermonkey.net/documentation.php#_version
+   *
    */
-  version: string;
+  version?: string;
 
   /**
    * @see https://www.tampermonkey.net/documentation.php#_author
+   *
    */
-  author: string;
+  author?: string;
 
   /**
    * @see https://www.tampermonkey.net/documentation.php#_description
+   *
    */
   description?: string | LocaleType<string>;
 
   /**
    * @see https://www.tampermonkey.net/documentation.php#_homepage
+   *
    */
   homepage?: string;
 
   /**
    * @see https://www.tampermonkey.net/documentation.php#_homepage
+   *
    */
   homepageURL?: string;
 
@@ -189,17 +196,16 @@ export interface TampermonkeyUserScript {
    */
   connect?: IArray<string>;
 
-  /**
-   * @see https://www.tampermonkey.net/documentation.php#_run_at
-   */
-  'run-at'?: TamperRunAt;
+  // /**
+  //  * @see https://www.tampermonkey.net/documentation.php#_run_at
+  //  */
+  // 'run-at'?: TamperRunAt;
 
-  /**
-   * @see https://www.tampermonkey.net/documentation.php#_grant
-   *
-   * @example {grant:'*'} // equal to {grant: GrantValueList}
-   */
-  grant?: IArray<TamperGrant> | 'none' | '*';
+  // /**
+  //  * @see https://www.tampermonkey.net/documentation.php#_grant
+  //  *
+  //  */
+  // grant?: IArray<TamperGrant> | 'none' | '*';
 
   /**
    * @see https://www.tampermonkey.net/documentation.php#_antifeature
@@ -211,220 +217,5 @@ export interface TampermonkeyUserScript {
    */
   noframes?: boolean;
 
-  extra?: [string, string][] | Record<string, IArray<string>>;
+  // extra?: [string, string][] | Record<string, IArray<string>>;
 }
-
-export type UserScript = Format & TampermonkeyUserScript;
-
-export const userscript2comment4tampermonkey = (
-  userscript: TampermonkeyUserScript,
-  format: Format = {}
-) => {
-  let attrList: [string, ...string[]][] = [];
-  const {
-    name,
-    namespace,
-    version,
-    author,
-    description,
-    homepage,
-    homepageURL,
-    website,
-    source,
-    icon,
-    iconURL,
-    defaulticon,
-    icon64,
-    icon64URL,
-    updateURL,
-    downloadURL,
-    supportURL,
-    include,
-    match,
-    exclude,
-    require,
-    resource,
-    connect,
-    grant,
-    antifeature,
-    noframes,
-    extra,
-  } = userscript;
-
-  let { align } = format;
-
-  {
-    // name
-    if (typeof name == 'string') {
-      attrList.push(['name', name]);
-    } else if (name && typeof name == 'object') {
-      Object.entries(name).forEach(([k, v]) => {
-        if (k.length == 0) {
-          attrList.push(['name', v]);
-        } else {
-          attrList.push(['name:' + k, v]);
-        }
-      });
-    }
-  }
-  {
-    // namespace
-    attrList.push(['namespace', namespace]);
-
-    // version
-    attrList.push(['version', version]);
-
-    // author
-    attrList.push(['author', author]);
-  }
-
-  {
-    // description
-    if (typeof description == 'string') {
-      attrList.push(['description', description]);
-    } else if (description && typeof description == 'object') {
-      Object.entries(description).forEach(([k, v]) => {
-        if (k.length == 0) {
-          attrList.push(['description', v]);
-        } else {
-          attrList.push(['description:' + k, v]);
-        }
-      });
-    }
-  }
-
-  {
-    Object.entries({
-      homepage,
-      homepageURL,
-      website,
-      source,
-      icon,
-      iconURL,
-      defaulticon,
-      icon64,
-      icon64URL,
-      updateURL,
-      downloadURL,
-      supportURL,
-    }).forEach(([k, v]) => {
-      if (typeof v == 'string') {
-        attrList.push([k, v]);
-      }
-    });
-  }
-
-  {
-    Object.entries({ include, match, exclude, require }).forEach(([k, v]) => {
-      if (v instanceof Array) {
-        v.forEach((s) => {
-          if (s instanceof RegExp) {
-            attrList.push([k, s.source]);
-          } else if (typeof s == 'string') {
-            attrList.push([k, s]);
-          }
-        });
-      } else if (typeof v == 'string') {
-        attrList.push([k, v]);
-      } else if (v instanceof RegExp) {
-        attrList.push([k, v.source]);
-      }
-    });
-  }
-
-  if (resource) {
-    Object.entries(resource).forEach(([k, v]) => {
-      attrList.push(['resource', k, v]);
-    });
-  }
-
-  if (typeof connect == 'string') {
-    attrList.push(['connect', connect]);
-  } else if (connect instanceof Array) {
-    connect.forEach((s) => {
-      attrList.push(['connect', s]);
-    });
-  }
-
-  if (typeof userscript['run-at'] == 'string') {
-    attrList.push(['run-at', userscript['run-at']]);
-  }
-
-  if (typeof grant == 'string') {
-    if (grant == '*') {
-      TamperGrantValueList.forEach((s) => {
-        attrList.push(['grant', s]);
-      });
-    } else {
-      attrList.push(['grant', grant]);
-    }
-  } else if (Array.isArray(grant)) {
-    grant.forEach((s) => {
-      attrList.push(['grant', s]);
-    });
-  }
-
-  if (antifeature instanceof Array) {
-    antifeature.forEach(({ tag, type, description }) => {
-      if (tag) {
-        attrList.push(['antifeature:' + tag, type, description]);
-      } else {
-        attrList.push(['antifeature', type, description]);
-      }
-    });
-  } else if (antifeature && typeof antifeature == 'object') {
-    const { tag, type, description } = antifeature;
-    if (tag) {
-      attrList.push(['antifeature:' + tag, type, description]);
-    } else {
-      attrList.push(['antifeature', type, description]);
-    }
-  }
-
-  if (noframes === true) {
-    attrList.push(['noframes']);
-  }
-
-  if (extra instanceof Array) {
-    attrList.push(...extra);
-  } else if (extra && typeof extra == 'object') {
-    Object.entries(extra).forEach(([k, v]) => {
-      if (typeof v == 'string') {
-        attrList.push([k, v]);
-      } else if (v instanceof Array) {
-        v.forEach((s) => {
-          attrList.push([k, s]);
-        });
-      }
-    });
-  }
-
-  if (align === true) {
-    align = 2;
-  }
-  // format
-  if (typeof align == 'number' && Number.isInteger(align) && align >= 1) {
-    let maxLen = 0;
-    attrList.forEach((s) => {
-      if (s[0].length > maxLen) {
-        maxLen = s[0].length;
-      }
-    });
-    const len = maxLen + align;
-    attrList.forEach((s) => {
-      s[0] += Array(len - s[0].length - 1)
-        .fill('\x20')
-        .join('');
-    });
-  } else if (typeof align == 'function') {
-    attrList = align(attrList);
-  }
-
-  return [
-    '==UserScript==',
-    ...attrList.map((s) => '@' + s.join('\x20')),
-    '==/UserScript==',
-  ]
-    .map((s) => '//\x20' + s)
-    .join('\n');
-};

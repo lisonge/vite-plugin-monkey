@@ -88,6 +88,16 @@ type MergemonkeyUserScript = {
   homepageURL?: string;
 
   /**
+   * @default package.json.repository
+   */
+  source?: string;
+
+  /**
+   * @default package.json.bugs
+   */
+  supportURL?: string;
+
+  /**
    * @see https://wiki.greasespot.net/Metadata_Block#.40run-at
    *
    * @see https://www.tampermonkey.net/documentation.php#_run_at
@@ -145,9 +155,9 @@ export const userscript2comment = (
     homepage = packageJson.homepage,
     homepageURL = packageJson.homepage,
     website,
-    source,
+    source = packageJson.repository,
 
-    supportURL,
+    supportURL = packageJson.bugs,
     downloadURL,
     updateURL,
 

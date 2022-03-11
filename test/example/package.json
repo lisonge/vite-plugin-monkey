@@ -4,6 +4,14 @@
   "main": "index.js",
   "author": "lisonge",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lisonge/vite-plugin-monkey.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lisonge/vite-plugin-monkey/issues"
+  },
+  "homepage": "https://github.com/lisonge/vite-plugin-monkey#readme",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

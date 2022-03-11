@@ -79,32 +79,69 @@ export const GM_keywords = [
   'window.focus',
   'window.onurlchange',
 ];
+type RawPackageJson = {
+  name?: string;
+  version?: string;
+  description?: string;
+  license?: string;
+  author?: string | { name: string };
+  homepage?: string;
+  repository?: string | { url?: string };
+  bugs?: string | { url?: string };
+};
 type PackageJson = {
   name: string;
   version: string;
   description?: string;
   license?: string;
-  author: string;
+  author?: string;
   homepage?: string;
+  repository?: string;
+  bugs?: string;
 };
 
 export const packageJson = (() => {
-  let target: Record<string, string> = {};
+  let rawTarget: RawPackageJson = {};
   try {
-    target = JSON.parse(
+    rawTarget = JSON.parse(
       readFileSync(path.resolve(process.cwd(), 'package.json'), 'utf-8')
     );
   } catch {
-    target = {};
+    rawTarget = {};
   }
-  Object.entries<string>({
+
+  const target: PackageJson = {
     name: 'monkey',
     version: '1.0.0',
-    author: 'monkey',
-  }).forEach(([k, v]) => {
-    if (typeof target[k] != 'string') {
+  };
+  Object.entries(rawTarget).forEach(([k, v]) => {
+    if (typeof v == 'string') {
+      // @ts-ignore
       target[k] = v;
     }
   });
-  return target as PackageJson;
+  if (
+    rawTarget.author instanceof Object &&
+    typeof rawTarget.author?.name == 'string'
+  ) {
+    target.name = rawTarget.author?.name;
+  }
+  if (
+    rawTarget.bugs instanceof Object &&
+    typeof rawTarget.bugs?.url == 'string'
+  ) {
+    target.bugs = rawTarget.bugs?.url;
+  }
+  if (
+    rawTarget.repository instanceof Object &&
+    typeof rawTarget.repository?.url == 'string'
+  ) {
+    const { url } = rawTarget.repository;
+    if (url.startsWith('http')) {
+      target.repository = url;
+    } else if (url.startsWith('git+http')) {
+      target.repository = url.slice(4);
+    }
+  }
+  return target;
 })();

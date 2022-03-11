@@ -5,7 +5,7 @@ declare global {
   }
 }
 
-export const template2string = <T extends (...args: any) => any>(
+export const template2string = <T extends (args: any) => any>(
   func: T,
   arg: Parameters<T>[0]
 ) => {

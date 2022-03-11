@@ -76,7 +76,7 @@ export interface MonkeyOption {
 }
 ```
 
-[MonkeyUserScript](./src/userscript/index.ts#L119)
+[MonkeyUserScript](./src/userscript/index.ts#L130)
 
 ```ts
 /**
@@ -127,3 +127,5 @@ so if host enable [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP), 
 - chrome - [Disable Content-Security-Policy](https://chrome.google.com/webstore/detail/disable-content-security/ieelmcmcagommplceebfedjlakkhpden/)
 - edge - [Disable Content-Security-Policy](https://microsoftedge.microsoft.com/addons/detail/disable-contentsecurity/ecmfamimnofkleckfamjbphegacljmbp?hl=zh-CN)
 - firefox - disable `security.csp.enable` in the `about:config` menu
+
+<!-- TODO https://sales.jetbrains.com/hc/zh-cn/articles/360016581839-%E5%BC%80%E6%BA%90%E8%AE%B8%E5%8F%AF%E8%AF%81%E6%98%AF%E4%BB%80%E4%B9%88-%E8%B0%81%E5%8F%AF%E4%BB%A5%E8%8E%B7%E5%BE%97%E5%BC%80%E6%BA%90%E8%AE%B8%E5%8F%AF%E8%AF%81- -->

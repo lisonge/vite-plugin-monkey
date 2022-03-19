@@ -8,4 +8,5 @@ export default defineConfig({
   dts: true,
   outDir: 'dist',
   format: ['cjs', 'esm'],
+  onSuccess: 'npx tsc --emitDeclarationOnly --declaration',
 });

@@ -1,0 +1,1 @@
+import CustomPlugin, { MonkeyOption } from '../';

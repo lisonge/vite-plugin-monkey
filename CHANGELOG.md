@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.2.7
+
+### Features
+
+- Support TypeScript declaration maps ([37010cce](https://github.com/lisonge/vite-plugin-monkey/commit/7d03faa4e7e905b4cd421c7951b11dd137010cce))
+
 ## 0.2.5
 
 ### Bug Fixes

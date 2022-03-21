@@ -152,8 +152,8 @@ export default (pluginOption: MonkeyOption): Plugin => {
 
       return {
         build: {
-          sourcemap: false,
-          minify: false,
+          sourcemap: config.build?.sourcemap ?? false,
+          minify: config.build?.minify ?? false,
           rollupOptions: {
             external,
             output: {

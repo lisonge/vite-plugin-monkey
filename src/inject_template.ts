@@ -66,19 +66,8 @@ export const serverInjectTemplate = ({
         sum++;
       }
     });
-    console.log(`vite-plugin-monkey: inject GM_*${sum} to unsafeWindow`);
+    console.log(`[vite-plugin-monkey] inject GM_*${sum} to unsafeWindow`);
   }
-
-  // /__vite_ping
-  // server connection lost. polling for restart...
-  // const fetchBackup = unsafeWindow.fetch;
-  // unsafeWindow.fetch = function (input, init?) {
-  //   if (typeof input == 'string' && input.startsWith('/__vite')) {
-  //     input = origin + input;
-  //   }
-  //   return fetchBackup.call(this, input, init);
-  // };
-  // console.log(`vite-plugin-monkey: redirect /__vite to ${origin}/__vite`);
 
   const createScript = (src: string) => {
     const el = document.createElement('script');
@@ -90,7 +79,7 @@ export const serverInjectTemplate = ({
   [`${origin}/@vite/client`, `${origin}/${entry}`].forEach((s) => {
     document.head.appendChild(createScript(s));
   });
-  console.log('vite-plugin-monkey: inject module to document.head');
+  console.log('[vite-plugin-monkey] inject module to document.head');
 };
 
 export const cssInjectTemplate = ({ cssTextList = [] as string[] }) => {
@@ -101,9 +90,3 @@ export const cssInjectTemplate = ({ cssTextList = [] as string[] }) => {
     document.head.appendChild(style);
   });
 };
-
-// export const clientHmrInjectTemplate = ()=>{
-//   // @ts-ignore
-//   const u = new URL(import.meta.url, location.origin)
-//   return u.protocol
-// }

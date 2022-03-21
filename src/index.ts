@@ -111,16 +111,6 @@ export default (pluginOption: MonkeyOption): Plugin => {
     fileName = pluginOption.build?.fileName;
   } else {
     fileName = packageJson.name + '.user.js';
-    // try {
-    //   const packageJson: { name?: string } = JSON.parse(
-    //     fs.readFileSync(path.resolve(process.cwd(), 'package.json'), 'utf-8')
-    //   );
-    //   if (packageJson.name) {
-
-    //   }
-    // } catch {
-    //   logger.warn(`not found package.json, fileName use ${fileName}`);
-    // }
   }
 
   const GM_keyword_set = new Set(GM_keywords);
@@ -389,19 +379,19 @@ export default (pluginOption: MonkeyOption): Plugin => {
       if (isServe && id.endsWith('node_modules/vite/dist/client/client.mjs')) {
         // use import.meta['url'] instead of import.meta.url, because vite will replace import.meta.url to file system path
         code = code.replace(
-          '__HMR_PROTOCOL__',
+          /__HMR_PROTOCOL__/g,
           `(__HMR_PROTOCOL__ || ((()=>{const u = new URL(import.meta['url'], location.origin);return u.protocol === 'https:' ? 'wss' : 'ws'})()))`
         );
         code = code.replace(
-          '__HMR_HOSTNAME__',
+          /__HMR_HOSTNAME__/g,
           `(__HMR_HOSTNAME__ || ((()=>{const u = new URL(import.meta['url'], location.origin);return u.hostname})()))`
         );
         code = code.replace(
-          '__HMR_PORT__',
+          /__HMR_PORT__/g,
           `(__HMR_PORT__ || ((()=>{const u = new URL(import.meta['url'], location.origin);return u.prort})()))`
         );
         code = code.replace(
-          '__BASE__',
+          /__BASE__/g,
           `((()=>{const b = __BASE__; const u = new URL(import.meta['url'], location.origin); return b !== '/' ? b : (u.origin+'/');})())`
         );
       }

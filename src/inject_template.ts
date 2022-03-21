@@ -9,7 +9,7 @@ export const template2string = <T extends (args: any) => any>(
   func: T,
   arg: Parameters<T>[0]
 ) => {
-  return `(${func.toString()})(${JSON.stringify(arg, undefined, 2)});`;
+  return `;(${func.toString()})(${JSON.stringify(arg, undefined, 2)});`;
 };
 
 export const serverInjectTemplate = ({

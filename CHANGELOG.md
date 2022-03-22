@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## 0.2.8
+
+### Features
+
+- set fixed dependencies ([50ebfc58](https://github.com/lisonge/vite-plugin-monkey/commit/ba5d80f2b926bfbff1dc2f6d49f3950150ebfc58))
+
+### Bug Fixes
+
+- default value for minify and sourcemap ([3c97992d](https://github.com/lisonge/vite-plugin-monkey/commit/6f8a0dcf452cf90a6e5d537796671c8a3c97992d))
+
+- add semi for template2string ([08ec4491](https://github.com/lisonge/vite-plugin-monkey/commit/bc6e47df8cf24efeb8ff454559ebf7c408ec4491))
+
+- code replace use g flag ([680ca675](https://github.com/lisonge/vite-plugin-monkey/commit/3c332637f2eab738c73ee7c1c873f1e2680ca675))
+
 ## 0.2.7
 
 ### Features

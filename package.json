@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-monkey",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "description": "vite plugin for Tampermonkey, Violentmonkey and Greasemonkey",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -24,7 +24,6 @@
   },
   "scripts": {
     "prepare": "husky install",
-    "preinstall": "npx only-allow pnpm",
     "build": "tsup"
   },
   "keywords": [

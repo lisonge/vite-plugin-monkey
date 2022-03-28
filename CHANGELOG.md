@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.2.9
+
+- del preinstall limit [c1517846](https://github.com/lisonge/vite-plugin-monkey/commit/47b9c3f954b73fbd83c9bb9de8956636c1517846)
+
 ## 0.2.8
 
 ### Features

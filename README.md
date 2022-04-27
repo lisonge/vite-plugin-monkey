@@ -57,12 +57,14 @@ export interface MonkeyOption {
      *  // recommended this, plugin will auto add this url to userscript.require
      *  vuex:['Vuex', (version)=>`https://unpkg.com/vuex@${version}/dist/vuex.global.js`],
      *  // better recommended this
+     *  vuex:['Vuex', (version, name)=>`https://unpkg.com/${name}@${version}/dist/vuex.global.js`],
+     *  // or this
      * }
      *
      */
     externalGlobals?: Record<
       string,
-      string | [string, string | ((version: string) => string)]
+      string | [string, string | ((version: string, name: string) => string)]
     >;
 
     /**
@@ -76,7 +78,7 @@ export interface MonkeyOption {
 }
 ```
 
-[MonkeyUserScript](./src/userscript/index.ts#L130)
+[MonkeyUserScript](./src/userscript/index.ts#L138)
 
 ```ts
 /**
@@ -92,8 +94,8 @@ export type MonkeyUserScript = GreasemonkeyUserScript &
 - [GreasemonkeyUserScript](./src/userscript/greasemonkey.ts#L38)
 - [TampermonkeyUserScript](./src/userscript/tampermonkey.ts#L77)
 - [ViolentmonkeyUserScript](./src/userscript/violentmonkey.ts#L81)
-- [GreasyforkUserScript](./src/userscript/index.ts#L32)
-- [MergemonkeyUserScript](./src/userscript/index.ts#L59)
+- [GreasyforkUserScript](./src/userscript/index.ts#L33)
+- [MergemonkeyUserScript](./src/userscript/index.ts#L61)
 
 [Format](./src/userscript/common.ts#L12)
 

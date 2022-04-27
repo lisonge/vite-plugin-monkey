@@ -8,8 +8,11 @@ export default defineConfig({
     CustomPlugin({
       entry: 'src/main.ts',
       userscript: {
-        // author: 'lisonge',
-        // name: 'op-wiki-plus',
+        name: {
+          '': 'default name',
+          ja: 'hentai',
+          zh: '默认名字',
+        },
         namespace: 'https://dev.songe.li',
         version: '1.1.2',
         icon: 'https://vitejs.dev/logo.svg',
@@ -21,7 +24,7 @@ export default defineConfig({
           'zh-CN': '描述',
         },
         include: ['https://dev.songe.li/*', /^https:\/\/www\.songe\.li\/.*$/],
-        extra: {
+        $extra: {
           note: ['2017.05.12-V8.4z', '2017.05.05-V8.3'],
         },
       },
@@ -35,8 +38,8 @@ export default defineConfig({
         externalGlobals: {
           'blueimp-md5': [
             'md5',
-            (version) =>
-              `https://cdn.jsdelivr.net/npm/blueimp-md5@${version}/js/md5.min.js`,
+            (version, name) =>
+              `https://cdn.jsdelivr.net/npm/${name}@${version}/js/md5.min.js`,
           ],
         },
       },

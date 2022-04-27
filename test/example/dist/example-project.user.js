@@ -1,27 +1,27 @@
 // ==UserScript==
-// @name              example-project
-// @namespace         https://dev.songe.li
-// @version           1.1.2
-// @author            lisonge
-// @description       default description zh
-// @license           MIT
-// @icon              https://vitejs.dev/logo.svg
-// @homepage          https://github.com/lisonge/vite-plugin-monkey#readme
-// @homepageURL       https://github.com/lisonge/vite-plugin-monkey#readme
-// @source            https://github.com/lisonge/vite-plugin-monkey.git
-// @supportURL        https://github.com/lisonge/vite-plugin-monkey/issues
-// @descriptionzh     描述
-// @descriptionen     description
-// @descriptionja     説明
-// @descriptionzh-CN  描述
-// @include           https://dev.songe.li/*
-// @include           ^https:\/\/www\.songe\.li\/.*$
-// @require           https://cdn.jsdelivr.net/npm/blueimp-md5@2.19.0/js/md5.min.js
-// @note              2017.05.12-V8.4z
-// @note              2017.05.05-V8.3
+// @name               default name
+// @name:ja            hentai
+// @name:zh            默认名字
+// @namespace          https://dev.songe.li
+// @version            1.1.2
+// @author             lisonge
+// @description        default description zh
+// @description:zh     描述
+// @description:en     description
+// @description:ja     説明
+// @description:zh-CN  描述
+// @license            MIT
+// @icon               https://vitejs.dev/logo.svg
+// @homepage           https://github.com/lisonge/vite-plugin-monkey#readme
+// @homepageURL        https://github.com/lisonge/vite-plugin-monkey#readme
+// @source             https://github.com/lisonge/vite-plugin-monkey.git
+// @supportURL         https://github.com/lisonge/vite-plugin-monkey/issues
+// @include            https://dev.songe.li/*
+// @include            ^https:\/\/www\.songe\.li\/.*$
+// @require            https://cdn.jsdelivr.net/npm/blueimp-md5@2.19.0/js/md5.min.js
 // ==/UserScript==
 
-(({ cssTextList = [] }) => {
+;(({ cssTextList = [] }) => {
   cssTextList.forEach((s) => {
     const style = document.createElement("style");
     style.innerText = s;

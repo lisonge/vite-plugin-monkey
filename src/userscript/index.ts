@@ -12,6 +12,7 @@ import {
   TamperRunAt,
 } from './tampermonkey';
 import { packageJson } from '../_util';
+import { logger } from '../_logger';
 import {
   ViolentGrant,
   ViolentGrantValueList,
@@ -32,6 +33,7 @@ export type {
 type GreasyforkUserScript = {
   /**
    * @see https://greasyfork.org/help/meta-keys
+   * @default package.json.license
    */
   license?: string;
 
@@ -120,8 +122,14 @@ type MergemonkeyUserScript = {
 
   /**
    * custom extra meta
+   * @deprecated since version 2.9.10, use $extra replace it, extra will be removed in the future version
    */
   extra?: [string, string][] | Record<string, IArray<string>>;
+
+  /**
+   * custom extra meta
+   */
+  $extra?: [string, string][] | Record<string, IArray<string>>;
 };
 
 /**
@@ -181,8 +189,16 @@ export const userscript2comment = (
     resource,
     grant,
     noframes,
-    extra,
   } = userscript;
+
+  let { extra, $extra } = userscript;
+  if (extra) {
+    logger.warn(
+      'userscript#extra is deprecated, just use $extra repalce it',
+      1
+    );
+  }
+  $extra = $extra ?? extra;
 
   let { align } = format;
 
@@ -223,7 +239,7 @@ export const userscript2comment = (
         if (k2.length == 0) {
           attrList.push([k, v2]);
         } else {
-          attrList.push([k + k2, v2]);
+          attrList.push([k + ':' + k2, v2]);
         }
       });
     }
@@ -304,60 +320,8 @@ export const userscript2comment = (
     attrList.push(['noframes']);
   }
 
-  const orderMap = (() => {
-    const map: Record<string, number> = {};
-    [
-      'name',
-      'namespace',
-      'version',
-      'author',
-      'description',
-      'license',
-
-      'icon',
-      'iconURL',
-      'icon64',
-      'icon64URL',
-      'defaulticon',
-
-      'homepage',
-      'homepageURL',
-      'website',
-      'source',
-
-      'supportURL',
-      'downloadURL',
-      'updateURL',
-
-      'include',
-      'match',
-      'exclude',
-      'require',
-      'exclude-match',
-
-      'connect',
-      'resource',
-      'grant',
-
-      'inject-into',
-      'run-at',
-
-      'compatible',
-      'incompatible',
-
-      'antifeature',
-      'contributionAmount',
-      'contributionURL',
-
-      'noframes',
-    ].forEach((v, i) => {
-      map[v] = i;
-    });
-    return map;
-  })();
-
   attrList.sort((a, b) => {
-    return orderMap[a[0]] - orderMap[b[0]];
+    return getOrder(a[0]) - getOrder(b[0]);
   });
 
   if (extra instanceof Array) {
@@ -403,4 +367,64 @@ export const userscript2comment = (
   ]
     .map((s) => '//\x20' + s)
     .join('\n');
+};
+
+const sortMap: Record<string, number> = (() => {
+  const tempMap: Record<string, number> = {};
+  [
+    'name',
+    'namespace',
+    'version',
+    'author',
+    'description',
+    'license',
+
+    'icon',
+    'iconURL',
+    'icon64',
+    'icon64URL',
+    'defaulticon',
+
+    'homepage',
+    'homepageURL',
+    'website',
+    'source',
+
+    'supportURL',
+    'downloadURL',
+    'updateURL',
+
+    'include',
+    'match',
+    'exclude',
+    'require',
+    'exclude-match',
+
+    'connect',
+    'resource',
+    'grant',
+
+    'inject-into',
+    'run-at',
+
+    'compatible',
+    'incompatible',
+
+    'antifeature',
+    'contributionAmount',
+    'contributionURL',
+
+    'noframes',
+  ].forEach((v, i) => {
+    tempMap[v] = i;
+  });
+  return tempMap;
+})();
+
+const getOrder = (value: string) => {
+  value = value.split(':')[0];
+  if (value in sortMap) {
+    return sortMap[value];
+  }
+  return Number.MIN_SAFE_INTEGER;
 };

@@ -42,4 +42,9 @@ export const createLogger = (tag: string) => ({
   },
 });
 
+/**
+ * default logger
+ */
+export const logger = createLogger('plugin-monkey');
+
 export type Logger = ReturnType<typeof createLogger>;

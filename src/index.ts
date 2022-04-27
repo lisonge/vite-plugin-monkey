@@ -15,7 +15,7 @@ import type {
   ViolentmonkeyUserScript,
 } from './userscript';
 import { userscript2comment } from './userscript';
-import { createLogger } from './_logger';
+import { logger } from './_logger';
 import { GM_keywords, isRestart, packageJson } from './_util';
 
 export type {
@@ -62,12 +62,14 @@ export interface MonkeyOption {
      *  // recommended this, plugin will auto add this url to userscript.require
      *  vuex:['Vuex', (version)=>`https://unpkg.com/vuex@${version}/dist/vuex.global.js`],
      *  // better recommended this
+     *  vuex:['Vuex', (version, name)=>`https://unpkg.com/${name}@${version}/dist/vuex.global.js`],
+     *  // or this
      * }
      *
      */
     externalGlobals?: Record<
       string,
-      string | [string, string | ((version: string) => string)]
+      string | [string, string | ((version: string, name: string) => string)]
     >;
 
     /**
@@ -84,7 +86,7 @@ const devPath = '/__vite-plugin-monkey.install.user.js';
 const cachePath = '/__vite-plugin-monkey.cache.user.js';
 
 export default (pluginOption: MonkeyOption): Plugin => {
-  const logger = createLogger('plugin-monkey');
+  // const logger = createLogger('plugin-monkey');
   const external: string[] = [];
   const globals: Record<string, string> = {};
   const cdnList: string[] = [];
@@ -145,7 +147,7 @@ export default (pluginOption: MonkeyOption): Plugin => {
             version = 'latest';
           }
           if (version) {
-            cdnList.push(v[1](version));
+            cdnList.push(v[1](version, k));
           }
         }
       }
@@ -232,7 +234,6 @@ export default (pluginOption: MonkeyOption): Plugin => {
             res.setHeader(k, v);
           });
 
-          config.root;
           let realEntry = pluginOption.entry;
           if (path.isAbsolute(pluginOption.entry)) {
             realEntry = path.relative(config.root, pluginOption.entry);

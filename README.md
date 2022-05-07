@@ -122,6 +122,8 @@ export type AlignFunc = (
 
 see [test/example/vite.config.ts](./test/example/vite.config.ts)
 
+build file see [test/example/dist/example-project.user.js](./test/example/dist/example-project.user.js)
+
 ## note
 
 in dev server, userscript will run between two origin

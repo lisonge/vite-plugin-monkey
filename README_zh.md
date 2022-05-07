@@ -123,6 +123,8 @@ export type AlignFunc = (
 
 vite 非常容易上手，请直接看 [test/example/vite.config.ts](./test/example/vite.config.ts)
 
+例子中的构建产物在 [test/example/dist/example-project.user.js](./test/example/dist/example-project.user.js)
+
 ## 注意
 
 大多数情况下，此问题不会出现

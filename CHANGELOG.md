@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.2.11
+
+### Bug Fixes
+
+- $extra not working [6c7d43eb](https://github.com/lisonge/vite-plugin-monkey/commit/991dae0461b8fa4da5e55eb709b48fcb6c7d43eb)
+
 ## 0.2.10
 
 ### Features

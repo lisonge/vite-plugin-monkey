@@ -19,6 +19,8 @@
 // @include            https://dev.songe.li/*
 // @include            ^https:\/\/www\.songe\.li\/.*$
 // @require            https://cdn.jsdelivr.net/npm/blueimp-md5@2.19.0/js/md5.min.js
+// @note               2017.05.12-V8.4z
+// @note               2017.05.05-V8.3
 // ==/UserScript==
 
 ;(({ cssTextList = [] }) => {

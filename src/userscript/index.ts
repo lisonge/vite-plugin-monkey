@@ -324,10 +324,10 @@ export const userscript2comment = (
     return getOrder(a[0]) - getOrder(b[0]);
   });
 
-  if (extra instanceof Array) {
-    attrList.push(...extra);
-  } else if (extra && typeof extra == 'object') {
-    Object.entries(extra).forEach(([k, v]) => {
+  if ($extra instanceof Array) {
+    attrList.push(...$extra);
+  } else if ($extra && typeof $extra == 'object') {
+    Object.entries($extra).forEach(([k, v]) => {
       if (typeof v == 'string') {
         attrList.push([k, v]);
       } else if (v instanceof Array) {

@@ -125,6 +125,10 @@ vite 非常容易上手，请直接看 [test/example/vite.config.ts](./test/exam
 
 例子中的构建产物在 [test/example/dist/example-project.user.js](./test/example/dist/example-project.user.js)
 
+### 搭配 vue 使用的例子
+
+- <https://github.com/lisonge/op-wiki-plus>
+
 ## 注意
 
 大多数情况下，此问题不会出现

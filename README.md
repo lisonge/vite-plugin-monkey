@@ -130,6 +130,8 @@ build file see [test/example/dist/example-project.user.js](./test/example/dist/e
 
 ## note
 
+### CSP
+
 in dev server, userscript will run between two origin
 
 so if host enable [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP), you can solve it in the following ways
@@ -139,3 +141,30 @@ so if host enable [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP), 
 - firefox - disable `security.csp.enable` in the `about:config` menu
 
 <!-- TODO https://sales.jetbrains.com/hc/zh-cn/articles/360016581839-%E5%BC%80%E6%BA%90%E8%AE%B8%E5%8F%AF%E8%AF%81%E6%98%AF%E4%BB%80%E4%B9%88-%E8%B0%81%E5%8F%AF%E4%BB%A5%E8%8E%B7%E5%BE%97%E5%BC%80%E6%BA%90%E8%AE%B8%E5%8F%AF%E8%AF%81- -->
+
+### Polyfill
+
+because of <https://github.com/vitejs/vite/issues/1639>, now you can not use `@vitejs/plugin-legacy`
+
+the following is a feasible solution by @require cdn
+
+```ts
+import { defineConfig } from 'vite';
+import monkeyPlugin from 'vite-plugin-monkey';
+
+export default defineConfig({
+  plugins: [
+    vue(),
+    monkeyPlugin({
+      userscript: {
+        require: [
+          // polyfill all
+          'https://cdn.jsdelivr.net/npm/core-js-bundle@latest/minified.js',
+          // or use polyfill.io
+          // https://polyfill.io/v3/polyfill.min.js
+        ],
+      },
+    }),
+  ],
+});
+```

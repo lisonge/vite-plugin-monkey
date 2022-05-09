@@ -131,6 +131,8 @@ vite 非常容易上手，请直接看 [test/example/vite.config.ts](./test/exam
 
 ## 注意
 
+### CSP
+
 大多数情况下，此问题不会出现
 
 在开发模式，我们的脚本需要在两个域之间工作，宿主域和本地开发服务器
@@ -142,3 +144,30 @@ vite 非常容易上手，请直接看 [test/example/vite.config.ts](./test/exam
 - firefox - 在 `about:config` 菜单项里，禁用配置 `security.csp.enable`
 
 <!-- TODO https://sales.jetbrains.com/hc/zh-cn/articles/360016581839-%E5%BC%80%E6%BA%90%E8%AE%B8%E5%8F%AF%E8%AF%81%E6%98%AF%E4%BB%80%E4%B9%88-%E8%B0%81%E5%8F%AF%E4%BB%A5%E8%8E%B7%E5%BE%97%E5%BC%80%E6%BA%90%E8%AE%B8%E5%8F%AF%E8%AF%81- -->
+
+### Polyfill
+
+由于 <https://github.com/vitejs/vite/issues/1639>, 你暂时不能使用 `@vitejs/plugin-legacy`
+
+一种可行的方案是直接在 @require 加 cdn 去 polyfill
+
+```ts
+import { defineConfig } from 'vite';
+import monkeyPlugin from 'vite-plugin-monkey';
+
+export default defineConfig({
+  plugins: [
+    vue(),
+    monkeyPlugin({
+      userscript: {
+        require: [
+          // polyfill 全部
+          'https://cdn.jsdelivr.net/npm/core-js-bundle@latest/minified.js',
+          // 或者使用 polyfill.io 智能 polyfill, 不过 polyfill.io 在大陆网络连通性很差, 几乎不能用
+          // https://polyfill.io/v3/polyfill.min.js
+        ],
+      },
+    }),
+  ],
+});
+```

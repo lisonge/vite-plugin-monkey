@@ -16,7 +16,11 @@
 
 ```shell
 pnpm add -D vite-plugin-monkey
+# 或者通过 npm i -D vite-plugin-monkey
+# 或者通过 yarn add -D vite-plugin-monkey
 ```
+
+插件的[依赖](./package.json#L81)使用了固定版本, npm/yarn/pnpm 都可以安装而无需担心没有对应的 lock.file
 
 ## 配置
 

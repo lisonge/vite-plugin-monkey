@@ -16,7 +16,11 @@ vite plugin server and build \*.user.js for [Tampermonkey](https://www.tampermon
 
 ```shell
 pnpm add -D vite-plugin-monkey
+# or by npm i -D vite-plugin-monkey
+# or by yarn add -D vite-plugin-monkey
 ```
+
+plugin [dependencies](./package.json#L81) use fixed versions, you can install plugin by npm/yarn/pnpm and don't worry about the missing of lock.file
 
 ## config
 

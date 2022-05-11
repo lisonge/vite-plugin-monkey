@@ -17,6 +17,7 @@ import type {
 import { userscript2comment } from './userscript';
 import { logger } from './_logger';
 import { GM_keywords, isRestart, packageJson } from './_util';
+import selfPackageJson from '../package.json';
 
 export type {
   MonkeyUserScript,
@@ -343,10 +344,12 @@ export default (pluginOption: MonkeyOption): Plugin => {
         logger.error(`expcet js modules size is 1, got ${jsBundleList.length}`);
       } else {
         const chunk = jsBundleList[0][1];
+        const { name, version } = selfPackageJson;
         if (chunk.type == 'chunk') {
           chunk.code =
             [
               userscript2comment(pluginOption.userscript, pluginOption.format),
+              `// use ${name}@${version} at ${new Date().toJSON()}`,
               injectCssCode,
               chunk.code,
             ]

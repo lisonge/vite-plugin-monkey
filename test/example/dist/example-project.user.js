@@ -23,6 +23,8 @@
 // @note               2017.05.05-V8.3
 // ==/UserScript==
 
+// use vite-plugin-monkey@0.2.11 at 2022-05-11T04:51:05.371Z
+
 ;(({ cssTextList = [] }) => {
   cssTextList.forEach((s) => {
     const style = document.createElement("style");

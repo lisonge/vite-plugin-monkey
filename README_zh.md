@@ -12,6 +12,10 @@
 - 友好的利用 @require 配置库的 cdn 的方案，大大减少构建脚本大小
 - 完全的 Typescript 和 Vite 的开发体验，比如模块热替换,秒启动
 
+## 快速使用
+
+使用模板即可 <https://github.com/lisonge/vite-userscript-template.git>
+
 ## 安装
 
 ```shell
@@ -128,6 +132,8 @@ export type AlignFunc = (
 vite 非常容易上手，请直接看 [test/example/vite.config.ts](./test/example/vite.config.ts)
 
 例子中的构建产物在 [test/example/dist/example-project.user.js](./test/example/dist/example-project.user.js)
+
+另一个简单的例子 <https://github.com/lisonge/vite-userscript-template.git>
 
 ### 搭配 vue 使用的例子
 

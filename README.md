@@ -12,6 +12,10 @@ vite plugin server and build \*.user.js for [Tampermonkey](https://www.tampermon
 - external cdn url inject to userscript @require
 - full typescript support and vite feature
 
+## quick usage
+
+just use <https://github.com/lisonge/vite-userscript-template.git>
+
 ## install
 
 ```shell
@@ -127,6 +131,8 @@ export type AlignFunc = (
 see [test/example/vite.config.ts](./test/example/vite.config.ts)
 
 build file see [test/example/dist/example-project.user.js](./test/example/dist/example-project.user.js)
+
+another simple example <https://github.com/lisonge/vite-userscript-template.git>
 
 ### example with vue
 

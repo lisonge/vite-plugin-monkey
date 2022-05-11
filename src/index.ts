@@ -332,9 +332,12 @@ export default (pluginOption: MonkeyOption): Plugin => {
           delete bundle[k];
         }
       });
-      const injectCssCode = template2string(cssInjectTemplate, {
-        cssTextList,
-      });
+      let injectCssCode: undefined | string = undefined;
+      if (cssTextList?.length > 0) {
+        injectCssCode = template2string(cssInjectTemplate, {
+          cssTextList,
+        });
+      }
 
       if (jsBundleList.length != 1) {
         logger.error(`expcet js modules size is 1, got ${jsBundleList.length}`);
@@ -346,7 +349,9 @@ export default (pluginOption: MonkeyOption): Plugin => {
               userscript2comment(pluginOption.userscript, pluginOption.format),
               injectCssCode,
               chunk.code,
-            ].join('\n\n') + ' \n';
+            ]
+              .filter((s) => s)
+              .join('\n\n') + ' \n';
         }
       }
     },

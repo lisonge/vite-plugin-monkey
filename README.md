@@ -142,6 +142,8 @@ another simple example <https://github.com/lisonge/vite-userscript-template.git>
 
 ### CSP
 
+in most cases, this problem does not occur
+
 in dev server, userscript will run between two origin
 
 so if host enable [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP), you can solve it in the following ways
@@ -149,6 +151,8 @@ so if host enable [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP), 
 - chrome - [Disable Content-Security-Policy](https://chrome.google.com/webstore/detail/disable-content-security/ieelmcmcagommplceebfedjlakkhpden/)
 - edge - [Disable Content-Security-Policy](https://microsoftedge.microsoft.com/addons/detail/disable-contentsecurity/ecmfamimnofkleckfamjbphegacljmbp?hl=zh-CN)
 - firefox - disable `security.csp.enable` in the `about:config` menu
+
+in the high version of chrome/edge, above extension will not work, I'm looking for a solution
 
 <!-- TODO https://sales.jetbrains.com/hc/zh-cn/articles/360016581839-%E5%BC%80%E6%BA%90%E8%AE%B8%E5%8F%AF%E8%AF%81%E6%98%AF%E4%BB%80%E4%B9%88-%E8%B0%81%E5%8F%AF%E4%BB%A5%E8%8E%B7%E5%BE%97%E5%BC%80%E6%BA%90%E8%AE%B8%E5%8F%AF%E8%AF%81- -->
 

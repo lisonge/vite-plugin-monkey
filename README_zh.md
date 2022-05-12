@@ -153,6 +153,8 @@ vite 非常容易上手，请直接看 [test/example/vite.config.ts](./test/exam
 - edge - 安装浏览器插件 [Disable Content-Security-Policy](https://microsoftedge.microsoft.com/addons/detail/disable-contentsecurity/ecmfamimnofkleckfamjbphegacljmbp?hl=zh-CN)
 - firefox - 在 `about:config` 菜单项里，禁用配置 `security.csp.enable`
 
+在高版本的 chrome/edge, 上面的浏览器插件不起作用, 正在寻找其他的解决方法
+
 <!-- TODO https://sales.jetbrains.com/hc/zh-cn/articles/360016581839-%E5%BC%80%E6%BA%90%E8%AE%B8%E5%8F%AF%E8%AF%81%E6%98%AF%E4%BB%80%E4%B9%88-%E8%B0%81%E5%8F%AF%E4%BB%A5%E8%8E%B7%E5%BE%97%E5%BC%80%E6%BA%90%E8%AE%B8%E5%8F%AF%E8%AF%81- -->
 
 ### Polyfill

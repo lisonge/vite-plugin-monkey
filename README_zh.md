@@ -143,7 +143,7 @@ vite 非常容易上手，请直接看 [test/example/vite.config.ts](./test/exam
 
 ### CSP
 
-大多数情况下，此问题不会出现
+大多数情况下，此问题不会出现，但是某些网站会出现，比如 <https://github.com/lisonge/vite-plugin-monkey/issues/1>
 
 在开发模式，我们的脚本需要在两个域之间工作，宿主域和本地开发服务器
 
@@ -153,9 +153,11 @@ vite 非常容易上手，请直接看 [test/example/vite.config.ts](./test/exam
 - edge - 安装浏览器插件 [Disable Content-Security-Policy](https://microsoftedge.microsoft.com/addons/detail/disable-contentsecurity/ecmfamimnofkleckfamjbphegacljmbp?hl=zh-CN)
 - firefox - 在 `about:config` 菜单项里，禁用配置 `security.csp.enable`
 
-在高版本的 chrome/edge, 上面的浏览器插件不起作用, 正在寻找其他的解决方法
+在高版本的 chrome/edge, 上面的浏览器插件不起作用
 
-<!-- TODO https://sales.jetbrains.com/hc/zh-cn/articles/360016581839-%E5%BC%80%E6%BA%90%E8%AE%B8%E5%8F%AF%E8%AF%81%E6%98%AF%E4%BB%80%E4%B9%88-%E8%B0%81%E5%8F%AF%E4%BB%A5%E8%8E%B7%E5%BE%97%E5%BC%80%E6%BA%90%E8%AE%B8%E5%8F%AF%E8%AF%81- -->
+你可以使用 [Tampermonkey](https://www.tampermonkey.net/) 然后打开插件配置 `extension://iikmkjmpaadaobahmlepeloendndfphd/options.html#nav=settings`
+
+在 `安全`, 设置 `如果站点有内容安全策略（CSP）则向其策略:` 为 `全部移除（可能不安全）`
 
 ### Polyfill
 

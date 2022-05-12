@@ -154,7 +154,7 @@ so if host enable [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP), 
 
 in the high version of chrome/edge, above extension will not work
 
-you can use [Tampermonkey](https://www.tampermonkey.net/) the open `extension://iikmkjmpaadaobahmlepeloendndfphd/options.html#nav=settings`
+you can use [Tampermonkey](https://www.tampermonkey.net/) then open `extension://iikmkjmpaadaobahmlepeloendndfphd/options.html#nav=settings`
 
 at `Security`, set `Modify existing content security policy (CSP) headers` to `Remove entirely (possibly unsecure)`
 

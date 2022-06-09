@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 0.2.12
+
+### Features
+
+- optimize, remove css_inject_js when without css <https://github.com/lisonge/vite-plugin-monkey/commit/3a088d5a27872832911999acac807770ac757555>
+
+- add plugin info to bundle <https://github.com/lisonge/vite-plugin-monkey/commit/2ce308c40e3384661405e33a932b3f28846c7a81>
+
 ## 0.2.11
 
 ### Bug Fixes

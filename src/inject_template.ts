@@ -76,8 +76,9 @@ export const serverInjectTemplate = ({
     el.dataset.source = 'vite-plugin-monkey';
     return el;
   };
-  [`${origin}/@vite/client`, `${origin}/${entry}`].forEach((s) => {
-    document.head.appendChild(createScript(s));
+  const { head } = document;
+  [`${origin}/@vite/client`, `${origin}/${entry}`].reverse().forEach((s) => {
+    head.insertBefore(createScript(s), head.firstChild);
   });
   console.log('[vite-plugin-monkey] inject module to document.head');
 };

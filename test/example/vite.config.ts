@@ -13,8 +13,8 @@ export default defineConfig({
           ja: 'hentai',
           zh: '默认名字',
         },
-        namespace: 'https://dev.songe.li',
-        version: '1.1.2',
+        namespace: 'https://github.com/lisonge',
+        version: '1.0.0',
         icon: 'https://vitejs.dev/logo.svg',
         description: {
           '': 'default description zh',
@@ -23,7 +23,8 @@ export default defineConfig({
           ja: '説明',
           'zh-CN': '描述',
         },
-        include: ['https://dev.songe.li/*', /^https:\/\/www\.songe\.li\/.*$/],
+        match: ['https://i.songe.li/*'],
+        // 'run-at': 'document-start',
         $extra: {
           note: ['2017.05.12-V8.4z', '2017.05.05-V8.3'],
         },

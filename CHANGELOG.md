@@ -1,12 +1,18 @@
 # CHANGELOG
 
+## 0.2.13
+
+### Features
+
+- support run-at document-start [9c7a30ed](https://github.com/lisonge/vite-plugin-monkey/commit/6d73040bfddffd5c8ad5b742a844bf0f9c7a30ed)
+
 ## 0.2.12
 
 ### Features
 
-- optimize, remove css_inject_js when without css <https://github.com/lisonge/vite-plugin-monkey/commit/3a088d5a27872832911999acac807770ac757555>
+- optimize, remove css_inject_js when without css [ac757555](https://github.com/lisonge/vite-plugin-monkey/commit/3a088d5a27872832911999acac807770ac757555)
 
-- add plugin info to bundle <https://github.com/lisonge/vite-plugin-monkey/commit/2ce308c40e3384661405e33a932b3f28846c7a81>
+- add plugin info to bundle [846c7a81](https://github.com/lisonge/vite-plugin-monkey/commit/2ce308c40e3384661405e33a932b3f28846c7a81)
 
 ## 0.2.11
 

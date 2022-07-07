@@ -35,14 +35,14 @@ jobs:
           tag: alpha
 
       - name: publish-beta
-        if: ${{ github.ref.contains('beta') }}
+        if: github.ref.contains('beta')
         uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.NPM_TOKEN }}
           tag: beta
 
       - name: publish-latest
-        if: ${{ !github.ref.contains('alpha') && !github.ref.contains('beta') }}
+        if: "!github.ref.contains('alpha') && !github.ref.contains('beta')"
         uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.NPM_TOKEN }}

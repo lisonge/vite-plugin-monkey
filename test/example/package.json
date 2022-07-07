@@ -21,10 +21,8 @@
   "devDependencies": {
     "@types/blueimp-md5": "^2.18.0",
     "@types/tampermonkey": "^4.0.5",
-    "typescript": "^4.5.5",
     "vite-plugin-inspect": "^0.3.14",
-    "vite-plugin-restart": "^0.1.1",
-    "vite": "2.9.6"
+    "vite-plugin-restart": "^0.1.1"
   },
   "dependencies": {
     "blueimp-md5": "^2.19.0"

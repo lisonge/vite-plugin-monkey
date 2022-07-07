@@ -1,5 +1,5 @@
 import fs from 'fs';
-import path from 'path';
+import * as path from 'path';
 import type { Plugin, ResolvedConfig } from 'vite';
 import {
   cssInjectTemplate,
@@ -16,7 +16,7 @@ import type {
 } from './userscript';
 import { userscript2comment } from './userscript';
 import { logger } from './_logger';
-import { GM_keywords, isRestart, packageJson } from './_util';
+import { GM_keywords, isRestart, packageJson, compatResolve } from './_util';
 import selfPackageJson from '../package.json';
 
 export type {
@@ -138,7 +138,7 @@ export default (pluginOption: MonkeyOption): Plugin => {
           globals[k] = v[0];
           let version: string | undefined = undefined;
           try {
-            const filePath = require.resolve(`${k}/package.json`);
+            const filePath = compatResolve(`${k}/package.json`);
             const modulePack: { version?: string } = JSON.parse(
               fs.readFileSync(filePath, 'utf-8')
             );
@@ -385,6 +385,7 @@ export default (pluginOption: MonkeyOption): Plugin => {
       }
 
       // WARN @vite/client source file may change in the future version
+      // TODO support vite@3
       if (isServe && id.endsWith('node_modules/vite/dist/client/client.mjs')) {
         // use import.meta['url'] instead of import.meta.url, because vite will replace import.meta.url to file system path
         code = code.replace(

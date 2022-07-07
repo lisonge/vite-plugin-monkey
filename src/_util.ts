@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs';
-import path from 'path';
+import * as path from 'path';
 
 export const delay = async (n = 0) => {
   await new Promise<void>((res) => {
@@ -144,4 +144,13 @@ export const packageJson = (() => {
     }
   }
   return target;
+})();
+
+import { createRequire } from 'module';
+
+export const compatResolve = (() => {
+  const hostRequire = createRequire(process.cwd() + '/any_filename.js');
+  return (id: string) => {
+    return hostRequire.resolve(id);
+  };
 })();

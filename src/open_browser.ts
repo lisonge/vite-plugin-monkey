@@ -1,9 +1,10 @@
 import { execSync } from 'child_process';
 import spawn from 'cross-spawn';
 import open from 'open';
-import path from 'path';
+import * as path from 'path';
 import colors from 'picocolors';
 import type { Logger } from './_logger';
+import { compatResolve } from './_util';
 
 // https://github.com/sindresorhus/open#app
 const OSX_CHROME = 'google chrome';
@@ -61,7 +62,7 @@ function startBrowserProcess(browser: string | undefined, url: string) {
       // on OS X Google Chrome with AppleScript
       execSync('ps cax | grep "Google Chrome"');
       execSync('osascript openChrome.applescript "' + encodeURI(url) + '"', {
-        cwd: path.dirname(require.resolve('vite/bin/openChrome.applescript')),
+        cwd: path.dirname(compatResolve('vite/bin/openChrome.applescript')),
         stdio: 'ignore',
       });
       return true;

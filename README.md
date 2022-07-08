@@ -28,7 +28,7 @@ plugin [dependencies](./package.json#L81) use fixed versions, you can install pl
 
 ## config
 
-[MonkeyOption](./src/index.ts#L29)
+[MonkeyOption](./src/index.ts#L30)
 
 ```ts
 export interface MonkeyOption {

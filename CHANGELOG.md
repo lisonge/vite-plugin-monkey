@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.2.14
+
+### Bug Fixes
+
+- require not available in esm -> [issues/2](https://github.com/lisonge/vite-plugin-monkey/issues/2) [2dfd5a3d](https://github.com/lisonge/vite-plugin-monkey/commit/dcde9c96216f786aa17b9f3de3711b182dfd5a3d)
+
 ## 0.2.13
 
 ### Features

@@ -28,7 +28,7 @@ pnpm add -D vite-plugin-monkey
 
 ## 配置
 
-[MonkeyOption](./src/index.ts#L29)
+[MonkeyOption](./src/index.ts#L30)
 
 ```ts
 export interface MonkeyOption {

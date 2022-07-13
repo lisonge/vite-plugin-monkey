@@ -14,8 +14,8 @@ console.log('document.readyState', document.readyState);
 // console.log(unsafeWindow);
 // not recommend use asset source, you should use raw url or iconfont cdn
 
-const mockLog = console.log;
-console.log = function (...agrs: any[]) {
-  console.warn('you call console.log');
-  return mockLog.apply(this, agrs);
-};
+// const mockLog = console.log;
+// console.log = function (...agrs: any[]) {
+//   console.warn('you call console.log');
+//   return mockLog.apply(this, agrs);
+// };

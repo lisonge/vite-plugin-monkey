@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name               default name
+// @name               default_name
 // @name:ja            hentai
 // @name:zh            默认名字
 // @namespace          https://github.com/lisonge
@@ -17,12 +17,13 @@
 // @source             https://github.com/lisonge/vite-plugin-monkey.git
 // @supportURL         https://github.com/lisonge/vite-plugin-monkey/issues
 // @match              https://i.songe.li/*
+// @match              https://lisonge.com/*
 // @require            https://cdn.jsdelivr.net/npm/blueimp-md5@2.19.0/js/md5.min.js
 // @note               2017.05.12-V8.4z
 // @note               2017.05.05-V8.3
 // ==/UserScript==
 
-// use vite-plugin-monkey@0.2.13 at 2022-07-07T06:15:12.021Z
+// use vite-plugin-monkey@1.0.0-alpha.0 at 2022-07-12T12:37:14.245Z
 
 ;(({ cssTextList = [] }) => {
   cssTextList.forEach((s) => {
@@ -53,10 +54,5 @@
   console.log({ png, svg });
   console.log("blueimp-md5", md5__default["default"]("114514"));
   console.log("document.readyState", document.readyState);
-  const mockLog = console.log;
-  console.log = function(...agrs) {
-    console.warn("you call console.log");
-    return mockLog.apply(this, agrs);
-  };
 })(md5);
  

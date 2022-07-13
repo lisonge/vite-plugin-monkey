@@ -12,10 +12,7 @@ export const template2string = <T extends (args: any) => any>(
   return `;(${func.toString()})(${JSON.stringify(arg, undefined, 2)});`;
 };
 
-export const serverInjectTemplate = ({
-  origin = 'http://127.0.0.1:3000',
-  entry = 'src/main.ts',
-}) => {
+export const serverInjectTemplate = ({ entryList = [] as string[] }) => {
   if (window.unsafeWindow) {
     const injectWindow = window.unsafeWindow;
     let sum = 0;
@@ -77,7 +74,7 @@ export const serverInjectTemplate = ({
     return el;
   };
   const { head } = document;
-  [`${origin}/@vite/client`, `${origin}/${entry}`].reverse().forEach((s) => {
+  entryList.reverse().forEach((s) => {
     head.insertBefore(createScript(s), head.firstChild);
   });
   console.log('[vite-plugin-monkey] inject module to document.head');
@@ -89,5 +86,14 @@ export const cssInjectTemplate = ({ cssTextList = [] as string[] }) => {
     style.innerText = s;
     style.dataset.source = 'vite-plugin-monkey';
     document.head.appendChild(style);
+  });
+};
+
+export const redirectFn = ({ url = '' }) => {
+  setTimeout(async () => {
+    window.location.href = url;
+    setTimeout(() => {
+      window.close();
+    }, 500);
   });
 };

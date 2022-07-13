@@ -8,15 +8,24 @@ export const delay = async (n = 0) => {
 };
 
 /**
- * @link https://gist.github.com/hyamamoto/fd435505d29ebfa3d9716fd2be8d42f0
+ * @link https://stackoverflow.com/questions/7616461/
  */
-export function hashCode(s: string) {
-  let h = 0;
-  for (let i = 0; i < s.length; i++) {
-    h = (Math.imul(31, h) + s.charCodeAt(i)) | 0;
+export const hashCode = (str = '', seed = 0) => {
+  let h1 = 0xdeadbeef ^ seed,
+    h2 = 0x41c6ce57 ^ seed;
+  for (let i = 0, ch; i < str.length; i++) {
+    ch = str.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
   }
-  return h;
-}
+  h1 =
+    Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^
+    Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 =
+    Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^
+    Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+};
 
 export const validUrl = (s: string) => {
   try {
@@ -154,3 +163,58 @@ export const compatResolve = (() => {
     return hostRequire.resolve(id);
   };
 })();
+
+export const lazy = <T extends object>(fn: () => T) => {
+  let temp: object | undefined = undefined;
+  return new Proxy<T>({} as T, {
+    set(_, p, value, receiver) {
+      if (!temp) {
+        temp = fn();
+      }
+      return Reflect.set(temp, p, value, receiver);
+    },
+    get(_, p, receiver) {
+      if (!temp) {
+        temp = fn();
+      }
+      return Reflect.get(temp, p, receiver);
+    },
+    apply(_, thisArg, argArray) {
+      if (!temp) {
+        temp = fn();
+      }
+      // @ts-ignore
+      return Reflect.apply(temp, thisArg, argArray);
+    },
+    ownKeys(_) {
+      if (!temp) {
+        temp = fn();
+      }
+      return Reflect.ownKeys(temp);
+    },
+  });
+};
+
+export const traverse = <T>(
+  target: T,
+  getChildren: (target: T) => T[],
+  action: (target: T) => void | true
+) => {
+  const stack = [target];
+  while (stack.length > 0) {
+    const top = stack.pop()!;
+    if (action(top)) {
+      break;
+    }
+    stack.push(...getChildren(top));
+  }
+};
+
+import fs from 'fs/promises';
+export const existFile = async (path: string) => {
+  try {
+    return (await fs.stat(path)).isFile();
+  } catch {
+    return false;
+  }
+};

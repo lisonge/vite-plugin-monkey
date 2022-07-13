@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-monkey",
-  "version": "0.2.14",
+  "version": "1.0.0-alpha.0",
   "description": "vite plugin for Tampermonkey, Violentmonkey and Greasemonkey",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -49,6 +49,7 @@
     "@commitlint/config-conventional": "^17.0.3",
     "@types/cross-spawn": "^6.0.2",
     "@types/node": "14.18.12",
+    "@types/node-fetch": "2.6.2",
     "@typescript-eslint/eslint-plugin": "^5.30.5",
     "@typescript-eslint/parser": "^5.30.5",
     "eslint": "^8.19.0",
@@ -80,6 +81,8 @@
   },
   "dependencies": {
     "cross-spawn": "7.0.3",
+    "htmlparser2": "8.0.1",
+    "node-fetch": "2.6.7",
     "open": "8.4.0",
     "picocolors": "1.0.0"
   },

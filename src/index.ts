@@ -1,8 +1,11 @@
-import fs from 'fs';
+import fs from 'fs/promises';
 import * as path from 'path';
 import type { Plugin, ResolvedConfig } from 'vite';
+import { parseDocument, ElementType, DomUtils } from 'htmlparser2';
+import nodeFetch from 'node-fetch';
 import {
   cssInjectTemplate,
+  redirectFn,
   serverInjectTemplate,
   template2string,
 } from './inject_template';
@@ -16,7 +19,15 @@ import type {
 } from './userscript';
 import { userscript2comment } from './userscript';
 import { logger } from './_logger';
-import { GM_keywords, isRestart, packageJson, compatResolve } from './_util';
+import {
+  GM_keywords,
+  isRestart,
+  packageJson,
+  compatResolve,
+  hashCode,
+  traverse,
+  existFile,
+} from './_util';
 import selfPackageJson from '../package.json';
 
 export type {
@@ -35,11 +46,11 @@ export interface MonkeyOption {
   userscript: MonkeyUserScript;
   format?: Format;
   server?: {
-    /**
-     * auto open *.user.js in default browser when userscript comment change or vite server first start
-     * @default true
-     */
-    open?: boolean;
+    // /**
+    //  * auto open *.user.js in default browser when userscript comment change or vite server first start
+    //  * @default true
+    //  */
+    // open?: boolean;
 
     /**
      * name prefix, distinguish server.user.js and build.user.js in monkey extension install list
@@ -83,8 +94,8 @@ export interface MonkeyOption {
   };
 }
 
-const devPath = '/__vite-plugin-monkey.install.user.js';
-const cachePath = '/__vite-plugin-monkey.cache.user.js';
+const installUserPath = '/__vite-plugin-monkey.install.user.js';
+const cacheUserPath = 'node_modules/.vite/__vite-plugin-monkey.cache.user.js';
 
 export default (pluginOption: MonkeyOption): Plugin => {
   // const logger = createLogger('plugin-monkey');
@@ -107,7 +118,7 @@ export default (pluginOption: MonkeyOption): Plugin => {
   };
   const getOrigin = () =>
     `${isHttps() ? 'https' : 'http'}://${getHost()}:${getPort()}`;
-  const getInstallUrl = () => getOrigin() + devPath;
+  const getInstallUrl = () => new URL(config.base, getOrigin()).href; //+ installUserPath;
 
   let fileName = 'monkey.user.js';
   if (pluginOption.build?.fileName) {
@@ -140,7 +151,7 @@ export default (pluginOption: MonkeyOption): Plugin => {
           try {
             const filePath = compatResolve(`${k}/package.json`);
             const modulePack: { version?: string } = JSON.parse(
-              fs.readFileSync(filePath, 'utf-8')
+              await fs.readFile(filePath, 'utf-8')
             );
             version = modulePack.version;
           } catch {
@@ -154,10 +165,12 @@ export default (pluginOption: MonkeyOption): Plugin => {
       }
 
       return {
+        server: { open: config.server?.open ?? true },
         build: {
           sourcemap: config.build?.sourcemap ?? false,
           minify: config.build?.minify ?? false,
           rollupOptions: {
+            input: pluginOption.entry,
             external,
             output: {
               globals,
@@ -173,6 +186,17 @@ export default (pluginOption: MonkeyOption): Plugin => {
           },
         },
       };
+    },
+    transformIndexHtml() {
+      if (!isServe) return;
+      return [
+        {
+          tag: 'script',
+          attrs: { type: 'module', 'data-source': 'vite-plugin-monkey' },
+          children: template2string(redirectFn, { url: installUserPath }),
+          injectTo: 'head',
+        },
+      ];
     },
     configResolved(resolvedConfig) {
       config = resolvedConfig;
@@ -193,7 +217,7 @@ export default (pluginOption: MonkeyOption): Plugin => {
         });
       }
     },
-    configureServer(server) {
+    async configureServer(server) {
       // prefix name
       const prefix = pluginOption.server?.prefix ?? 'dev:';
       const { name = packageJson.name } = pluginOption.userscript;
@@ -218,74 +242,121 @@ export default (pluginOption: MonkeyOption): Plugin => {
       // support dev env
       pluginOption.userscript.grant = '*';
 
-      // dev userscript middleware
-      server.middlewares.use((req, res, next) => {
+      server.middlewares.use(async (req, res, next) => {
         let realHost = req.headers[':authority'] ?? req.headers['host'];
-        if (!realHost) {
-          logger.error('host not found');
-        } else if (realHost instanceof Array) {
+        if (realHost instanceof Array) {
           realHost = realHost[0];
         }
-        if (req.url == devPath && realHost) {
+        if (!realHost) {
+          logger.error('host not found');
+          return;
+        }
+        const origin = `${isHttps() ? 'https' : 'http'}://${realHost}`;
+
+        if (req.url?.startsWith(installUserPath)) {
           Object.entries({
             'access-control-allow-origin': '*',
             'access-control-expose-headers': '*',
-            'content-type': 'text/javascript;\x20charset=utf-8',
+            'content-type': 'application/javascript',
           }).forEach(([k, v]) => {
             res.setHeader(k, v);
           });
+
+          const response = await nodeFetch(origin);
+          const htmlText = await response.text();
+          const doc = parseDocument(htmlText);
+          type Element = ReturnType<typeof DomUtils.findAll> extends Array<
+            infer T
+          >
+            ? T
+            : never;
+          const scriptList = (
+            DomUtils.getElementsByTagType(ElementType.Script, doc) as Element[]
+          ).filter(
+            (p) =>
+              p.attribs.type == 'module' &&
+              p.attribs['data-source'] !== 'vite-plugin-monkey'
+          );
+
+          const entryList = scriptList
+            .map((p) => {
+              const src = p.attribs.src ?? '';
+              const text = p.firstChild;
+              let innerText = '';
+              if (text?.type == ElementType.Text) {
+                innerText = text.data ?? '';
+              }
+              if (src) return new URL(src, origin).href;
+              else if (innerText) {
+                const u = new URL(origin);
+                u.pathname = '/__vite-plugin-monkey/pull_script';
+                u.searchParams.set(
+                  'innerText',
+                  Buffer.from(innerText, 'utf-8').toString('base64url')
+                );
+                return u.href;
+              }
+              return '';
+            })
+            .filter((s) => s);
 
           let realEntry = pluginOption.entry;
           if (path.isAbsolute(pluginOption.entry)) {
             realEntry = path.relative(config.root, pluginOption.entry);
             realEntry = realEntry.replace('\\', '/');
           }
+          entryList.push(new URL(realEntry, origin).href);
 
-          res.write(
+          res.end(
             [
               userscript2comment(pluginOption.userscript, pluginOption.format),
               template2string(serverInjectTemplate, {
-                origin: `${isHttps() ? 'https' : 'http'}://${realHost}`,
-                entry: realEntry,
+                entryList,
               }),
             ].join('\n\n')
           );
-          res.end();
+        } else if (req.url?.startsWith('/__vite-plugin-monkey/pull_script')) {
+          Object.entries({
+            'access-control-allow-origin': '*',
+            'access-control-expose-headers': '*',
+            'content-type': 'application/javascript',
+          }).forEach(([k, v]) => {
+            res.setHeader(k, v);
+          });
+          const u = new URL(req.url, origin);
+          const innerText = u.searchParams.get('innerText') ?? '';
+          res.end(Buffer.from(innerText, 'base64url').toString('utf-8'));
         } else {
           next();
         }
       });
 
       // according to the change of final UserScript text, open install url in Browser
-      let isOutUrl = false;
-      const u = getInstallUrl();
-      if (pluginOption.server?.open !== false) {
+      // let isOutUrl = false;
+      // const u = getInstallUrl();
+      // console.log('server');
+      if (config.server?.open ?? true) {
         let cacheComment = '';
-        const cacheCommentPath = 'node_modules' + cachePath;
-        if (fs.existsSync(cacheCommentPath)) {
-          cacheComment = fs.readFileSync(cacheCommentPath).toString('utf-8');
+        // const cacheCommentPath = '' + ;
+        if (await existFile(cacheUserPath)) {
+          cacheComment = (await fs.readFile(cacheUserPath)).toString('utf-8');
+        } else {
+          try {
+            await fs.mkdir(path.dirname(cacheUserPath));
+          } catch {}
         }
         const newComment = userscript2comment(
           pluginOption.userscript,
           pluginOption.format
         );
         if (!isRestart()) {
-          openBrowser(u, true, logger);
-          fs.writeFile(cacheCommentPath, newComment, () => {});
-          logger.info(u, 500);
-          isOutUrl = true;
-        } else {
-          if (cacheComment != newComment) {
-            openBrowser(u, true, logger);
-            fs.writeFile(cacheCommentPath, newComment, () => {});
-            logger.info('reopen, config comment has changed');
-            logger.info(u);
-            isOutUrl = true;
-          }
+          openBrowser(getInstallUrl(), true, logger);
+          await fs.writeFile(cacheUserPath, newComment);
+        } else if (cacheComment != newComment) {
+          openBrowser(getInstallUrl(), true, logger);
+          await fs.writeFile(cacheUserPath, newComment);
+          logger.info('reopen, config comment has changed');
         }
-      }
-      if (!isOutUrl) {
-        logger.info(u, 500);
       }
     },
     generateBundle(_, bundle) {

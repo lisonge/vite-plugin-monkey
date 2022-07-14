@@ -23,7 +23,7 @@ jobs:
         with:
           version: 6
 
-      - run: pnpm install --registry=https://registry.npmmirror.com/
+      - run: pnpm install
 
       - run: pnpm run build
 

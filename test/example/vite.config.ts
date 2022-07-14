@@ -22,7 +22,7 @@ export default defineConfig(({ command, mode }) => ({
           '': 'default description zh',
           zh: '描述',
           en: 'description',
-          ja: '説明',
+          ja: '説明z',
           'zh-CN': '描述',
         },
         match: ['https://i.songe.li/*', 'https://lisonge.com/*'],

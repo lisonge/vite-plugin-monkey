@@ -89,11 +89,14 @@ export const cssInjectTemplate = ({ cssTextList = [] as string[] }) => {
   });
 };
 
-export const redirectFn = ({ url = '' }) => {
-  setTimeout(async () => {
-    window.location.href = url;
-    setTimeout(() => {
-      window.close();
-    }, 500);
-  });
+export const redirectFn = async ({ url = '' }) => {
+  const delay = async (n = 0) => {
+    await new Promise<void>((res) => {
+      setTimeout(res, n);
+    });
+  };
+  await delay();
+  window.location.href = url;
+  await delay(500);
+  window.close();
 };

@@ -37,7 +37,7 @@ export const validUrl = (s: string) => {
 const get_vite_start_time = () => {
   // @see https://github.com/vitejs/vite/blob/c703a3348adeaad9dc92d805a381866917f2a03b/packages/vite/src/node/server/index.ts#L741
   // @ts-ignore
-  const n: unknown = global.__vite_start_time;
+  const n: unknown = global.__vite_start_time ?? 0;
   if (typeof n != 'number') {
     return 0;
   } else {
@@ -45,7 +45,7 @@ const get_vite_start_time = () => {
   }
 };
 
-export const isRestart = (n = 1000) => get_vite_start_time() > n;
+export const isFirstBoot = (n = 1000) => get_vite_start_time() < n;
 
 export const GM_keywords = [
   'GM.addElement',

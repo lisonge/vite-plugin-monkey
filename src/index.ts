@@ -21,7 +21,7 @@ import { userscript2comment } from './userscript';
 import { logger } from './_logger';
 import {
   GM_keywords,
-  isRestart,
+  isFirstBoot,
   packageJson,
   compatResolve,
   hashCode,
@@ -46,11 +46,11 @@ export interface MonkeyOption {
   userscript: MonkeyUserScript;
   format?: Format;
   server?: {
-    // /**
-    //  * auto open *.user.js in default browser when userscript comment change or vite server first start
-    //  * @default true
-    //  */
-    // open?: boolean;
+    /**
+     * auto open *.user.js in default browser when userscript comment change or vite server first start
+     * @default true
+     */
+    open?: boolean;
 
     /**
      * name prefix, distinguish server.user.js and build.user.js in monkey extension install list
@@ -165,7 +165,9 @@ export default (pluginOption: MonkeyOption): Plugin => {
       }
 
       return {
-        server: { open: config.server?.open ?? true },
+        server: {
+          open: config.server?.open ?? pluginOption.server?.open ?? true,
+        },
         build: {
           sourcemap: config.build?.sourcemap ?? false,
           minify: config.build?.minify ?? false,
@@ -335,28 +337,24 @@ export default (pluginOption: MonkeyOption): Plugin => {
       // let isOutUrl = false;
       // const u = getInstallUrl();
       // console.log('server');
-      if (config.server?.open ?? true) {
+      if (pluginOption.server?.open ?? true) {
         let cacheComment = '';
         // const cacheCommentPath = '' + ;
         if (await existFile(cacheUserPath)) {
           cacheComment = (await fs.readFile(cacheUserPath)).toString('utf-8');
         } else {
-          try {
-            await fs.mkdir(path.dirname(cacheUserPath));
-          } catch {}
+          await fs.mkdir(path.dirname(cacheUserPath)).catch();
         }
         const newComment = userscript2comment(
           pluginOption.userscript,
           pluginOption.format
         );
-        if (!isRestart()) {
-          openBrowser(getInstallUrl(), true, logger);
-          await fs.writeFile(cacheUserPath, newComment);
+        if (isFirstBoot()) {
         } else if (cacheComment != newComment) {
           openBrowser(getInstallUrl(), true, logger);
-          await fs.writeFile(cacheUserPath, newComment);
           logger.info('reopen, config comment has changed');
         }
+        await fs.writeFile(cacheUserPath, newComment).catch();
       }
     },
     generateBundle(_, bundle) {

@@ -487,6 +487,13 @@ export default (pluginOption: MonkeyOption): Plugin => {
           /__BASE__/g,
           `((()=>{const b = __BASE__; const u = new URL(import.meta['url'], location.origin); return b !== '/' ? b : (u.origin+'/');})())`
         );
+
+        // work with vite@3
+        // see https://github.com/vitejs/vite/blob/v3.0.0/packages/vite/src/client/client.ts#L302
+        code = code.replace(
+          '`${location.protocol}//${hostAndPath}`',
+          "`${new URL(import.meta['url'], location.origin).protocol}//${hostAndPath}`"
+        );
       }
       return code;
     },

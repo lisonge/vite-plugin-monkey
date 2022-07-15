@@ -29,6 +29,7 @@ import {
   existFile,
 } from './_util';
 import selfPackageJson from '../package.json';
+import detectPort from 'detect-port';
 
 export type {
   MonkeyUserScript,
@@ -106,7 +107,14 @@ export default (pluginOption: MonkeyOption): Plugin => {
   let config: ResolvedConfig;
   let isServe = true;
   const isHttps = () => !!config.server.https;
-  const getPort = () => config.server.port ?? 3000;
+  const getPort = (() => {
+    // 5173 come from https://github.com/vitejs/vite/blob/26bcdc3186807bb6f3817119cd7e64ae8308a057/packages/vite/src/node/server/index.ts#L612
+    let availablePort = 5173;
+    detectPort(availablePort).then((p) => {
+      availablePort = p;
+    });
+    return () => config.server.port ?? availablePort;
+  })();
   const getHost = () => {
     if (
       typeof config.server.host == 'string' &&
@@ -205,6 +213,7 @@ export default (pluginOption: MonkeyOption): Plugin => {
       const { server } = resolvedConfig;
 
       server.host = getHost();
+      server.port = getPort();
       server.origin = getOrigin();
 
       if (server.hmr === undefined && server.hmr === true) {

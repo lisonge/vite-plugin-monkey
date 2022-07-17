@@ -24,7 +24,7 @@ pnpm create monkey
 
 然后你能选择 vue/react/preact/svelte/vanilla, 或者它们对应的 typescript 版本
 
-![vue-ts](https://raw.githubusercontent.com/lisonge/src/main/img/2022-07-15_15-28-39.gif)
+![vue-ts](https://github.com/lisonge/src/raw/main/img/2022-07-17_19-15-35.gif)
 
 ## 单独安装
 

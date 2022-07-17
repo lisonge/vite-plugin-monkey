@@ -24,7 +24,7 @@ pnpm create monkey
 
 then you can choose vue/react/preact/svelte/vanilla, or their typescript version
 
-![vue-ts](https://raw.githubusercontent.com/lisonge/src/main/img/2022-07-15_15-28-39.gif)
+![vue-ts](https://github.com/lisonge/src/raw/main/img/2022-07-17_19-15-35.gif)
 
 ## installation
 

@@ -19,17 +19,11 @@
     "preinstall": "npx only-allow pnpm"
   },
   "devDependencies": {
-    "@types/react": "^18.0.15",
-    "@types/react-dom": "^18.0.6",
-    "@types/blueimp-md5": "^2.18.0",
     "@types/tampermonkey": "^4.0.5",
-    "@vitejs/plugin-react": "2.0.0",
     "vite-plugin-inspect": "^0.6.0",
     "vite-plugin-restart": "^0.2.0"
   },
   "dependencies": {
-    "blueimp-md5": "^2.19.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "blueimp-md5": "^2.19.0"
   }
 }

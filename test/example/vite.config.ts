@@ -1,12 +1,10 @@
 import { defineConfig } from 'vite';
 import ViteRestart from 'vite-plugin-restart';
-import react from '@vitejs/plugin-react';
 import CustomPlugin from '../../src/index';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command, mode }) => ({
   plugins: [
-    react(),
     CustomPlugin({
       entry: 'src/main.ts',
       userscript: {

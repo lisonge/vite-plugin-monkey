@@ -8,27 +8,35 @@
 
 - 支持 Tampermonkey 和 Violentmonkey 和 Greasemonkey 的脚本辅助开发
 - 打包自动注入脚本配置头部注释
-- 当 第一次启动 或 脚本配置注释改变时 自动在默认浏览器打开脚本
+- 当 第一次启动 或 脚本配置注释改变时 自动在默认浏览器打开脚本安装
 - 友好的利用 @require 配置库的 cdn 的方案，大大减少构建脚本大小
 - 完全的 Typescript 和 Vite 的开发体验，比如模块热替换,秒启动
 
-## 快速使用
+## 快速使用 (推荐)
 
-使用模板即可 <https://github.com/lisonge/vite-userscript-template.git>
+使用方式与 vite create 一致
 
-## 安装
+```shell
+pnpm create monkey
+# npm create monkey
+# yarn create monkey
+```
+
+然后你能选择 vue/react/preact/svelte/vanilla, 或者它们对应的 typescript 版本
+
+![vue-ts](https://raw.githubusercontent.com/lisonge/src/main/img/2022-07-15_15-28-39.gif)
+
+## 单独安装
 
 ```shell
 pnpm add -D vite-plugin-monkey
-# 或者通过 npm i -D vite-plugin-monkey
-# 或者通过 yarn add -D vite-plugin-monkey
+# npm i -D vite-plugin-monkey
+# yarn add -D vite-plugin-monkey
 ```
-
-插件的[依赖](./package.json#L81)使用了固定版本, npm/yarn/pnpm 都可以安装而无需担心没有对应的 lock.file
 
 ## 配置
 
-[MonkeyOption](./src/index.ts#L30)
+[MonkeyOption](./src/index.ts#L42)
 
 ```ts
 export interface MonkeyOption {
@@ -129,35 +137,21 @@ export type AlignFunc = (
 
 ## 例子
 
-vite 非常容易上手，请直接看 [test/example/vite.config.ts](./test/example/vite.config.ts)
+vite 非常容易上手，请直接看 [vite.config.ts](./test/example/vite.config.ts)
 
-例子中的构建产物在 [test/example/dist/example-project.user.js](./test/example/dist/example-project.user.js)
+例子中的构建产物在 [example-project.user.js](./test/example/dist/example-project.user.js)
 
-另一个简单的例子 <https://github.com/lisonge/vite-userscript-template.git>
-
-### 搭配 vue 使用的例子
-
-- <https://github.com/lisonge/op-wiki-plus>
+preact/react/svelte/vanilla/vue 的例子在 [create-monkey](https://github.com/lisonge/create-monkey.git)
 
 ## 注意
 
 ### CSP
 
-大多数情况下，此问题不会出现，但是某些网站会出现，比如 <https://github.com/lisonge/vite-plugin-monkey/issues/1>
-
-在开发模式，我们的脚本需要在两个域之间工作，宿主域和本地开发服务器
-
-如果宿主域启用了 [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP), 浏览器会拒绝加载宿主域以外的脚本，因此你必须关闭它，关闭方法如下
-
-- chrome - 安装浏览器插件 [Disable Content-Security-Policy](https://chrome.google.com/webstore/detail/disable-content-security/ieelmcmcagommplceebfedjlakkhpden/)
-- edge - 安装浏览器插件 [Disable Content-Security-Policy](https://microsoftedge.microsoft.com/addons/detail/disable-contentsecurity/ecmfamimnofkleckfamjbphegacljmbp?hl=zh-CN)
-- firefox - 在 `about:config` 菜单项里，禁用配置 `security.csp.enable`
-
-在高版本的 chrome/edge, 上面的浏览器插件不起作用
-
 你可以使用 [Tampermonkey](https://www.tampermonkey.net/) 然后打开插件配置 `extension://iikmkjmpaadaobahmlepeloendndfphd/options.html#nav=settings`
 
 在 `安全`, 设置 `如果站点有内容安全策略（CSP）则向其策略:` 为 `全部移除（可能不安全）`
+
+具体情况请看 [issues/1](https://github.com/lisonge/vite-plugin-monkey/issues/1)
 
 ### Polyfill
 
@@ -171,7 +165,6 @@ import monkeyPlugin from 'vite-plugin-monkey';
 
 export default defineConfig({
   plugins: [
-    vue(),
     monkeyPlugin({
       userscript: {
         require: [
@@ -179,6 +172,8 @@ export default defineConfig({
           'https://cdn.jsdelivr.net/npm/core-js-bundle@latest/minified.js',
           // 或者使用 polyfill.io 智能 polyfill, 不过 polyfill.io 在大陆网络连通性很差, 几乎不能用
           // https://polyfill.io/v3/polyfill.min.js
+          // 或者使用字节的cdn
+          // https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/core-js/3.21.1/minified.min.js
         ],
       },
     }),

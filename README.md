@@ -12,23 +12,31 @@ vite plugin server and build \*.user.js for [Tampermonkey](https://www.tampermon
 - external cdn url inject to userscript @require
 - full typescript support and vite feature
 
-## quick usage
+## quick usage (recommend)
 
-just use <https://github.com/lisonge/vite-userscript-template.git>
+just like vite create
 
-## install
+```shell
+pnpm create monkey
+# npm create monkey
+# yarn create monkey
+```
+
+then you can choose vue/react/preact/svelte/vanilla, or their typescript version
+
+![vue-ts](https://raw.githubusercontent.com/lisonge/src/main/img/2022-07-15_15-28-39.gif)
+
+## installation
 
 ```shell
 pnpm add -D vite-plugin-monkey
-# or by npm i -D vite-plugin-monkey
-# or by yarn add -D vite-plugin-monkey
+# npm i -D vite-plugin-monkey
+# yarn add -D vite-plugin-monkey
 ```
-
-plugin [dependencies](./package.json#L81) use fixed versions, you can install plugin by npm/yarn/pnpm and don't worry about the missing of lock.file
 
 ## config
 
-[MonkeyOption](./src/index.ts#L30)
+[MonkeyOption](./src/index.ts#L42)
 
 ```ts
 export interface MonkeyOption {
@@ -128,39 +136,23 @@ export type AlignFunc = (
 
 ## example
 
-see [test/example/vite.config.ts](./test/example/vite.config.ts)
+vite config is simple, see [vite.config.ts](./test/example/vite.config.ts), build file see [example-project.user.js](./test/example/dist/example-project.user.js)
 
-build file see [test/example/dist/example-project.user.js](./test/example/dist/example-project.user.js)
-
-another simple example <https://github.com/lisonge/vite-userscript-template.git>
-
-### example with vue
-
-- <https://github.com/lisonge/op-wiki-plus>
+and preact/react/svelte/vanilla/vue examples see [create-monkey](https://github.com/lisonge/create-monkey.git)
 
 ## note
 
 ### CSP
 
-in most cases, this problem does not occur, but some website like <https://github.com/lisonge/vite-plugin-monkey/issues/1> will appear
-
-in dev server, userscript will run between two origin
-
-so if host enable [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP), you can solve it in the following ways
-
-- chrome - [Disable Content-Security-Policy](https://chrome.google.com/webstore/detail/disable-content-security/ieelmcmcagommplceebfedjlakkhpden/)
-- edge - [Disable Content-Security-Policy](https://microsoftedge.microsoft.com/addons/detail/disable-contentsecurity/ecmfamimnofkleckfamjbphegacljmbp?hl=zh-CN)
-- firefox - disable `security.csp.enable` in the `about:config` menu
-
-in the high version of chrome/edge, above extension will not work
-
 you can use [Tampermonkey](https://www.tampermonkey.net/) then open `extension://iikmkjmpaadaobahmlepeloendndfphd/options.html#nav=settings`
 
 at `Security`, set `Modify existing content security policy (CSP) headers` to `Remove entirely (possibly unsecure)`
 
+full detail see [issues/1](https://github.com/lisonge/vite-plugin-monkey/issues/1)
+
 ### Polyfill
 
-because of <https://github.com/vitejs/vite/issues/1639>, now you can not use `@vitejs/plugin-legacy`
+because of [vite/issues/1639](https://github.com/vitejs/vite/issues/1639), now you can not use `@vitejs/plugin-legacy`
 
 the following is a feasible solution by @require cdn
 
@@ -170,7 +162,6 @@ import monkeyPlugin from 'vite-plugin-monkey';
 
 export default defineConfig({
   plugins: [
-    vue(),
     monkeyPlugin({
       userscript: {
         require: [

@@ -1,5 +1,23 @@
 # CHANGELOG
 
+## 1.0.0
+
+### Features
+
+- support vite@^3 [73cbaed1](https://github.com/lisonge/vite-plugin-monkey/commit/31ed164cd3706ba719cdc0cf2420f28673cbaed1)
+- support template create, <https://github.com/lisonge/create-monkey.git>
+
+### Bug Fixes
+
+- [can not work with vite plugin @vitejs/plugin-react](https://github.com/lisonge/vite-plugin-monkey/issues/3)
+- use fixed port, now will auto detect port [4eba5d4d](https://github.com/lisonge/vite-plugin-monkey/commit/00367eaf64ef713c4cffd39bf040666d4eba5d4d)
+- modify ping protocol for vite@3 [055ab211](https://github.com/lisonge/vite-plugin-monkey/commit/9a342f76823e43a33f51231284b7a91f055ab211)
+- repeat open at boot [2c3ac266](https://github.com/lisonge/vite-plugin-monkey/commit/1b18448c611acf1fb89b7bc7c829098f2c3ac266)
+
+### Break Changes
+
+- change install entry of user.js to `/` [6a954910](https://github.com/lisonge/vite-plugin-monkey/commit/2ee31fb30181e2fe5b069fe2d8ce2bcf6a954910)
+
 ## 0.2.14
 
 ### Bug Fixes

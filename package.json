@@ -32,7 +32,10 @@
     "monkey",
     "Tampermonkey",
     "Violentmonkey",
-    "Greasemonkey"
+    "Greasemonkey",
+    "userscript",
+    "greasyfork",
+    "typescript"
   ],
   "author": "lisonge",
   "license": "MIT",

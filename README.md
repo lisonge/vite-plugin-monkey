@@ -22,7 +22,17 @@ pnpm create monkey
 # yarn create monkey
 ```
 
-then you can choose vue/react/preact/svelte/vanilla, or their typescript version
+then you can choose the following template
+
+- [vue](https://github.com/lisonge/create-monkey/tree/main/template-vue)
+- [vue-ts](https://github.com/lisonge/create-monkey/tree/main/template-vue-ts)
+- [react](https://github.com/lisonge/create-monkey/tree/main/template-react)
+- [react-ts](https://github.com/lisonge/create-monkey/tree/main/template-react-ts)
+- [preact-preact](https://github.com/lisonge/create-monkey/tree/main/template-preact)
+- [svelte](https://github.com/lisonge/create-monkey/tree/main/template-svelte)
+- [svelte-ts](https://github.com/lisonge/create-monkey/tree/main/template-svelte-ts)
+- [vanilla](https://github.com/lisonge/create-monkey/tree/main/template-vanilla) (native js)
+- [vanilla-ts](https://github.com/lisonge/create-monkey/tree/main/template-vanilla-ts) (native ts)
 
 ![vue-ts](https://github.com/lisonge/src/raw/main/img/2022-07-17_19-15-35.gif)
 

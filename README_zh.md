@@ -22,7 +22,17 @@ pnpm create monkey
 # yarn create monkey
 ```
 
-然后你能选择 vue/react/preact/svelte/vanilla, 或者它们对应的 typescript 版本
+然后你能从以下模板选择
+
+- [vue](https://github.com/lisonge/create-monkey/tree/main/template-vue)
+- [vue-ts](https://github.com/lisonge/create-monkey/tree/main/template-vue-ts)
+- [react](https://github.com/lisonge/create-monkey/tree/main/template-react)
+- [react-ts](https://github.com/lisonge/create-monkey/tree/main/template-react-ts)
+- [preact-preact](https://github.com/lisonge/create-monkey/tree/main/template-preact)
+- [svelte](https://github.com/lisonge/create-monkey/tree/main/template-svelte)
+- [svelte-ts](https://github.com/lisonge/create-monkey/tree/main/template-svelte-ts)
+- [vanilla](https://github.com/lisonge/create-monkey/tree/main/template-vanilla) (原生 js)
+- [vanilla-ts](https://github.com/lisonge/create-monkey/tree/main/template-vanilla-ts) (原生 ts)
 
 ![vue-ts](https://github.com/lisonge/src/raw/main/img/2022-07-17_19-15-35.gif)
 

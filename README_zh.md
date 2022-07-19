@@ -36,6 +36,10 @@ pnpm create monkey
 
 ![vue-ts](https://github.com/lisonge/src/raw/main/img/2022-07-17_19-15-35.gif)
 
+模块热替换 (hmr)
+
+![hmr](https://github.com/lisonge/src/raw/main/img/2022-07-18_18-00-12.gif)
+
 ## 单独安装
 
 ```shell

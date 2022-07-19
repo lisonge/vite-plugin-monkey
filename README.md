@@ -36,6 +36,10 @@ then you can choose the following template
 
 ![vue-ts](https://github.com/lisonge/src/raw/main/img/2022-07-17_19-15-35.gif)
 
+Hot Module Replacement
+
+![hmr](https://github.com/lisonge/src/raw/main/img/2022-07-18_18-00-12.gif)
+
 ## installation
 
 ```shell

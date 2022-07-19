@@ -68,10 +68,10 @@ export interface MonkeyOption {
     open?: boolean;
 
     /**
-     * 开发阶段的脚本名字前缀，用以在脚本安装列表里区分构建好的脚本
+     * 开发阶段的脚本名字前缀，用以在脚本安装列表里区分构建好的脚本, 如果你不要前缀, 设置 false 即可
      * @default 'dev:'
      */
-    prefix?: string | ((name: string) => string);
+    prefix?: string | ((name: string) => string) | false;
   };
   build?: {
     /**

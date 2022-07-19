@@ -53,10 +53,10 @@ export interface MonkeyOption {
     open?: boolean;
 
     /**
-     * name prefix, distinguish server.user.js and build.user.js in monkey extension install list
+     * name prefix, distinguish server.user.js and build.user.js in monkey extension install list, if you not want prefix, set false
      * @default 'dev:'
      */
-    prefix?: string | ((name: string) => string);
+    prefix?: string | ((name: string) => string) | false;
   };
   build?: {
     /**

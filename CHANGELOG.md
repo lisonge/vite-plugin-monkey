@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 1.1.0
+
+### Features
+
+- add cdn url util [09cf2d1d](https://github.com/lisonge/vite-plugin-monkey/commit/5d62c904e7690877715e641ff267614d09cf2d1d)
+
 ## 1.0.0
 
 ### Features

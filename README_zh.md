@@ -50,7 +50,7 @@ pnpm add -D vite-plugin-monkey
 
 ## 配置
 
-[MonkeyOption](./src/index.ts#L42)
+[MonkeyOption](./src/index.ts#L41)
 
 ```ts
 export interface MonkeyOption {
@@ -148,6 +148,28 @@ export type AlignFunc = (
   p0: [string, ...string[]][]
 ) => [string, ...string[]][];
 ```
+
+## externalGlobals cdn 工具
+
+```js
+// 使用示例
+import { cdn } from 'vite-plugin-monkey';
+{
+  externalGlobals: {
+    'blueimp-md5': cdn.bytecdntp('md5', 'js/md5.min.js'),
+  },
+}
+```
+
+有以下 cdn 可使用，详情见 [cdn.ts](./src/cdn.ts)
+
+- [jsdelivr](./src/cdn.ts#L4) <https://www.jsdelivr.com/>
+- [unpkg](./src/cdn.ts#L19) <https://unpkg.com/>
+- [bytecdntp](./src/cdn.ts#L34) <https://cdn.bytedance.com/>
+- [bootcdn](./src/cdn.ts#L49) <https://www.bootcdn.cn/all/>
+- [baomitu](./src/cdn.ts#L64) <https://cdn.baomitu.com/>
+- [staticfile](./src/cdn.ts#L79) <https://staticfile.org/>
+- [cdnjs](./src/cdn.ts#L93) <https://cdnjs.com/libraries>
 
 ## 例子
 

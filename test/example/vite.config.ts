@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite';
 import ViteRestart from 'vite-plugin-restart';
-import CustomPlugin from '../../src/index';
+import CustomPlugin, { cdn } from '../../src/index';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command, mode }) => ({
@@ -29,16 +29,9 @@ export default defineConfig(({ command, mode }) => ({
         //   note: ['2017.05.12-V8.4z', '2017.05.05-V8.3'],
         // },
       },
-      // server: {
-      //   open: false,
-      // },
       build: {
         externalGlobals: {
-          'blueimp-md5': [
-            'md5',
-            (version, name) =>
-              `https://cdn.jsdelivr.net/npm/${name}@${version}/js/md5.min.js`,
-          ],
+          'blueimp-md5': cdn.bytecdntp('md5', 'js/md5.min.js'),
         },
       },
     }),
@@ -46,4 +39,8 @@ export default defineConfig(({ command, mode }) => ({
       restart: ['../../src/index.ts'],
     }),
   ],
+  build: {
+    // if you want to minify xxx.user.js, set true
+    // minify: true,
+  },
 }));

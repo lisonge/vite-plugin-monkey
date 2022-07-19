@@ -18,10 +18,10 @@
 // @supportURL         https://github.com/lisonge/vite-plugin-monkey/issues
 // @match              https://i.songe.li/*
 // @match              https://lisonge.com/*
-// @require            https://cdn.jsdelivr.net/npm/blueimp-md5@2.19.0/js/md5.min.js
+// @require            https://lf9-cdn-tos.bytecdntp.com/cdn/expire-10-y/blueimp-md5/2.19.0/js/md5.min.js
 // ==/UserScript==
 
-// use vite-plugin-monkey@1.0.0 at 2022-07-15T12:34:06.125Z
+// use vite-plugin-monkey@1.0.0 at 2022-07-19T05:26:46.885Z
 
 ;(({ cssTextList = [] }) => {
   cssTextList.forEach((s) => {

@@ -1,8 +1,10 @@
+import detectPort from 'detect-port';
 import fs from 'fs/promises';
+import { DomUtils, ElementType, parseDocument } from 'htmlparser2';
+import nodeFetch from 'node-fetch';
 import * as path from 'path';
 import type { Plugin, ResolvedConfig } from 'vite';
-import { parseDocument, ElementType, DomUtils } from 'htmlparser2';
-import nodeFetch from 'node-fetch';
+import selfPackageJson from '../package.json';
 import {
   cssInjectTemplate,
   redirectFn,
@@ -11,26 +13,23 @@ import {
 } from './inject_template';
 import { openBrowser } from './open_browser';
 import type {
-  MonkeyUserScript,
   Format,
   GreasemonkeyUserScript,
+  MonkeyUserScript,
   TampermonkeyUserScript,
   ViolentmonkeyUserScript,
 } from './userscript';
 import { userscript2comment } from './userscript';
 import { logger } from './_logger';
 import {
+  compatResolve,
+  existFile,
   GM_keywords,
   isFirstBoot,
   packageJson,
-  compatResolve,
-  hashCode,
-  traverse,
-  existFile,
 } from './_util';
-import selfPackageJson from '../package.json';
-import detectPort from 'detect-port';
 
+export * as cdn from './cdn';
 export type {
   MonkeyUserScript,
   TampermonkeyUserScript,

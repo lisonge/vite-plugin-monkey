@@ -19,6 +19,7 @@
     "preinstall": "npx only-allow pnpm"
   },
   "devDependencies": {
+    "@types/blueimp-md5": "2.18.0",
     "@types/tampermonkey": "^4.0.5",
     "vite-plugin-inspect": "^0.6.0",
     "vite-plugin-restart": "^0.2.0"

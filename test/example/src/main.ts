@@ -19,3 +19,10 @@ console.log('document.readyState', document.readyState);
 //   console.warn('you call console.log');
 //   return mockLog.apply(this, agrs);
 // };
+
+// test config.define
+if (process.env.NODE_ENV == 'production') {
+  console.log('hello prod');
+} else {
+  console.log('hello dev');
+}

@@ -1,6 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@types/blueimp-md5': 2.18.0
   '@types/tampermonkey': ^4.0.5
   blueimp-md5: ^2.19.0
   vite-plugin-inspect: ^0.6.0
@@ -10,6 +11,7 @@ dependencies:
   blueimp-md5: 2.19.0
 
 devDependencies:
+  '@types/blueimp-md5': 2.18.0
   '@types/tampermonkey': 4.0.5
   vite-plugin-inspect: 0.6.0
   vite-plugin-restart: 0.2.0
@@ -26,6 +28,10 @@ packages:
     dependencies:
       estree-walker: 2.0.2
       picomatch: 2.3.1
+    dev: true
+
+  /@types/blueimp-md5/2.18.0:
+    resolution: {integrity: sha512-f4A+++lGZGJvVSgeyMkqA7BEf2BVQli6F+qEykKb49c5ieWQBkfpn6CP5c1IZr2Yi2Ofl6Fj+v0e1fN18Z8Cnw==}
     dev: true
 
   /@types/tampermonkey/4.0.5:

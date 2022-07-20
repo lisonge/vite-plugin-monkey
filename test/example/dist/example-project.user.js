@@ -21,7 +21,7 @@
 // @require            https://cdn.jsdelivr.net/npm/blueimp-md5@2.19.0
 // ==/UserScript==
 
-// use vite-plugin-monkey@1.1.0 at 2022-07-20T03:25:28.038Z
+// use vite-plugin-monkey@1.1.1 at 2022-07-20T09:06:35.230Z
 
 ;(({ cssText = "" }) => {
   const style = document.createElement("style");
@@ -46,5 +46,8 @@
   console.log({ png, svg });
   console.log("blueimp-md5", md5__default.default("114514"));
   console.log("document.readyState", document.readyState);
+  {
+    console.log("hello prod");
+  }
 })(md5);
  

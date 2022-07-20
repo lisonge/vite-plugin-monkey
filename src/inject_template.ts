@@ -80,13 +80,11 @@ export const serverInjectTemplate = ({ entryList = [] as string[] }) => {
   console.log('[vite-plugin-monkey] inject module to document.head');
 };
 
-export const cssInjectTemplate = ({ cssTextList = [] as string[] }) => {
-  cssTextList.forEach((s) => {
-    const style = document.createElement('style');
-    style.innerText = s;
-    style.dataset.source = 'vite-plugin-monkey';
-    document.head.appendChild(style);
-  });
+export const cssInjectTemplate = ({ cssText = '' }) => {
+  const style = document.createElement('style');
+  style.innerText = cssText;
+  style.dataset.source = 'vite-plugin-monkey';
+  document.head.appendChild(style);
 };
 
 export const redirectFn = async ({ url = '' }) => {

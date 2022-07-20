@@ -411,9 +411,9 @@ export default (pluginOption: MonkeyOption): Plugin => {
         }
       });
       let injectCssCode: undefined | string = undefined;
-      if (cssTextList?.length > 0) {
+      if (cssTextList.length > 0) {
         injectCssCode = template2string(cssInjectTemplate, {
-          cssTextList,
+          cssText: cssTextList.join(''),
         });
       }
 

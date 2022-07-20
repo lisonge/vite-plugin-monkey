@@ -162,13 +162,14 @@ import { cdn } from 'vite-plugin-monkey';
 
 there is the following cdn to use, full detail see [cdn.ts](./src/cdn.ts)
 
-- [jsdelivr](./src/cdn.ts#L4) <https://www.jsdelivr.com/>
-- [unpkg](./src/cdn.ts#L19) <https://unpkg.com/>
-- [bytecdntp](./src/cdn.ts#L34) <https://cdn.bytedance.com/>
-- [bootcdn](./src/cdn.ts#L49) <https://www.bootcdn.cn/all/>
-- [baomitu](./src/cdn.ts#L64) <https://cdn.baomitu.com/>
-- [staticfile](./src/cdn.ts#L79) <https://staticfile.org/>
-- [cdnjs](./src/cdn.ts#L93) <https://cdnjs.com/libraries>
+- [jsdelivr](./src/cdn.ts#L1) <https://www.jsdelivr.com/>
+- [unpkg](./src/cdn.ts#L43) <https://unpkg.com/>
+- [bytecdntp](./src/cdn.ts#L59) <https://cdn.bytedance.com/>
+- [bootcdn](./src/cdn.ts#L75) <https://www.bootcdn.cn/all/>
+- [baomitu](./src/cdn.ts#L91) <https://cdn.baomitu.com/>
+- [staticfile](./src/cdn.ts#L107) <https://staticfile.org/>
+- [cdnjs](./src/cdn.ts#L122) <https://cdnjs.com/libraries>
+- [zhimg](./src/cdn.ts#L138) <https://unpkg.zhimg.com/>
 
 ## example
 

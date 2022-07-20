@@ -9,7 +9,7 @@ export default defineConfig(({ command, mode }) => ({
       entry: 'src/main.ts',
       userscript: {
         name: {
-          '': 'default_name',
+          // '': 'default_name', // if not set, will get from package.json
           ja: 'hentai',
           zh: '默认名字',
         },
@@ -17,21 +17,17 @@ export default defineConfig(({ command, mode }) => ({
         version: '1.0.1',
         icon: 'https://vitejs.dev/logo.svg',
         description: {
-          '': 'default description zh',
+          '': 'default description zh', // if not set, will get from package.json
           zh: '描述',
           en: 'description',
           ja: '説明z',
           'zh-CN': '描述',
         },
-        match: ['https://i.songe.li/*', 'https://lisonge.com/*'],
-        // 'run-at': 'document-start',
-        // $extra: {
-        //   note: ['2017.05.12-V8.4z', '2017.05.05-V8.3'],
-        // },
+        match: ['https://i.songe.li/', 'https://lisonge.com/'],
       },
       build: {
         externalGlobals: {
-          'blueimp-md5': cdn.bytecdntp('md5', 'js/md5.min.js'),
+          'blueimp-md5': cdn.jsdelivr('md5'),
         },
       },
     }),

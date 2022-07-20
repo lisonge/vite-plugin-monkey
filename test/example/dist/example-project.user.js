@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name               default_name
+// @name               example-project
 // @name:ja            hentai
 // @name:zh            默认名字
 // @namespace          https://github.com/lisonge
@@ -16,24 +16,20 @@
 // @homepageURL        https://github.com/lisonge/vite-plugin-monkey#readme
 // @source             https://github.com/lisonge/vite-plugin-monkey.git
 // @supportURL         https://github.com/lisonge/vite-plugin-monkey/issues
-// @match              https://i.songe.li/*
-// @match              https://lisonge.com/*
-// @require            https://lf9-cdn-tos.bytecdntp.com/cdn/expire-10-y/blueimp-md5/2.19.0/js/md5.min.js
+// @match              https://i.songe.li/
+// @match              https://lisonge.com/
+// @require            https://cdn.jsdelivr.net/npm/blueimp-md5@2.19.0
 // ==/UserScript==
 
-// use vite-plugin-monkey@1.0.0 at 2022-07-19T05:26:46.885Z
+// use vite-plugin-monkey@1.1.0 at 2022-07-20T03:25:28.038Z
 
-;(({ cssTextList = [] }) => {
-  cssTextList.forEach((s) => {
-    const style = document.createElement("style");
-    style.innerText = s;
-    style.dataset.source = "vite-plugin-monkey";
-    document.head.appendChild(style);
-  });
+;(({ cssText = "" }) => {
+  const style = document.createElement("style");
+  style.innerText = cssText;
+  style.dataset.source = "vite-plugin-monkey";
+  document.head.appendChild(style);
 })({
-  "cssTextList": [
-    "#app {\r\n  background-color: beige;\r\n}\r\n.test {\r\n  font-size: larger;\r\n}\r\n"
-  ]
+  "cssText": "#app {\r\n  background-color: beige;\r\n}\r\n.test {\r\n  font-size: larger;\r\n}\r\n"
 });
 
 (function(md52) {

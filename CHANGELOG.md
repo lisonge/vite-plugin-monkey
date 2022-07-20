@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 1.1.2
+
+### Bug Fixes
+
+- process.env.NODE_ENV not define [0eae47e3](https://github.com/lisonge/vite-plugin-monkey/commit/aabb188475e77278cd65fbfea4f2f1f00eae47e3)
+
 ## 1.1.1
 
 ### Features

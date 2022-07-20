@@ -61,6 +61,7 @@ type GreasyforkUserScript = {
 type MergemonkeyUserScript = {
   /**
    * @default package.json.name??'monkey'
+   * @default {...{'':package.json.name??'monkey'},...name} // if name is object
    */
   name?: string | LocaleType<string>;
 
@@ -71,6 +72,7 @@ type MergemonkeyUserScript = {
 
   /**
    * @default package.json.description
+   * @default {...{'':package.json.description},...description} // if description is object
    */
   description?: string | LocaleType<string>;
 
@@ -122,7 +124,7 @@ type MergemonkeyUserScript = {
 
   /**
    * custom extra meta
-   * @deprecated since version 2.9.10, use $extra replace it, extra will be removed in the future version
+   * @deprecated since version 1.0.0, use $extra replace it, extra will be removed in the future version
    */
   extra?: [string, string][] | Record<string, IArray<string>>;
 
@@ -235,6 +237,14 @@ export const userscript2comment = (
     if (typeof v == 'string') {
       attrList.push([k, v]);
     } else if (v && typeof v == 'object') {
+      if (!('' in v)) {
+        if (k == 'name') {
+          // keep key sort
+          v = { '': packageJson.name, ...v };
+        } else if (k == 'description' && packageJson.description) {
+          v = { '': packageJson.description, ...v };
+        }
+      }
       Object.entries(v).forEach(([k2, v2]) => {
         if (k2.length == 0) {
           attrList.push([k, v2]);

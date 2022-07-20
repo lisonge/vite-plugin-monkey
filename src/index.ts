@@ -103,29 +103,29 @@ export default (pluginOption: MonkeyOption): Plugin => {
   const globals: Record<string, string> = {};
   const cdnList: string[] = [];
 
-  let config: ResolvedConfig;
+  let finalConfig: ResolvedConfig;
   let isServe = true;
-  const isHttps = () => !!config.server.https;
+  const isHttps = () => !!finalConfig.server.https;
   const getPort = (() => {
     // 5173 come from https://github.com/vitejs/vite/blob/26bcdc3186807bb6f3817119cd7e64ae8308a057/packages/vite/src/node/server/index.ts#L612
     let availablePort = 5173;
     detectPort(availablePort).then((p) => {
       availablePort = p;
     });
-    return () => config.server.port ?? availablePort;
+    return () => finalConfig.server.port ?? availablePort;
   })();
   const getHost = () => {
     if (
-      typeof config.server.host == 'string' &&
-      config.server.host != '0.0.0.0'
+      typeof finalConfig.server.host == 'string' &&
+      finalConfig.server.host != '0.0.0.0'
     ) {
-      return config.server.host;
+      return finalConfig.server.host;
     }
     return '127.0.0.1';
   };
   const getOrigin = () =>
     `${isHttps() ? 'https' : 'http'}://${getHost()}:${getPort()}`;
-  const getInstallUrl = () => new URL(config.base, getOrigin()).href; //+ installUserPath;
+  const getInstallUrl = () => new URL(finalConfig.base, getOrigin()).href; //+ installUserPath;
 
   let fileName = 'monkey.user.js';
   if (pluginOption.build?.fileName) {
@@ -172,6 +172,13 @@ export default (pluginOption: MonkeyOption): Plugin => {
       }
 
       return {
+        define: {
+          'process.env.NODE_ENV':
+            config.define?.['process.env.NODE_ENV'] ??
+            JSON.stringify(
+              config.mode ?? (isServe ? 'development' : 'production')
+            ),
+        },
         server: {
           open: config.server?.open ?? pluginOption.server?.open ?? true,
         },
@@ -208,7 +215,7 @@ export default (pluginOption: MonkeyOption): Plugin => {
       ];
     },
     configResolved(resolvedConfig) {
-      config = resolvedConfig;
+      finalConfig = resolvedConfig;
       const { server } = resolvedConfig;
 
       server.host = getHost();
@@ -312,7 +319,7 @@ export default (pluginOption: MonkeyOption): Plugin => {
 
           let realEntry = pluginOption.entry;
           if (path.isAbsolute(pluginOption.entry)) {
-            realEntry = path.relative(config.root, pluginOption.entry);
+            realEntry = path.relative(finalConfig.root, pluginOption.entry);
             realEntry = realEntry.replace('\\', '/');
           }
           entryList.push(new URL(realEntry, origin).href);

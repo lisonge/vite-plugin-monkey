@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 1.1.1
+
+### Features
+
+- now prefix can be false [42fc5c31](https://github.com/lisonge/vite-plugin-monkey/commit/82a43768cccaa971aa56640edb2d4aab42fc5c31)
+
+- css inject simplify [5973acb2](https://github.com/lisonge/vite-plugin-monkey/commit/92157d871328852a8af8d215d51c4a815973acb2)
+
+- locale_type set default value [afc0b476](https://github.com/lisonge/vite-plugin-monkey/commit/e89a64062ab8e01232baf2ea9d2391c6afc0b476)
+
+- new cdn [41266aa3](https://github.com/lisonge/vite-plugin-monkey/commit/aca75a962b827661c230c5d5d8ac216841266aa3)
+
 ## 1.1.0
 
 ### Features

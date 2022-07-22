@@ -237,7 +237,14 @@ export default (pluginOption: MonkeyOption): Plugin => {
     async configureServer(server) {
       // prefix name
       const prefix = pluginOption.server?.prefix ?? 'dev:';
-      const { name = packageJson.name } = pluginOption.userscript;
+      const name = (() => {
+        let _name = pluginOption.userscript.name ?? packageJson.name;
+        if (typeof _name == 'object' && !('' in _name)) {
+          _name = { '': packageJson.name, ..._name };
+        }
+        return _name;
+      })();
+
       if (typeof prefix == 'string') {
         if (typeof name == 'string') {
           pluginOption.userscript.name = prefix + name;
@@ -245,6 +252,7 @@ export default (pluginOption: MonkeyOption): Plugin => {
           Object.entries(name).forEach(([k, v]) => {
             name[k] = prefix + v;
           });
+          pluginOption.userscript.name = name;
         }
       } else if (typeof prefix == 'function') {
         if (typeof name == 'string') {
@@ -253,6 +261,7 @@ export default (pluginOption: MonkeyOption): Plugin => {
           Object.entries(name).forEach(([k, v]) => {
             name[k] = prefix(v);
           });
+          pluginOption.userscript.name = name;
         }
       }
 

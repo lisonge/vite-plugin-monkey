@@ -171,6 +171,8 @@ there is the following cdn to use, full detail see [cdn.ts](./src/cdn.ts)
 - [cdnjs](./src/cdn.ts#L122) <https://cdnjs.com/libraries>
 - [zhimg](./src/cdn.ts#L138) <https://unpkg.zhimg.com/>
 
+if you want use other cdn, you can see [external-scripts](https://greasyfork.org/zh-CN/help/external-scripts)
+
 ## example
 
 vite config is simple, see [vite.config.ts](./test/example/vite.config.ts), build file see [example-project.user.js](./test/example/dist/example-project.user.js)

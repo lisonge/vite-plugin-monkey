@@ -172,6 +172,8 @@ import { cdn } from 'vite-plugin-monkey';
 - [cdnjs](./src/cdn.ts#L122) <https://cdnjs.com/libraries>
 - [zhimg](./src/cdn.ts#L138) <https://unpkg.zhimg.com/>
 
+如果你想使用其他 cdn，请查看 [external-scripts](https://greasyfork.org/zh-CN/help/external-scripts)
+
 ## 例子
 
 vite 非常容易上手，请直接看 [vite.config.ts](./test/example/vite.config.ts)

@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 1.1.3
+
+### Bug Fixes
+
+- prefix not work in serve mode [ed73cf64](https://github.com/lisonge/vite-plugin-monkey/commit/6d8c21f3f9277803c775cf8f54425221ed73cf64)
+
 ## 1.1.2
 
 ### Bug Fixes

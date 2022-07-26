@@ -111,6 +111,12 @@ export interface MonkeyOption {
      * @default true
      */
     autoGrant?: boolean;
+
+    /**
+     * 检查所有 require cdn 链接可用性, 依据是 http 状态码为 200
+     * @default false
+     */
+    checkCDN?: boolean;
   };
 }
 ```

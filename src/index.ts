@@ -1,7 +1,7 @@
 import detectPort from 'detect-port';
 import fs from 'fs/promises';
 import { DomUtils, ElementType, parseDocument } from 'htmlparser2';
-import nodeFetch from 'node-fetch';
+import nodeFetch, { Response as nodeResponse } from 'node-fetch';
 import * as path from 'path';
 import type { Plugin, ResolvedConfig } from 'vite';
 import selfPackageJson from '../package.json';
@@ -91,6 +91,12 @@ export interface MonkeyOption {
      * @default true
      */
     autoGrant?: boolean;
+
+    /**
+     * check all require urls for availability, http code is 2xx
+     * @default false
+     */
+    checkCDN?: boolean;
   };
 }
 
@@ -136,6 +142,11 @@ export default (pluginOption: MonkeyOption): Plugin => {
 
   const GM_keyword_set = new Set(GM_keywords);
   const autoGrantList: string[] = [];
+
+  let cdnPromiseList: Array<{
+    url: string;
+    responsePromise: Promise<nodeResponse | unknown>;
+  }> = [];
 
   return {
     name: 'monkey',
@@ -386,16 +397,22 @@ export default (pluginOption: MonkeyOption): Plugin => {
         return;
       }
 
-      // add cdn url
-      if (cdnList.length > 0) {
-        const { require } = pluginOption.userscript;
-        if (typeof require == 'string') {
-          pluginOption.userscript.require = [require, ...cdnList];
-        } else if (require instanceof Array) {
-          pluginOption.userscript.require = [...require, ...cdnList];
-        } else {
-          pluginOption.userscript.require = cdnList;
-        }
+      const { require } = pluginOption.userscript;
+      if (typeof require == 'string') {
+        pluginOption.userscript.require = [require, ...cdnList];
+      } else if (require instanceof Array) {
+        pluginOption.userscript.require = [...require, ...cdnList];
+      } else {
+        pluginOption.userscript.require = cdnList;
+      }
+
+      if (pluginOption.build?.checkCDN ?? false) {
+        cdnPromiseList = pluginOption.userscript.require.map((url) => ({
+          url,
+          responsePromise: nodeFetch(url, {
+            timeout: 3000,
+          }).catch((e) => e),
+        }));
       }
 
       if (autoGrantList.length > 0 && pluginOption.userscript.grant != '*') {
@@ -511,6 +528,56 @@ export default (pluginOption: MonkeyOption): Plugin => {
         );
       }
       return code;
+    },
+    async closeBundle() {
+      if (isServe || cdnPromiseList.length == 0) return;
+      console.log();
+      logger.info(`checking CDN*${cdnPromiseList.length} for availability`);
+      await new Promise<void>((res) => {
+        let n = 0;
+        let failedNum = 0;
+        cdnPromiseList.forEach(async ({ url, responsePromise }) => {
+          const response = await responsePromise;
+          if (response instanceof nodeResponse) {
+            if (!response.ok) {
+              failedNum++;
+              logger.error(`CDN HTTP ${response.status}, ${url}`);
+            } else {
+              logger.info(`CDN ok, ${url}`);
+            }
+          } else {
+            const error = response as unknown;
+            failedNum++;
+            if (error instanceof Error) {
+              if (error.message.includes(url)) {
+                logger.error(`${error.name}:${error.message}`);
+              } else {
+                logger.error(`${error.name}:${error.message}, ${url}`);
+              }
+            } else {
+              const message = String(error);
+              if (message.includes(url)) {
+                logger.error(`unknown error:${message}`);
+              } else {
+                logger.error(`unknown error:${message}, ${url}`);
+              }
+            }
+          }
+          n++;
+          if (n == cdnPromiseList.length) {
+            if (failedNum > 0) {
+              logger.error(
+                `check finished, CDN*${failedNum} are not available, you need fix it`
+              );
+            } else {
+              logger.info(
+                `check finished, All CDN*${cdnPromiseList.length} are available`
+              );
+            }
+            res();
+          }
+        });
+      });
     },
   };
 };

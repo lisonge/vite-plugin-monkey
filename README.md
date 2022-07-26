@@ -111,6 +111,12 @@ export interface MonkeyOption {
      * @default true
      */
     autoGrant?: boolean;
+
+    /**
+     * check all require urls for availability, http code is 2xx
+     * @default false
+     */
+    checkCDN?: boolean;
   };
 }
 ```

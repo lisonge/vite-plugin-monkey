@@ -1,0 +1,36 @@
+{
+  "name": "example",
+  "version": "1.0.0",
+  "private": true,
+  "author": "lisonge",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lisonge/vite-plugin-monkey.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lisonge/vite-plugin-monkey/issues"
+  },
+  "homepage": "https://github.com/lisonge/vite-plugin-monkey#readme",
+  "scripts": {
+    "serve": "vite",
+    "build": "vite build",
+    "preinstall": "npx only-allow pnpm"
+  },
+  "devDependencies": {
+    "@types/blueimp-md5": "2.18.0",
+    "@types/tampermonkey": "^4.0.5",
+    "vite-plugin-restart": "^0.2.0",
+    "vite-plugin-monkey": "workspace:*"
+  },
+  "dependencies": {
+    "blueimp-md5": "^2.19.0"
+  },
+  "pnpm": {
+    "peerDependencyRules": {
+      "ignoreMissing": [
+        "vite"
+      ]
+    }
+  }
+}

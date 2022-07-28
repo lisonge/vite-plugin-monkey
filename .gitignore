@@ -1,4 +1,6 @@
 node_modules
 dist
-.vscode
+/.vscode/
 .eslintcache
+*.local
+*.log

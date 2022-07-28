@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name               example-project
+// @name               example
 // @name:ja            hentai
 // @name:zh            默认名字
 // @namespace          https://github.com/lisonge
@@ -21,7 +21,7 @@
 // @require            https://cdn.jsdelivr.net/npm/blueimp-md5@2.19.0
 // ==/UserScript==
 
-// use vite-plugin-monkey@1.1.1 at 2022-07-20T09:06:35.230Z
+// use vite-plugin-monkey@1.1.3 at 2022-07-28T08:58:01.193Z
 
 ;(({ cssText = "" }) => {
   const style = document.createElement("style");
@@ -29,7 +29,7 @@
   style.dataset.source = "vite-plugin-monkey";
   document.head.appendChild(style);
 })({
-  "cssText": "#app {\r\n  background-color: beige;\r\n}\r\n.test {\r\n  font-size: larger;\r\n}\r\n"
+  "cssText": "#app {\n  background-color: beige;\n}\n.test {\n  font-size: larger;\n}\n"
 });
 
 (function(md52) {

@@ -188,7 +188,7 @@ if you want use other cdn, you can see [external-scripts](https://greasyfork.org
 
 vite config is simple, see [vite.config.ts](/playground/example/vite.config.ts), build file see [example-project.user.js](/playground/example/dist/example.user.js)
 
-and preact/react/svelte/vanilla/vue examples see [create-monkey](/packages/vite-plugin-monkey)
+and preact/react/svelte/vanilla/vue examples see [create-monkey](/packages/create-monkey)
 
 ## note
 

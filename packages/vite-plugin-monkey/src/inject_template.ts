@@ -1,70 +1,57 @@
-declare global {
-  interface Window {
-    unsafeWindow?: Window;
-    [key: string]: unknown;
-  }
-}
+// declare global {
+//   interface Window {
+//     unsafeWindow?: Window;
+//   }
+// }
 
-//
-export const template2string = <T extends (args: object) => void>(
+export const template2string = <T extends (arg: object) => void>(
   func: T,
   arg: Parameters<T>[0],
 ) => {
   return `;(${func.toString()})(${JSON.stringify(arg, undefined, 2)});`;
 };
 
-export const serverInjectTemplate = ({ entryList = [] as string[] }) => {
-  if (window.unsafeWindow) {
-    const injectWindow = window.unsafeWindow;
-    let sum = 0;
-    [
-      // 'GM.addElement',
-      // 'GM.addStyle',
-      // 'GM.deleteValue',
-      // 'GM.getResourceUrl',
-      // 'GM.getValue',
-      // 'GM.info',
-      // 'GM.listValues',
-      // 'GM.notification',
-      // 'GM.openInTab',
-      // 'GM.registerMenuCommand',
-      // 'GM.setClipboard',
-      // 'GM.setValue',
-      // 'GM.xmlHttpRequest',
-      'GM',
-      'GM_addElement',
-      'GM_addStyle',
-      'GM_addValueChangeListener',
-      'GM_deleteValue',
-      'GM_download',
-      'GM_getResourceText',
-      'GM_getResourceURL',
-      'GM_getTab',
-      'GM_getTabs',
-      'GM_getValue',
-      'GM_info',
-      'GM_listValues',
-      'GM_log',
-      'GM_notification',
-      'GM_openInTab',
-      'GM_registerMenuCommand',
-      'GM_removeValueChangeListener',
-      'GM_saveTab',
-      'GM_setClipboard',
-      'GM_setValue',
-      'GM_unregisterMenuCommand',
-      'GM_xmlhttpRequest',
-      // 'unsafeWindow',
-      // 'window.close',
-      // 'window.focus',
-      // 'window.onurlchange',
-    ].forEach((s) => {
-      if (window[s]) {
-        injectWindow[s] = window[s];
-        sum++;
+export const serverInjectTemplate = ({
+  entryList = [] as string[],
+  apiList = [] as string[],
+}) => {
+  // 所有的 GM api 都是不可枚举的，必须显式提供注入列表
+  // @ts-ignore
+  const _unsafeWindow: Window | undefined = window.unsafeWindow;
+  if (_unsafeWindow) {
+    Reflect.set(_unsafeWindow, 'unsafeWindow', _unsafeWindow);
+
+    const mountedApiList: string[] = [];
+    const unMountedApiList: string[] = [];
+    apiList.forEach((s) => {
+      const fn = Reflect.get(window, s);
+      if (fn) {
+        Reflect.set(_unsafeWindow, s, fn);
+        mountedApiList.push(s);
+      } else {
+        unMountedApiList.push(s);
       }
     });
-    console.log(`[vite-plugin-monkey] inject GM_*${sum} to unsafeWindow`);
+    console.log(
+      `[vite-plugin-monkey] mount ${mountedApiList.length}/${apiList.length} GM_api to unsafeWindow`,
+    );
+    Reflect.set(_unsafeWindow, '__vite_plugin_monkey', {
+      mountedApiList,
+      unMountedApiList,
+    });
+    // TODO 目前暂不处理 onurlchange, window.close window.focus
+    // if (Reflect.get(window, 'onurlchange') === null) {
+    //   const mockAddEventListener = unsafeWindow.addEventListener;
+    //   // @ts-ignore
+    //   unsafeWindow.addEventListener = function (...args) {
+    //     if (args[0] === 'onurlchange') {
+    //       // @ts-ignore
+    //       return window.addEventListener(...args);
+    //     }
+    //     // @ts-ignore
+    //     return mockAddEventListener.apply(this, args);
+    //   };
+    // }
   }
 
   const createScript = (src: string) => {
@@ -78,7 +65,9 @@ export const serverInjectTemplate = ({ entryList = [] as string[] }) => {
   entryList.reverse().forEach((s) => {
     head.insertBefore(createScript(s), head.firstChild);
   });
-  console.log('[vite-plugin-monkey] inject module to document.head');
+  console.log(
+    `[vite-plugin-monkey] mount ${entryList.length} module to document.head`,
+  );
 };
 
 export const cssInjectTemplate = ({ cssText = '' }) => {

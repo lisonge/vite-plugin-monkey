@@ -279,6 +279,50 @@ export default (pluginOption: MonkeyOption): Plugin => {
       // support dev env
       pluginOption.userscript.grant = '*';
 
+      const apiSet = new Set<string>([
+        'GM',
+        'GM_addElement',
+        'GM_addStyle',
+        'GM_addValueChangeListener',
+        'GM_deleteValue',
+        'GM_download',
+        'GM_getResourceText',
+        'GM_getResourceURL',
+        'GM_getTab',
+        'GM_getTabs',
+        'GM_getValue',
+        'GM_info',
+        'GM_listValues',
+        'GM_log',
+        'GM_notification',
+        'GM_openInTab',
+        'GM_registerMenuCommand',
+        'GM_removeValueChangeListener',
+        'GM_saveTab',
+        'GM_setClipboard',
+        'GM_setValue',
+        'GM_unregisterMenuCommand',
+        'GM_xmlhttpRequest',
+      ]);
+      const { $extra = [] } = pluginOption.userscript;
+      if ($extra instanceof Array) {
+        $extra.forEach(([k, v]) => {
+          if (k == 'grant') {
+            apiSet.add(v);
+          }
+        });
+      } else if (typeof $extra == 'object') {
+        Object.entries($extra).forEach(([k, v]) => {
+          if (k == 'grant') {
+            if (typeof v == 'string') {
+              apiSet.add(v);
+            } else if (v instanceof Array) {
+              v.forEach((s) => apiSet.add(s));
+            }
+          }
+        });
+      }
+
       server.middlewares.use(async (req, res, next) => {
         let realHost = req.headers[':authority'] ?? req.headers['host'];
         if (realHost instanceof Array) {
@@ -349,6 +393,7 @@ export default (pluginOption: MonkeyOption): Plugin => {
               userscript2comment(pluginOption.userscript, pluginOption.format),
               template2string(serverInjectTemplate, {
                 entryList,
+                apiList: Array.from(apiSet),
               }),
             ].join('\n\n'),
           );

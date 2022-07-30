@@ -19,9 +19,11 @@
 // @match              https://i.songe.li/
 // @match              https://lisonge.com/
 // @require            https://cdn.jsdelivr.net/npm/blueimp-md5@2.19.0
+// @grant              GM.addElement
+// @grant              GM_cookie
 // ==/UserScript==
 
-// use vite-plugin-monkey@1.1.3 at 2022-07-28T08:58:01.193Z
+// use vite-plugin-monkey@1.1.3 at 2022-07-29T13:33:43.180Z
 
 ;(({ cssText = "" }) => {
   const style = document.createElement("style");

@@ -1,0 +1,37 @@
+name: Add GitHub Release Tag
+
+on:
+  push:
+    tags:
+      - 'v*'
+      - 'create-monkey*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Get pkgName for tag
+        id: tag
+        run: |
+          # matching v2.0.0 / v2.0.0-beta.8 etc
+          if [[ $GITHUB_REF_NAME =~ ^v.+ ]]; then
+            pkgName="vite-plugin-monkey"
+          else
+            # `%@*` truncates @ and version number from the right side.
+            # https://stackoverflow.com/questions/9532654/expression-after-last-specific-character
+            pkgName=${GITHUB_REF_NAME%@*}
+          fi
+          echo "::set-output name=pkgName::$pkgName"
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            Please refer to [CHANGELOG.md](https://github.com/lisonge/vite-plugin-monkey/blob/${{ github.ref_name }}/packages/${{ steps.tag.outputs.pkgName }}/CHANGELOG.md) for details.

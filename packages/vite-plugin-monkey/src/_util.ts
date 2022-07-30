@@ -1,4 +1,6 @@
 import { readFileSync } from 'node:fs';
+import fs from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 
 export const delay = async (n = 0) => {
@@ -155,12 +157,10 @@ export const packageJson = (() => {
   return target;
 })();
 
-import { createRequire } from 'module';
-
 export const compatResolve = (() => {
-  const hostRequire = createRequire(process.cwd() + '/any_filename.js');
+  const compatRequire = createRequire(process.cwd() + '/any_filename.js');
   return (id: string) => {
-    return hostRequire.resolve(id);
+    return compatRequire.resolve(id);
   };
 })();
 
@@ -212,7 +212,6 @@ export const traverse = <T>(
   }
 };
 
-import fs from 'fs/promises';
 export const existFile = async (path: string) => {
   try {
     return (await fs.stat(path)).isFile();

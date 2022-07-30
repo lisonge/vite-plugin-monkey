@@ -24,6 +24,10 @@ export default defineConfig(({ command, mode }) => ({
           'zh-CN': '描述',
         },
         match: ['https://i.songe.li/', 'https://lisonge.com/'],
+        grant: ['GM.addElement'],
+        $extra: {
+          grant: ['GM_cookie'],
+        },
       },
       build: {
         externalGlobals: {

@@ -6,15 +6,23 @@ importers:
     specifiers:
       '@commitlint/cli': ^17.0.3
       '@commitlint/config-conventional': ^17.0.3
+      '@types/fs-extra': 9.0.13
+      '@types/minimist': 1.2.2
       '@types/node': 14.18.12
+      '@types/semver': 7.3.10
       '@typescript-eslint/eslint-plugin': ^5.31.0
       '@typescript-eslint/parser': ^5.31.0
       eslint: ^8.20.0
       eslint-config-prettier: ^8.5.0
       eslint-define-config: 1.5.1
+      execa: 6.1.0
+      fs-extra: 10.1.0
       husky: ^8.0.1
       lint-staged: ^13.0.3
+      minimist: ^1.2.6
+      picocolors: 1.0.0
       prettier: ^2.7.1
+      semver: 7.3.7
       tsup: ^6.2.0
       tsx: 3.8.0
       typescript: ^4.7.4
@@ -24,14 +32,22 @@ importers:
     devDependencies:
       '@commitlint/cli': 17.0.3
       '@commitlint/config-conventional': 17.0.3
+      '@types/fs-extra': 9.0.13
+      '@types/minimist': 1.2.2
       '@types/node': 14.18.12
+      '@types/semver': 7.3.10
       '@typescript-eslint/eslint-plugin': 5.31.0_d5zwcxr4bwkhmuo464cb3a2puu
       '@typescript-eslint/parser': 5.31.0_he2ccbldppg44uulnyq4rwocfa
       eslint: 8.20.0
       eslint-config-prettier: 8.5.0_eslint@8.20.0
+      execa: 6.1.0
+      fs-extra: 10.1.0
       husky: 8.0.1
       lint-staged: 13.0.3
+      minimist: 1.2.6
+      picocolors: 1.0.0
       prettier: 2.7.1
+      semver: 7.3.7
       tsup: 6.2.0_typescript@4.7.4
       tsx: 3.8.0
       typescript: 4.7.4
@@ -398,6 +414,12 @@ packages:
     resolution: {integrity: sha512-xxgAGA2SAU4111QefXPSp5eGbDm/hW6zhvYl9IeEPZEry9F4d66QAHm5qpUXjb6IsevZV/7emAEx5MhP6O192g==}
     dev: true
 
+  /@types/fs-extra/9.0.13:
+    resolution: {integrity: sha512-nEnwB++1u5lVDM2UI4c1+5R+FYaKfaAzS4OococimjVm3nQw3TuzH5UNsocrcTBbhnerblyHj4A49qXbIiZdpA==}
+    dependencies:
+      '@types/node': 18.6.1
+    dev: true
+
   /@types/json-schema/7.0.11:
     resolution: {integrity: sha512-wOuvG1SN4Us4rez+tylwwwCV1psiNVOkJeM3AUWUNWg/jDQY2+HE/444y5gc+jBmRqASOm2Oeh5c1axHobwRKQ==}
     dev: true
@@ -427,6 +449,10 @@ packages:
 
   /@types/parse-json/4.0.0:
     resolution: {integrity: sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==}
+    dev: true
+
+  /@types/semver/7.3.10:
+    resolution: {integrity: sha512-zsv3fsC7S84NN6nPK06u79oWgrPVd0NvOyqgghV1haPaFcVxIrP4DLomRwGAXk0ui4HZA7mOcSFL98sMVW9viw==}
     dev: true
 
   /@types/tampermonkey/4.0.5:
@@ -2125,7 +2151,6 @@ packages:
 
   /minimist/1.2.6:
     resolution: {integrity: sha512-Jsjnk4bw3YJqYzbdyBiNsPWHPfO++UGG749Cxs6peCu5Xg4nrena6OVxOYxrQTqww0Jmwt+Ref8rggumkTLz9Q==}
-    dev: false
 
   /ms/2.0.0:
     resolution: {integrity: sha512-Tpp60P6IUJDTuOq/5Z8cdskzJujfwqfOTkrwIwj7IRISpnkJnT6SyJ4PCPnGMoFjC9ddhal5KVIYtAt97ix05A==}

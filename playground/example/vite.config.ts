@@ -1,8 +1,7 @@
 import { defineConfig } from 'vite';
-import ViteRestart from 'vite-plugin-restart';
 import monkey, { cdn } from 'vite-plugin-monkey';
 
-// https://vitejs.dev/config/
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default defineConfig(({ command, mode }) => ({
   plugins: [
     monkey({
@@ -11,7 +10,7 @@ export default defineConfig(({ command, mode }) => ({
         name: {
           // '': 'default_name', // if not set, will get from package.json
           ja: 'hentai',
-          zh: '默认名字',
+          zh: '测试_',
         },
         namespace: 'https://github.com/lisonge',
         version: '1.0.1',
@@ -23,8 +22,8 @@ export default defineConfig(({ command, mode }) => ({
           ja: '説明z',
           'zh-CN': '描述',
         },
-        match: ['https://i.songe.li/', 'https://lisonge.com/'],
-        grant: ['GM.addElement'],
+        match: ['https://i.songe.li/'],
+        grant: ['GM.addElement', 'GM_openInTab'],
         $extra: {
           grant: ['GM_cookie'],
         },
@@ -34,9 +33,6 @@ export default defineConfig(({ command, mode }) => ({
           'blueimp-md5': cdn.jsdelivr('md5'),
         },
       },
-    }),
-    ViteRestart({
-      restart: ['../../src/index.ts'],
     }),
   ],
   build: {

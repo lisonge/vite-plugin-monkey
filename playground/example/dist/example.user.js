@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name               example
 // @name:ja            hentai
-// @name:zh            默认名字
+// @name:zh            测试_
 // @namespace          https://github.com/lisonge
 // @version            1.0.1
 // @author             lisonge
@@ -17,13 +17,13 @@
 // @source             https://github.com/lisonge/vite-plugin-monkey.git
 // @supportURL         https://github.com/lisonge/vite-plugin-monkey/issues
 // @match              https://i.songe.li/
-// @match              https://lisonge.com/
 // @require            https://cdn.jsdelivr.net/npm/blueimp-md5@2.19.0
 // @grant              GM.addElement
+// @grant              GM_openInTab
 // @grant              GM_cookie
 // ==/UserScript==
 
-// use vite-plugin-monkey@1.1.3 at 2022-07-29T13:33:43.180Z
+// use vite-plugin-monkey@1.1.4 at 2022-07-30T12:34:29.215Z
 
 ;(({ cssText = "" }) => {
   const style = document.createElement("style");
@@ -31,7 +31,7 @@
   style.dataset.source = "vite-plugin-monkey";
   document.head.appendChild(style);
 })({
-  "cssText": "#app {\n  background-color: beige;\n}\n.test {\n  font-size: larger;\n}\n"
+  "cssText": "#app {\r\n  background-color: beige;\r\n}\r\n.test {\r\n  font-size: larger;\r\n}\r\n"
 });
 
 (function(md52) {

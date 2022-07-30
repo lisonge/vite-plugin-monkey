@@ -15,10 +15,10 @@ module.exports = defineConfig({
   },
   plugins: ['@typescript-eslint'],
   rules: {
-    '@typescript-eslint/ban-ts-comment': 'warn',
+    '@typescript-eslint/ban-ts-comment': 'off',
     'no-empty': 'off',
     '@typescript-eslint/no-empty-function': 'off',
-    'prefer-const': 'warn',
+    'prefer-const': 'off',
   },
   globals: {},
 });

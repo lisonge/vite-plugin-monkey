@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 1.1.4
+
+### Bug Fixes
+
+- some grant api not mount to unsafeWindow [issues/6](https://github.com/lisonge/vite-plugin-monkey/issues/6) [e46e6f1a](https://github.com/lisonge/vite-plugin-monkey/commit/b81ad20b16ab9a395b760af3007ca794e46e6f1a)
+
 ## 1.1.3
 
 ### Bug Fixes

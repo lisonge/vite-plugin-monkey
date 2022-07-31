@@ -33,7 +33,8 @@ then you can choose the following template
 - [vue-ts](/packages/create-monkey/template-vue-ts)
 - [react](/packages/create-monkey/template-react)
 - [react-ts](/packages/create-monkey/template-react-ts)
-- [preact-preact](/packages/create-monkey/template-preact)
+- [preact](/packages/create-monkey/template-preact)
+- [preact-ts](/packages/create-monkey/template-preact-ts)
 - [svelte](/packages/create-monkey/template-svelte)
 - [svelte-ts](/packages/create-monkey/template-svelte-ts)
 - [vanilla](/packages/create-monkey/template-vanilla) (native js)
@@ -188,7 +189,7 @@ if you want use other cdn, you can see [external-scripts](https://greasyfork.org
 
 vite config is simple, see [vite.config.ts](/playground/example/vite.config.ts), build file see [example-project.user.js](/playground/example/dist/example.user.js)
 
-and preact/react/svelte/vanilla/vue examples see [create-monkey](/packages/vite-plugin-monkey)
+and preact/react/svelte/vanilla/vue examples see [create-monkey](/packages/create-monkey)
 
 ## note
 

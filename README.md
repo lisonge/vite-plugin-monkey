@@ -29,6 +29,10 @@ pnpm create monkey
 
 then you can choose the following template
 
+- [empty](/packages/create-monkey/template-empty) (only js)
+- [empty-ts](/packages/create-monkey/template-empty-ts) (only ts)
+- [vanilla](/packages/create-monkey/template-vanilla) (js + css)
+- [vanilla-ts](/packages/create-monkey/template-vanilla-ts) (ts + css)
 - [vue](/packages/create-monkey/template-vue)
 - [vue-ts](/packages/create-monkey/template-vue-ts)
 - [react](/packages/create-monkey/template-react)
@@ -37,8 +41,6 @@ then you can choose the following template
 - [preact-ts](/packages/create-monkey/template-preact-ts)
 - [svelte](/packages/create-monkey/template-svelte)
 - [svelte-ts](/packages/create-monkey/template-svelte-ts)
-- [vanilla](/packages/create-monkey/template-vanilla) (native js)
-- [vanilla-ts](/packages/create-monkey/template-vanilla-ts) (native ts)
 
 ![vue-ts](https://github.com/lisonge/src/raw/main/img/2022-07-17_19-15-35.gif)
 

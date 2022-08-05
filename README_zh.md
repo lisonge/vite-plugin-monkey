@@ -29,6 +29,10 @@ pnpm create monkey
 
 然后你能从以下模板选择
 
+- [empty](/packages/create-monkey/template-empty) (仅 js)
+- [empty-ts](/packages/create-monkey/template-empty-ts) (仅 ts)
+- [vanilla](/packages/create-monkey/template-vanilla) (js + css)
+- [vanilla-ts](/packages/create-monkey/template-vanilla-ts) (ts + css)
 - [vue](/packages/create-monkey/template-vue)
 - [vue-ts](/packages/create-monkey/template-vue-ts)
 - [react](/packages/create-monkey/template-react)
@@ -37,8 +41,6 @@ pnpm create monkey
 - [preact-ts](/packages/create-monkey/template-preact-ts)
 - [svelte](/packages/create-monkey/template-svelte)
 - [svelte-ts](/packages/create-monkey/template-svelte-ts)
-- [vanilla](/packages/create-monkey/template-vanilla) (原生 js)
-- [vanilla-ts](/packages/create-monkey/template-vanilla-ts) (原生 ts)
 
 ![vue-ts](https://github.com/lisonge/src/raw/main/img/2022-07-17_19-15-35.gif)
 

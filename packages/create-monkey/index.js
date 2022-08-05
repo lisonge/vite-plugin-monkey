@@ -1,7 +1,16 @@
 #!/usr/bin/env node
 
 // @ts-check
-import { blue, cyan, green, magenta, red, reset, yellow } from 'kolorist';
+import {
+  blue,
+  cyan,
+  green,
+  magenta,
+  red,
+  reset,
+  yellow,
+  white,
+} from 'kolorist';
 import minimist from 'minimist';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -14,6 +23,22 @@ const argv = minimist(process.argv.slice(2), { string: ['_'] });
 const cwd = process.cwd();
 
 const FRAMEWORKS = [
+  {
+    name: 'empty',
+    color: white,
+    variants: [
+      {
+        name: 'empty',
+        display: 'JavaScript',
+        color: white,
+      },
+      {
+        name: 'empty-ts',
+        display: 'TypeScript',
+        color: magenta,
+      },
+    ],
+  },
   {
     name: 'vanilla',
     color: yellow,

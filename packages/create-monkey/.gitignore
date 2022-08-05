@@ -20,3 +20,4 @@ dist
 *.sw?
 
 template-*/pnpm-lock.yaml
+template-*/npm-lock.json

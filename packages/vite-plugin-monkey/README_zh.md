@@ -196,13 +196,19 @@ preact/react/svelte/vanilla/vue 的例子在 [create-monkey](/packages/create-mo
 
 ## 注意
 
-### CSP
+### [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)
 
 你可以使用 [Tampermonkey](https://www.tampermonkey.net/) 然后打开插件配置 `extension://iikmkjmpaadaobahmlepeloendndfphd/options.html#nav=settings`
 
 在 `安全`, 设置 `如果站点有内容安全策略（CSP）则向其策略:` 为 `全部移除（可能不安全）`
 
 具体情况请看 [issues/1](https://github.com/lisonge/vite-plugin-monkey/issues/1)
+
+如果你使用 `Violentmonkey`/`Greasemonkey`, 你能通过以下方式解决
+
+- chrome - [Disable Content-Security-Policy](https://chrome.google.com/webstore/detail/disable-content-security/ieelmcmcagommplceebfedjlakkhpden/)
+- edge - [Disable Content-Security-Policy](https://microsoftedge.microsoft.com/addons/detail/disable-contentsecurity/ecmfamimnofkleckfamjbphegacljmbp?hl=zh-CN)
+- firefox - 在 `about:config` 菜单配置中，禁用 `security.csp.enable`
 
 ### Polyfill
 

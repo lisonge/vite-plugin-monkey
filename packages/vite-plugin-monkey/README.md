@@ -191,15 +191,21 @@ vite config is simple, see [vite.config.ts](/playground/example/vite.config.ts),
 
 and preact/react/svelte/vanilla/vue examples see [create-monkey](/packages/create-monkey)
 
-## note
+## some note
 
-### CSP
+### [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)
 
 you can use [Tampermonkey](https://www.tampermonkey.net/) then open `extension://iikmkjmpaadaobahmlepeloendndfphd/options.html#nav=settings`
 
 at `Security`, set `Modify existing content security policy (CSP) headers` to `Remove entirely (possibly unsecure)`
 
 full detail see [issues/1](https://github.com/lisonge/vite-plugin-monkey/issues/1)
+
+and if you use `Violentmonkey`/`Greasemonkey`, you can solve it in the following ways
+
+- chrome - [Disable Content-Security-Policy](https://chrome.google.com/webstore/detail/disable-content-security/ieelmcmcagommplceebfedjlakkhpden/)
+- edge - [Disable Content-Security-Policy](https://microsoftedge.microsoft.com/addons/detail/disable-contentsecurity/ecmfamimnofkleckfamjbphegacljmbp?hl=zh-CN)
+- firefox - disable `security.csp.enable` in the `about:config` menu
 
 ### Polyfill
 

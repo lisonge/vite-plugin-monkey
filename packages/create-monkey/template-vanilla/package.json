@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "vite": "^3.0.2",
+    "vite": "^3.0.4",
     "vite-plugin-monkey": "1.1.4"
   }
 }

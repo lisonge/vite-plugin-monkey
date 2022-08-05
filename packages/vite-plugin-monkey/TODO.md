@@ -6,4 +6,4 @@
 
 ## feature
 
-- nothing
+- 不再依靠挂载 GM_api 到 unsafeWindow, 应该使 import {GM_api} from 'virtual:module'; 的方式使用

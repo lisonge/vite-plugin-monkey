@@ -89,14 +89,12 @@ importers:
   playground/example:
     specifiers:
       '@types/blueimp-md5': 2.18.0
-      '@types/tampermonkey': ^4.0.5
       blueimp-md5: ^2.19.0
       vite-plugin-monkey: workspace:*
     dependencies:
       blueimp-md5: 2.19.0
     devDependencies:
       '@types/blueimp-md5': 2.18.0
-      '@types/tampermonkey': 4.0.5
       vite-plugin-monkey: link:../../packages/vite-plugin-monkey
 
   playground/polyfill:
@@ -451,10 +449,6 @@ packages:
 
   /@types/semver/7.3.10:
     resolution: {integrity: sha512-zsv3fsC7S84NN6nPK06u79oWgrPVd0NvOyqgghV1haPaFcVxIrP4DLomRwGAXk0ui4HZA7mOcSFL98sMVW9viw==}
-    dev: true
-
-  /@types/tampermonkey/4.0.5:
-    resolution: {integrity: sha512-FGPo7d+qZkDF7vyrwY1WNhcUnfDyVpt2uyL7krAu3WKCUMCfIUzOuvt8aSk8N2axHT8XPr9stAEDGVHLvag6Pw==}
     dev: true
 
   /@typescript-eslint/eslint-plugin/5.31.0_d5zwcxr4bwkhmuo464cb3a2puu:

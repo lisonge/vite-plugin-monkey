@@ -18,11 +18,12 @@
 // @supportURL         https://github.com/lisonge/vite-plugin-monkey/issues
 // @match              https://i.songe.li/
 // @require            https://cdn.jsdelivr.net/npm/blueimp-md5@2.19.0
+// @require            https://raw.githubusercontent.com/lisonge/src/main/js/monkey.js
 // @grant              GM_cookie
 // @grant              unsafeWindow
 // ==/UserScript==
 
-// use vite-plugin-monkey@1.1.4 at 2022-08-09T08:58:45.252Z
+// use vite-plugin-monkey@1.1.4 at 2022-08-09T13:28:07.176Z
 
 ;(({ css = "" }) => {
   const style = document.createElement("style");

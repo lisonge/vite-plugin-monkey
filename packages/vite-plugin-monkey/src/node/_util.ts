@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import fs from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
+import { logger } from './_logger';
 
 export const delay = async (n = 0) => {
   await new Promise<void>((res) => {
@@ -220,4 +221,18 @@ export const existFile = async (path: string) => {
   } catch {
     return false;
   }
+};
+
+export const getModuleVersion = async (name: string) => {
+  let version: string | undefined = undefined;
+  try {
+    const filePath = compatResolve(`${name}/package.json`);
+    const modulePack: { version?: string } = JSON.parse(
+      await fs.readFile(filePath, 'utf-8'),
+    );
+    version = modulePack.version;
+  } catch {
+    logger.warn(`not found module ${name} version, use ${name}@latest`);
+  }
+  return version ?? 'latest';
 };

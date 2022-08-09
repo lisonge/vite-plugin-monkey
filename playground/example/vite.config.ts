@@ -25,7 +25,10 @@ export default defineConfig(({ command, mode }) => ({
       },
       build: {
         externalGlobals: {
-          'blueimp-md5': cdn.jsdelivr('md5'),
+          'blueimp-md5': [
+            ...cdn.jsdelivr('md5'),
+            'https://raw.githubusercontent.com/lisonge/src/main/js/monkey.js',
+          ],
         },
       },
     }),

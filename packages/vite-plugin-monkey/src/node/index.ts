@@ -22,8 +22,8 @@ import type {
 import { userscript2comment } from './userscript';
 import { logger } from './_logger';
 import {
-  compatResolve,
   existFile,
+  getModuleVersion,
   GM_keywords,
   isFirstBoot,
   packageJson,
@@ -37,6 +37,8 @@ export type {
   GreasemonkeyUserScript,
   Format,
 };
+
+type Lib2Url = (version: string, name: string) => string;
 
 export interface MonkeyOption {
   /**
@@ -77,7 +79,7 @@ export interface MonkeyOption {
     prefix?: string | ((name: string) => string) | false;
 
     /**
-     * mount GM_api to unsafeWindow
+     * mount GM_api to unsafeWindow, not recommend it, you should use GM_api by ESM import
      * @default false
      */
     mountGmApi?: boolean;
@@ -95,17 +97,15 @@ export interface MonkeyOption {
      *  vue:'Vue',
      *  // need manually set userscript.require = ['https://unpkg.com/vue@3.0.0/dist/vue.global.js']
      *  vuex:['Vuex', 'https://unpkg.com/vuex@4.0.0/dist/vuex.global.js'],
-     *  // recommended this, plugin will auto add this url to userscript.require
-     *  vuex:['Vuex', (version)=>`https://unpkg.com/vuex@${version}/dist/vuex.global.js`],
-     *  // better recommended this
+     *  // use fixed version, plugin will auto add this url to userscript.require
      *  vuex:['Vuex', (version, name)=>`https://unpkg.com/${name}@${version}/dist/vuex.global.js`],
-     *  // or this
+     *  // best recommended this
      * }
      *
      */
     externalGlobals?: Record<
       string,
-      string | [string, string | ((version: string, name: string) => string)]
+      string | [string, ...(string | Lib2Url)[]]
     >;
 
     /**
@@ -168,7 +168,7 @@ export default (pluginOption: MonkeyOption): Plugin => {
 
   const autoGrantList: string[] = [];
 
-  let cdnPromiseList: Array<{
+  let checkCdnPromiseList: Array<{
     url: string;
     responsePromise: Promise<nodeResponse | unknown>;
   }> = [];
@@ -181,28 +181,23 @@ export default (pluginOption: MonkeyOption): Plugin => {
       for (const kv of Object.entries(
         pluginOption.build?.externalGlobals ?? {},
       )) {
-        const [k, v] = kv;
-        external.push(k);
-        if (typeof v == 'string') {
-          globals[k] = v;
-        } else if (typeof v[1] == 'string') {
-          globals[k] = v[0];
-          cdnList.push(v[1]);
-        } else if (typeof v[1] == 'function') {
-          globals[k] = v[0];
-          let version: string | undefined = undefined;
-          try {
-            const filePath = compatResolve(`${k}/package.json`);
-            const modulePack: { version?: string } = JSON.parse(
-              await fs.readFile(filePath, 'utf-8'),
-            );
-            version = modulePack.version;
-          } catch {
-            logger.warn(`not found module ${k} version, use ${k}@latest`);
-            version = 'latest';
-          }
-          if (version) {
-            cdnList.push(v[1](version, k));
+        const [moduleName, varName$LibUrl] = kv;
+        external.push(moduleName);
+
+        if (typeof varName$LibUrl == 'string') {
+          globals[moduleName] = varName$LibUrl;
+        } else if (varName$LibUrl instanceof Array) {
+          const [varName, ...libUrlList] = varName$LibUrl;
+          globals[moduleName] = varName;
+          for (const libUrl of libUrlList) {
+            // keep add order
+            if (typeof libUrl == 'string') {
+              cdnList.push(libUrl);
+            } else if (typeof libUrl == 'function') {
+              cdnList.push(
+                libUrl(await getModuleVersion(moduleName), moduleName),
+              );
+            }
           }
         }
       }
@@ -446,7 +441,7 @@ export default (pluginOption: MonkeyOption): Plugin => {
       }
 
       if (pluginOption.build?.checkCDN ?? false) {
-        cdnPromiseList = pluginOption.userscript.require.map((url) => ({
+        checkCdnPromiseList = pluginOption.userscript.require.map((url) => ({
           url,
           responsePromise: nodeFetch(url, {
             timeout: 3000,
@@ -563,13 +558,15 @@ export default (pluginOption: MonkeyOption): Plugin => {
       return code;
     },
     async closeBundle() {
-      if (isServe || cdnPromiseList.length == 0) return;
+      if (isServe || checkCdnPromiseList.length == 0) return;
       console.log();
-      logger.info(`checking CDN*${cdnPromiseList.length} for availability`);
+      logger.info(
+        `checking CDN*${checkCdnPromiseList.length} for availability`,
+      );
       await new Promise<void>((res) => {
         let n = 0;
         let failedNum = 0;
-        cdnPromiseList.forEach(async ({ url, responsePromise }) => {
+        checkCdnPromiseList.forEach(async ({ url, responsePromise }) => {
           const response = await responsePromise;
           if (response instanceof nodeResponse) {
             if (!response.ok) {
@@ -597,14 +594,14 @@ export default (pluginOption: MonkeyOption): Plugin => {
             }
           }
           n++;
-          if (n == cdnPromiseList.length) {
+          if (n == checkCdnPromiseList.length) {
             if (failedNum > 0) {
               logger.error(
                 `check finished, CDN*${failedNum} are not available, you need fix it`,
               );
             } else {
               logger.info(
-                `check finished, All CDN*${cdnPromiseList.length} are available`,
+                `check finished, All CDN*${checkCdnPromiseList.length} are available`,
               );
             }
             res();

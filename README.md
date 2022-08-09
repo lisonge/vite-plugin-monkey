@@ -15,6 +15,8 @@ vite plugin server and build \*.user.js for [Tampermonkey](https://www.tampermon
 - inject userscript comment to build bundle
 - auto open \*.user.js in default browser when userscript change
 - external cdn url inject to userscript @require
+- use GM_api by ESM import with type hints
+- when vite preview, auto open browser install dist.user.js
 - full typescript support and vite feature
 
 ## quick usage (recommend)
@@ -58,7 +60,7 @@ pnpm add -D vite-plugin-monkey
 
 ## config
 
-[MonkeyOption](/packages/vite-plugin-monkey/src/index.ts#L41)
+[MonkeyOption](/packages/vite-plugin-monkey/src/node/index.ts#L43)
 
 ```ts
 export interface MonkeyOption {
@@ -68,6 +70,24 @@ export interface MonkeyOption {
   entry: string;
   userscript: MonkeyUserScript;
   format?: Format;
+
+  /**
+   * alias of vite-plugin-monkey/dist/client
+   * @default '$'
+   * @example
+   * // vite.config.ts, plugin will auto modify config
+   * resolve: {
+   *   alias: {
+   *     [clientAlias]: 'vite-plugin-monkey/dist/client',
+   *   },
+   * }
+   * @example
+   * // vite-env.d.ts, you must manual modify .env file
+   * declare module clientAlias {
+   *   export * from 'vite-plugin-monkey/dist/client';
+   * }
+   */
+  clientAlias?: string;
   server?: {
     /**
      * auto open *.user.js in default browser when userscript comment change or vite server first start
@@ -80,6 +100,12 @@ export interface MonkeyOption {
      * @default 'dev:'
      */
     prefix?: string | ((name: string) => string) | false;
+
+    /**
+     * mount GM_api to unsafeWindow, not recommend it, you should use GM_api by ESM import
+     * @default false
+     */
+    mountGmApi?: boolean;
   };
   build?: {
     /**
@@ -94,17 +120,15 @@ export interface MonkeyOption {
      *  vue:'Vue',
      *  // need manually set userscript.require = ['https://unpkg.com/vue@3.0.0/dist/vue.global.js']
      *  vuex:['Vuex', 'https://unpkg.com/vuex@4.0.0/dist/vuex.global.js'],
-     *  // recommended this, plugin will auto add this url to userscript.require
-     *  vuex:['Vuex', (version)=>`https://unpkg.com/vuex@${version}/dist/vuex.global.js`],
-     *  // better recommended this
+     *  // use fixed version, plugin will auto add this url to userscript.require
      *  vuex:['Vuex', (version, name)=>`https://unpkg.com/${name}@${version}/dist/vuex.global.js`],
-     *  // or this
+     *  // best recommended this
      * }
-     *
+     * // type Lib2Url = (version: string, name: string) => string
      */
     externalGlobals?: Record<
       string,
-      string | [string, string | ((version: string, name: string) => string)]
+      string | [string, ...(string | Lib2Url)[]]
     >;
 
     /**
@@ -124,7 +148,7 @@ export interface MonkeyOption {
 }
 ```
 
-[MonkeyUserScript](/packages/vite-plugin-monkey/src/userscript/index.ts#L138)
+[MonkeyUserScript](/packages/vite-plugin-monkey/src/node/userscript/index.ts#L138)
 
 ```ts
 /**
@@ -137,13 +161,13 @@ export type MonkeyUserScript = GreasemonkeyUserScript &
   MergemonkeyUserScript;
 ```
 
-- [GreasemonkeyUserScript](/packages/vite-plugin-monkey/src/userscript/greasemonkey.ts#L38)
-- [TampermonkeyUserScript](/packages/vite-plugin-monkey/src/userscript/tampermonkey.ts#L77)
-- [ViolentmonkeyUserScript](/packages/vite-plugin-monkey/src/userscript/violentmonkey.ts#L81)
-- [GreasyforkUserScript](/packages/vite-plugin-monkey/src/userscript/index.ts#L33)
-- [MergemonkeyUserScript](/packages/vite-plugin-monkey/src/userscript/index.ts#L61)
+- [GreasemonkeyUserScript](/packages/vite-plugin-monkey/src/node/userscript/greasemonkey.ts#L38)
+- [TampermonkeyUserScript](/packages/vite-plugin-monkey/src/node/userscript/tampermonkey.ts#L77)
+- [ViolentmonkeyUserScript](/packages/vite-plugin-monkey/src/node/userscript/violentmonkey.ts#L81)
+- [GreasyforkUserScript](/packages/vite-plugin-monkey/src/node/userscript/index.ts#L31)
+- [MergemonkeyUserScript](/packages/vite-plugin-monkey/src/node/userscript/index.ts#L62)
 
-[Format](/packages/vite-plugin-monkey/src/userscript/common.ts#L12)
+[Format](/packages/vite-plugin-monkey/src/node/userscript/common.ts#L9)
 
 ```ts
 /**
@@ -174,18 +198,49 @@ import { cdn } from 'vite-plugin-monkey';
 }
 ```
 
-there is the following cdn to use, full detail see [cdn.ts](/packages/vite-plugin-monkey/src/cdn.ts)
+there is the following cdn to use, full detail see [cdn.ts](/packages/vite-plugin-monkey/src/node/cdn.ts)
 
-- [jsdelivr](/packages/vite-plugin-monkey/src/cdn.ts#L1) <https://www.jsdelivr.com/>
-- [unpkg](/packages/vite-plugin-monkey/src/cdn.ts#L43) <https://unpkg.com/>
-- [bytecdntp](/packages/vite-plugin-monkey/src/cdn.ts#L59) <https://cdn.bytedance.com/>
-- [bootcdn](/packages/vite-plugin-monkey/src/cdn.ts#L75) <https://www.bootcdn.cn/all/>
-- [baomitu](/packages/vite-plugin-monkey/src/cdn.ts#L91) <https://cdn.baomitu.com/>
-- [staticfile](/packages/vite-plugin-monkey/src/cdn.ts#L107) <https://staticfile.org/>
-- [cdnjs](/packages/vite-plugin-monkey/src/cdn.ts#L122) <https://cdnjs.com/libraries>
-- [zhimg](/packages/vite-plugin-monkey/src/cdn.ts#L138) <https://unpkg.zhimg.com/>
+- [jsdelivr](/packages/vite-plugin-monkey/src/node/cdn.ts#L1) <https://www.jsdelivr.com/>
+- [unpkg](/packages/vite-plugin-monkey/src/node/cdn.ts#L43) <https://unpkg.com/>
+- [bytecdntp](/packages/vite-plugin-monkey/src/node/cdn.ts#L59) <https://cdn.bytedance.com/>
+- [bootcdn](/packages/vite-plugin-monkey/src/node/cdn.ts#L75) <https://www.bootcdn.cn/all/>
+- [baomitu](/packages/vite-plugin-monkey/src/node/cdn.ts#L91) <https://cdn.baomitu.com/>
+- [staticfile](/packages/vite-plugin-monkey/src/node/cdn.ts#L107) <https://staticfile.org/>
+- [cdnjs](/packages/vite-plugin-monkey/src/node/cdn.ts#L122) <https://cdnjs.com/libraries>
+- [zhimg](/packages/vite-plugin-monkey/src/node/cdn.ts#L138) <https://unpkg.zhimg.com/>
 
 if you want use other cdn, you can see [external-scripts](https://greasyfork.org/zh-CN/help/external-scripts)
+
+## ESM GM_api
+
+we can use GM_api by esm module
+
+```ts
+import { GM_cookie, unsafeWindow, monkeyWindow, GM_addElement } from '$';
+// $ is the alias of vite-plugin-monkey/dist/client, you can use others
+
+// whatever it is serve or build mode, monkeyWindow is always the window of [UserScript Scope]
+console.log(monkeyWindow);
+
+GM_addElement(document.body, 'div', { innerHTML: 'hello' });
+
+// whatever it is serve or build mode, unsafeWindow is always host window
+if (unsafeWindow == window) {
+  console.log('scope->host, esm mode');
+} else {
+  console.log('scope->monkey, iife mode');
+}
+GM_cookie.list({}, (cookies, error) => {
+  if (error) {
+    console.log(error);
+  } else {
+    const [cookie] = cookies;
+    if (cookie) {
+      console.log(cookie);
+    }
+  }
+});
+```
 
 ## example
 

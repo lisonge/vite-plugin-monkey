@@ -15,6 +15,8 @@
 - 打包自动注入脚本配置头部注释
 - 当 第一次启动 或 脚本配置注释改变时 自动在默认浏览器打开脚本安装
 - 友好的利用 @require 配置库的 cdn 的方案，大大减少构建脚本大小
+- 通过 ESM 导入的方式使用 GM_api, 附带类型提示
+- 预览模式下自动打开浏览器安装构建好的脚本
 - 完全的 Typescript 和 Vite 的开发体验，比如模块热替换,秒启动
 
 ## 快速使用 (推荐)
@@ -58,7 +60,7 @@ pnpm add -D vite-plugin-monkey
 
 ## 配置
 
-[MonkeyOption](/packages/vite-plugin-monkey/src/index.ts#L41)
+[MonkeyOption](/packages/vite-plugin-monkey/src/node/index.ts#L43)
 
 ```ts
 export interface MonkeyOption {
@@ -68,6 +70,24 @@ export interface MonkeyOption {
   entry: string;
   userscript: MonkeyUserScript;
   format?: Format;
+
+  /**
+   * vite-plugin-monkey/dist/client 的别名
+   * @default '$'
+   * @example
+   * // vite.config.ts, 插件会自动设置此项
+   * resolve: {
+   *   alias: {
+   *     [clientAlias]: 'vite-plugin-monkey/dist/client',
+   *   },
+   * }
+   * @example
+   * // vite-env.d.ts, 你需要将以下内容附加到 vite-env.d.ts 中从而获得类型提示
+   * declare module clientAlias {
+   *   export * from 'vite-plugin-monkey/dist/client';
+   * }
+   */
+  clientAlias?: string;
   server?: {
     /**
      * 当 第一次启动 或 脚本配置注释改变时 自动在默认浏览器打开脚本
@@ -95,16 +115,14 @@ export interface MonkeyOption {
      *  // 你需要额外设置脚本配置 userscript.require = ['https://unpkg.com/vue@3.0.0/dist/vue.global.js']
      *  vuex:['Vuex', 'https://unpkg.com/vuex@4.0.0/dist/vuex.global.js'],
      *  // 插件将会自动注入 cdn 链接到 userscript.require
-     *  vuex:['Vuex', (version)=>`https://unpkg.com/vuex@${version}/dist/vuex.global.js`],
-     *  // 相比之前的，加了版本号，当依赖升级的时候，cdn 链接自动改变
      *  vuex:['Vuex', (version, name)=>`https://unpkg.com/${name}@${version}/dist/vuex.global.js`],
-     *  // 还可以加依赖名字,不过各个依赖的 cdn basename 都不尽一致, 导致可能没什么用
+     *  // 依据版本自动变化
      * }
-     *
+     * // type Lib2Url = (version: string, name: string) => string
      */
     externalGlobals?: Record<
       string,
-      string | [string, string | ((version: string, name: string) => string)]
+      string | [string, ...(string | Lib2Url)[]]
     >;
 
     /**
@@ -124,7 +142,7 @@ export interface MonkeyOption {
 }
 ```
 
-[MonkeyUserScript](/packages/vite-plugin-monkey/src/userscript/index.ts#L138)
+[MonkeyUserScript](/packages/vite-plugin-monkey/src/node/userscript/index.ts#L138)
 
 ```ts
 /**
@@ -137,13 +155,13 @@ export type MonkeyUserScript = GreasemonkeyUserScript &
   MergemonkeyUserScript;
 ```
 
-- [GreasemonkeyUserScript](/packages/vite-plugin-monkey/src/userscript/greasemonkey.ts#L38)
-- [TampermonkeyUserScript](/packages/vite-plugin-monkey/src/userscript/tampermonkey.ts#L77)
-- [ViolentmonkeyUserScript](/packages/vite-plugin-monkey/src/userscript/violentmonkey.ts#L81)
-- [GreasyforkUserScript](/packages/vite-plugin-monkey/src/userscript/index.ts#L33)
-- [MergemonkeyUserScript](/packages/vite-plugin-monkey/src/userscript/index.ts#L61)
+- [GreasemonkeyUserScript](/packages/vite-plugin-monkey/src/node/userscript/greasemonkey.ts#L38)
+- [TampermonkeyUserScript](/packages/vite-plugin-monkey/src/node/userscript/tampermonkey.ts#L77)
+- [ViolentmonkeyUserScript](/packages/vite-plugin-monkey/src/node/userscript/violentmonkey.ts#L81)
+- [GreasyforkUserScript](/packages/vite-plugin-monkey/src/node/userscript/index.ts#L33)
+- [MergemonkeyUserScript](/packages/vite-plugin-monkey/src/node/userscript/index.ts#L61)
 
-[Format](/packages/vite-plugin-monkey/src/userscript/common.ts#L12)
+[Format](/packages/vite-plugin-monkey/src/node/userscript/common.ts#L12)
 
 ```ts
 /**
@@ -175,18 +193,49 @@ import { cdn } from 'vite-plugin-monkey';
 }
 ```
 
-有以下 cdn 可使用，详情见 [cdn.ts](/packages/vite-plugin-monkey/src/cdn.ts)
+有以下 cdn 可使用，详情见 [cdn.ts](/packages/vite-plugin-monkey/src/node/cdn.ts)
 
-- [jsdelivr](/packages/vite-plugin-monkey/src/cdn.ts#L1) <https://www.jsdelivr.com/>
-- [unpkg](/packages/vite-plugin-monkey/src/cdn.ts#L43) <https://unpkg.com/>
-- [bytecdntp](/packages/vite-plugin-monkey/src/cdn.ts#L59) <https://cdn.bytedance.com/>
-- [bootcdn](/packages/vite-plugin-monkey/src/cdn.ts#L75) <https://www.bootcdn.cn/all/>
-- [baomitu](/packages/vite-plugin-monkey/src/cdn.ts#L91) <https://cdn.baomitu.com/>
-- [staticfile](/packages/vite-plugin-monkey/src/cdn.ts#L107) <https://staticfile.org/>
-- [cdnjs](/packages/vite-plugin-monkey/src/cdn.ts#L122) <https://cdnjs.com/libraries>
-- [zhimg](/packages/vite-plugin-monkey/src/cdn.ts#L138) <https://unpkg.zhimg.com/>
+- [jsdelivr](/packages/vite-plugin-monkey/src/node/cdn.ts#L1) <https://www.jsdelivr.com/>
+- [unpkg](/packages/vite-plugin-monkey/src/node/cdn.ts#L43) <https://unpkg.com/>
+- [bytecdntp](/packages/vite-plugin-monkey/src/node/cdn.ts#L59) <https://cdn.bytedance.com/>
+- [bootcdn](/packages/vite-plugin-monkey/src/node/cdn.ts#L75) <https://www.bootcdn.cn/all/>
+- [baomitu](/packages/vite-plugin-monkey/src/node/cdn.ts#L91) <https://cdn.baomitu.com/>
+- [staticfile](/packages/vite-plugin-monkey/src/node/cdn.ts#L107) <https://staticfile.org/>
+- [cdnjs](/packages/vite-plugin-monkey/src/node/cdn.ts#L122) <https://cdnjs.com/libraries>
+- [zhimg](/packages/vite-plugin-monkey/src/node/cdn.ts#L138) <https://unpkg.zhimg.com/>
 
 如果你想使用其他 cdn，请查看 [external-scripts](https://greasyfork.org/zh-CN/help/external-scripts)
+
+## ESM GM_api
+
+我们通过 esm 模块来使用 GM_api
+
+```ts
+import { GM_cookie, unsafeWindow, monkeyWindow, GM_addElement } from '$';
+// $ 是 vite-plugin-monkey/dist/client 的别名, 你也可以设置其他别名
+
+// 无论当前运行环境是开发环境还是构建环境, monkeyWindow 总是脚本作用域的 window
+console.log(monkeyWindow);
+
+GM_addElement(document.body, 'div', { innerHTML: 'hello' });
+
+// 无论当前运行环境是开发环境还是构建环境, unsafeWindow 总是宿主作用域的 window
+if (unsafeWindow == window) {
+  console.log('scope->host, esm mode');
+} else {
+  console.log('scope->monkey, iife mode');
+}
+GM_cookie.list({}, (cookies, error) => {
+  if (error) {
+    console.log(error);
+  } else {
+    const [cookie] = cookies;
+    if (cookie) {
+      console.log(cookie);
+    }
+  }
+});
+```
 
 ## 例子
 

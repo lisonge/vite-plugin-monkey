@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite';
 import monkey, { cdn } from 'vite-plugin-monkey';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default defineConfig(({ command, mode }) => ({
   plugins: [
     monkey({
@@ -23,10 +22,6 @@ export default defineConfig(({ command, mode }) => ({
           'zh-CN': '描述',
         },
         match: ['https://i.songe.li/'],
-        grant: ['GM.addElement', 'GM_openInTab'],
-        $extra: {
-          grant: ['GM_cookie'],
-        },
       },
       build: {
         externalGlobals: {
@@ -38,5 +33,10 @@ export default defineConfig(({ command, mode }) => ({
   build: {
     // if you want to minify xxx.user.js, set true
     // minify: true,
+    rollupOptions: {
+      treeshake: {
+        annotations: true,
+      },
+    },
   },
 }));

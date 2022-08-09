@@ -92,14 +92,12 @@ importers:
       '@types/tampermonkey': ^4.0.5
       blueimp-md5: ^2.19.0
       vite-plugin-monkey: workspace:*
-      vite-plugin-restart: ^0.2.0
     dependencies:
       blueimp-md5: 2.19.0
     devDependencies:
       '@types/blueimp-md5': 2.18.0
       '@types/tampermonkey': 4.0.5
       vite-plugin-monkey: link:../../packages/vite-plugin-monkey
-      vite-plugin-restart: 0.2.0
 
   playground/polyfill:
     specifiers: {}
@@ -3013,14 +3011,6 @@ packages:
     dependencies:
       spdx-correct: 3.1.1
       spdx-expression-parse: 3.0.1
-    dev: true
-
-  /vite-plugin-restart/0.2.0:
-    resolution: {integrity: sha512-DDgZh2EM0b2ZvqMpk3AOiXMP/ZOLhrJhUvcYkV21qbBl85tM5ezzt2OUXamV0wIsOzz3UDFAnLcHs3k6G3QMWw==}
-    peerDependencies:
-      vite: ^2.9.0 || ^3.0.0
-    dependencies:
-      micromatch: 4.0.5
     dev: true
 
   /vite/3.0.3:

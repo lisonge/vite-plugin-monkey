@@ -1,28 +1,37 @@
 import './style.css';
-import './test.css';
-import { x } from './util';
-import png from './asset/test.png';
-import svg from './asset/favicon.svg';
+// import pngUrl from './asset/test.png';
+// import svgUrl from './asset/favicon.svg';
 import md5 from 'blueimp-md5';
 
-console.log('hello world main.ts:' + x);
-console.log({ png, svg });
-console.log('blueimp-md5', md5('114514'));
-console.log('document.readyState', document.readyState);
+console.log(`md5('114514')=${md5('114514')}`); //c4d038b4bed09fdb1471ef51ec3a32cd
+console.log('document.readyState', document.readyState); // interactive
 
-// console.log(import.meta);
-// console.log(unsafeWindow);
-// not recommend use asset source, you should use raw url or iconfont cdn
+import { GM_cookie, unsafeWindow, monkeyWindow } from '$';
 
-// const mockLog = console.log;
-// console.log = function (...agrs: any[]) {
-//   console.warn('you call console.log');
-//   return mockLog.apply(this, agrs);
-// };
-
-// test config.define
-if (process.env.NODE_ENV == 'production') {
-  console.log('hello prod');
+console.log(monkeyWindow);
+if (unsafeWindow == window) {
+  console.log('scope->host');
 } else {
-  console.log('hello dev');
+  console.log('scope->monkey');
 }
+GM_cookie.list({}, (cookies, error) => {
+  if (error) {
+    console.log(error);
+  } else {
+    const [cookie] = cookies;
+    if (cookie) {
+      console.log(cookie);
+      // {
+      //   "domain": "i.songe.li",
+      //   "httpOnly": false,
+      //   "secure": false,
+      //   "name": "k",
+      //   "path": "/",
+      //   "sameSite": "unspecified",
+      //   "value": "v",
+      //   "session": true,
+      //   "hostOnly": true
+      // }
+    }
+  }
+});

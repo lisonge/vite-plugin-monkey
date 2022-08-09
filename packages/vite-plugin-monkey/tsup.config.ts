@@ -1,11 +1,21 @@
 import { defineConfig } from 'tsup';
 
-export default defineConfig({
-  entry: ['src/index.ts'],
-  sourcemap: true,
-  clean: true,
-  dts: true,
-  outDir: 'dist',
-  format: ['cjs', 'esm'],
-  onSuccess: 'tsc --emitDeclarationOnly --declaration',
-});
+export default defineConfig([
+  {
+    entry: ['src/node/index.ts'],
+    sourcemap: true,
+    clean: true,
+    dts: true,
+    outDir: 'dist/node',
+    format: ['cjs', 'esm'],
+  },
+  {
+    entry: ['src/client/index.ts'],
+    sourcemap: true,
+    clean: true,
+    dts: true,
+    target: 'es2020',
+    outDir: 'dist/client',
+    format: ['esm'],
+  },
+]);

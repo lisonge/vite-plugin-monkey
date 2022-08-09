@@ -323,7 +323,7 @@ export const userscript2comment = (
       attrList.push(['grant', grant]);
     }
   } else if (Array.isArray(grant)) {
-    grant.forEach((s) => {
+    new Set(grant).forEach((s) => {
       attrList.push(['grant', s]);
     });
   }

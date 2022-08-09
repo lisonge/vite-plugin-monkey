@@ -4,7 +4,7 @@ import nodeFetch, { Response as nodeResponse } from 'node-fetch';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import type { Plugin, ResolvedConfig } from 'vite';
-import selfPackageJson from '../package.json';
+import selfPackageJson from '../../package.json';
 import {
   cssInjectTemplate,
   redirectFn,
@@ -45,6 +45,24 @@ export interface MonkeyOption {
   entry: string;
   userscript: MonkeyUserScript;
   format?: Format;
+
+  /**
+   * alias of vite-plugin-monkey/dist/client
+   * @default '$'
+   * @example
+   * // vite.config.ts, plugin will auto modify config
+   * resolve: {
+   *   alias: {
+   *     [clientAlias]: 'vite-plugin-monkey/dist/client',
+   *   },
+   * }
+   * @example
+   * // vite-env.d.ts, you must manual modify .env file
+   * declare module clientAlias {
+   *   export * from 'vite-plugin-monkey/dist/client';
+   * }
+   */
+  clientAlias?: string;
   server?: {
     /**
      * auto open *.user.js in default browser when userscript comment change or vite server first start
@@ -57,6 +75,12 @@ export interface MonkeyOption {
      * @default 'dev:'
      */
     prefix?: string | ((name: string) => string) | false;
+
+    /**
+     * mount GM_api to unsafeWindow
+     * @default false
+     */
+    mountGmApi?: boolean;
   };
   build?: {
     /**
@@ -141,6 +165,7 @@ export default (pluginOption: MonkeyOption): Plugin => {
   }
 
   const GM_keyword_set = new Set(GM_keywords);
+
   const autoGrantList: string[] = [];
 
   let cdnPromiseList: Array<{
@@ -183,6 +208,11 @@ export default (pluginOption: MonkeyOption): Plugin => {
       }
 
       return {
+        resolve: {
+          alias: {
+            [pluginOption.clientAlias ?? '$']: 'vite-plugin-monkey/dist/client',
+          },
+        },
         define: {
           'process.env.NODE_ENV':
             config.define?.['process.env.NODE_ENV'] ??
@@ -277,50 +307,9 @@ export default (pluginOption: MonkeyOption): Plugin => {
       }
 
       // support dev env
-      pluginOption.userscript.grant = '*';
-
-      const apiSet = new Set<string>([
-        'GM',
-        'GM_addElement',
-        'GM_addStyle',
-        'GM_addValueChangeListener',
-        'GM_deleteValue',
-        'GM_download',
-        'GM_getResourceText',
-        'GM_getResourceURL',
-        'GM_getTab',
-        'GM_getTabs',
-        'GM_getValue',
-        'GM_info',
-        'GM_listValues',
-        'GM_log',
-        'GM_notification',
-        'GM_openInTab',
-        'GM_registerMenuCommand',
-        'GM_removeValueChangeListener',
-        'GM_saveTab',
-        'GM_setClipboard',
-        'GM_setValue',
-        'GM_unregisterMenuCommand',
-        'GM_xmlhttpRequest',
-      ]);
-      const { $extra = [] } = pluginOption.userscript;
-      if ($extra instanceof Array) {
-        $extra.forEach(([k, v]) => {
-          if (k == 'grant') {
-            apiSet.add(v);
-          }
-        });
-      } else if (typeof $extra == 'object') {
-        Object.entries($extra).forEach(([k, v]) => {
-          if (k == 'grant') {
-            if (typeof v == 'string') {
-              apiSet.add(v);
-            } else if (v instanceof Array) {
-              v.forEach((s) => apiSet.add(s));
-            }
-          }
-        });
+      const { grant } = pluginOption.userscript;
+      if (grant !== 'none') {
+        pluginOption.userscript.grant = '*';
       }
 
       server.middlewares.use(async (req, res, next) => {
@@ -393,8 +382,9 @@ export default (pluginOption: MonkeyOption): Plugin => {
               userscript2comment(pluginOption.userscript, pluginOption.format),
               template2string(serverInjectTemplate, {
                 entryList,
-                apiList: Array.from(apiSet),
+                mountGmApi: pluginOption.server?.mountGmApi ?? false,
               }),
+              '',
             ].join('\n\n'),
           );
         } else if (req.url?.startsWith('/__vite-plugin-monkey/pull_script')) {
@@ -484,17 +474,17 @@ export default (pluginOption: MonkeyOption): Plugin => {
       const bundleList = Object.entries(bundle);
       const cssBundleList = bundleList.filter(([k]) => k.endsWith('.css'));
       const jsBundleList = bundleList.filter(([k]) => k.endsWith('.js'));
-      const cssTextList: string[] = [];
+      const cssList: string[] = [];
       cssBundleList.forEach(([k, v]) => {
         if (v.type == 'asset') {
-          cssTextList.push(v.source.toString());
+          cssList.push(v.source.toString());
           delete bundle[k];
         }
       });
       let injectCssCode: undefined | string = undefined;
-      if (cssTextList.length > 0) {
+      if (cssList.length > 0) {
         injectCssCode = template2string(cssInjectTemplate, {
-          cssText: cssTextList.join(''),
+          css: cssList.join(''),
         });
       }
 
@@ -520,19 +510,8 @@ export default (pluginOption: MonkeyOption): Plugin => {
       if (
         pluginOption.build?.autoGrant !== false &&
         !isServe &&
-        GM_keyword_set.size > 0
-        // &&
-        // [
-        //   '.js',
-        //   '.ts',
-        //   '.mjs',
-        //   '.cjs',
-        //   '.json',
-        //   '.vue',
-        //   '.tsx',
-        //   '.jsx',
-        //   '.svelte',
-        // ].some((ext) => id.endsWith(ext))
+        GM_keyword_set.size > 0 &&
+        !id.endsWith('vite-plugin-monkey/dist/client/index.mjs')
       ) {
         Array.from(GM_keyword_set)
           .filter((fnName) => code.includes(fnName))
@@ -551,13 +530,15 @@ export default (pluginOption: MonkeyOption): Plugin => {
           `(__HMR_PROTOCOL__ || ((()=>{const u = new URL(import.meta['url'], location.origin);return u.protocol === 'https:' ? 'wss' : 'ws'})()))`,
         );
 
-        // vite@v3 not need, see https://github.com/vitejs/vite/blob/v3.0.0/packages/vite/src/client/client.ts#L26
+        // vite@v3 not need
+        // see https://github.com/vitejs/vite/blob/v3.0.0/packages/vite/src/client/client.ts#L26
         code = code.replace(
           /__HMR_HOSTNAME__/g,
           `(__HMR_HOSTNAME__ || ((()=>{const u = new URL(import.meta['url'], location.origin);return u.hostname})()))`,
         );
 
-        // vite@v3 not need, see https://github.com/vitejs/vite/blob/v3.0.0/packages/vite/src/client/client.ts#L29
+        // vite@v3 not need
+        // see https://github.com/vitejs/vite/blob/v3.0.0/packages/vite/src/client/client.ts#L29
         code = code.replace(
           /__HMR_PORT__/g,
           `(__HMR_PORT__ || ((()=>{const u = new URL(import.meta['url'], location.origin);return u.prort})()))`,
@@ -627,5 +608,15 @@ export default (pluginOption: MonkeyOption): Plugin => {
         });
       });
     },
+    // resolveId(id) {
+    //   if (id === virtualModuleId) {
+    //     return resolvedVirtualModuleId;
+    //   }
+    // },
+    // load(id) {
+    //   if (id === resolvedVirtualModuleId) {
+    //     return `export * from 'vite-plugin-monkey/dist/client';`;
+    //   }
+    // },
   };
 };

@@ -2,15 +2,21 @@
   "name": "vite-plugin-monkey",
   "version": "1.1.4",
   "description": "vite plugin for Tampermonkey, Violentmonkey and Greasemonkey",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
+  "main": "dist/node/index.js",
+  "module": "dist/node/index.mjs",
+  "types": "dist/node/index.d.ts",
   "exports": {
+    "./package.json": "./package.json",
     ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "import": "./dist/node/index.mjs",
+      "require": "./dist/node/index.js",
+      "types": "./dist/node/index.d.ts"
     },
-    "./package.json": "./package.json"
+    "./dist/client": {
+      "import": "./dist/client/index.mjs",
+      "require": "./dist/client/index.js",
+      "types": "./dist/client/index.d.ts"
+    }
   },
   "files": [
     "src",
@@ -61,18 +67,9 @@
     "@types/node-fetch": "2.6.2"
   },
   "peerDependencies": {
-    "@types/greasemonkey": "^4.0.3",
-    "@types/tampermonkey": "^4.0.5",
     "vite": "^2.0.0 || ^3.0.0"
   },
-  "peerDependenciesMeta": {
-    "@types/greasemonkey": {
-      "optional": true
-    },
-    "@types/tampermonkey": {
-      "optional": true
-    }
-  },
+  "peerDependenciesMeta": {},
   "engines": {
     "pnpm": ">=6",
     "node": "^14.18 || >= 16"

@@ -19,6 +19,7 @@ module.exports = defineConfig({
     'no-empty': 'off',
     '@typescript-eslint/no-empty-function': 'off',
     'prefer-const': 'off',
+    '@typescript-eslint/no-unused-vars': 'off',
   },
   globals: {},
 });

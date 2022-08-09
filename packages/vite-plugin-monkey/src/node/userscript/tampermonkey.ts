@@ -33,7 +33,8 @@ export type TamperGrant =
   | 'GM_getTabs'
   | 'GM_notification'
   | 'GM_setClipboard'
-  | 'GM_info';
+  | 'GM_info'
+  | 'GM_cookie';
 
 export const TamperGrantValueList: TamperGrant[] = [
   'unsafeWindow',
@@ -62,6 +63,7 @@ export const TamperGrantValueList: TamperGrant[] = [
   'GM_notification',
   'GM_setClipboard',
   'GM_info',
+  'GM_cookie',
 ];
 
 export type AntifeatureType = {

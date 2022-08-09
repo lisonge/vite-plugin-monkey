@@ -15,12 +15,11 @@
   "scripts": {
     "serve": "vite",
     "build": "vite build",
-    "preinstall": "npx only-allow pnpm"
+    "preview": "vite preview"
   },
   "devDependencies": {
     "@types/blueimp-md5": "2.18.0",
     "@types/tampermonkey": "^4.0.5",
-    "vite-plugin-restart": "^0.2.0",
     "vite-plugin-monkey": "workspace:*"
   },
   "dependencies": {

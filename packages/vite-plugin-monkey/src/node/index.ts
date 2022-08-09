@@ -213,6 +213,10 @@ export default (pluginOption: MonkeyOption): Plugin => {
             [pluginOption.clientAlias ?? '$']: 'vite-plugin-monkey/dist/client',
           },
         },
+        preview: {
+          host: config.preview?.host ?? '127.0.0.1',
+          cors: config.preview?.cors ?? true,
+        },
         define: {
           'process.env.NODE_ENV':
             config.define?.['process.env.NODE_ENV'] ??
@@ -608,15 +612,29 @@ export default (pluginOption: MonkeyOption): Plugin => {
         });
       });
     },
-    // resolveId(id) {
-    //   if (id === virtualModuleId) {
-    //     return resolvedVirtualModuleId;
-    //   }
-    // },
-    // load(id) {
-    //   if (id === resolvedVirtualModuleId) {
-    //     return `export * from 'vite-plugin-monkey/dist/client';`;
-    //   }
-    // },
+    configurePreviewServer(server) {
+      server.middlewares.use(async (req, res, next) => {
+        if (['/', '/index.html'].includes((req.url ?? '').split('?')[0])) {
+          const [fileName] = (
+            await fs.readdir(path.join(process.cwd(), finalConfig.build.outDir))
+          ).filter((name) => name.endsWith('.user.js'));
+          if (fileName) {
+            Object.entries({
+              'content-type': 'text/html; charset=utf-8',
+            }).forEach(([k, v]) => {
+              res.setHeader(k, String(v));
+            });
+            res.end(
+              `<script type="module" data-source="vite-plugin-monkey">${template2string(
+                redirectFn,
+                { url: '/' + fileName },
+              )}</script>`,
+            );
+            return;
+          }
+        }
+        next();
+      });
+    },
   };
 };

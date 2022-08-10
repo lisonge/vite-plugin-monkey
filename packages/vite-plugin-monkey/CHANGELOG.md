@@ -10,7 +10,7 @@
 
 ### 2.0.0-BreakChanges
 
-- no longer default turn off mount gm_api to unsafeWindow, yuo should use gm_api by esm
+- no longer default mount gm_api to unsafeWindow, yuo should use gm_api by esm
 
 ## 1.1.4
 

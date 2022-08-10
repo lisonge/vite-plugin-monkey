@@ -1,3 +1,3 @@
 # TODO
 
-- nothing
+- isolate code for different functions

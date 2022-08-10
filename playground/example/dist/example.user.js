@@ -19,11 +19,12 @@
 // @match              https://i.songe.li/
 // @require            https://cdn.jsdelivr.net/npm/blueimp-md5@2.19.0
 // @require            https://raw.githubusercontent.com/lisonge/src/main/js/monkey.js
+// @grant              GM_addElement
 // @grant              GM_cookie
 // @grant              unsafeWindow
 // ==/UserScript==
 
-// use vite-plugin-monkey@1.1.4 at 2022-08-09T13:28:07.176Z
+// use vite-plugin-monkey@2.0.0 at 2022-08-10T02:27:30.115Z
 
 ;(({ css = "" }) => {
   const style = document.createElement("style");
@@ -46,9 +47,13 @@
   var unsafeWindow = monkeyWindow.unsafeWindow;
   monkeyWindow.GM_info;
   var GM_cookie = monkeyWindow.GM_cookie;
+  var GM_addElement = (...args) => {
+    return monkeyWindow.GM_addElement(...args);
+  };
   console.log(`md5('114514')=${md5__default.default("114514")}`);
   console.log("document.readyState", document.readyState);
   console.log(monkeyWindow);
+  GM_addElement("div", { innerHTML: "hello" });
   if (unsafeWindow == window) {
     console.log("scope->host");
   } else {

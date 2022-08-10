@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 2.0.0
+
+### 2.0.0-Features
+
+- support use gm_api and its hints by esm [93a776e8](https://github.com/lisonge/vite-plugin-monkey/commit/a603ae3750a86f3193d8a3cbfb9310d793a776e8)
+- vite preview will auto open & install [24df8e14](https://github.com/lisonge/vite-plugin-monkey/commit/04de56f184231c8dcc57755d8d3cdfb924df8e14)
+- externalGlobals support multiple url [b778c2ab](https://github.com/lisonge/vite-plugin-monkey/commit/891fc7bca4ebf116e34672c9328970f9b778c2ab)
+
+### 2.0.0-BreakChanges
+
+- no longer default turn off mount gm_api to unsafeWindow, yuo should use gm_api by esm
+
 ## 1.1.4
 
 ### 1.1.4-BugFixes

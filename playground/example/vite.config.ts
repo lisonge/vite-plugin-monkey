@@ -35,11 +35,6 @@ export default defineConfig(({ command, mode }) => ({
   ],
   build: {
     // if you want to minify xxx.user.js, set true
-    // minify: true,
-    rollupOptions: {
-      treeshake: {
-        annotations: true,
-      },
-    },
+    minify: true,
   },
 }));

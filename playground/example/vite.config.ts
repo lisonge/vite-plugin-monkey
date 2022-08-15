@@ -25,17 +25,15 @@ export default defineConfig(({ command, mode }) => ({
         include: [/^https:\/\/i\.songe\.li\/.*/],
       },
       build: {
+        metaFileName: true,
         externalGlobals: {
-          'blueimp-md5': [
-            ...cdn.jsdelivr('md5'),
-            'https://raw.githubusercontent.com/lisonge/src/main/js/monkey.js',
-          ],
+          'blueimp-md5': cdn.jsdelivr('md5'),
         },
       },
     }),
   ],
   build: {
     // if you want to minify xxx.user.js, set true
-    minify: true,
+    // minify: true,
   },
 }));

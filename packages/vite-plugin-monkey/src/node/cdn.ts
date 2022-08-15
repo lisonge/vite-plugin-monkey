@@ -4,11 +4,11 @@
  * @see https://www.jsdelivr.com/features
  */
 export const jsdelivr = (
-  umdVarName: string,
+  exportVarName: string,
   basename?: string,
 ): [string, (version: string, name: string) => string] => {
   return [
-    umdVarName,
+    exportVarName,
     (version: string, name: string): string => {
       if (basename) {
         return `https://cdn.jsdelivr.net/npm/${name}@${version}/${basename}`;
@@ -25,11 +25,11 @@ export const jsdelivr = (
  * @see https://www.jsdelivr.com/features
  */
 export const jsdelivrFastly = (
-  umdVarName: string,
+  exportVarName: string,
   basename?: string,
 ): [string, (version: string, name: string) => string] => {
   return [
-    umdVarName,
+    exportVarName,
     (version: string, name: string): string => {
       if (basename) {
         return `https://fastly.jsdelivr.net/npm/${name}@${version}/${basename}`;
@@ -45,11 +45,11 @@ export const jsdelivrFastly = (
  * @see https://unpkg.com/
  */
 export const unpkg = (
-  umdVarName: string,
+  exportVarName: string,
   basename: string,
 ): [string, (version: string, name: string) => string] => {
   return [
-    umdVarName,
+    exportVarName,
     (version: string, name: string): string => {
       return `https://unpkg.com/${name}@${version}/${basename}`;
     },
@@ -61,11 +61,11 @@ export const unpkg = (
  * @see https://cdn.bytedance.com/
  */
 export const bytecdntp = (
-  umdVarName: string,
+  exportVarName: string,
   basename: string,
 ): [string, (version: string, name: string) => string] => {
   return [
-    umdVarName,
+    exportVarName,
     (version: string, name: string): string => {
       return `https://lf9-cdn-tos.bytecdntp.com/cdn/expire-10-y/${name}/${version}/${basename}`;
     },
@@ -77,11 +77,11 @@ export const bytecdntp = (
  * @see https://www.bootcdn.cn/all/
  */
 export const bootcdn = (
-  umdVarName: string,
+  exportVarName: string,
   basename: string,
 ): [string, (version: string, name: string) => string] => {
   return [
-    umdVarName,
+    exportVarName,
     (version: string, name: string): string => {
       return `https://cdn.bootcdn.net/ajax/libs/${name}/${version}/${basename}`;
     },
@@ -93,11 +93,11 @@ export const bootcdn = (
  * @see https://cdn.baomitu.com/
  */
 export const baomitu = (
-  umdVarName: string,
+  exportVarName: string,
   basename: string,
 ): [string, (version: string, name: string) => string] => {
   return [
-    umdVarName,
+    exportVarName,
     (version: string, name: string): string => {
       return `https://lib.baomitu.com/${name}/${version}/${basename}`;
     },
@@ -109,11 +109,11 @@ export const baomitu = (
  * @see https://staticfile.org/
  */
 export const staticfile = (
-  umdVarName: string,
+  exportVarName: string,
   basename: string,
 ): [string, (version: string, name: string) => string] => {
   return [
-    umdVarName,
+    exportVarName,
     (version: string, name: string): string => {
       return `https://cdn.staticfile.org/${name}/${version}/${basename}`;
     },
@@ -124,11 +124,11 @@ export const staticfile = (
  * @see https://cdnjs.com/libraries
  */
 export const cdnjs = (
-  umdVarName: string,
+  exportVarName: string,
   basename: string,
 ): [string, (version: string, name: string) => string] => {
   return [
-    umdVarName,
+    exportVarName,
     (version: string, name: string): string => {
       return `https://cdnjs.cloudflare.com/ajax/libs/${name}/${version}/${basename}`;
     },
@@ -140,11 +140,11 @@ export const cdnjs = (
  * @link https://unpkg.zhimg.com/
  */
 export const zhimg = (
-  umdVarName: string,
+  exportVarName: string,
   basename: string,
 ): [string, (version: string, name: string) => string] => {
   return [
-    umdVarName,
+    exportVarName,
     (version: string, name: string): string => {
       return `https://unpkg.zhimg.com/${name}/${version}/${basename}`;
     },
@@ -155,11 +155,11 @@ export const zhimg = (
  * `https://npm.elemecdn.com/${name}@${version}/${basename}`
  */
 export const elemecdn = (
-  umdVarName: string,
+  exportVarName: string,
   basename: string,
 ): [string, (version: string, name: string) => string] => {
   return [
-    umdVarName,
+    exportVarName,
     (version: string, name: string): string => {
       return `https://npm.elemecdn.com/${name}@${version}/${basename}`;
     },
@@ -170,11 +170,11 @@ export const elemecdn = (
  * `https://code.bdstatic.com/npm/${name}@${version}/${basename}`
  */
 export const bdstatic = (
-  umdVarName: string,
+  exportVarName: string,
   basename: string,
 ): [string, (version: string, name: string) => string] => {
   return [
-    umdVarName,
+    exportVarName,
     (version: string, name: string): string => {
       return `https://code.bdstatic.com/npm/${name}@${version}/${basename}`;
     },

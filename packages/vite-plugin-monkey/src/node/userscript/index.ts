@@ -267,7 +267,7 @@ export const userscript2comment = (
     if (v instanceof Array) {
       v.forEach((s) => {
         if (s instanceof RegExp) {
-          attrList.push([k, s.source]);
+          attrList.push([k, String(s)]);
         } else if (typeof s == 'string') {
           attrList.push([k, s]);
         }
@@ -275,7 +275,7 @@ export const userscript2comment = (
     } else if (typeof v == 'string') {
       attrList.push([k, v]);
     } else if (v instanceof RegExp) {
-      attrList.push([k, v.source]);
+      attrList.push([k, String(v)]);
     }
   });
 

@@ -31,24 +31,35 @@ pnpm create monkey
 
 then you can choose the following template
 
-- [empty](/packages/create-monkey/template-empty) (only js)
-- [empty-ts](/packages/create-monkey/template-empty-ts) (only ts)
-- [vanilla](/packages/create-monkey/template-vanilla) (js + css)
-- [vanilla-ts](/packages/create-monkey/template-vanilla-ts) (ts + css)
-- [vue](/packages/create-monkey/template-vue)
-- [vue-ts](/packages/create-monkey/template-vue-ts)
-- [react](/packages/create-monkey/template-react)
-- [react-ts](/packages/create-monkey/template-react-ts)
-- [preact](/packages/create-monkey/template-preact)
-- [preact-ts](/packages/create-monkey/template-preact-ts)
-- [svelte](/packages/create-monkey/template-svelte)
-- [svelte-ts](/packages/create-monkey/template-svelte-ts)
+| JavaScript                                                     | TypeSript                                                            |
+| -------------------------------------------------------------- | -------------------------------------------------------------------- |
+| [empty](/packages/create-monkey/template-empty) (only js)      | [empty-ts](/packages/create-monkey/template-empty-ts) (only ts)      |
+| [vanilla](/packages/create-monkey/template-vanilla) (js + css) | [vanilla-ts](/packages/create-monkey/template-vanilla-ts) (ts + css) |
+| [vue](/packages/create-monkey/template-vue)                    | [vue-ts](/packages/create-monkey/template-vue-ts)                    |
+| [react](/packages/create-monkey/template-react)                | [react-ts](/packages/create-monkey/template-react-ts)                |
+| [preact](/packages/create-monkey/template-preact)              | [preact-ts](/packages/create-monkey/template-preact-ts)              |
+| [svelte](/packages/create-monkey/template-svelte)              | [svelte-ts](/packages/create-monkey/template-svelte-ts)              |
+
+<details open>
+  <summary>Sample: Initializing a Template</summary>
 
 ![vue-ts](https://github.com/lisonge/src/raw/main/img/2022-07-17_19-15-35.gif)
 
-Hot Module Replacement
+</details>
+
+<details open>
+  <summary>Sample: Hot Module Replacement</summary>
 
 ![hmr](https://github.com/lisonge/src/raw/main/img/2022-07-18_18-00-12.gif)
+
+</details>
+
+<details open>
+  <summary>Sample: Build & Preview</summary>
+
+![build&preview](https://github.com/lisonge/src/raw/main/img/2022-08-15_11-02-58.gif)
+
+</details>
 
 ## installation
 

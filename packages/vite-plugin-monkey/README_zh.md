@@ -31,24 +31,35 @@ pnpm create monkey
 
 然后你能从以下模板选择
 
-- [empty](/packages/create-monkey/template-empty) (仅 js)
-- [empty-ts](/packages/create-monkey/template-empty-ts) (仅 ts)
-- [vanilla](/packages/create-monkey/template-vanilla) (js + css)
-- [vanilla-ts](/packages/create-monkey/template-vanilla-ts) (ts + css)
-- [vue](/packages/create-monkey/template-vue)
-- [vue-ts](/packages/create-monkey/template-vue-ts)
-- [react](/packages/create-monkey/template-react)
-- [react-ts](/packages/create-monkey/template-react-ts)
-- [preact](/packages/create-monkey/template-preact)
-- [preact-ts](/packages/create-monkey/template-preact-ts)
-- [svelte](/packages/create-monkey/template-svelte)
-- [svelte-ts](/packages/create-monkey/template-svelte-ts)
+| JavaScript                                                     | TypeSript                                                            |
+| -------------------------------------------------------------- | -------------------------------------------------------------------- |
+| [empty](/packages/create-monkey/template-empty) (仅 js)        | [empty-ts](/packages/create-monkey/template-empty-ts) (仅 ts)        |
+| [vanilla](/packages/create-monkey/template-vanilla) (js + css) | [vanilla-ts](/packages/create-monkey/template-vanilla-ts) (ts + css) |
+| [vue](/packages/create-monkey/template-vue)                    | [vue-ts](/packages/create-monkey/template-vue-ts)                    |
+| [react](/packages/create-monkey/template-react)                | [react-ts](/packages/create-monkey/template-react-ts)                |
+| [preact](/packages/create-monkey/template-preact)              | [preact-ts](/packages/create-monkey/template-preact-ts)              |
+| [svelte](/packages/create-monkey/template-svelte)              | [svelte-ts](/packages/create-monkey/template-svelte-ts)              |
+
+<details open>
+  <summary>示例: 初始化模板</summary>
 
 ![vue-ts](https://github.com/lisonge/src/raw/main/img/2022-07-17_19-15-35.gif)
 
-模块热替换 (hmr)
+</details>
+
+<details open>
+  <summary>示例: 模块热替换</summary>
 
 ![hmr](https://github.com/lisonge/src/raw/main/img/2022-07-18_18-00-12.gif)
+
+</details>
+
+<details open>
+  <summary>示例: 构建&预览</summary>
+
+![build&preview](https://github.com/lisonge/src/raw/main/img/2022-08-15_11-02-58.gif)
+
+</details>
 
 ## 单独安装
 

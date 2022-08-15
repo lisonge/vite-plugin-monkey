@@ -320,7 +320,7 @@ export type XhrRequest<TContext = object> = {
   onload?: RequestEventListener<TResponse<TContext>>;
 };
 
-export type MonkeyWindow = {
+export type MonkeyWindow = Window & {
   unsafeWindow: Window;
 
   /**

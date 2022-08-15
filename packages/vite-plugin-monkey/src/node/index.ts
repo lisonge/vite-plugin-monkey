@@ -41,7 +41,7 @@ export type {
 
 type Lib2Url = (version: string, name: string) => string;
 
-export interface MonkeyOption {
+export type MonkeyOption = {
   /**
    * userscript entry file path
    */
@@ -97,14 +97,14 @@ export interface MonkeyOption {
     /**
      * build bundle userscript comment file name, this file is only include comment
      *
-     * it can be used by userscript.updateURL
+     * it can be used by userscript.updateURL, when checking for updates, just download this small file instead of downloading the entire script
      *
-     * it should end with '.meta.js'
+     * it should end with '.meta.js', if set false, will not generate this file
      *
-     * if set false, will not generate this file
-     * @default fileName.replace(/\.user\.js$/,'.meta.js')
+     * if set true, will equal to fileName.replace(/\\.user\\.js$/,'.meta.js')
+     * @default false
      */
-    metaFileName?: string | false;
+    metaFileName?: string | boolean;
 
     /**
      * @example
@@ -137,7 +137,7 @@ export interface MonkeyOption {
      */
     checkCDN?: boolean;
   };
-}
+};
 
 const installUserPath = '/__vite-plugin-monkey.install.user.js';
 const cacheUserPath = 'node_modules/.vite/__vite-plugin-monkey.cache.user.js';
@@ -500,10 +500,12 @@ export default (pluginOption: MonkeyOption): Plugin => {
       if (jsBundleList.length != 1) {
         logger.error(`expcet js modules size is 1, got ${jsBundleList.length}`);
       } else {
-        const metaFileName =
-          pluginOption.build?.metaFileName ??
-          pluginOption.build?.fileName?.replace(/\.user\.js$/, '.meta.js') ??
-          (packageJson.name ?? 'monkey') + '.meta.js';
+        let metaFileName = pluginOption.build?.metaFileName ?? false;
+        if (metaFileName === true) {
+          metaFileName =
+            pluginOption.build?.fileName?.replace(/\.user\.js$/, '.meta.js') ??
+            (packageJson.name ?? 'monkey') + '.meta.js';
+        }
         if (typeof metaFileName == 'string' && metaFileName.length > 0) {
           this.emitFile({
             type: 'asset',

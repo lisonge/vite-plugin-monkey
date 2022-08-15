@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.1.1
+
+### 2.1.1-Features
+
+- support meta file [802ce298](https://github.com/lisonge/vite-plugin-monkey/commit/213b84afdb04ace03f9bac5c5a6a714a802ce298), [7164471f](https://github.com/lisonge/vite-plugin-monkey/commit/3fe8a58e52e9abf42de449ff37ffb53e7164471f)
+
 ## 2.0.1
 
 ### 2.0.1-Features

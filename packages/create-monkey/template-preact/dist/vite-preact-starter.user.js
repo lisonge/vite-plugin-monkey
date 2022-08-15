@@ -4,97 +4,116 @@
 // @version    0.0.0
 // @icon       https://vitejs.dev/logo.svg
 // @match      https://www.google.com/
-// @require    https://cdn.jsdelivr.net/npm/preact@10.10.0/dist/preact.min.js
+// @require    https://cdn.jsdelivr.net/npm/preact@10.10.2/dist/preact.min.js
 // ==/UserScript==
 
-// use vite-plugin-monkey@1.1.2 at 2022-07-20T09:13:37.080Z
+// use vite-plugin-monkey@2.1.1 at 2022-08-15T17:35:52.434Z
 
-;(({ cssText = "" }) => {
+;(({ css = "" }) => {
   const style = document.createElement("style");
-  style.innerText = cssText;
+  style.innerText = css;
   style.dataset.source = "vite-plugin-monkey";
   document.head.appendChild(style);
 })({
-  "cssText": "#app {\n  max-width: 1280px;\n  margin: 0 auto;\n  padding: 2rem;\n  text-align: center;\n}\n\n.logo {\n  height: 6em;\n  padding: 1.5em;\n}\n.logo:hover {\n  filter: drop-shadow(0 0 2em #646cffaa);\n}\n.logo.preact:hover {\n  filter: drop-shadow(0 0 2em #673ab8aa);\n}\n\n.card {\n  padding: 2em;\n}\n\n.read-the-docs {\n  color: #888;\n}\n:root {\n  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;\n  font-size: 16px;\n  line-height: 24px;\n  font-weight: 400;\n\n  color-scheme: light dark;\n  color: rgba(255, 255, 255, 0.87);\n  background-color: #242424;\n\n  font-synthesis: none;\n  text-rendering: optimizeLegibility;\n  -webkit-font-smoothing: antialiased;\n  -moz-osx-font-smoothing: grayscale;\n  -webkit-text-size-adjust: 100%;\n}\n\na {\n  font-weight: 500;\n  color: #646cff;\n  text-decoration: inherit;\n}\na:hover {\n  color: #535bf2;\n}\n\nbody {\n  margin: 0;\n  display: flex;\n  place-items: center;\n  min-width: 320px;\n  min-height: 100vh;\n}\n\nh1 {\n  font-size: 3.2em;\n  line-height: 1.1;\n}\n\nbutton {\n  border-radius: 8px;\n  border: 1px solid transparent;\n  padding: 0.6em 1.2em;\n  font-size: 1em;\n  font-weight: 500;\n  font-family: inherit;\n  background-color: #1a1a1a;\n  cursor: pointer;\n  transition: border-color 0.25s;\n}\nbutton:hover {\n  border-color: #646cff;\n}\nbutton:focus,\nbutton:focus-visible {\n  outline: 4px auto -webkit-focus-ring-color;\n}\n\n@media (prefers-color-scheme: light) {\n  :root {\n    color: #213547;\n    background-color: #ffffff;\n  }\n  a:hover {\n    color: #747bff;\n  }\n  button {\n    background-color: #f9f9f9;\n  }\n}\n"
+  "css": "#app {\r\n  max-width: 1280px;\r\n  margin: 0 auto;\r\n  padding: 2rem;\r\n  text-align: center;\r\n}\r\n\r\n.logo {\r\n  height: 6em;\r\n  padding: 1.5em;\r\n}\r\n.logo:hover {\r\n  filter: drop-shadow(0 0 2em #646cffaa);\r\n}\r\n.logo.preact:hover {\r\n  filter: drop-shadow(0 0 2em #673ab8aa);\r\n}\r\n\r\n.card {\r\n  padding: 2em;\r\n}\r\n\r\n.read-the-docs {\r\n  color: #888;\r\n}\r\n:root {\r\n  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;\r\n  font-size: 16px;\r\n  line-height: 24px;\r\n  font-weight: 400;\r\n\r\n  color-scheme: light dark;\r\n  color: rgba(255, 255, 255, 0.87);\r\n  background-color: #242424;\r\n\r\n  font-synthesis: none;\r\n  text-rendering: optimizeLegibility;\r\n  -webkit-font-smoothing: antialiased;\r\n  -moz-osx-font-smoothing: grayscale;\r\n  -webkit-text-size-adjust: 100%;\r\n}\r\n\r\na {\r\n  font-weight: 500;\r\n  color: #646cff;\r\n  text-decoration: inherit;\r\n}\r\na:hover {\r\n  color: #535bf2;\r\n}\r\n\r\nbody {\r\n  margin: 0;\r\n  display: flex;\r\n  place-items: center;\r\n  min-width: 320px;\r\n  min-height: 100vh;\r\n}\r\n\r\nh1 {\r\n  font-size: 3.2em;\r\n  line-height: 1.1;\r\n}\r\n\r\nbutton {\r\n  border-radius: 8px;\r\n  border: 1px solid transparent;\r\n  padding: 0.6em 1.2em;\r\n  font-size: 1em;\r\n  font-weight: 500;\r\n  font-family: inherit;\r\n  background-color: #1a1a1a;\r\n  cursor: pointer;\r\n  transition: border-color 0.25s;\r\n}\r\nbutton:hover {\r\n  border-color: #646cff;\r\n}\r\nbutton:focus,\r\nbutton:focus-visible {\r\n  outline: 4px auto -webkit-focus-ring-color;\r\n}\r\n\r\n@media (prefers-color-scheme: light) {\r\n  :root {\r\n    color: #213547;\r\n    background-color: #ffffff;\r\n  }\r\n  a:hover {\r\n    color: #747bff;\r\n  }\r\n  button {\r\n    background-color: #f9f9f9;\r\n  }\r\n}\r\n"
 });
 
 (function(preact2) {
   "use strict";
-  var t, u, r, o$1, i = 0, c = [], f = [], e$1 = preact2.options.__b, a = preact2.options.__r, v = preact2.options.diffed, l = preact2.options.__c, m = preact2.options.unmount;
-  function p(t2, r2) {
-    preact2.options.__h && preact2.options.__h(u, t2, i || r2), i = 0;
-    var o2 = u.__H || (u.__H = { __: [], __h: [] });
-    return t2 >= o2.__.length && o2.__.push({ __V: f }), o2.__[t2];
+  var t, r, u, i, o$1 = 0, c = [], f = [], e$1 = preact2.options.__b, a = preact2.options.__r, v = preact2.options.diffed, l = preact2.options.__c, m = preact2.options.unmount;
+  function d(t2, u2) {
+    preact2.options.__h && preact2.options.__h(r, t2, o$1 || u2), o$1 = 0;
+    var i2 = r.__H || (r.__H = { __: [], __h: [] });
+    return t2 >= i2.__.length && i2.__.push({ __V: f }), i2.__[t2];
   }
-  function y(n) {
-    return i = 1, d(z, n);
+  function p(n) {
+    return o$1 = 1, y(z, n);
   }
-  function d(n, r2, o2) {
-    var i2 = p(t++, 2);
-    return i2.t = n, i2.__c || (i2.__ = [o2 ? o2(r2) : z(void 0, r2), function(n2) {
-      var t2 = i2.t(i2.__[0], n2);
-      i2.__[0] !== t2 && (i2.__ = [t2, i2.__[1]], i2.__c.setState({}));
-    }], i2.__c = u), i2.__;
+  function y(n, u2, i2) {
+    var o2 = d(t++, 2);
+    if (o2.t = n, !o2.__c && (o2.__ = [i2 ? i2(u2) : z(void 0, u2), function(n2) {
+      var t2 = o2.__N ? o2.__N[0] : o2.__[0], r2 = o2.t(t2, n2);
+      t2 !== r2 && (o2.__N = [r2, o2.__[1]], o2.__c.setState({}));
+    }], o2.__c = r, !o2.__c.u)) {
+      o2.__c.__H.u = true;
+      var c2 = o2.__c.shouldComponentUpdate;
+      o2.__c.shouldComponentUpdate = function(n2, t2, r2) {
+        if (!o2.__c.__H)
+          return true;
+        var u3 = o2.__c.__H.__.filter(function(n3) {
+          return n3.__c;
+        });
+        return u3.every(function(n3) {
+          return !n3.__N;
+        }) ? !c2 || c2(n2, t2, r2) : !u3.every(function(n3) {
+          if (!n3.__N)
+            return true;
+          var t3 = n3.__[0];
+          return n3.__ = n3.__N, n3.__N = void 0, t3 === n3.__[0];
+        }) && (!c2 || c2(n2, t2, r2));
+      };
+    }
+    return o2.__N || o2.__;
   }
   function b() {
     for (var t2; t2 = c.shift(); )
-      if (t2.__P)
+      if (t2.__P && t2.__H)
         try {
           t2.__H.__h.forEach(j), t2.__H.__h.forEach(k), t2.__H.__h = [];
-        } catch (u2) {
-          t2.__H.__h = [], preact2.options.__e(u2, t2.__v);
+        } catch (r2) {
+          t2.__H.__h = [], preact2.options.__e(r2, t2.__v);
         }
   }
   preact2.options.__b = function(n) {
-    u = null, e$1 && e$1(n);
+    r = null, e$1 && e$1(n);
   }, preact2.options.__r = function(n) {
     a && a(n), t = 0;
-    var o2 = (u = n.__c).__H;
-    o2 && (r === u ? (o2.__h = [], u.__h = [], o2.__.forEach(function(n2) {
-      n2.__V = f, n2.u = void 0;
-    })) : (o2.__h.forEach(j), o2.__h.forEach(k), o2.__h = [])), r = u;
+    var i2 = (r = n.__c).__H;
+    i2 && (u === r ? (i2.__h = [], r.__h = [], i2.__.forEach(function(n2) {
+      n2.__N && (n2.__ = n2.__N), n2.__V = f, n2.__N = n2.i = void 0;
+    })) : (i2.__h.forEach(j), i2.__h.forEach(k), i2.__h = [])), u = r;
   }, preact2.options.diffed = function(t2) {
     v && v(t2);
-    var i2 = t2.__c;
-    i2 && i2.__H && (i2.__H.__h.length && (1 !== c.push(i2) && o$1 === preact2.options.requestAnimationFrame || ((o$1 = preact2.options.requestAnimationFrame) || function(n) {
-      var t3, u2 = function() {
-        clearTimeout(r2), g && cancelAnimationFrame(t3), setTimeout(n);
-      }, r2 = setTimeout(u2, 100);
-      g && (t3 = requestAnimationFrame(u2));
-    })(b)), i2.__H.__.forEach(function(n) {
-      n.u && (n.__H = n.u), n.__V !== f && (n.__ = n.__V), n.u = void 0, n.__V = f;
-    })), r = u = null;
-  }, preact2.options.__c = function(t2, u2) {
-    u2.some(function(t3) {
+    var o2 = t2.__c;
+    o2 && o2.__H && (o2.__H.__h.length && (1 !== c.push(o2) && i === preact2.options.requestAnimationFrame || ((i = preact2.options.requestAnimationFrame) || function(n) {
+      var t3, r2 = function() {
+        clearTimeout(u2), g && cancelAnimationFrame(t3), setTimeout(n);
+      }, u2 = setTimeout(r2, 100);
+      g && (t3 = requestAnimationFrame(r2));
+    })(b)), o2.__H.__.forEach(function(n) {
+      n.i && (n.__H = n.i), n.__V !== f && (n.__ = n.__V), n.i = void 0, n.__V = f;
+    })), u = r = null;
+  }, preact2.options.__c = function(t2, r2) {
+    r2.some(function(t3) {
       try {
         t3.__h.forEach(j), t3.__h = t3.__h.filter(function(n) {
           return !n.__ || k(n);
         });
-      } catch (r2) {
-        u2.some(function(n) {
+      } catch (u2) {
+        r2.some(function(n) {
           n.__h && (n.__h = []);
-        }), u2 = [], preact2.options.__e(r2, t3.__v);
+        }), r2 = [], preact2.options.__e(u2, t3.__v);
       }
-    }), l && l(t2, u2);
+    }), l && l(t2, r2);
   }, preact2.options.unmount = function(t2) {
     m && m(t2);
-    var u2, r2 = t2.__c;
-    r2 && r2.__H && (r2.__H.__.forEach(function(n) {
+    var r2, u2 = t2.__c;
+    u2 && u2.__H && (u2.__H.__.forEach(function(n) {
       try {
         j(n);
       } catch (n2) {
-        u2 = n2;
+        r2 = n2;
       }
-    }), u2 && preact2.options.__e(u2, r2.__v));
+    }), r2 && preact2.options.__e(r2, u2.__v));
   };
   var g = "function" == typeof requestAnimationFrame;
   function j(n) {
-    var t2 = u, r2 = n.__c;
-    "function" == typeof r2 && (n.__c = void 0, r2()), u = t2;
+    var t2 = r, u2 = n.__c;
+    "function" == typeof u2 && (n.__c = void 0, u2()), r = t2;
   }
   function k(n) {
-    var t2 = u;
-    n.__c = n.__(), u = t2;
+    var t2 = r;
+    n.__c = n.__(), r = t2;
   }
   function z(n, t2) {
     return "function" == typeof t2 ? t2(n) : t2;
@@ -114,7 +133,7 @@
     return preact2.options.vnode && preact2.options.vnode(a2), a2;
   }
   function App() {
-    const [count, setCount] = y(0);
+    const [count, setCount] = p(0);
     return e(preact2.Fragment, {
       children: [e("div", {
         children: [e("a", {

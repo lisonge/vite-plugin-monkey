@@ -35,6 +35,9 @@ type CommonInfo = {
   script: ScriptMeta;
 };
 
+/**
+ * GM_info Type
+ */
 export type ScriptInfo = CommonInfo & TamperInfo & ViolentInfo;
 
 type IfEquals<X, Y, A = X, B = never> = (<T>() => T extends X ? 1 : 2) extends <
@@ -73,30 +76,29 @@ type AddElementFn = {
   ): HTMLElement;
 };
 
+type OpenInTabDetails = {
+  active?: boolean;
+  insert?: boolean;
+  /**
+   * @available tampermonkey
+   */
+  setParent?: boolean;
+  /**
+   * @available tampermonkey
+   */
+  incognito?: boolean;
+  /**
+   * @available violentmonkey
+   */
+  container?: 0 | 1 | 2;
+  /**
+   * @available violentmonkey
+   */
+  pinned?: boolean;
+};
+
 type OpenInTabFn = {
-  (
-    url: string,
-    options?: {
-      active?: boolean;
-      insert?: boolean;
-      /**
-       * @available tampermonkey
-       */
-      setParent?: boolean;
-      /**
-       * @available tampermonkey
-       */
-      incognito?: boolean;
-      /**
-       * @available violentmonkey
-       */
-      container?: 0 | 1 | 2;
-      /**
-       * @available violentmonkey
-       */
-      pinned?: boolean;
-    },
-  ): {
+  (url: string, details?: OpenInTabDetails): {
     onclose?: () => void;
     closed: boolean;
     close: () => void;
@@ -231,7 +233,7 @@ type TResponse<TContext> = ResponseBase & {
   readonly context: TContext;
 };
 type ProgressResponse<TContext> = TResponse<TContext> & ProgressResponseBase;
-type XhrRequest<TContext = object> = {
+export type XhrRequest<TContext = object> = {
   method?: 'GET' | 'HEAD' | 'POST';
   /** Destination URL */
   url: string;

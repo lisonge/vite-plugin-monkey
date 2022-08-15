@@ -1,5 +1,5 @@
 import type { MonkeyWindow } from './types';
-export type { MonkeyWindow };
+export type { MonkeyWindow, ScriptInfo, XhrRequest } from './types';
 
 export const monkeyWindow: MonkeyWindow =
   Reflect.get(document, '__monkeyWindow') ?? window;

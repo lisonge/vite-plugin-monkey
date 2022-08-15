@@ -126,6 +126,18 @@ export interface MonkeyOption {
     fileName?: string;
 
     /**
+     * build bundle userscript comment file name, this file is only include comment
+     *
+     * it can be used by userscript.updateURL, when checking for updates, just download this small file instead of downloading the entire script
+     *
+     * it should end with '.meta.js', if set false, will not generate this file
+     *
+     * if set true, will equal to fileName.replace(/\\.user\\.js$/,'.meta.js')
+     * @default false
+     */
+    metaFileName?: string | boolean;
+
+    /**
      * @example
      * {
      *  vue:'Vue',

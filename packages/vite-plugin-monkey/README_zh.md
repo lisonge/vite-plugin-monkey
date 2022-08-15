@@ -120,6 +120,18 @@ export interface MonkeyOption {
     fileName?: string;
 
     /**
+     * 构建后的 meta 文件，此文件只包含注释
+     *
+     * 可被使用在 userscript.updateURL, 检查更新的时候只需下载这个小文件而不是下载整个脚本
+     *
+     * 文件名应该以 '.meta.js' 结尾, 如果设置 false, 将不会生成这个文件
+     *
+     * 如果设置 true, 等价于 fileName.replace(/\\.user\\.js$/,'.meta.js')
+     * @default false
+     */
+    metaFileName?: string | boolean;
+
+    /**
      * @example
      * {
      *  vue:'Vue',

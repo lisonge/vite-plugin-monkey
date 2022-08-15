@@ -1,44 +1,44 @@
 import pc from 'picocolors';
-import { delay } from './_util';
 
 export type Message = string | number | null | undefined;
+type OutputOptions = {
+  /**
+   * @default false
+   */
+  time?: boolean;
+};
 
-const log = (tag: string, message: Message) => {
+const log = (tag: string, message: Message, options?: OutputOptions) => {
   console.log(
     [
-      pc.dim(new Date().toLocaleTimeString()),
+      (options?.time ?? false) === true
+        ? pc.dim(new Date().toLocaleTimeString())
+        : '',
       pc.bold(pc.blue(`[${tag}]`)),
       message,
-    ].join('\x20'),
+    ]
+      .filter((s) => s)
+      .join('\x20'),
   );
 };
-const info = (tag: string, message: Message) => {
-  log(tag, pc.white(message));
+const info = (tag: string, message: Message, options?: OutputOptions) => {
+  log(tag, pc.white(message), options);
 };
-const warn = (tag: string, message: Message) => {
-  log(tag, pc.yellow(message));
+const warn = (tag: string, message: Message, options?: OutputOptions) => {
+  log(tag, pc.yellow(message), options);
 };
-const error = (tag: string, message: Message) => {
-  log(tag, pc.red(message));
+const error = (tag: string, message: Message, options?: OutputOptions) => {
+  log(tag, pc.red(message), options);
 };
 export const createLogger = (tag: string) => ({
-  info: async (message: Message, delayTime?: number) => {
-    if (typeof delayTime == 'number') {
-      await delay(delayTime);
-    }
-    info(tag, message);
+  info: async (message: Message, options?: OutputOptions) => {
+    info(tag, message, options);
   },
-  warn: async (message: Message, delayTime?: number) => {
-    if (typeof delayTime == 'number') {
-      await delay(delayTime);
-    }
-    warn(tag, message);
+  warn: async (message: Message, options?: OutputOptions) => {
+    warn(tag, message, options);
   },
-  error: async (message: Message, delayTime?: number) => {
-    if (typeof delayTime == 'number') {
-      await delay(delayTime);
-    }
-    error(tag, message);
+  error: async (message: Message, options?: OutputOptions) => {
+    error(tag, message, options);
   },
 });
 

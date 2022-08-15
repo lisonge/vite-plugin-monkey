@@ -1,5 +1,5 @@
 import { logger } from '../_logger';
-import { packageJson } from '../_util';
+import { delay, packageJson } from '../_util';
 import type { IArray, LocaleType } from './common';
 import { Format } from './common';
 import type {
@@ -197,10 +197,12 @@ export const userscript2comment = (
   const { extra } = userscript;
   let { $extra } = userscript;
   if (extra) {
-    logger.warn(
-      'userscript#extra is deprecated, just use $extra repalce it',
-      1,
-    );
+    delay().then(() => {
+      logger.warn(
+        'userscript#extra is deprecated, just use $extra repalce it',
+        { time: true },
+      );
+    });
   }
   $extra = $extra ?? extra;
 

@@ -42,6 +42,7 @@ function executeNodeScript(scriptPath: string, url: string, logger: Logger) {
             scriptPath,
           )} exited with code ${code}.`,
         ),
+        { time: true },
       );
     }
   });

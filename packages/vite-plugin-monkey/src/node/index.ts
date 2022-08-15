@@ -3,6 +3,7 @@ import { DomUtils, ElementType, parseDocument } from 'htmlparser2';
 import nodeFetch, { Response as nodeResponse } from 'node-fetch';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import pc from 'picocolors';
 import type { Plugin, ResolvedConfig } from 'vite';
 import selfPackageJson from '../../package.json';
 import {
@@ -86,10 +87,24 @@ export interface MonkeyOption {
   };
   build?: {
     /**
-     * build bundle userscript file name, it should end with '.user.js'
-     * @default (package.json.name||'monkey')+'.user.js'
+     * build bundle userscript file name
+     *
+     * it should end with '.user.js'
+     * @default (package.json.name??'monkey')+'.user.js'
      */
     fileName?: string;
+
+    /**
+     * build bundle userscript comment file name, this file is only include comment
+     *
+     * it can be used by userscript.updateURL
+     *
+     * it should end with '.meta.js'
+     *
+     * if set false, will not generate this file
+     * @default fileName.replace(/\.user\.js$/,'.meta.js')
+     */
+    metaFileName?: string | false;
 
     /**
      * @example
@@ -128,7 +143,6 @@ const installUserPath = '/__vite-plugin-monkey.install.user.js';
 const cacheUserPath = 'node_modules/.vite/__vite-plugin-monkey.cache.user.js';
 
 export default (pluginOption: MonkeyOption): Plugin => {
-  // const logger = createLogger('plugin-monkey');
   const external: string[] = [];
   const globals: Record<string, string> = {};
   const cdnList: string[] = [];
@@ -317,7 +331,7 @@ export default (pluginOption: MonkeyOption): Plugin => {
           realHost = realHost[0];
         }
         if (!realHost) {
-          logger.error('host not found');
+          logger.error('host not found', { time: true });
           return;
         }
         const origin = `${isHttps() ? 'https' : 'http'}://${realHost}`;
@@ -421,16 +435,12 @@ export default (pluginOption: MonkeyOption): Plugin => {
         if (isFirstBoot()) {
         } else if (cacheComment != newComment) {
           openBrowser(getInstallUrl(), true, logger);
-          logger.info('reopen, config comment has changed');
+          logger.info('reopen, config comment has changed', { time: true });
         }
         await fs.writeFile(cacheUserPath, newComment).catch();
       }
     },
     generateBundle(_, bundle) {
-      if (isServe) {
-        return;
-      }
-
       const { require } = pluginOption.userscript;
       if (typeof require == 'string') {
         pluginOption.userscript.require = [require, ...cdnList];
@@ -490,6 +500,20 @@ export default (pluginOption: MonkeyOption): Plugin => {
       if (jsBundleList.length != 1) {
         logger.error(`expcet js modules size is 1, got ${jsBundleList.length}`);
       } else {
+        const metaFileName =
+          pluginOption.build?.metaFileName ??
+          pluginOption.build?.fileName?.replace(/\.user\.js$/, '.meta.js') ??
+          (packageJson.name ?? 'monkey') + '.meta.js';
+        if (typeof metaFileName == 'string' && metaFileName.length > 0) {
+          this.emitFile({
+            type: 'asset',
+            fileName: metaFileName,
+            source: userscript2comment(
+              pluginOption.userscript,
+              pluginOption.format,
+            ),
+          });
+        }
         const chunk = jsBundleList[0][1];
         const { name, version } = selfPackageJson;
         if (chunk.type == 'chunk') {
@@ -558,56 +582,56 @@ export default (pluginOption: MonkeyOption): Plugin => {
       return code;
     },
     async closeBundle() {
-      if (isServe || checkCdnPromiseList.length == 0) return;
-      console.log();
-      logger.info(
-        `checking CDN*${checkCdnPromiseList.length} for availability`,
-      );
-      await new Promise<void>((res) => {
-        let n = 0;
-        let failedNum = 0;
-        checkCdnPromiseList.forEach(async ({ url, responsePromise }) => {
-          const response = await responsePromise;
-          if (response instanceof nodeResponse) {
-            if (!response.ok) {
+      if (checkCdnPromiseList.length > 0) {
+        logger.info(
+          `checking CDN*${checkCdnPromiseList.length} for availability`,
+        );
+        await new Promise<void>((res) => {
+          let n = 0;
+          let failedNum = 0;
+          checkCdnPromiseList.forEach(async ({ url, responsePromise }) => {
+            const response = await responsePromise;
+            if (response instanceof nodeResponse) {
+              if (!response.ok) {
+                failedNum++;
+                logger.error(`CDN HTTP ${response.status}, ${pc.red(url)}`);
+              } else {
+                logger.info(`${pc.green('CDN ok,')} ${pc.gray(url)}`);
+              }
+            } else {
+              const error = response as unknown;
               failedNum++;
-              logger.error(`CDN HTTP ${response.status}, ${url}`);
-            } else {
-              logger.info(`CDN ok, ${url}`);
-            }
-          } else {
-            const error = response as unknown;
-            failedNum++;
-            if (error instanceof Error) {
-              if (error.message.includes(url)) {
-                logger.error(`${error.name}:${error.message}`);
+              if (error instanceof Error) {
+                if (error.message.includes(url)) {
+                  logger.error(`${error.name}:${error.message}`);
+                } else {
+                  logger.error(`${error.name}:${error.message}, ${url}`);
+                }
               } else {
-                logger.error(`${error.name}:${error.message}, ${url}`);
-              }
-            } else {
-              const message = String(error);
-              if (message.includes(url)) {
-                logger.error(`unknown error:${message}`);
-              } else {
-                logger.error(`unknown error:${message}, ${url}`);
+                const message = String(error);
+                if (message.includes(url)) {
+                  logger.error(`unknown error:${message}`);
+                } else {
+                  logger.error(`unknown error:${message}, ${url}`);
+                }
               }
             }
-          }
-          n++;
-          if (n == checkCdnPromiseList.length) {
-            if (failedNum > 0) {
-              logger.error(
-                `check finished, CDN*${failedNum} are not available, you need fix it`,
-              );
-            } else {
-              logger.info(
-                `check finished, All CDN*${checkCdnPromiseList.length} are available`,
-              );
+            n++;
+            if (n == checkCdnPromiseList.length) {
+              if (failedNum > 0) {
+                logger.error(
+                  `check finished, CDN*${failedNum} are not available, you need fix it`,
+                );
+              } else {
+                logger.info(
+                  `check finished, All CDN*${checkCdnPromiseList.length} are available`,
+                );
+              }
+              res();
             }
-            res();
-          }
+          });
         });
-      });
+      }
     },
     configurePreviewServer(server) {
       server.middlewares.use(async (req, res, next) => {

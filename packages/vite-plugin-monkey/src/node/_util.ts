@@ -1,5 +1,7 @@
 import { readFileSync } from 'node:fs';
 import fs from 'node:fs/promises';
+import zlib from 'node:zlib';
+import { promisify } from 'node:util';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { logger } from './_logger';
@@ -167,36 +169,17 @@ export const compatResolve = (() => {
   };
 })();
 
-export const lazy = <T extends object>(fn: () => T) => {
-  let temp: object | undefined = undefined;
-  return new Proxy<T>({} as T, {
-    set(_, p, value, receiver) {
-      if (!temp) {
+export const lazy = <T = unknown>(fn: () => T) => {
+  const uniqueValue = Symbol('uniqueValue');
+  let temp: T | symbol = uniqueValue;
+  return {
+    get value() {
+      if (temp === uniqueValue) {
         temp = fn();
       }
-      return Reflect.set(temp, p, value, receiver);
+      return temp as T;
     },
-    get(_, p, receiver) {
-      if (!temp) {
-        temp = fn();
-      }
-      return Reflect.get(temp, p, receiver);
-    },
-    apply(_, thisArg, argArray) {
-      if (!temp) {
-        temp = fn();
-      }
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      return Reflect.apply(temp, thisArg, argArray);
-    },
-    ownKeys() {
-      if (!temp) {
-        temp = fn();
-      }
-      return Reflect.ownKeys(temp);
-    },
-  });
+  };
 };
 
 export const traverse = <T>(
@@ -235,4 +218,13 @@ export const getModuleVersion = async (name: string) => {
     logger.warn(`not found module ${name} version, use ${name}@latest`);
   }
   return version ?? 'latest';
+};
+
+export const getGzipSize = async (filePath: string | Buffer) => {
+  if (filePath instanceof Buffer)
+    return (await promisify(zlib.gzip)(filePath)).length;
+  return fs
+    .readFile(filePath)
+    .then(promisify(zlib.gzip))
+    .then((x) => x.length);
 };

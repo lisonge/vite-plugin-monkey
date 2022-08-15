@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## 2.0.1
+
+### 2.0.1-Features
+
+- add locale type example [a1a6c59d](https://github.com/lisonge/vite-plugin-monkey/commit/d54e363a06e984cb6b0e18178fa6ce09a1a6c59d)
+- client export more type [cd7d3ade](https://github.com/lisonge/vite-plugin-monkey/commit/d6b827cb82094a032bd0699203b90585cd7d3ade), [74a0c311](https://github.com/lisonge/vite-plugin-monkey/commit/aad5c166778fd1a018e8fe885bc0ab8174a0c311)
+- docs add table and more sample [83caadd9](https://github.com/lisonge/vite-plugin-monkey/commit/6988564a59b65cd220826c96d92dc50883caadd9)
+
+### 2.0.1-BugFixes
+
+- build userscript.include miss `/`, full detail see [issues/14](https://github.com/lisonge/vite-plugin-monkey/issues/14) [174fe00e](https://github.com/lisonge/vite-plugin-monkey/commit/7343aee8bd5712a1675fa6b41f6c31c8174fe00e)
+- docs semantic error [91a659a2](https://github.com/lisonge/vite-plugin-monkey/commit/61e922a44fa3ccfd603dae4959bb355891a659a2)
+
 ## 2.0.0
 
 ### 2.0.0-Features

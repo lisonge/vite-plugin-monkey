@@ -16,6 +16,7 @@
 // @homepageURL        https://github.com/lisonge/vite-plugin-monkey#readme
 // @source             https://github.com/lisonge/vite-plugin-monkey.git
 // @supportURL         https://github.com/lisonge/vite-plugin-monkey/issues
+// @include            /test\.com/
 // @match              https://i.songe.li/
 // @require            https://cdn.jsdelivr.net/npm/blueimp-md5@2.19.0
 // @require            https://raw.githubusercontent.com/lisonge/src/main/js/monkey.js
@@ -24,7 +25,7 @@
 // @grant              unsafeWindow
 // ==/UserScript==
 
-// use vite-plugin-monkey@2.0.0 at 2022-08-10T02:27:30.115Z
+// use vite-plugin-monkey@2.0.1 at 2022-08-15T03:48:35.655Z
 
 ;(({ css = "" }) => {
   const style = document.createElement("style");
@@ -32,42 +33,8 @@
   style.dataset.source = "vite-plugin-monkey";
   document.head.appendChild(style);
 })({
-  "css": "#app {\n  background-color: beige;\n}\n"
+  "css": "#app{background-color:beige}\n"
 });
 
-(function(md52) {
-  var _a, _b;
-  "use strict";
-  const _interopDefaultLegacy = (e) => e && typeof e === "object" && "default" in e ? e : { default: e };
-  const md5__default = /* @__PURE__ */ _interopDefaultLegacy(md52);
-  const style = "";
-  var monkeyWindow = (_a = Reflect.get(document, "__monkeyWindow")) != null ? _a : window;
-  monkeyWindow.GM;
-  monkeyWindow.unsafeWindow = (_b = monkeyWindow.unsafeWindow) != null ? _b : window;
-  var unsafeWindow = monkeyWindow.unsafeWindow;
-  monkeyWindow.GM_info;
-  var GM_cookie = monkeyWindow.GM_cookie;
-  var GM_addElement = (...args) => {
-    return monkeyWindow.GM_addElement(...args);
-  };
-  console.log(`md5('114514')=${md5__default.default("114514")}`);
-  console.log("document.readyState", document.readyState);
-  console.log(monkeyWindow);
-  GM_addElement("div", { innerHTML: "hello" });
-  if (unsafeWindow == window) {
-    console.log("scope->host");
-  } else {
-    console.log("scope->monkey");
-  }
-  GM_cookie.list({}, (cookies, error) => {
-    if (error) {
-      console.log(error);
-    } else {
-      const [cookie] = cookies;
-      if (cookie) {
-        console.log(cookie);
-      }
-    }
-  });
-})(md5);
+(function(c){var n,t;"use strict";const i=(o=>o&&typeof o=="object"&&"default"in o?o:{default:o})(c),w="";var e=(n=Reflect.get(document,"__monkeyWindow"))!=null?n:window;e.GM,e.unsafeWindow=(t=e.unsafeWindow)!=null?t:window;var s=e.unsafeWindow;e.GM_info;var a=e.GM_cookie,f=(...o)=>e.GM_addElement(...o);console.log(`md5('114514')=${i.default("114514")}`),console.log("document.readyState",document.readyState),console.log(e),f("div",{innerHTML:"hello"}),s==window?console.log("scope->host"):console.log("scope->monkey"),a.list({},(o,l)=>{if(l)console.log(l);else{const[d]=o;d&&console.log(d)}})})(md5);
  

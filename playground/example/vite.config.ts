@@ -22,6 +22,7 @@ export default defineConfig(({ command, mode }) => ({
           'zh-CN': '描述',
         },
         match: ['https://i.songe.li/'],
+        include: [/^https:\/\/i\.songe\.li\/.*/],
       },
       build: {
         externalGlobals: {

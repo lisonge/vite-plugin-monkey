@@ -24,7 +24,7 @@ import { userscript2comment } from './userscript';
 import { logger } from './_logger';
 import {
   existFile,
-  getModuleVersion,
+  getModuleRealInfo,
   GM_keywords,
   isFirstBoot,
   packageJson,
@@ -39,7 +39,12 @@ export type {
   Format,
 };
 
-type Lib2Url = (version: string, name: string) => string;
+/**
+ * @param moduleName 'name/subname' in example
+ * @example
+ * const mod = await import('name/subname')
+ */
+type Lib2Url = (version: string, name: string, moduleName: string) => string;
 
 export type MonkeyOption = {
   /**
@@ -139,13 +144,22 @@ export type MonkeyOption = {
      * @example
      * {
      *  vue:'Vue',
-     *  // need manually set userscript.require = ['https://unpkg.com/vue@3.0.0/dist/vue.global.js']
-     *  vuex:['Vuex', 'https://unpkg.com/vuex@4.0.0/dist/vuex.global.js'],
-     *  // use fixed version, plugin will auto add this url to userscript.require
-     *  vuex:['Vuex', (version, name)=>`https://unpkg.com/${name}@${version}/dist/vuex.global.js`],
-     *  // best recommended this
-     * }
+     *  // youe need manually set userscript.require = ['https://unpkg.com/vue@3.0.0/dist/vue.global.js'], when command=='build'
      *
+     *  vuex:['Vuex', (version, name)=>`https://unpkg.com/${name}@${version}/dist/vuex.global.js`],
+     *  // plugin will auto add this url to userscript.require
+     *
+     *  'prettier/parser-babel': [
+     *    'prettierPlugins.babel',
+     *    (version, name, moduleName) => {
+     *      // name == `prettier`
+     *      // moduleName == `prettier/parser-babel`
+     *      const subpath = `${moduleName.split('/').at(-1)}.js`;
+     *      return `https://cdn.jsdelivr.net/npm/${name}@${version}/${subpath}`;
+     *    },
+     *  ],
+     *  // sometimes moduleName deffers from package name
+     * }
      */
     externalGlobals?: Record<
       string,
@@ -232,14 +246,13 @@ export default (pluginOption: MonkeyOption): Plugin => {
         } else if (varName$LibUrl instanceof Array) {
           const [varName, ...libUrlList] = varName$LibUrl;
           globals[moduleName] = varName;
+          const { name, version } = await getModuleRealInfo(moduleName);
           for (const libUrl of libUrlList) {
             // keep add order
             if (typeof libUrl == 'string') {
               cdnList.push(libUrl);
             } else if (typeof libUrl == 'function') {
-              cdnList.push(
-                libUrl(await getModuleVersion(moduleName), moduleName),
-              );
+              cdnList.push(libUrl(version, name, moduleName));
             }
           }
         }

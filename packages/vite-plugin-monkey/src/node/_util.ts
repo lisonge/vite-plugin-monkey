@@ -206,18 +206,34 @@ export const existFile = async (path: string) => {
   }
 };
 
-export const getModuleVersion = async (name: string) => {
+export const getModuleRealInfo = async (name: string) => {
   let version: string | undefined = undefined;
-  try {
-    const filePath = compatResolve(`${name}/package.json`);
-    const modulePack: { version?: string } = JSON.parse(
+  const nameList = name.replace('\\', '/').split('/');
+  let subname = name;
+  while (nameList.length > 0) {
+    subname = nameList.join('/');
+    const filePath = (() => {
+      try {
+        return compatResolve(`${subname}/package.json`);
+      } catch {
+        return undefined;
+      }
+    })();
+    if (filePath === undefined || !(await existFile(filePath))) {
+      nameList.pop();
+      continue;
+    }
+    const modulePack: PackageJson = JSON.parse(
       await fs.readFile(filePath, 'utf-8'),
     );
     version = modulePack.version;
-  } catch {
-    logger.warn(`not found module ${name} version, use ${name}@latest`);
+    break;
   }
-  return version ?? 'latest';
+  if (version === undefined) {
+    logger.warn(`not found module ${name} version, use ${name}@latest`);
+    version = 'latest';
+  }
+  return { version, name: subname };
 };
 
 export const getGzipSize = async (filePath: string | Buffer) => {

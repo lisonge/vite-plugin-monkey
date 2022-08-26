@@ -71,7 +71,7 @@ pnpm add -D vite-plugin-monkey
 
 ## 配置
 
-[MonkeyOption](/packages/vite-plugin-monkey/src/node/index.ts#L43)
+[MonkeyOption](/packages/vite-plugin-monkey/src/node/index.ts#L42)
 
 ```ts
 export interface MonkeyOption {
@@ -111,6 +111,40 @@ export interface MonkeyOption {
      * @default 'dev:'
      */
     prefix?: string | ((name: string) => string) | false;
+
+    /**
+     * 挂载 GM_api 到 unsafeWindow, 不推荐使用, 你应该通过 ESM 导入使用
+     * @default false
+     * @example
+     * // if set true, you can export all from vite-plugin-monkey/dist/client to global
+     * // vite-env.d.ts
+     * type MonkeyWindow = import('vite-plugin-monkey/dist/client').MonkeyWindow;
+     * declare const unsafeWindow: MonkeyWindow['unsafeWindow'];
+     * declare const GM_addStyle: MonkeyWindow['GM_addStyle'];
+     * declare const GM_addElement: MonkeyWindow['GM_addElement'];
+     * declare const GM_deleteValue: MonkeyWindow['GM_deleteValue'];
+     * declare const GM_listValues: MonkeyWindow['GM_listValues'];
+     * declare const GM_addValueChangeListener: MonkeyWindow['GM_addValueChangeListener'];
+     * declare const GM_removeValueChangeListener: MonkeyWindow['GM_removeValueChangeListener'];
+     * declare const GM_setValue: MonkeyWindow['GM_setValue'];
+     * declare const GM_getValue: MonkeyWindow['GM_getValue'];
+     * declare const GM_log: MonkeyWindow['GM_log'];
+     * declare const GM_getResourceText: MonkeyWindow['GM_getResourceText'];
+     * declare const GM_getResourceURL: MonkeyWindow['GM_getResourceURL'];
+     * declare const GM_registerMenuCommand: MonkeyWindow['GM_registerMenuCommand'];
+     * declare const GM_unregisterMenuCommand: MonkeyWindow['GM_unregisterMenuCommand'];
+     * declare const GM_openInTab: MonkeyWindow['GM_openInTab'];
+     * declare const GM_xmlhttpRequest: MonkeyWindow['GM_xmlhttpRequest'];
+     * declare const GM_download: MonkeyWindow['GM_download'];
+     * declare const GM_getTab: MonkeyWindow['GM_getTab'];
+     * declare const GM_saveTab: MonkeyWindow['GM_saveTab'];
+     * declare const GM_getTabs: MonkeyWindow['GM_getTabs'];
+     * declare const GM_notification: MonkeyWindow['GM_notification'];
+     * declare const GM_setClipboard: MonkeyWindow['GM_setClipboard'];
+     * declare const GM_info: MonkeyWindow['GM_info'];
+     * declare const GM_cookie: MonkeyWindow['GM_cookie'];
+     */
+    mountGmApi?: boolean;
   };
   build?: {
     /**
@@ -135,13 +169,22 @@ export interface MonkeyOption {
      * @example
      * {
      *  vue:'Vue',
-     *  // 你需要额外设置脚本配置 userscript.require = ['https://unpkg.com/vue@3.0.0/dist/vue.global.js']
-     *  vuex:['Vuex', 'https://unpkg.com/vuex@4.0.0/dist/vuex.global.js'],
-     *  // 插件将会自动注入 cdn 链接到 userscript.require
+     *  // 在build模式下, 你需要手动 userscript.require = ['https://unpkg.com/vue@3.0.0/dist/vue.global.js']
+     *
      *  vuex:['Vuex', (version, name)=>`https://unpkg.com/${name}@${version}/dist/vuex.global.js`],
-     *  // 依据版本自动变化
+     *  // 插件会自动吧urk注入 userscript.require
+     *
+     *  'prettier/parser-babel': [
+     *    'prettierPlugins.babel',
+     *    (version, name, moduleName) => {
+     *      // name == `prettier`
+     *      // moduleName == `prettier/parser-babel`
+     *      const subpath = `${moduleName.split('/').at(-1)}.js`;
+     *      return `https://cdn.jsdelivr.net/npm/${name}@${version}/${subpath}`;
+     *    },
+     *  ],
+     *  // 某些情况下, 模块名不同与包名
      * }
-     * // type Lib2Url = (version: string, name: string) => string
      */
     externalGlobals?: Record<
       string,

@@ -37,3 +37,27 @@ GM_cookie.list({}, (cookies, error) => {
     }
   }
 });
+
+//---------test code format--------
+import { formatCode } from './format';
+console.log('format tsx code');
+const tsxCode = `const App=()=>{return(<div class={styles.App}>
+<header class={styles.header}>
+<img src={logo} class={styles.logo} alt="logo" />
+<p>
+Edit <code>src/App.tsx</code> and save to reload.
+</p>
+<a
+class={styles.link}
+href="https://github.com/solidjs/solid"
+target="_blank"
+rel="noopener noreferrer"
+>
+Learn Solid
+</a>
+</header>
+</div>
+);
+};`;
+console.log(formatCode(tsxCode, 'tsx'));
+//-------------------------

@@ -71,10 +71,10 @@ pnpm add -D vite-plugin-monkey
 
 ## config
 
-[MonkeyOption](/packages/vite-plugin-monkey/src/node/index.ts#L43)
+[MonkeyOption](/packages/vite-plugin-monkey/src/node/index.ts#L42)
 
 ```ts
-export interface MonkeyOption {
+export type MonkeyOption = {
   /**
    * userscript entry file path
    */
@@ -101,7 +101,8 @@ export interface MonkeyOption {
   clientAlias?: string;
   server?: {
     /**
-     * auto open *.user.js in default browser when userscript comment change or vite server first start
+     * auto open *.user.js in default browser when userscript comment change or vite server first start.
+     * if you don't want to open when vite server first start, just want to open when userscript comment change, you should set viteConfig.server.open=false
      * @default true
      */
     open?: boolean;
@@ -115,13 +116,43 @@ export interface MonkeyOption {
     /**
      * mount GM_api to unsafeWindow, not recommend it, you should use GM_api by ESM import
      * @default false
+     * @example
+     * // if set true, you can export all from vite-plugin-monkey/dist/client to global
+     * // vite-env.d.ts
+     * type MonkeyWindow = import('vite-plugin-monkey/dist/client').MonkeyWindow;
+     * declare const unsafeWindow: MonkeyWindow['unsafeWindow'];
+     * declare const GM_addStyle: MonkeyWindow['GM_addStyle'];
+     * declare const GM_addElement: MonkeyWindow['GM_addElement'];
+     * declare const GM_deleteValue: MonkeyWindow['GM_deleteValue'];
+     * declare const GM_listValues: MonkeyWindow['GM_listValues'];
+     * declare const GM_addValueChangeListener: MonkeyWindow['GM_addValueChangeListener'];
+     * declare const GM_removeValueChangeListener: MonkeyWindow['GM_removeValueChangeListener'];
+     * declare const GM_setValue: MonkeyWindow['GM_setValue'];
+     * declare const GM_getValue: MonkeyWindow['GM_getValue'];
+     * declare const GM_log: MonkeyWindow['GM_log'];
+     * declare const GM_getResourceText: MonkeyWindow['GM_getResourceText'];
+     * declare const GM_getResourceURL: MonkeyWindow['GM_getResourceURL'];
+     * declare const GM_registerMenuCommand: MonkeyWindow['GM_registerMenuCommand'];
+     * declare const GM_unregisterMenuCommand: MonkeyWindow['GM_unregisterMenuCommand'];
+     * declare const GM_openInTab: MonkeyWindow['GM_openInTab'];
+     * declare const GM_xmlhttpRequest: MonkeyWindow['GM_xmlhttpRequest'];
+     * declare const GM_download: MonkeyWindow['GM_download'];
+     * declare const GM_getTab: MonkeyWindow['GM_getTab'];
+     * declare const GM_saveTab: MonkeyWindow['GM_saveTab'];
+     * declare const GM_getTabs: MonkeyWindow['GM_getTabs'];
+     * declare const GM_notification: MonkeyWindow['GM_notification'];
+     * declare const GM_setClipboard: MonkeyWindow['GM_setClipboard'];
+     * declare const GM_info: MonkeyWindow['GM_info'];
+     * declare const GM_cookie: MonkeyWindow['GM_cookie'];
      */
     mountGmApi?: boolean;
   };
   build?: {
     /**
-     * build bundle userscript file name, it should end with '.user.js'
-     * @default (package.json.name||'monkey')+'.user.js'
+     * build bundle userscript file name
+     *
+     * it should end with '.user.js'
+     * @default (package.json.name??'monkey')+'.user.js'
      */
     fileName?: string;
 
@@ -141,13 +172,22 @@ export interface MonkeyOption {
      * @example
      * {
      *  vue:'Vue',
-     *  // need manually set userscript.require = ['https://unpkg.com/vue@3.0.0/dist/vue.global.js']
-     *  vuex:['Vuex', 'https://unpkg.com/vuex@4.0.0/dist/vuex.global.js'],
-     *  // use fixed version, plugin will auto add this url to userscript.require
+     *  // youe need manually set userscript.require = ['https://unpkg.com/vue@3.0.0/dist/vue.global.js'], when command=='build'
+     *
      *  vuex:['Vuex', (version, name)=>`https://unpkg.com/${name}@${version}/dist/vuex.global.js`],
-     *  // best recommended this
+     *  // plugin will auto add this url to userscript.require
+     *
+     *  'prettier/parser-babel': [
+     *    'prettierPlugins.babel',
+     *    (version, name, moduleName) => {
+     *      // name == `prettier`
+     *      // moduleName == `prettier/parser-babel`
+     *      const subpath = `${moduleName.split('/').at(-1)}.js`;
+     *      return `https://cdn.jsdelivr.net/npm/${name}@${version}/${subpath}`;
+     *    },
+     *  ],
+     *  // sometimes moduleName deffers from package name
      * }
-     * // type Lib2Url = (version: string, name: string) => string
      */
     externalGlobals?: Record<
       string,
@@ -163,12 +203,12 @@ export interface MonkeyOption {
     autoGrant?: boolean;
 
     /**
-     * check all require urls for availability, http code is 2xx
+     * check all require urls for availability, just http code is 2xx, never check http.body
      * @default false
      */
     checkCDN?: boolean;
   };
-}
+};
 ```
 
 [MonkeyUserScript](/packages/vite-plugin-monkey/src/node/userscript/index.ts#L138)

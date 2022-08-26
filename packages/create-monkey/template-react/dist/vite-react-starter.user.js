@@ -8,7 +8,7 @@
 // @require    https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js
 // ==/UserScript==
 
-// use vite-plugin-monkey@2.1.1 at 2022-08-15T17:36:42.025Z
+// use vite-plugin-monkey@2.1.2 at 2022-08-26T10:41:13.936Z
 
 ;(({ css = "" }) => {
   const style = document.createElement("style");

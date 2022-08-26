@@ -4,10 +4,10 @@
 // @version    0.0.0
 // @icon       https://vitejs.dev/logo.svg
 // @match      https://www.google.com/
-// @require    https://cdn.jsdelivr.net/npm/preact@10.10.2/dist/preact.min.js
+// @require    https://cdn.jsdelivr.net/npm/preact@10.10.6/dist/preact.min.js
 // ==/UserScript==
 
-// use vite-plugin-monkey@2.1.1 at 2022-08-15T17:36:15.840Z
+// use vite-plugin-monkey@2.1.2 at 2022-08-26T10:40:40.149Z
 
 ;(({ css = "" }) => {
   const style = document.createElement("style");
@@ -34,23 +34,26 @@
     if (o2.t = n, !o2.__c && (o2.__ = [i2 ? i2(u2) : z(void 0, u2), function(n2) {
       var t2 = o2.__N ? o2.__N[0] : o2.__[0], r2 = o2.t(t2, n2);
       t2 !== r2 && (o2.__N = [r2, o2.__[1]], o2.__c.setState({}));
-    }], o2.__c = r, !o2.__c.u)) {
-      o2.__c.__H.u = true;
-      var c2 = o2.__c.shouldComponentUpdate;
-      o2.__c.shouldComponentUpdate = function(n2, t2, r2) {
+    }], o2.__c = r, !r.u)) {
+      r.u = true;
+      var c2 = r.shouldComponentUpdate;
+      r.shouldComponentUpdate = function(n2, t2, r2) {
         if (!o2.__c.__H)
           return true;
         var u3 = o2.__c.__H.__.filter(function(n3) {
           return n3.__c;
         });
-        return u3.every(function(n3) {
+        if (u3.every(function(n3) {
           return !n3.__N;
-        }) ? !c2 || c2(n2, t2, r2) : !u3.every(function(n3) {
-          if (!n3.__N)
-            return true;
-          var t3 = n3.__[0];
-          return n3.__ = n3.__N, n3.__N = void 0, t3 === n3.__[0];
-        }) && (!c2 || c2(n2, t2, r2));
+        }))
+          return !c2 || c2.call(this, n2, t2, r2);
+        var i3 = false;
+        return u3.forEach(function(n3) {
+          if (n3.__N) {
+            var t3 = n3.__[0];
+            n3.__ = n3.__N, n3.__N = void 0, t3 !== n3.__[0] && (i3 = true);
+          }
+        }), !!i3 && (!c2 || c2.call(this, n2, t2, r2));
       };
     }
     return o2.__N || o2.__;

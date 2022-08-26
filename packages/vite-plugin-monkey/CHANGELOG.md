@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.1.2
+
+### 2.1.2-BugFixes
+
+- config.build.externalGlobals, submodule cannot get correct version, [issues/16](https://github.com/lisonge/vite-plugin-monkey/issues/16) [fe2b159c](https://github.com/lisonge/vite-plugin-monkey/commit/9feef8582cb83bd7ccbeefeaa1c43a26fe2b159c)
+
 ## 2.1.1
 
 ### 2.1.1-Features

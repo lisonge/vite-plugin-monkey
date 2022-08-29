@@ -6,10 +6,9 @@
 // @match      https://www.google.com/
 // ==/UserScript==
 
-// use vite-plugin-monkey@2.2.0 at 2022-08-29T07:21:47.429Z
+// use vite-plugin-monkey@2.3.0 at 2022-08-29T08:08:35.555Z
 
 (function() {
   "use strict";
   console.log("hello world");
 })();
- 

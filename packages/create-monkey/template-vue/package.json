@@ -14,6 +14,6 @@
   "devDependencies": {
     "@vitejs/plugin-vue": "^3.0.3",
     "vite": "^3.0.9",
-    "vite-plugin-monkey": "^2.2.0"
+    "vite-plugin-monkey": "^2.3.0"
   }
 }

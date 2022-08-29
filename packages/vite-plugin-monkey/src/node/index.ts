@@ -21,6 +21,7 @@ import type {
   ViolentmonkeyUserScript,
 } from './userscript';
 import { userscript2comment } from './userscript';
+import type { IArray } from './userscript/common';
 import { logger } from './_logger';
 import {
   existFile,
@@ -41,6 +42,7 @@ export type {
 
 /**
  * @param moduleName 'name/subname' in example
+ * @returns url or exportVarName
  * @example
  * const mod = await import('name/subname')
  */
@@ -141,6 +143,10 @@ export type MonkeyOption = {
     metaFileName?: string | boolean;
 
     /**
+     * if value is string or function, it or its return value is exportVarName
+     *
+     * if value is Array, the first [item or its return value] is exportVarName, the items after it all are url that is [require url]
+     *
      * @example
      * {
      *  vue:'Vue',
@@ -161,10 +167,7 @@ export type MonkeyOption = {
      *  // sometimes moduleName deffers from package name
      * }
      */
-    externalGlobals?: Record<
-      string,
-      string | [string, ...(string | Lib2Url)[]]
-    >;
+    externalGlobals?: Record<string, IArray<string | Lib2Url>>;
 
     /**
      * according to final code bundle, auto inject GM_* or GM.* to userscript comment grant
@@ -238,15 +241,21 @@ export default (pluginOption: MonkeyOption): Plugin => {
       for (const kv of Object.entries(
         pluginOption.build?.externalGlobals ?? {},
       )) {
-        const [moduleName, varName$LibUrl] = kv;
+        const [moduleName, varName2LibUrl] = kv;
         external.push(moduleName);
+        const { name, version } = await getModuleRealInfo(moduleName);
 
-        if (typeof varName$LibUrl == 'string') {
-          globals[moduleName] = varName$LibUrl;
-        } else if (varName$LibUrl instanceof Array) {
-          const [varName, ...libUrlList] = varName$LibUrl;
-          globals[moduleName] = varName;
-          const { name, version } = await getModuleRealInfo(moduleName);
+        if (typeof varName2LibUrl == 'string') {
+          globals[moduleName] = varName2LibUrl;
+        } else if (typeof varName2LibUrl == 'function') {
+          globals[moduleName] = varName2LibUrl(version, name, moduleName);
+        } else if (varName2LibUrl instanceof Array) {
+          const [varName, ...libUrlList] = varName2LibUrl;
+          if (typeof varName == 'string') {
+            globals[moduleName] = varName;
+          } else if (typeof varName == 'function') {
+            globals[moduleName] = varName(version, name, moduleName);
+          }
           for (const libUrl of libUrlList) {
             // keep add order
             if (typeof libUrl == 'string') {

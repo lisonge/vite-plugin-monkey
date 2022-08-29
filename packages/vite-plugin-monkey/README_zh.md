@@ -167,6 +167,10 @@ export interface MonkeyOption {
     metaFileName?: string | boolean;
 
     /**
+     * 如果值是字符串或函数, 字符串或函数的返回值将作为库的 导出变量名
+     *
+     * 如果值是数组, 数组第一项或其返回值将作为 导出变量名, 后续项全部作为 require url
+     *
      * @example
      * {
      *  vue:'Vue',

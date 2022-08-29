@@ -170,6 +170,10 @@ export type MonkeyOption = {
     metaFileName?: string | boolean;
 
     /**
+     * if value is string or function, it or its return value is exportVarName
+     *
+     * if value is Array, the first [item or its return value] is exportVarName, the items after it all are url that is [require url]
+     *
      * @example
      * {
      *  vue:'Vue',

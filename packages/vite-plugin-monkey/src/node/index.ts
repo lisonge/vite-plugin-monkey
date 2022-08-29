@@ -5,6 +5,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import pc from 'picocolors';
 import type { Plugin, ResolvedConfig } from 'vite';
+import { transformWithEsbuild } from 'vite';
 import selfPackageJson from '../../package.json';
 import {
   cssInjectTemplate,
@@ -182,6 +183,12 @@ export type MonkeyOption = {
      * @default false
      */
     checkCDN?: boolean;
+
+    /**
+     * if you want minify all, just set viteConfig.build.minify=true
+     * @default true
+     */
+    minifyCss?: boolean;
   };
 };
 
@@ -193,29 +200,29 @@ export default (pluginOption: MonkeyOption): Plugin => {
   const globals: Record<string, string> = {};
   const cdnList: string[] = [];
 
-  let finalConfig: ResolvedConfig;
+  let viteConfig: ResolvedConfig;
   let isServe = true;
-  const isHttps = () => !!finalConfig.server.https;
+  const isHttps = () => !!viteConfig.server.https;
   const getPort = (() => {
     // 5173 come from https://github.com/vitejs/vite/blob/26bcdc3186807bb6f3817119cd7e64ae8308a057/packages/vite/src/node/server/index.ts#L612
     let availablePort = 5173;
     detectPort(availablePort).then((p) => {
       availablePort = p;
     });
-    return () => finalConfig.server.port ?? availablePort;
+    return () => viteConfig.server.port ?? availablePort;
   })();
   const getHost = () => {
     if (
-      typeof finalConfig.server.host == 'string' &&
-      finalConfig.server.host != '0.0.0.0'
+      typeof viteConfig.server.host == 'string' &&
+      viteConfig.server.host != '0.0.0.0'
     ) {
-      return finalConfig.server.host;
+      return viteConfig.server.host;
     }
     return '127.0.0.1';
   };
   const getOrigin = () =>
     `${isHttps() ? 'https' : 'http'}://${getHost()}:${getPort()}`;
-  const getInstallUrl = () => new URL(finalConfig.base, getOrigin()).href; //+ installUserPath;
+  const getInstallUrl = () => new URL(viteConfig.base, getOrigin()).href; //+ installUserPath;
 
   let fileName = 'monkey.user.js';
   if (pluginOption.build?.fileName) {
@@ -320,7 +327,7 @@ export default (pluginOption: MonkeyOption): Plugin => {
       ];
     },
     configResolved(resolvedConfig) {
-      finalConfig = resolvedConfig;
+      viteConfig = resolvedConfig;
       const { server } = resolvedConfig;
 
       server.host = getHost();
@@ -436,7 +443,7 @@ export default (pluginOption: MonkeyOption): Plugin => {
 
           let realEntry = pluginOption.entry;
           if (path.isAbsolute(pluginOption.entry)) {
-            realEntry = path.relative(finalConfig.root, pluginOption.entry);
+            realEntry = path.relative(viteConfig.root, pluginOption.entry);
             realEntry = realEntry.replace('\\', '/');
           }
           entryList.push(new URL(realEntry, origin).href);
@@ -491,7 +498,7 @@ export default (pluginOption: MonkeyOption): Plugin => {
         await fs.writeFile(cacheUserPath, newComment).catch();
       }
     },
-    generateBundle(_, bundle) {
+    async generateBundle(_, bundle) {
       const { require } = pluginOption.userscript;
       if (typeof require == 'string') {
         pluginOption.userscript.require = [require, ...cdnList];
@@ -543,8 +550,21 @@ export default (pluginOption: MonkeyOption): Plugin => {
       });
       let injectCssCode: undefined | string = undefined;
       if (cssList.length > 0) {
+        let css = cssList.join('');
+        if (
+          !viteConfig.build.minify &&
+          (pluginOption.build?.minifyCss ?? true)
+        ) {
+          css = (
+            await transformWithEsbuild(css, 'any_name.css', {
+              minify: true,
+              sourcemap: false,
+              logLevel: 'error',
+            })
+          ).code.trim();
+        }
         injectCssCode = template2string(cssInjectTemplate, {
-          css: cssList.join(''),
+          css,
         });
       }
 
@@ -570,15 +590,14 @@ export default (pluginOption: MonkeyOption): Plugin => {
         const chunk = jsBundleList[0][1];
         const { name, version } = selfPackageJson;
         if (chunk.type == 'chunk') {
-          chunk.code =
-            [
-              userscript2comment(pluginOption.userscript, pluginOption.format),
-              `// use ${name}@${version} at ${new Date().toJSON()}`,
-              injectCssCode,
-              chunk.code,
-            ]
-              .filter((s) => s)
-              .join('\n\n') + ' \n';
+          chunk.code = [
+            userscript2comment(pluginOption.userscript, pluginOption.format),
+            `// use ${name}@${version} at ${new Date().toJSON()}`,
+            injectCssCode,
+            chunk.code,
+          ]
+            .filter((s) => s)
+            .join('\n\n');
         }
       }
     },
@@ -690,7 +709,7 @@ export default (pluginOption: MonkeyOption): Plugin => {
       server.middlewares.use(async (req, res, next) => {
         if (['/', '/index.html'].includes((req.url ?? '').split('?')[0])) {
           const [fileName] = (
-            await fs.readdir(path.join(process.cwd(), finalConfig.build.outDir))
+            await fs.readdir(path.join(process.cwd(), viteConfig.build.outDir))
           ).filter((name) => name.endsWith('.user.js'));
           if (fileName) {
             Object.entries({

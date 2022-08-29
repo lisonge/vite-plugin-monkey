@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.2.0
+
+### 2.2.0-Features
+
+- extend externalGlobals value type [3939cf82](https://github.com/lisonge/vite-plugin-monkey/commit/1019d43f654c1681863d6e268c31b03f3939cf82)
+
 ## 2.1.2
 
 ### 2.1.2-BugFixes

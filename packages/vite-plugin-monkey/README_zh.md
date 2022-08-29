@@ -209,6 +209,12 @@ export interface MonkeyOption {
      * @default false
      */
     checkCDN?: boolean;
+
+    /**
+     * 如果你想最小化全部, 设置 viteConfig.build.minify=true
+     * @default true
+     */
+    minifyCss?: boolean;
   };
 }
 ```

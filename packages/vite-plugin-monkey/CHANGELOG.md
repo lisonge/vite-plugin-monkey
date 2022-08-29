@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.3.0
+
+### 2.3.0-Features
+
+- minifyCss [c64decbf](https://github.com/lisonge/vite-plugin-monkey/commit/b1ba2e250dde11a948297f22eeb0d912c64decbf)
+
 ## 2.2.0
 
 ### 2.2.0-Features

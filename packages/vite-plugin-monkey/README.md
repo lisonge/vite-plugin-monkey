@@ -212,6 +212,12 @@ export type MonkeyOption = {
      * @default false
      */
     checkCDN?: boolean;
+
+    /**
+     * if you want minify all, just set viteConfig.build.minify=true
+     * @default true
+     */
+    minifyCss?: boolean;
   };
 };
 ```

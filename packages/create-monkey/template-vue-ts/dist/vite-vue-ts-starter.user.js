@@ -7,7 +7,7 @@
 // @require    https://cdn.jsdelivr.net/npm/vue@3.2.37/dist/vue.global.prod.js
 // ==/UserScript==
 
-// use vite-plugin-monkey@2.1.2 at 2022-08-26T10:46:52.216Z
+// use vite-plugin-monkey@2.2.0 at 2022-08-29T07:21:43.537Z
 
 ;(({ css = "" }) => {
   const style = document.createElement("style");

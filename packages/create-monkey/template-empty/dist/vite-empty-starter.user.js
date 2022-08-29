@@ -6,7 +6,7 @@
 // @match      https://www.google.com/
 // ==/UserScript==
 
-// use vite-plugin-monkey@2.1.2 at 2022-08-26T10:34:46.371Z
+// use vite-plugin-monkey@2.2.0 at 2022-08-29T07:21:47.429Z
 
 (function() {
   "use strict";

@@ -6,7 +6,7 @@
 // @match      https://www.google.com/
 // ==/UserScript==
 
-// use vite-plugin-monkey@2.1.2 at 2022-08-26T10:45:54.040Z
+// use vite-plugin-monkey@2.2.0 at 2022-08-29T07:23:10.991Z
 
 ;(({ css = "" }) => {
   const style = document.createElement("style");

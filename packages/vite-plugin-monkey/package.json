@@ -75,6 +75,6 @@
     "node": "^14.18 || >= 16"
   },
   "volta": {
-    "node": "16.15.1"
+    "extends": "../../package.json"
   }
 }

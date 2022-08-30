@@ -30,5 +30,8 @@
         "vite"
       ]
     }
+  },
+  "volta": {
+    "extends": "../../package.json"
   }
 }

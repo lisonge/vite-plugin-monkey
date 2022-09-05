@@ -8,7 +8,8 @@ declare module '$' {
 }
 
 // if set mountGmApi=true
-// type MonkeyWindow = import('vite-plugin-monkey/dist/client').MonkeyWindow;
+type MonkeyWindow = import('vite-plugin-monkey/dist/client').MonkeyWindow;
+// declare const GM: MonkeyWindow['GM'];
 // declare const unsafeWindow: MonkeyWindow['unsafeWindow'];
 // declare const GM_addStyle: MonkeyWindow['GM_addStyle'];
 // declare const GM_addElement: MonkeyWindow['GM_addElement'];

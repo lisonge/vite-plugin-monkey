@@ -9,34 +9,39 @@ console.log('document.readyState', document.readyState); // interactive
 import { GM_cookie, unsafeWindow, monkeyWindow, GM_addElement } from '$';
 
 console.log(monkeyWindow);
-GM_addElement('div', { innerHTML: 'hello' });
+
+// tampermonkey only
+GM_addElement && GM_addElement('div', { innerHTML: 'hello' });
 
 if (unsafeWindow == window) {
   console.log('scope->host');
 } else {
   console.log('scope->monkey');
 }
-GM_cookie.list({}, (cookies, error) => {
-  if (error) {
-    console.log(error);
-  } else {
-    const [cookie] = cookies;
-    if (cookie) {
-      console.log(cookie);
-      // {
-      //   "domain": "i.songe.li",
-      //   "httpOnly": false,
-      //   "secure": false,
-      //   "name": "k",
-      //   "path": "/",
-      //   "sameSite": "unspecified",
-      //   "value": "v",
-      //   "session": true,
-      //   "hostOnly": true
-      // }
+
+// tampermonkey only
+GM_cookie &&
+  GM_cookie.list({}, (cookies, error) => {
+    if (error) {
+      console.log(error);
+    } else {
+      const [cookie] = cookies;
+      if (cookie) {
+        console.log(cookie);
+        // {
+        //   "domain": "i.songe.li",
+        //   "httpOnly": false,
+        //   "secure": false,
+        //   "name": "k",
+        //   "path": "/",
+        //   "sameSite": "unspecified",
+        //   "value": "v",
+        //   "session": true,
+        //   "hostOnly": true
+        // }
+      }
     }
-  }
-});
+  });
 
 //---------test code format--------
 import { formatCode } from './format';

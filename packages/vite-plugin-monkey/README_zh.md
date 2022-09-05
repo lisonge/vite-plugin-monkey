@@ -70,6 +70,8 @@ pnpm add -D vite-plugin-monkey
 # yarn add -D vite-plugin-monkey
 ```
 
+要使 `vite serve` 正常工作, 你应该在 `工作目录` 添加一个 `index.html` 文件, 它的内容应该与 [index.html](/packages/create-monkey/template-empty-ts/index.html) 一致
+
 ## 配置
 
 [MonkeyOption](/packages/vite-plugin-monkey/src/node/index.ts#L42)
@@ -117,10 +119,11 @@ export interface MonkeyOption {
      * 挂载 GM_api 到 unsafeWindow, 不推荐使用, 你应该通过 ESM 导入使用
      * @default false
      * @example
-     * // if set true, you can export all from vite-plugin-monkey/dist/client to global
+     * // 如果设置 true, 你可以把以下内容附加到 vite-env.d.ts 从而获得全局作用域的类型提示
      * // vite-env.d.ts
      * type MonkeyWindow = import('vite-plugin-monkey/dist/client').MonkeyWindow;
      * declare const unsafeWindow: MonkeyWindow['unsafeWindow'];
+     * declare const GM: MonkeyWindow['GM'];
      * declare const GM_addStyle: MonkeyWindow['GM_addStyle'];
      * declare const GM_addElement: MonkeyWindow['GM_addElement'];
      * declare const GM_deleteValue: MonkeyWindow['GM_deleteValue'];
@@ -171,13 +174,15 @@ export interface MonkeyOption {
      *
      * 如果值是数组, 数组第一项或其返回值将作为 导出变量名, 后续项全部作为 require url
      *
+     * 如果模块在代码中并没有被导入, 则 require url 不会添加到 userscript
+     *
      * @example
      * {
      *  vue:'Vue',
      *  // 在build模式下, 你需要手动 userscript.require = ['https://unpkg.com/vue@3.0.0/dist/vue.global.js']
      *
      *  vuex:['Vuex', (version, name)=>`https://unpkg.com/${name}@${version}/dist/vuex.global.js`],
-     *  // 插件会自动吧urk注入 userscript.require
+     *  // 插件会自动把url注入 userscript.require
      *
      *  'prettier/parser-babel': [
      *    'prettierPlugins.babel',
@@ -294,7 +299,7 @@ import { GM_cookie, unsafeWindow, monkeyWindow, GM_addElement } from '$';
 // 无论当前运行环境是开发环境还是构建环境, monkeyWindow 总是脚本作用域的 window
 console.log(monkeyWindow);
 
-GM_addElement(document.body, 'div', { innerHTML: 'hello' });
+GM_addElement && GM_addElement(document.body, 'div', { innerHTML: 'hello' });
 
 // 无论当前运行环境是开发环境还是构建环境, unsafeWindow 总是宿主作用域的 window
 if (unsafeWindow == window) {
@@ -302,16 +307,17 @@ if (unsafeWindow == window) {
 } else {
   console.log('scope->monkey, iife mode');
 }
-GM_cookie.list({}, (cookies, error) => {
-  if (error) {
-    console.log(error);
-  } else {
-    const [cookie] = cookies;
-    if (cookie) {
-      console.log(cookie);
+GM_cookie &&
+  GM_cookie.list({}, (cookies, error) => {
+    if (error) {
+      console.log(error);
+    } else {
+      const [cookie] = cookies;
+      if (cookie) {
+        console.log(cookie);
+      }
     }
-  }
-});
+  });
 ```
 
 ## 例子
@@ -326,6 +332,10 @@ preact/react/svelte/vanilla/vue 的例子在 [create-monkey](/packages/create-mo
 
 ### [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)
 
+在 `vite serve` 模式下, 代码入口被作为 script 添加到目标环境 document.head, 代码需要在两个源之间正常工作
+
+#### 对于 http header csp
+
 你可以使用 [Tampermonkey](https://www.tampermonkey.net/) 然后打开插件配置 `extension://iikmkjmpaadaobahmlepeloendndfphd/options.html#nav=settings`
 
 在 `安全`, 设置 `如果站点有内容安全策略（CSP）则向其策略:` 为 `全部移除（可能不安全）`
@@ -338,6 +348,14 @@ preact/react/svelte/vanilla/vue 的例子在 [create-monkey](/packages/create-mo
 - edge - [Disable Content-Security-Policy](https://microsoftedge.microsoft.com/addons/detail/disable-contentsecurity/ecmfamimnofkleckfamjbphegacljmbp?hl=zh-CN)
 - firefox - 在 `about:config` 菜单配置中，禁用 `security.csp.enable`
 
+#### for html csp
+
+- 利用 <https://wproxy.org/whistle/> 中间人攻击修改 html
+
+- 如果 csp 允许 `*.xx.com` 这类域名, 你可以设置 `viteConfig.server.host=localhost.xx.com` 然后添加本地 dns `127.0.0.1 localhost.xx.com` 到你的 hosts 文件, 如果你需要伪装 https ca, 你可以使用 [mkcert](https://github.com/FiloSottile/mkcert)
+
+- 通过 chrome-remote-interface [issues/1#issuecomment-1236060681](https://github.com/lisonge/vite-plugin-monkey/issues/1#issuecomment-1236060681)
+
 ### Polyfill
 
 由于 <https://github.com/vitejs/vite/issues/1639>, 你暂时不能使用 `@vitejs/plugin-legacy`
@@ -346,11 +364,11 @@ preact/react/svelte/vanilla/vue 的例子在 [create-monkey](/packages/create-mo
 
 ```ts
 import { defineConfig } from 'vite';
-import monkeyPlugin from 'vite-plugin-monkey';
+import monkey from 'vite-plugin-monkey';
 
 export default defineConfig({
   plugins: [
-    monkeyPlugin({
+    monkey({
       userscript: {
         require: [
           // polyfill 全部

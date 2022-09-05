@@ -70,6 +70,8 @@ pnpm add -D vite-plugin-monkey
 # yarn add -D vite-plugin-monkey
 ```
 
+for make `vite serve` work normally, you should add file named `index.html` to `work directory`, its content should be same as [index.html](/packages/create-monkey/template-empty-ts/index.html)
+
 ## config
 
 [MonkeyOption](/packages/vite-plugin-monkey/src/node/index.ts#L42)
@@ -94,7 +96,7 @@ export type MonkeyOption = {
    *   },
    * }
    * @example
-   * // vite-env.d.ts, you must manual modify .env file
+   * // vite-env.d.ts, you must manual modify vite-env.d.ts file for type hint
    * declare module clientAlias {
    *   export * from 'vite-plugin-monkey/dist/client';
    * }
@@ -118,10 +120,11 @@ export type MonkeyOption = {
      * mount GM_api to unsafeWindow, not recommend it, you should use GM_api by ESM import
      * @default false
      * @example
-     * // if set true, you can export all from vite-plugin-monkey/dist/client to global
+     * // if set true, you can export all from vite-plugin-monkey/dist/client to global for type hint
      * // vite-env.d.ts
      * type MonkeyWindow = import('vite-plugin-monkey/dist/client').MonkeyWindow;
      * declare const unsafeWindow: MonkeyWindow['unsafeWindow'];
+     * declare const GM: MonkeyWindow['GM'];
      * declare const GM_addStyle: MonkeyWindow['GM_addStyle'];
      * declare const GM_addElement: MonkeyWindow['GM_addElement'];
      * declare const GM_deleteValue: MonkeyWindow['GM_deleteValue'];
@@ -174,6 +177,8 @@ export type MonkeyOption = {
      *
      * if value is Array, the first [item or its return value] is exportVarName, the items after it all are url that is [require url]
      *
+     * if module is unimported, plugin will not add require url to userscript
+     *
      * @example
      * {
      *  vue:'Vue',
@@ -202,7 +207,7 @@ export type MonkeyOption = {
     /**
      * according to final code bundle, auto inject GM_* or GM.* to userscript comment grant
      *
-     * the judgment is based on String.prototype.includes
+     * the judgment is based on String.prototype.includes, if code.includes('GM_xxx'), add \@grant GM_xxx to userscript
      * @default true
      */
     autoGrant?: boolean;
@@ -296,7 +301,7 @@ import { GM_cookie, unsafeWindow, monkeyWindow, GM_addElement } from '$';
 // whatever it is serve or build mode, monkeyWindow is always the window of [UserScript Scope]
 console.log(monkeyWindow);
 
-GM_addElement(document.body, 'div', { innerHTML: 'hello' });
+GM_addElement && GM_addElement(document.body, 'div', { innerHTML: 'hello' });
 
 // whatever it is serve or build mode, unsafeWindow is always host window
 if (unsafeWindow == window) {
@@ -304,16 +309,17 @@ if (unsafeWindow == window) {
 } else {
   console.log('scope->monkey, iife mode');
 }
-GM_cookie.list({}, (cookies, error) => {
-  if (error) {
-    console.log(error);
-  } else {
-    const [cookie] = cookies;
-    if (cookie) {
-      console.log(cookie);
+GM_cookie &&
+  GM_cookie.list({}, (cookies, error) => {
+    if (error) {
+      console.log(error);
+    } else {
+      const [cookie] = cookies;
+      if (cookie) {
+        console.log(cookie);
+      }
     }
-  }
-});
+  });
 ```
 
 ## example
@@ -325,6 +331,10 @@ and preact/react/svelte/vanilla/vue examples see [create-monkey](/packages/creat
 ## some note
 
 ### [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)
+
+in `vite serve` mode, the code entry is added as script to target host document.head, code need work between two origins
+
+#### for http header csp
 
 you can use [Tampermonkey](https://www.tampermonkey.net/) then open `extension://iikmkjmpaadaobahmlepeloendndfphd/options.html#nav=settings`
 
@@ -338,6 +348,14 @@ and if you use `Violentmonkey`/`Greasemonkey`, you can solve it in the following
 - edge - [Disable Content-Security-Policy](https://microsoftedge.microsoft.com/addons/detail/disable-contentsecurity/ecmfamimnofkleckfamjbphegacljmbp?hl=zh-CN)
 - firefox - disable `security.csp.enable` in the `about:config` menu
 
+#### for html csp
+
+- MITM modify html by <https://wproxy.org/whistle/>
+
+- if csp allow `*.xx.com`, you can set `viteConfig.server.host=localhost.xx.com` and add `127.0.0.1 localhost.xx.com` to your hosts file, if your need fake https ca, you can use [mkcert](https://github.com/FiloSottile/mkcert)
+
+- by chrome-remote-interface [issues/1#issuecomment-1236060681](https://github.com/lisonge/vite-plugin-monkey/issues/1#issuecomment-1236060681)
+
 ### Polyfill
 
 because of [vite/issues/1639](https://github.com/vitejs/vite/issues/1639), now you can not use `@vitejs/plugin-legacy`
@@ -346,11 +364,11 @@ the following is a feasible solution by @require cdn
 
 ```ts
 import { defineConfig } from 'vite';
-import monkeyPlugin from 'vite-plugin-monkey';
+import monkey from 'vite-plugin-monkey';
 
 export default defineConfig({
   plugins: [
-    monkeyPlugin({
+    monkey({
       userscript: {
         require: [
           // polyfill all

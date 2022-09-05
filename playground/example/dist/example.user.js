@@ -26,7 +26,7 @@
 // @grant              unsafeWindow
 // ==/UserScript==
 
-// use vite-plugin-monkey@2.2.0 at 2022-08-29T07:58:27.383Z
+// use vite-plugin-monkey@2.3.1 at 2022-09-05T10:38:28.968Z
 
 ;(({ css = "" }) => {
   const style = document.createElement("style");
@@ -81,13 +81,13 @@
   console.log(`md5('114514')=${md5__default.default("114514")}`);
   console.log("document.readyState", document.readyState);
   console.log(monkeyWindow);
-  GM_addElement("div", { innerHTML: "hello" });
+  GM_addElement && GM_addElement("div", { innerHTML: "hello" });
   if (unsafeWindow == window) {
     console.log("scope->host");
   } else {
     console.log("scope->monkey");
   }
-  GM_cookie.list({}, (cookies, error) => {
+  GM_cookie && GM_cookie.list({}, (cookies, error) => {
     if (error) {
       console.log(error);
     } else {

@@ -2,11 +2,12 @@
 // @name       vite-vanilla-ts-starter
 // @namespace  npm/vite-plugin-monkey
 // @version    0.0.0
+// @author     monkey
 // @icon       https://vitejs.dev/logo.svg
 // @match      https://www.google.com/
 // ==/UserScript==
 
-// use vite-plugin-monkey@2.3.0 at 2022-08-29T08:09:57.225Z
+// use vite-plugin-monkey@2.3.1 at 2022-09-05T11:05:13.440Z
 
 ;(({ css = "" }) => {
   const style = document.createElement("style");

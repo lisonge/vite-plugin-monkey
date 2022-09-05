@@ -2,11 +2,12 @@
 // @name       vite-solid-starter
 // @namespace  npm/vite-plugin-monkey
 // @version    0.0.0
+// @author     monkey
 // @icon       https://vitejs.dev/logo.svg
 // @match      https://www.google.com/
 // ==/UserScript==
 
-// use vite-plugin-monkey@2.3.0 at 2022-08-29T08:09:22.692Z
+// use vite-plugin-monkey@2.3.1 at 2022-09-05T11:04:39.436Z
 
 ;(({ css = "" }) => {
   const style = document.createElement("style");
@@ -466,7 +467,7 @@
         if (unwrap) {
           while (typeof item === "function")
             item = item();
-          dynamic = normalizeIncomingArray(normalized, Array.isArray(item) ? item : [item], prev) || dynamic;
+          dynamic = normalizeIncomingArray(normalized, Array.isArray(item) ? item : [item], Array.isArray(prev) ? prev : [prev]) || dynamic;
         } else {
           normalized.push(item);
           dynamic = true;

@@ -2,12 +2,13 @@
 // @name       vite-vue-ts-starter
 // @namespace  npm/vite-plugin-monkey
 // @version    0.0.0
+// @author     monkey
 // @icon       https://vitejs.dev/logo.svg
 // @match      https://www.google.com/
-// @require    https://cdn.jsdelivr.net/npm/vue@3.2.37/dist/vue.global.prod.js
+// @require    https://cdn.jsdelivr.net/npm/vue@3.2.38/dist/vue.global.prod.js
 // ==/UserScript==
 
-// use vite-plugin-monkey@2.3.0 at 2022-08-29T08:10:12.247Z
+// use vite-plugin-monkey@2.3.1 at 2022-09-05T11:05:28.122Z
 
 ;(({ css = "" }) => {
   const style = document.createElement("style");

@@ -2,12 +2,13 @@
 // @name       vite-preact-starter
 // @namespace  npm/vite-plugin-monkey
 // @version    0.0.0
+// @author     monkey
 // @icon       https://vitejs.dev/logo.svg
 // @match      https://www.google.com/
 // @require    https://cdn.jsdelivr.net/npm/preact@10.10.6/dist/preact.min.js
 // ==/UserScript==
 
-// use vite-plugin-monkey@2.3.0 at 2022-08-29T08:08:52.757Z
+// use vite-plugin-monkey@2.3.1 at 2022-09-05T11:04:03.234Z
 
 ;(({ css = "" }) => {
   const style = document.createElement("style");

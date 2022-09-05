@@ -2,13 +2,14 @@
 // @name       vite-react-starter
 // @namespace  npm/vite-plugin-monkey
 // @version    0.0.0
+// @author     monkey
 // @icon       https://vitejs.dev/logo.svg
 // @match      https://www.google.com/
 // @require    https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js
 // @require    https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js
 // ==/UserScript==
 
-// use vite-plugin-monkey@2.3.0 at 2022-08-29T08:09:08.228Z
+// use vite-plugin-monkey@2.3.1 at 2022-09-05T11:04:20.602Z
 
 ;(({ css = "" }) => {
   const style = document.createElement("style");

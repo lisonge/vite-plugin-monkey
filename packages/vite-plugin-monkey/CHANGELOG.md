@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.3.1
+
+### 2.3.1-BugFixes
+
+- not should add url from plugin.build.externalGlobals to userscript.require if code not import [a2a9988c](https://github.com/lisonge/vite-plugin-monkey/commit/22014b3cb7dfc29b12ff3a4c79ce366fa2a9988c)
+
 ## 2.3.0
 
 ### 2.3.0-Features

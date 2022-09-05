@@ -115,7 +115,7 @@ type PackageJson = {
   bugs?: string;
 };
 
-export const packageJson = (() => {
+export const projectPkg = (() => {
   let rawTarget: RawPackageJson = {};
   try {
     rawTarget = JSON.parse(
@@ -169,7 +169,7 @@ export const compatResolve = (() => {
   };
 })();
 
-export const lazy = <T = unknown>(fn: () => T) => {
+export const lazyValue = <T = unknown>(fn: () => T) => {
   const uniqueValue = Symbol('uniqueValue');
   let temp: T | symbol = uniqueValue;
   return {
@@ -180,6 +180,60 @@ export const lazy = <T = unknown>(fn: () => T) => {
       return temp as T;
     },
   };
+};
+export const lazy = <T extends object>(fn: () => T) => {
+  let temp: T | undefined = undefined;
+  let o = {
+    get k() {
+      if (temp === undefined) {
+        temp = fn();
+      }
+      return temp;
+    },
+  };
+  return new Proxy({} as T, {
+    get(_, p, receiver) {
+      return Reflect.get(o.k, p, receiver);
+    },
+    set(_, p, newValue, receiver) {
+      return Reflect.set(o.k, p, newValue, receiver);
+    },
+    has(_, p) {
+      return Reflect.has(o.k, p);
+    },
+    ownKeys() {
+      return Reflect.ownKeys(o.k);
+    },
+    isExtensible() {
+      return Reflect.isExtensible(o.k);
+    },
+    deleteProperty(_, p) {
+      return Reflect.deleteProperty(o.k, p);
+    },
+    setPrototypeOf(_, v) {
+      return Reflect.setPrototypeOf(o.k, v);
+    },
+    getOwnPropertyDescriptor(_, p) {
+      return Reflect.getOwnPropertyDescriptor(o.k, p);
+    },
+    defineProperty(_, property, attributes) {
+      return Reflect.defineProperty(o.k, property, attributes);
+    },
+    getPrototypeOf() {
+      return Reflect.getPrototypeOf(o.k);
+    },
+    preventExtensions() {
+      return Reflect.preventExtensions(o.k);
+    },
+    apply(_, thisArg, argArray) {
+      // @ts-ignore
+      return Reflect.apply(o.k, thisArg, argArray);
+    },
+    construct(_, argArray, newTarget) {
+      // @ts-ignore
+      return Reflect.construct(o.k, argArray, newTarget);
+    },
+  });
 };
 
 export const traverse = <T>(
@@ -243,4 +297,17 @@ export const getGzipSize = async (filePath: string | Buffer) => {
     .readFile(filePath)
     .then(promisify(zlib.gzip))
     .then((x) => x.length);
+};
+
+export const mergeObj = <T, S>(target: T | undefined, source: S) => {
+  if (target === undefined) return { ...source } as T & S;
+  const obj = { ...target };
+  for (const k in source) {
+    // @ts-ignore
+    if (obj[k] === undefined) {
+      // @ts-ignore
+      obj[k] = source[k];
+    }
+  }
+  return obj as T & S;
 };

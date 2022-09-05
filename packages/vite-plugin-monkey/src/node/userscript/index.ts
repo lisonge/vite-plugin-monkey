@@ -1,5 +1,5 @@
 import { logger } from '../_logger';
-import { delay, packageJson } from '../_util';
+import { delay, projectPkg } from '../_util';
 import type { IArray, LocaleType } from './common';
 import { Format } from './common';
 import type {
@@ -150,12 +150,12 @@ export const userscript2comment = (
 ) => {
   let attrList: [string, ...string[]][] = [];
   const {
-    name = packageJson.name,
+    name = projectPkg.name,
     namespace,
-    version = packageJson.version,
-    author = packageJson.author,
-    description = packageJson.description,
-    license = packageJson.license,
+    version = projectPkg.version,
+    author = projectPkg.author,
+    description = projectPkg.description,
+    license = projectPkg.license,
 
     icon,
     iconURL,
@@ -163,12 +163,12 @@ export const userscript2comment = (
     icon64URL,
     defaulticon,
 
-    homepage = packageJson.homepage,
-    homepageURL = packageJson.homepage,
+    homepage = projectPkg.homepage,
+    homepageURL = projectPkg.homepage,
     website,
-    source = packageJson.repository,
+    source = projectPkg.repository,
 
-    supportURL = packageJson.bugs,
+    supportURL = projectPkg.bugs,
     downloadURL,
     updateURL,
 
@@ -244,11 +244,14 @@ export const userscript2comment = (
       if (!('' in v)) {
         if (k == 'name') {
           // keep key sort
-          v = { '': packageJson.name, ...v };
-        } else if (k == 'description' && packageJson.description) {
-          v = { '': packageJson.description, ...v };
+          v = { '': projectPkg.name, ...v };
+        } else if (k == 'description' && projectPkg.description) {
+          v = { '': projectPkg.description, ...v };
         }
+      } else {
+        v = { '': v[''], ...v };
       }
+
       Object.entries(v).forEach(([k2, v2]) => {
         if (k2.length == 0) {
           attrList.push([k, v2]);

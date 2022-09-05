@@ -4,9 +4,9 @@ import nodeFetch, { Response as nodeResponse } from 'node-fetch';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import pc from 'picocolors';
-import type { Plugin, ResolvedConfig } from 'vite';
+import type { PluginOption, ResolvedConfig } from 'vite';
 import { transformWithEsbuild } from 'vite';
-import selfPackageJson from '../../package.json';
+import selfPkg from '../../package.json';
 import {
   cssInjectTemplate,
   redirectFn,
@@ -22,14 +22,16 @@ import type {
   ViolentmonkeyUserScript,
 } from './userscript';
 import { userscript2comment } from './userscript';
-import type { IArray } from './userscript/common';
+import type { IArray, LocaleType } from './userscript/common';
 import { logger } from './_logger';
 import {
   existFile,
   getModuleRealInfo,
   GM_keywords,
   isFirstBoot,
-  packageJson,
+  lazy,
+  mergeObj,
+  projectPkg,
 } from './_util';
 
 export * as cdn from './cdn';
@@ -68,7 +70,7 @@ export type MonkeyOption = {
    *   },
    * }
    * @example
-   * // vite-env.d.ts, you must manual modify .env file
+   * // vite-env.d.ts, you must manual modify vite-env.d.ts file for type hint
    * declare module clientAlias {
    *   export * from 'vite-plugin-monkey/dist/client';
    * }
@@ -92,10 +94,11 @@ export type MonkeyOption = {
      * mount GM_api to unsafeWindow, not recommend it, you should use GM_api by ESM import
      * @default false
      * @example
-     * // if set true, you can export all from vite-plugin-monkey/dist/client to global
+     * // if set true, you can export all from vite-plugin-monkey/dist/client to global for type hint
      * // vite-env.d.ts
      * type MonkeyWindow = import('vite-plugin-monkey/dist/client').MonkeyWindow;
      * declare const unsafeWindow: MonkeyWindow['unsafeWindow'];
+     * declare const GM: MonkeyWindow['GM'];
      * declare const GM_addStyle: MonkeyWindow['GM_addStyle'];
      * declare const GM_addElement: MonkeyWindow['GM_addElement'];
      * declare const GM_deleteValue: MonkeyWindow['GM_deleteValue'];
@@ -148,6 +151,8 @@ export type MonkeyOption = {
      *
      * if value is Array, the first [item or its return value] is exportVarName, the items after it all are url that is [require url]
      *
+     * if module is unimported, plugin will not add require url to userscript
+     *
      * @example
      * {
      *  vue:'Vue',
@@ -173,7 +178,7 @@ export type MonkeyOption = {
     /**
      * according to final code bundle, auto inject GM_* or GM.* to userscript comment grant
      *
-     * the judgment is based on String.prototype.includes
+     * the judgment is based on String.prototype.includes, if code.includes('GM_xxx'), add \@grant GM_xxx to userscript
      * @default true
      */
     autoGrant?: boolean;
@@ -192,48 +197,97 @@ export type MonkeyOption = {
   };
 };
 
+type FinalMonkeyOption = MonkeyOption & {
+  userscript: {
+    name: string | LocaleType<string>;
+    version: string;
+    author: string;
+  };
+  clientAlias: string;
+  server: {
+    open: boolean;
+    prefix: string | ((name: string) => string) | false;
+    mountGmApi: boolean;
+  };
+  build: {
+    fileName: string;
+    metaFileName: string | boolean;
+    externalGlobals: Record<string, IArray<string | Lib2Url>>;
+    autoGrant: boolean;
+    checkCDN: boolean;
+    minifyCss: boolean;
+  };
+};
+
 const installUserPath = '/__vite-plugin-monkey.install.user.js';
 const cacheUserPath = 'node_modules/.vite/__vite-plugin-monkey.cache.user.js';
 
-export default (pluginOption: MonkeyOption): Plugin => {
-  const external: string[] = [];
-  const globals: Record<string, string> = {};
-  const cdnList: string[] = [];
+export default (pluginOption: MonkeyOption): PluginOption => {
+  let finalPluginOption: FinalMonkeyOption = {
+    ...pluginOption,
+    userscript: mergeObj(pluginOption.userscript, {
+      name: projectPkg.name,
+      version: projectPkg.version,
+      author: projectPkg.author ?? 'monkey',
+    }),
+    clientAlias: '$',
+    server: mergeObj(pluginOption.server, {
+      open: true,
+      prefix: 'dev:',
+      mountGmApi: false,
+    }),
+    build: mergeObj(pluginOption.build, {
+      fileName: projectPkg.name + '.user.js',
+      metaFileName: false,
+      externalGlobals: {},
+      autoGrant: true,
+      checkCDN: false,
+      minifyCss: true,
+    }),
+  };
 
   let viteConfig: ResolvedConfig;
-  let isServe = true;
-  const isHttps = () => !!viteConfig.server.https;
-  const getPort = (() => {
-    // 5173 come from https://github.com/vitejs/vite/blob/26bcdc3186807bb6f3817119cd7e64ae8308a057/packages/vite/src/node/server/index.ts#L612
+  const serverConfig = lazy(() => {
     let availablePort = 5173;
     detectPort(availablePort).then((p) => {
       availablePort = p;
     });
-    return () => viteConfig.server.port ?? availablePort;
-  })();
-  const getHost = () => {
-    if (
-      typeof viteConfig.server.host == 'string' &&
-      viteConfig.server.host != '0.0.0.0'
-    ) {
-      return viteConfig.server.host;
-    }
-    return '127.0.0.1';
-  };
-  const getOrigin = () =>
-    `${isHttps() ? 'https' : 'http'}://${getHost()}:${getPort()}`;
-  const getInstallUrl = () => new URL(viteConfig.base, getOrigin()).href; //+ installUserPath;
+    return {
+      get isHttps() {
+        return !!viteConfig.server.https;
+      },
+      get port() {
+        return viteConfig.server.port ?? availablePort;
+      },
+      get host() {
+        if (
+          typeof viteConfig.server.host == 'string' &&
+          viteConfig.server.host != '0.0.0.0'
+        ) {
+          return viteConfig.server.host;
+        }
+        return '127.0.0.1';
+      },
+      get origin() {
+        return `${this.isHttps ? 'https' : 'http'}://${this.host}:${this.port}`;
+      },
+      get installUrl() {
+        return new URL(viteConfig.base, this.origin).href;
+      },
+    };
+  });
 
-  let fileName = 'monkey.user.js';
-  if (pluginOption.build?.fileName) {
-    fileName = pluginOption.build?.fileName;
-  } else {
-    fileName = packageJson.name + '.user.js';
-  }
+  let isServe = true;
+
+  const externalModNameSet = new Set<string>(
+    Object.keys(finalPluginOption.build.externalGlobals),
+  );
+  const realUsedModNameSet = new Set<string>();
+  const globalsPkg2VarName: Record<string, string> = {};
+  const requirePkgList: { moduleName: string; url: string }[] = [];
 
   const GM_keyword_set = new Set(GM_keywords);
-
-  const autoGrantList: string[] = [];
+  const autoGrantList = new Set<string>();
 
   let checkCdnPromiseList: Array<{
     url: string;
@@ -243,32 +297,45 @@ export default (pluginOption: MonkeyOption): Plugin => {
   return {
     name: 'monkey',
     enforce: 'post',
-    async config(config, { command }) {
+    async config(userConfig, { command }) {
       isServe = command == 'serve';
-      for (const kv of Object.entries(
-        pluginOption.build?.externalGlobals ?? {},
-      )) {
-        const [moduleName, varName2LibUrl] = kv;
-        external.push(moduleName);
-        const { name, version } = await getModuleRealInfo(moduleName);
 
-        if (typeof varName2LibUrl == 'string') {
-          globals[moduleName] = varName2LibUrl;
-        } else if (typeof varName2LibUrl == 'function') {
-          globals[moduleName] = varName2LibUrl(version, name, moduleName);
-        } else if (varName2LibUrl instanceof Array) {
-          const [varName, ...libUrlList] = varName2LibUrl;
-          if (typeof varName == 'string') {
-            globals[moduleName] = varName;
-          } else if (typeof varName == 'function') {
-            globals[moduleName] = varName(version, name, moduleName);
-          }
-          for (const libUrl of libUrlList) {
-            // keep add order
-            if (typeof libUrl == 'string') {
-              cdnList.push(libUrl);
-            } else if (typeof libUrl == 'function') {
-              cdnList.push(libUrl(version, name, moduleName));
+      if (!isServe) {
+        for (const kv of Object.entries(
+          finalPluginOption.build.externalGlobals,
+        )) {
+          const [moduleName, varName2LibUrl] = kv;
+          const { name, version } = await getModuleRealInfo(moduleName);
+
+          if (typeof varName2LibUrl == 'string') {
+            globalsPkg2VarName[moduleName] = varName2LibUrl;
+          } else if (typeof varName2LibUrl == 'function') {
+            globalsPkg2VarName[moduleName] = varName2LibUrl(
+              version,
+              name,
+              moduleName,
+            );
+          } else if (varName2LibUrl instanceof Array) {
+            const [varName, ...libUrlList] = varName2LibUrl;
+            if (typeof varName == 'string') {
+              globalsPkg2VarName[moduleName] = varName;
+            } else if (typeof varName == 'function') {
+              globalsPkg2VarName[moduleName] = varName(
+                version,
+                name,
+                moduleName,
+              );
+            }
+            for (const libUrl of libUrlList) {
+              // keep add order
+              if (typeof libUrl == 'string') {
+                requirePkgList.push({ url: libUrl, moduleName });
+              } else if (typeof libUrl == 'function') {
+                requirePkgList.push({
+                  url: libUrl(version, name, moduleName),
+                  moduleName,
+                });
+              }
             }
           }
         }
@@ -277,110 +344,99 @@ export default (pluginOption: MonkeyOption): Plugin => {
       return {
         resolve: {
           alias: {
-            [pluginOption.clientAlias ?? '$']: 'vite-plugin-monkey/dist/client',
+            [finalPluginOption.clientAlias]: 'vite-plugin-monkey/dist/client',
           },
         },
         preview: {
-          host: config.preview?.host ?? '127.0.0.1',
-          cors: config.preview?.cors ?? true,
+          host: userConfig.preview?.host ?? '127.0.0.1',
+          cors: true,
         },
         define: {
           'process.env.NODE_ENV':
-            config.define?.['process.env.NODE_ENV'] ??
+            userConfig.define?.['process.env.NODE_ENV'] ??
             JSON.stringify(
-              config.mode ?? (isServe ? 'development' : 'production'),
+              userConfig.mode ?? (isServe ? 'development' : 'production'),
             ),
         },
         server: {
-          open: config.server?.open ?? pluginOption.server?.open ?? true,
+          open: userConfig.server?.open ?? finalPluginOption.server.open,
+          cors: true,
         },
         build: {
-          sourcemap: config.build?.sourcemap ?? false,
-          minify: config.build?.minify ?? false,
+          sourcemap: userConfig.build?.sourcemap ?? false,
+          minify: userConfig.build?.minify ?? false,
           rollupOptions: {
-            input: pluginOption.entry,
-            external,
+            input: finalPluginOption.entry,
+            external(source) {
+              if (
+                !source.startsWith('./') &&
+                !source.startsWith('../') &&
+                !path.isAbsolute(source)
+              ) {
+                realUsedModNameSet.add(source);
+              }
+              return externalModNameSet.has(source);
+            },
             output: {
-              globals,
+              globals: globalsPkg2VarName,
             },
           },
           lib: {
-            entry: pluginOption.entry,
+            entry: finalPluginOption.entry,
             formats: ['iife'],
             fileName: () => {
-              return fileName;
+              return finalPluginOption.build.fileName;
             },
             name: 'vite_plugin_monkey_' + Math.random().toString(16).slice(2),
           },
         },
       };
     },
-    transformIndexHtml() {
-      if (!isServe) return;
-      return [
-        {
-          tag: 'script',
-          attrs: { type: 'module', 'data-source': 'vite-plugin-monkey' },
-          children: template2string(redirectFn, { url: installUserPath }),
-          injectTo: 'head',
-        },
-      ];
-    },
-    configResolved(resolvedConfig) {
+    async configResolved(resolvedConfig) {
       viteConfig = resolvedConfig;
-      const { server } = resolvedConfig;
-
-      server.host = getHost();
-      server.port = getPort();
-      server.origin = getOrigin();
-
-      if (server.hmr === undefined && server.hmr === true) {
-        server.hmr = {
-          host: getHost(),
-          protocol: isHttps() ? 'wss' : 'ws',
+      if (isServe) {
+        const { server } = viteConfig;
+        server.host = serverConfig.host;
+        server.port = serverConfig.port;
+        server.origin = serverConfig.origin;
+        const baseConfig = {
+          host: serverConfig.host,
+          protocol: serverConfig.isHttps ? 'wss' : 'ws',
         };
-      } else if (server.hmr && typeof server.hmr == 'object') {
-        Object.assign(server.hmr, {
-          host: getHost(),
-          protocol: isHttps() ? 'wss' : 'ws',
-        });
+        if (server.hmr === undefined && server.hmr === true) {
+          server.hmr = baseConfig;
+        } else if (server.hmr && typeof server.hmr == 'object') {
+          Object.assign(server.hmr, baseConfig);
+        }
       }
     },
     async configureServer(server) {
-      // prefix name
-      const prefix = pluginOption.server?.prefix ?? 'dev:';
-      const name = (() => {
-        let _name = pluginOption.userscript.name ?? packageJson.name;
-        if (typeof _name == 'object' && !('' in _name)) {
-          _name = { '': packageJson.name, ..._name };
-        }
-        return _name;
-      })();
+      const { userscript } = finalPluginOption;
 
+      // prefix name
+      if (typeof userscript.name == 'string') {
+        userscript.name = { '': userscript.name };
+      }
+      userscript.name = mergeObj(userscript.name, {
+        '': projectPkg.name,
+      });
+
+      let prefix = finalPluginOption.server.prefix;
       if (typeof prefix == 'string') {
-        if (typeof name == 'string') {
-          pluginOption.userscript.name = prefix + name;
-        } else {
-          Object.entries(name).forEach(([k, v]) => {
-            name[k] = prefix + v;
-          });
-          pluginOption.userscript.name = name;
-        }
-      } else if (typeof prefix == 'function') {
-        if (typeof name == 'string') {
-          pluginOption.userscript.name = prefix(name);
-        } else {
-          Object.entries(name).forEach(([k, v]) => {
-            name[k] = prefix(v);
-          });
-          pluginOption.userscript.name = name;
-        }
+        const t = prefix + '';
+        prefix = (name: string) => t + name;
+      }
+      if (typeof prefix == 'function') {
+        Object.entries(userscript.name).forEach(([k, v]) => {
+          // @ts-ignore
+          Reflect.set(userscript.name as object, k, prefix(v));
+        });
       }
 
       // support dev env
-      const { grant } = pluginOption.userscript;
+      const { grant } = userscript;
       if (grant !== 'none') {
-        pluginOption.userscript.grant = '*';
+        finalPluginOption.userscript.grant = '*';
       }
 
       server.middlewares.use(async (req, res, next) => {
@@ -392,7 +448,9 @@ export default (pluginOption: MonkeyOption): Plugin => {
           logger.error('host not found', { time: true });
           return;
         }
-        const origin = `${isHttps() ? 'https' : 'http'}://${realHost}`;
+        const origin = `${
+          serverConfig.isHttps ? 'https' : 'http'
+        }://${realHost}`;
 
         if (req.url?.startsWith(installUserPath)) {
           Object.entries({
@@ -404,7 +462,14 @@ export default (pluginOption: MonkeyOption): Plugin => {
           });
 
           const response = await nodeFetch(origin);
+          if (!response.ok) {
+            logger.warn(
+              `${origin} response is not ok, check if index.html exists`,
+              { time: true },
+            );
+          }
           const htmlText = await response.text();
+
           const doc = parseDocument(htmlText);
           type Element = ReturnType<typeof DomUtils.findAll> extends Array<
             infer T
@@ -441,19 +506,22 @@ export default (pluginOption: MonkeyOption): Plugin => {
             })
             .filter((s) => s);
 
-          let realEntry = pluginOption.entry;
-          if (path.isAbsolute(pluginOption.entry)) {
-            realEntry = path.relative(viteConfig.root, pluginOption.entry);
+          let realEntry = finalPluginOption.entry;
+          if (path.isAbsolute(realEntry)) {
+            realEntry = path.relative(viteConfig.root, realEntry);
             realEntry = realEntry.replace('\\', '/');
           }
           entryList.push(new URL(realEntry, origin).href);
 
           res.end(
             [
-              userscript2comment(pluginOption.userscript, pluginOption.format),
+              userscript2comment(
+                finalPluginOption.userscript,
+                finalPluginOption.format,
+              ),
               template2string(serverInjectTemplate, {
                 entryList,
-                mountGmApi: pluginOption.server?.mountGmApi ?? false,
+                mountGmApi: finalPluginOption.server.mountGmApi,
               }),
               '',
             ].join('\n\n'),
@@ -474,136 +542,63 @@ export default (pluginOption: MonkeyOption): Plugin => {
         }
       });
 
-      // according to the change of final UserScript text, open install url in Browser
-      // let isOutUrl = false;
-      // const u = getInstallUrl();
-      // console.log('server');
-      if (pluginOption.server?.open ?? true) {
+      if (finalPluginOption.server.open) {
         let cacheComment = '';
-        // const cacheCommentPath = '' + ;
         if (await existFile(cacheUserPath)) {
           cacheComment = (await fs.readFile(cacheUserPath)).toString('utf-8');
         } else {
           await fs.mkdir(path.dirname(cacheUserPath)).catch();
         }
         const newComment = userscript2comment(
-          pluginOption.userscript,
-          pluginOption.format,
+          finalPluginOption.userscript,
+          finalPluginOption.format,
         );
-        if (isFirstBoot()) {
-        } else if (cacheComment != newComment) {
-          openBrowser(getInstallUrl(), true, logger);
+        if (!isFirstBoot() && cacheComment != newComment) {
+          openBrowser(serverConfig.installUrl, true, logger);
           logger.info('reopen, config comment has changed', { time: true });
         }
         await fs.writeFile(cacheUserPath, newComment).catch();
       }
     },
-    async generateBundle(_, bundle) {
-      const { require } = pluginOption.userscript;
-      if (typeof require == 'string') {
-        pluginOption.userscript.require = [require, ...cdnList];
-      } else if (require instanceof Array) {
-        pluginOption.userscript.require = [...require, ...cdnList];
-      } else {
-        pluginOption.userscript.require = cdnList;
-      }
-
-      if (pluginOption.build?.checkCDN ?? false) {
-        checkCdnPromiseList = pluginOption.userscript.require.map((url) => ({
-          url,
-          responsePromise: nodeFetch(url, {
-            timeout: 3000,
-          }).catch((e) => e),
-        }));
-      }
-
-      if (autoGrantList.length > 0 && pluginOption.userscript.grant != '*') {
-        const { grant } = pluginOption.userscript;
-        if (typeof grant == 'string') {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          pluginOption.userscript.grant = Array.from(
-            new Set([grant, ...autoGrantList]),
-          );
-        } else if (grant instanceof Array) {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          pluginOption.userscript.grant = Array.from(
-            new Set([...grant, ...autoGrantList]),
-          );
-        } else {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          pluginOption.userscript.grant = autoGrantList;
+    async configurePreviewServer(server) {
+      server.middlewares.use(async (req, res, next) => {
+        if (['/', '/index.html'].includes((req.url ?? '').split('?')[0])) {
+          const [fileName] = (
+            await fs.readdir(path.join(process.cwd(), viteConfig.build.outDir))
+          ).filter((name) => name.endsWith('.user.js'));
+          if (fileName) {
+            Object.entries({
+              'content-type': 'text/html; charset=utf-8',
+            }).forEach(([k, v]) => {
+              res.setHeader(k, String(v));
+            });
+            res.end(
+              `<script type="module" data-source="vite-plugin-monkey">${template2string(
+                redirectFn,
+                { url: '/' + fileName },
+              )}</script>`,
+            );
+            return;
+          }
         }
-      }
-
-      const bundleList = Object.entries(bundle);
-      const cssBundleList = bundleList.filter(([k]) => k.endsWith('.css'));
-      const jsBundleList = bundleList.filter(([k]) => k.endsWith('.js'));
-      const cssList: string[] = [];
-      cssBundleList.forEach(([k, v]) => {
-        if (v.type == 'asset') {
-          cssList.push(v.source.toString());
-          delete bundle[k];
-        }
+        next();
       });
-      let injectCssCode: undefined | string = undefined;
-      if (cssList.length > 0) {
-        let css = cssList.join('');
-        if (
-          !viteConfig.build.minify &&
-          (pluginOption.build?.minifyCss ?? true)
-        ) {
-          css = (
-            await transformWithEsbuild(css, 'any_name.css', {
-              minify: true,
-              sourcemap: false,
-              logLevel: 'error',
-            })
-          ).code.trim();
-        }
-        injectCssCode = template2string(cssInjectTemplate, {
-          css,
-        });
-      }
-
-      if (jsBundleList.length != 1) {
-        logger.error(`expcet js modules size is 1, got ${jsBundleList.length}`);
-      } else {
-        let metaFileName = pluginOption.build?.metaFileName ?? false;
-        if (metaFileName === true) {
-          metaFileName =
-            pluginOption.build?.fileName?.replace(/\.user\.js$/, '.meta.js') ??
-            (packageJson.name ?? 'monkey') + '.meta.js';
-        }
-        if (typeof metaFileName == 'string' && metaFileName.length > 0) {
-          this.emitFile({
-            type: 'asset',
-            fileName: metaFileName,
-            source: userscript2comment(
-              pluginOption.userscript,
-              pluginOption.format,
-            ),
-          });
-        }
-        const chunk = jsBundleList[0][1];
-        const { name, version } = selfPackageJson;
-        if (chunk.type == 'chunk') {
-          chunk.code = [
-            userscript2comment(pluginOption.userscript, pluginOption.format),
-            `// use ${name}@${version} at ${new Date().toJSON()}`,
-            injectCssCode,
-            chunk.code,
-          ]
-            .filter((s) => s)
-            .join('\n\n');
-        }
+    },
+    async transformIndexHtml() {
+      if (isServe) {
+        return [
+          {
+            tag: 'script',
+            attrs: { type: 'module', 'data-source': 'vite-plugin-monkey' },
+            children: template2string(redirectFn, { url: installUserPath }),
+            injectTo: 'head',
+          },
+        ];
       }
     },
-    transform(code, id) {
+    async transform(code, id) {
       if (
-        pluginOption.build?.autoGrant !== false &&
+        finalPluginOption.build.autoGrant &&
         !isServe &&
         GM_keyword_set.size > 0 &&
         !id.endsWith('vite-plugin-monkey/dist/client/index.mjs')
@@ -611,7 +606,7 @@ export default (pluginOption: MonkeyOption): Plugin => {
         Array.from(GM_keyword_set)
           .filter((fnName) => code.includes(fnName))
           .forEach((fnName) => {
-            autoGrantList.push(fnName);
+            autoGrantList.add(fnName);
             GM_keyword_set.delete(fnName);
           });
       }
@@ -652,6 +647,108 @@ export default (pluginOption: MonkeyOption): Plugin => {
         );
       }
       return code;
+    },
+    async generateBundle(_, bundle) {
+      const { userscript } = finalPluginOption;
+
+      let requireUrlList = requirePkgList
+        .filter((p) => realUsedModNameSet.has(p.moduleName))
+        .map((p) => p.url);
+      {
+        const { require = [] } = userscript;
+        if (typeof require == 'string') {
+          requireUrlList = [require, ...requireUrlList];
+        } else if (require instanceof Array) {
+          requireUrlList = [...require, ...requireUrlList];
+        }
+        userscript.require = requireUrlList;
+      }
+
+      if (finalPluginOption.build.checkCDN) {
+        checkCdnPromiseList = requireUrlList.map((url) => ({
+          url,
+          responsePromise: nodeFetch(url, {
+            timeout: 3000,
+          }).catch((e) => e),
+        }));
+      }
+
+      if (autoGrantList.size > 0 && userscript.grant != '*') {
+        let tempSet: Set<string>;
+        if (typeof userscript.grant == 'string') {
+          tempSet = new Set([userscript.grant, ...autoGrantList]);
+        } else if (userscript.grant instanceof Array) {
+          tempSet = new Set([...userscript.grant, ...autoGrantList]);
+        } else {
+          tempSet = autoGrantList;
+        }
+        userscript.grant = Array.from(tempSet) as typeof userscript.grant;
+      }
+
+      const bundleList = Object.entries(bundle);
+      const cssBundleList = bundleList.filter(([k]) => k.endsWith('.css'));
+      const jsBundleList = bundleList.filter(([k]) => k.endsWith('.js'));
+      const cssList: string[] = [];
+      cssBundleList.forEach(([k, v]) => {
+        if (v.type == 'asset') {
+          cssList.push(v.source.toString());
+          delete bundle[k];
+        }
+      });
+      let injectCssCode: undefined | string = undefined;
+      if (cssList.length > 0) {
+        let css = cssList.join('');
+        if (!viteConfig.build.minify && finalPluginOption.build.minifyCss) {
+          css = (
+            await transformWithEsbuild(css, 'any_name.css', {
+              minify: true,
+              sourcemap: false,
+              logLevel: 'error',
+            })
+          ).code.trim();
+        }
+        injectCssCode = template2string(cssInjectTemplate, {
+          css,
+        });
+      }
+
+      if (jsBundleList.length != 1) {
+        logger.error(`expcet js modules size is 1, got ${jsBundleList.length}`);
+      } else {
+        let { metaFileName } = finalPluginOption.build;
+        if (metaFileName === true) {
+          metaFileName = finalPluginOption.build.fileName.replace(
+            /\.user\.js$/,
+            '.meta.js',
+          );
+        }
+        if (typeof metaFileName == 'string' && metaFileName.length > 0) {
+          this.emitFile({
+            type: 'asset',
+            fileName: metaFileName,
+            source: userscript2comment(
+              finalPluginOption.userscript,
+              finalPluginOption.format,
+            ),
+          });
+        }
+        const chunk = jsBundleList[0][1];
+        if (chunk.type == 'chunk') {
+          chunk.code = [
+            userscript2comment(
+              finalPluginOption.userscript,
+              finalPluginOption.format,
+            ),
+            `// use ${selfPkg.name}@${
+              selfPkg.version
+            } at ${new Date().toJSON()}`,
+            injectCssCode,
+            chunk.code,
+          ]
+            .filter((s) => s)
+            .join('\n\n');
+        }
+      }
     },
     async closeBundle() {
       if (checkCdnPromiseList.length > 0) {
@@ -704,30 +801,6 @@ export default (pluginOption: MonkeyOption): Plugin => {
           });
         });
       }
-    },
-    configurePreviewServer(server) {
-      server.middlewares.use(async (req, res, next) => {
-        if (['/', '/index.html'].includes((req.url ?? '').split('?')[0])) {
-          const [fileName] = (
-            await fs.readdir(path.join(process.cwd(), viteConfig.build.outDir))
-          ).filter((name) => name.endsWith('.user.js'));
-          if (fileName) {
-            Object.entries({
-              'content-type': 'text/html; charset=utf-8',
-            }).forEach(([k, v]) => {
-              res.setHeader(k, String(v));
-            });
-            res.end(
-              `<script type="module" data-source="vite-plugin-monkey">${template2string(
-                redirectFn,
-                { url: '/' + fileName },
-              )}</script>`,
-            );
-            return;
-          }
-        }
-        next();
-      });
     },
   };
 };

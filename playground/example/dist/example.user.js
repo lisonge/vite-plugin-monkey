@@ -26,7 +26,7 @@
 // @grant              unsafeWindow
 // ==/UserScript==
 
-// use vite-plugin-monkey@2.3.1 at 2022-09-05T10:38:28.968Z
+// use vite-plugin-monkey@2.3.1 at 2022-09-07T13:41:02.299Z
 
 ;(({ css = "" }) => {
   const style = document.createElement("style");
@@ -87,7 +87,7 @@
   } else {
     console.log("scope->monkey");
   }
-  GM_cookie && GM_cookie.list({}, (cookies, error) => {
+  GM_cookie == null ? void 0 : GM_cookie.list({}, (cookies, error) => {
     if (error) {
       console.log(error);
     } else {

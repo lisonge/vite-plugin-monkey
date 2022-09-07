@@ -1,7 +1,5 @@
 import { readFileSync } from 'node:fs';
 import fs from 'node:fs/promises';
-import zlib from 'node:zlib';
-import { promisify } from 'node:util';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { logger } from './_logger';
@@ -10,33 +8,6 @@ export const delay = async (n = 0) => {
   await new Promise<void>((res) => {
     setTimeout(res, n);
   });
-};
-
-/**
- * @link https://stackoverflow.com/questions/7616461/
- */
-export const hashCode = (str = '', seed = 0) => {
-  let h1 = 0xdeadbeef ^ seed,
-    h2 = 0x41c6ce57 ^ seed;
-  for (let i = 0, ch; i < str.length; i++) {
-    ch = str.charCodeAt(i);
-    h1 = Math.imul(h1 ^ ch, 2654435761);
-    h2 = Math.imul(h2 ^ ch, 1597334677);
-  }
-  h1 =
-    Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^
-    Math.imul(h2 ^ (h2 >>> 13), 3266489909);
-  h2 =
-    Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^
-    Math.imul(h1 ^ (h1 >>> 13), 3266489909);
-  return 4294967296 * (2097151 & h2) + (h1 >>> 0);
-};
-
-export const validUrl = (s: string) => {
-  try {
-    const u = new URL(s);
-    return u;
-  } catch {}
 };
 
 const get_vite_start_time = () => {
@@ -169,18 +140,6 @@ export const compatResolve = (() => {
   };
 })();
 
-export const lazyValue = <T = unknown>(fn: () => T) => {
-  const uniqueValue = Symbol('uniqueValue');
-  let temp: T | symbol = uniqueValue;
-  return {
-    get value() {
-      if (temp === uniqueValue) {
-        temp = fn();
-      }
-      return temp as T;
-    },
-  };
-};
 export const lazy = <T extends object>(fn: () => T) => {
   let temp: T | undefined = undefined;
   let o = {
@@ -236,22 +195,6 @@ export const lazy = <T extends object>(fn: () => T) => {
   });
 };
 
-export const traverse = <T>(
-  target: T,
-  getChildren: (target: T) => T[],
-  action: (target: T) => void | true,
-) => {
-  const stack = [target];
-  while (stack.length > 0) {
-    const top = stack.pop();
-    if (!top) break;
-    if (action(top)) {
-      break;
-    }
-    stack.push(...getChildren(top));
-  }
-};
-
 export const existFile = async (path: string) => {
   try {
     return (await fs.stat(path)).isFile();
@@ -288,15 +231,6 @@ export const getModuleRealInfo = async (name: string) => {
     version = 'latest';
   }
   return { version, name: subname };
-};
-
-export const getGzipSize = async (filePath: string | Buffer) => {
-  if (filePath instanceof Buffer)
-    return (await promisify(zlib.gzip)(filePath)).length;
-  return fs
-    .readFile(filePath)
-    .then(promisify(zlib.gzip))
-    .then((x) => x.length);
 };
 
 export const mergeObj = <T, S>(target: T | undefined, source: S) => {

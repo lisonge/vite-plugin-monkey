@@ -1,4 +1,4 @@
-import { IArray, LocaleType } from './common';
+import { IArray, LocaleType } from '../types';
 
 export type TamperRunAt =
   | 'document-start'

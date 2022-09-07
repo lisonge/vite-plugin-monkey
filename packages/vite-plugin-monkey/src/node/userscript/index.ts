@@ -1,6 +1,6 @@
 import { logger } from '../_logger';
 import { delay, projectPkg } from '../_util';
-import type { IArray, LocaleType } from './common';
+import { IArray, LocaleType } from '../types';
 import { Format } from './common';
 import type {
   GreaseGrant,
@@ -144,7 +144,7 @@ export type MonkeyUserScript = GreasemonkeyUserScript &
   GreasyforkUserScript &
   MergemonkeyUserScript;
 
-export const userscript2comment = (
+export const userscript2comment = async (
   userscript: MonkeyUserScript,
   format: Format = { align: 2 },
 ) => {
@@ -374,7 +374,7 @@ export const userscript2comment = (
         .join('');
     });
   } else if (typeof align == 'function') {
-    attrList = align(attrList);
+    attrList = await align(attrList);
   }
 
   return [

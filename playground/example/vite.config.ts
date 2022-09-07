@@ -31,7 +31,7 @@ export default defineConfig(({ command, mode }) => ({
           prettier: cdn.jsdelivr('prettier', 'standalone.js'),
           'prettier/parser-babel': [
             'prettierPlugins.babel',
-            (version, name, moduleName) => {
+            async (version, name, moduleName) => {
               // name == `prettier`
               // moduleName == `prettier/parser-babel`
               const subpath = `${moduleName.split('/').at(-1)}.js`;

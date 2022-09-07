@@ -1,4 +1,4 @@
-import { IArray, LocaleType } from './common';
+import { IArray, LocaleType } from '../types';
 
 export type ViolentRunAt = 'document-end' | 'document-start' | 'document-idle';
 export type ViolentInjectInto = 'page' | 'content' | 'auto';

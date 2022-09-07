@@ -1,4 +1,4 @@
-import { IArray, LocaleType } from './common';
+import { IArray, LocaleType } from '../types';
 
 export type GreaseRunAt = 'document-start' | 'document-end' | 'document-idle';
 

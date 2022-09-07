@@ -22,7 +22,7 @@ import type {
   ViolentmonkeyUserScript,
 } from './userscript';
 import { userscript2comment } from './userscript';
-import type { IArray, LocaleType } from './userscript/common';
+import type { IArray, IPromise, LocaleType } from './types';
 import { logger } from './_logger';
 import {
   existFile,
@@ -49,7 +49,11 @@ export type {
  * @example
  * const mod = await import('name/subname')
  */
-type Lib2Url = (version: string, name: string, moduleName: string) => string;
+type Lib2Url = (
+  version: string,
+  name: string,
+  moduleName: string,
+) => IPromise<string>;
 
 export type MonkeyOption = {
   /**
@@ -88,7 +92,7 @@ export type MonkeyOption = {
      * name prefix, distinguish server.user.js and build.user.js in monkey extension install list, if you not want prefix, set false
      * @default 'dev:'
      */
-    prefix?: string | ((name: string) => string) | false;
+    prefix?: string | ((name: string) => IPromise<string>) | false;
 
     /**
      * mount GM_api to unsafeWindow, not recommend it, you should use GM_api by ESM import
@@ -310,7 +314,7 @@ export default (pluginOption: MonkeyOption): PluginOption => {
           if (typeof varName2LibUrl == 'string') {
             globalsPkg2VarName[moduleName] = varName2LibUrl;
           } else if (typeof varName2LibUrl == 'function') {
-            globalsPkg2VarName[moduleName] = varName2LibUrl(
+            globalsPkg2VarName[moduleName] = await varName2LibUrl(
               version,
               name,
               moduleName,
@@ -320,7 +324,7 @@ export default (pluginOption: MonkeyOption): PluginOption => {
             if (typeof varName == 'string') {
               globalsPkg2VarName[moduleName] = varName;
             } else if (typeof varName == 'function') {
-              globalsPkg2VarName[moduleName] = varName(
+              globalsPkg2VarName[moduleName] = await varName(
                 version,
                 name,
                 moduleName,
@@ -332,7 +336,7 @@ export default (pluginOption: MonkeyOption): PluginOption => {
                 requirePkgList.push({ url: libUrl, moduleName });
               } else if (typeof libUrl == 'function') {
                 requirePkgList.push({
-                  url: libUrl(version, name, moduleName),
+                  url: await libUrl(version, name, moduleName),
                   moduleName,
                 });
               }
@@ -427,10 +431,14 @@ export default (pluginOption: MonkeyOption): PluginOption => {
         prefix = (name: string) => t + name;
       }
       if (typeof prefix == 'function') {
-        Object.entries(userscript.name).forEach(([k, v]) => {
-          // @ts-ignore
-          Reflect.set(userscript.name as object, k, prefix(v));
-        });
+        for (const [k, v] of Object.entries(userscript.name)) {
+          Reflect.set(
+            userscript.name as object,
+            k,
+            // @ts-ignore
+            await prefix(v),
+          );
+        }
       }
 
       // support dev env
@@ -515,7 +523,7 @@ export default (pluginOption: MonkeyOption): PluginOption => {
 
           res.end(
             [
-              userscript2comment(
+              await userscript2comment(
                 finalPluginOption.userscript,
                 finalPluginOption.format,
               ),
@@ -549,7 +557,7 @@ export default (pluginOption: MonkeyOption): PluginOption => {
         } else {
           await fs.mkdir(path.dirname(cacheUserPath)).catch();
         }
-        const newComment = userscript2comment(
+        const newComment = await userscript2comment(
           finalPluginOption.userscript,
           finalPluginOption.format,
         );
@@ -726,7 +734,7 @@ export default (pluginOption: MonkeyOption): PluginOption => {
           this.emitFile({
             type: 'asset',
             fileName: metaFileName,
-            source: userscript2comment(
+            source: await userscript2comment(
               finalPluginOption.userscript,
               finalPluginOption.format,
             ),
@@ -735,7 +743,7 @@ export default (pluginOption: MonkeyOption): PluginOption => {
         const chunk = jsBundleList[0][1];
         if (chunk.type == 'chunk') {
           chunk.code = [
-            userscript2comment(
+            await userscript2comment(
               finalPluginOption.userscript,
               finalPluginOption.format,
             ),

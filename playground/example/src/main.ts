@@ -20,28 +20,27 @@ if (unsafeWindow == window) {
 }
 
 // tampermonkey only
-GM_cookie &&
-  GM_cookie.list({}, (cookies, error) => {
-    if (error) {
-      console.log(error);
-    } else {
-      const [cookie] = cookies;
-      if (cookie) {
-        console.log(cookie);
-        // {
-        //   "domain": "i.songe.li",
-        //   "httpOnly": false,
-        //   "secure": false,
-        //   "name": "k",
-        //   "path": "/",
-        //   "sameSite": "unspecified",
-        //   "value": "v",
-        //   "session": true,
-        //   "hostOnly": true
-        // }
-      }
+GM_cookie?.list({}, (cookies, error) => {
+  if (error) {
+    console.log(error);
+  } else {
+    const [cookie] = cookies;
+    if (cookie) {
+      console.log(cookie);
+      // {
+      //   "domain": "i.songe.li",
+      //   "httpOnly": false,
+      //   "secure": false,
+      //   "name": "k",
+      //   "path": "/",
+      //   "sameSite": "unspecified",
+      //   "value": "v",
+      //   "session": true,
+      //   "hostOnly": true
+      // }
     }
-  });
+  }
+});
 
 //---------test code format--------
 import { formatCode } from './format';

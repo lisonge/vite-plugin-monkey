@@ -180,3 +180,26 @@ export const bdstatic = (
     },
   ];
 };
+import { transformWithEsbuild } from 'vite';
+// eslint-disable-next-line
+export const base64Fn = async <T extends (arg: any) => any>(
+  fn: T,
+  arg: Parameters<T>[0],
+) => {
+  return (
+    'data:application/javascript,' +
+    encodeURIComponent(
+      (
+        await transformWithEsbuild(
+          `;(${fn})(${JSON.stringify(arg)})`,
+          'any_name.js',
+          {
+            minify: true,
+            logLevel: 'error',
+            sourcemap: false,
+          },
+        )
+      ).code.trim(),
+    )
+  );
+};

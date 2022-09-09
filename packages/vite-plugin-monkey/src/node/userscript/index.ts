@@ -361,17 +361,31 @@ export const userscript2comment = async (
 
   // format
   if (typeof align == 'number' && Number.isInteger(align) && align >= 1) {
+    const alignN = align;
     let maxLen = 0;
+
+    // format resource key value
+    attrList
+      .filter((s) => s[0] == 'resource')
+      .map((s) => {
+        if (s[1].length > maxLen) {
+          maxLen = s[1].length;
+        }
+        return s;
+      })
+      .forEach((s) => {
+        s[1] += '\x20'.repeat(alignN + maxLen - s[1].length - 1);
+      });
+
+    // format all
+    maxLen = 0;
     attrList.forEach((s) => {
       if (s[0].length > maxLen) {
         maxLen = s[0].length;
       }
     });
-    const len = maxLen + align;
     attrList.forEach((s) => {
-      s[0] += Array(len - s[0].length - 1)
-        .fill('\x20')
-        .join('');
+      s[0] += '\x20'.repeat(alignN + maxLen - s[0].length - 1);
     });
   } else if (typeof align == 'function') {
     attrList = await align(attrList);

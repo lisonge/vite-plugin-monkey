@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.4.1
+
+### 2.4.1-Features
+
+- externalGlobals can be array [666934c8](https://github.com/lisonge/vite-plugin-monkey/commit/a66e75f9bf2c2c5707fed2c4ccad5ef7666934c8)
+
 ## 2.4.0
 
 ### 2.4.0-Features

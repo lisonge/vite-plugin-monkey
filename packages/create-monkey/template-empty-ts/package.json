@@ -9,8 +9,8 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "typescript": "^4.8.2",
+    "typescript": "^4.8.3",
     "vite": "^3.1.0",
-    "vite-plugin-monkey": "^2.3.1"
+    "vite-plugin-monkey": "^2.4.0"
   }
 }

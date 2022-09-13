@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.4.0
+
+### 2.4.0-Features
+
+- externalResource [396da63a](https://github.com/lisonge/vite-plugin-monkey/commit/b72b7f08db13993aef69a80f7dd3e0b3396da63a)
+
 ## 2.3.1
 
 ### 2.3.1-BugFixes

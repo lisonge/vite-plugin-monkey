@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-monkey",
-  "version": "2.3.1",
+  "version": "2.4.0",
   "description": "vite plugin for Tampermonkey, Violentmonkey and Greasemonkey",
   "main": "dist/node/index.js",
   "module": "dist/node/index.mjs",
@@ -57,6 +57,7 @@
     "cross-spawn": "7.0.3",
     "detect-port": "1.3.0",
     "htmlparser2": "8.0.1",
+    "mrmime": "1.0.1",
     "node-fetch": "2.6.7",
     "open": "8.4.0",
     "picocolors": "1.0.0"

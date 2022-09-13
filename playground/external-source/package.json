@@ -1,0 +1,30 @@
+{
+  "name": "external-source",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "serve": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "sass": "1.54.9",
+    "vite-plugin-monkey": "workspace:*"
+  },
+  "dependencies": {
+    "animate.css": "4.1.1",
+    "base64-img": "1.0.4",
+    "element-plus": "2.2.16",
+    "vue": "3.2.38"
+  },
+  "pnpm": {
+    "peerDependencyRules": {
+      "ignoreMissing": [
+        "vite"
+      ]
+    }
+  },
+  "volta": {
+    "extends": "../../package.json"
+  }
+}

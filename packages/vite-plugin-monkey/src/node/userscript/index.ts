@@ -1,6 +1,6 @@
 import { logger } from '../_logger';
 import { delay, projectPkg } from '../_util';
-import { IArray, LocaleType } from '../types';
+import type { IArray, LocaleType } from '../types';
 import { Format } from './common';
 import type {
   GreaseGrant,

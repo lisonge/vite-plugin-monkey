@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import fs from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
+import { normalizePath, transformWithEsbuild } from 'vite';
 import { logger } from './_logger';
 
 export const delay = async (n = 0) => {
@@ -203,15 +204,20 @@ export const existFile = async (path: string) => {
   }
 };
 
-export const getModuleRealInfo = async (name: string) => {
+export const getModuleRealInfo = async (importName: string) => {
+  const importName2 = normalizePath(importName.split('?')[0]);
+  const resolveName = normalizePath(compatResolve(importName2)).replace(
+    /.*\/node_modules\/[^/]+\//,
+    '',
+  );
   let version: string | undefined = undefined;
-  const nameList = name.replace('\\', '/').split('/');
-  let subname = name;
+  const nameList = importName2.split('/');
+  let pkgName = importName2;
   while (nameList.length > 0) {
-    subname = nameList.join('/');
+    pkgName = nameList.join('/');
     const filePath = (() => {
       try {
-        return compatResolve(`${subname}/package.json`);
+        return compatResolve(`${pkgName}/package.json`);
       } catch {
         return undefined;
       }
@@ -227,10 +233,12 @@ export const getModuleRealInfo = async (name: string) => {
     break;
   }
   if (version === undefined) {
-    logger.warn(`not found module ${name} version, use ${name}@latest`);
+    logger.warn(
+      `not found module ${importName2} version, use ${importName2}@latest`,
+    );
     version = 'latest';
   }
-  return { version, name: subname };
+  return { version, name: pkgName, resolveName };
 };
 
 export const mergeObj = <T, S>(target: T | undefined, source: S) => {
@@ -244,4 +252,14 @@ export const mergeObj = <T, S>(target: T | undefined, source: S) => {
     }
   }
   return obj as T & S;
+};
+
+export const miniCode = async (code: string, type: 'css' | 'js' = 'js') => {
+  return (
+    await transformWithEsbuild(code, 'any_name.' + type, {
+      minify: true,
+      sourcemap: false,
+      legalComments: 'none',
+    })
+  ).code.trimEnd();
 };

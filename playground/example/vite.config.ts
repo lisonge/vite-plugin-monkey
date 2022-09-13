@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 import monkey, { cdn } from 'vite-plugin-monkey';
 
-export default defineConfig(({ command, mode }) => ({
+export default defineConfig(async ({ command, mode }) => ({
   plugins: [
     monkey({
       entry: 'src/main.ts',

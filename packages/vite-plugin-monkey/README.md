@@ -15,6 +15,7 @@ vite plugin server and build \*.user.js for [Tampermonkey](https://www.tampermon
 - inject userscript comment to build bundle
 - auto open \*.user.js in default browser when userscript change
 - external cdn url inject to userscript @require
+- external module inject to userscript @resource
 - use GM_api by ESM import with type hints
 - when vite preview, auto open browser install dist.user.js
 - full typescript support and vite feature
@@ -74,7 +75,10 @@ for make `vite serve` work normally, you should add file named `index.html` to `
 
 ## config
 
-[MonkeyOption](/packages/vite-plugin-monkey/src/node/index.ts#L42)
+[MonkeyOption](/packages/vite-plugin-monkey/src/node/types.ts#L113)
+
+<details open>
+  <summary>MonkeyOption Type</summary>
 
 ```ts
 export type MonkeyOption = {
@@ -189,20 +193,17 @@ export type MonkeyOption = {
      *
      *  'prettier/parser-babel': [
      *    'prettierPlugins.babel',
-     *    (version, name, moduleName) => {
+     *    (version, name, importName) => {
      *      // name == `prettier`
-     *      // moduleName == `prettier/parser-babel`
-     *      const subpath = `${moduleName.split('/').at(-1)}.js`;
+     *      // importName == `prettier/parser-babel`
+     *      const subpath = `${importName.split('/').at(-1)}.js`;
      *      return `https://cdn.jsdelivr.net/npm/${name}@${version}/${subpath}`;
      *    },
      *  ],
-     *  // sometimes moduleName deffers from package name
+     *  // sometimes importName deffers from package name
      * }
      */
-    externalGlobals?: Record<
-      string,
-      string | [string, ...(string | Lib2Url)[]]
-    >;
+    externalGlobals?: ExternalGlobals;
 
     /**
      * according to final code bundle, auto inject GM_* or GM.* to userscript comment grant
@@ -223,72 +224,70 @@ export type MonkeyOption = {
      * @default true
      */
     minifyCss?: boolean;
+
+    /**
+     * @example
+     * {  // resourceName default value is pkg.importName
+     *   'element-plus/dist/index.css': pkg=>`https://unpkg.com/${pkg.name}@${pkg.version}/${pkg.resolveName}`,
+     *   'element-plus/dist/index.css': {
+     *     resourceName: pkg=>pkg.importName,
+     *     resourceUrl: pkg=>`https://unpkg.com/${pkg.name}@${pkg.version}/${pkg.resolveName}`,
+     *     loader: pkg=>{ // there are default loaders that support [css, json, the assets that vite support, ?url, ?raw] file/name suffix
+     *        const css = GM_getResourceText(pkg.resourceName);
+     *        GM_addStyle(css);
+     *        return css;
+     *     },
+     *     nodeLoader: pkg=>{
+     *        return [
+     *          `export default (()=>{`,
+     *          `const css = GM_getResourceText(${JSON.stringify(pkg.resourceName)});`,
+     *          `GM_addStyle(css);`,
+     *          `return css;`,
+     *          `})();`
+     *        ].join('');
+     *     },
+     *   },
+     *   'element-plus/dist/index.css': [ // compat externalGlobals cdn function
+     *      (version, name, importName, resolveName)=>importName,
+     *      (version, name, importName, resolveName)=>`https://unpkg.com/${name}@${version}/${resolveName}`,
+     *   ],
+     *   'element-plus/dist/index.css': cdn.jsdelivr(),
+     * }
+     */
+    externalResource?: ExternalResource;
   };
 };
 ```
 
-[MonkeyUserScript](/packages/vite-plugin-monkey/src/node/userscript/index.ts#L138)
-
-```ts
-/**
- * UserScript, merge metadata from Greasemonkey, Tampermonkey, Violentmonkey, Greasyfork
- */
-export type MonkeyUserScript = GreasemonkeyUserScript &
-  TampermonkeyUserScript &
-  ViolentmonkeyUserScript &
-  GreasyforkUserScript &
-  MergemonkeyUserScript;
-```
-
-- [GreasemonkeyUserScript](/packages/vite-plugin-monkey/src/node/userscript/greasemonkey.ts#L38)
-- [TampermonkeyUserScript](/packages/vite-plugin-monkey/src/node/userscript/tampermonkey.ts#L77)
-- [ViolentmonkeyUserScript](/packages/vite-plugin-monkey/src/node/userscript/violentmonkey.ts#L81)
-- [GreasyforkUserScript](/packages/vite-plugin-monkey/src/node/userscript/index.ts#L31)
-- [MergemonkeyUserScript](/packages/vite-plugin-monkey/src/node/userscript/index.ts#L62)
-
-[Format](/packages/vite-plugin-monkey/src/node/userscript/common.ts#L9)
-
-```ts
-/**
- * format userscript comment
- */
-export type Format = {
-  /**
-   * @description note font_width/font_family, suggest fixed-width font
-   * @default 2, true
-   */
-  align?: number | boolean | AlignFunc;
-};
-
-export type AlignFunc = (
-  p0: [string, ...string[]][],
-) => [string, ...string[]][];
-```
+</details>
 
 ## externalGlobals cdn util
 
 ```js
 // use example
 import { cdn } from 'vite-plugin-monkey';
-{
+const buildonfig = {
   externalGlobals: {
     'blueimp-md5': cdn.bytecdntp('md5', 'js/md5.min.js'),
   },
-}
+  externalResource: {
+    'element-plus/dist/index.css': cdn.jsdelivr(),
+  },
+};
 ```
 
 there is the following cdn to use, full detail see [cdn.ts](/packages/vite-plugin-monkey/src/node/cdn.ts)
 
-- [jsdelivr](/packages/vite-plugin-monkey/src/node/cdn.ts#L1) <https://www.jsdelivr.com/>
-- [unpkg](/packages/vite-plugin-monkey/src/node/cdn.ts#L43) <https://unpkg.com/>
-- [bytecdntp](/packages/vite-plugin-monkey/src/node/cdn.ts#L59) <https://cdn.bytedance.com/>
-- [bootcdn](/packages/vite-plugin-monkey/src/node/cdn.ts#L75) <https://www.bootcdn.cn/all/>
-- [baomitu](/packages/vite-plugin-monkey/src/node/cdn.ts#L91) <https://cdn.baomitu.com/>
-- [staticfile](/packages/vite-plugin-monkey/src/node/cdn.ts#L107) <https://staticfile.org/>
-- [cdnjs](/packages/vite-plugin-monkey/src/node/cdn.ts#L122) <https://cdnjs.com/libraries>
-- [zhimg](/packages/vite-plugin-monkey/src/node/cdn.ts#L138) <https://unpkg.zhimg.com/>
+- [jsdelivr](https://www.jsdelivr.com/)
+- [unpkg](https://unpkg.com/)
+- [bytecdntp](https://cdn.bytedance.com/)
+- [bootcdn](https://www.bootcdn.cn/all/)
+- [baomitu](https://cdn.baomitu.com/)
+- [staticfile](https://staticfile.org/)
+- [cdnjs](https://cdnjs.com/libraries)
+- [zhimg](https://unpkg.zhimg.com/)
 
-if you want use other cdn, you can see [external-scripts](https://greasyfork.org/zh-CN/help/external-scripts)
+if you want use other cdn, you can see [external-scripts](https://greasyfork.org/help/external-scripts)
 
 ## ESM GM_api
 
@@ -324,9 +323,9 @@ GM_cookie &&
 
 ## example
 
-vite config is simple, see [vite.config.ts](/playground/example/vite.config.ts), build file see [example-project.user.js](/playground/example/dist/example.user.js)
+test example, see [/playground](/playground)
 
-and preact/react/svelte/vanilla/vue examples see [create-monkey](/packages/create-monkey)
+and preact/react/svelte/vanilla/vue/solid examples, see [create-monkey](/packages/create-monkey)
 
 ## some note
 
@@ -355,6 +354,30 @@ and if you use `Violentmonkey`/`Greasemonkey`, you can solve it in the following
 - if csp allow `*.xx.com`, you can set `viteConfig.server.host=localhost.xx.com` and add `127.0.0.1 localhost.xx.com` to your hosts file, if your need fake https ca, you can use [mkcert](https://github.com/FiloSottile/mkcert)
 
 - by chrome-remote-interface [issues/1#issuecomment-1236060681](https://github.com/lisonge/vite-plugin-monkey/issues/1#issuecomment-1236060681)
+
+### Mixed IIFE and UMD at @require
+
+the variable declared by `var` from iife-cdn will not become the property of window at monkeyWindow scope
+
+so if an umd lib is dependent on an iife lib, such as `element-plus` is dependent on `vue`, `element-plus` cdn will not work
+
+detail see [issues/5](https://github.com/lisonge/vite-plugin-monkey/issues/5) or [greasyfork#1084](https://github.com/JasonBarnabe/greasyfork/issues/1084)
+
+the solution is that we append a dataUrl script that will set iife-variable as the property of window after iife-cdn
+
+```js
+// solution example
+import { cdn, util } from 'vite-plugin-monkey';
+const buildonfig = {
+  vue: cdn.jsdelivr('Vue', 'dist/vue.global.prod.js').concat(
+    await util.encodeFn(() => {
+      // @ts-ignore
+      window.Vue = Vue;
+    }, []),
+  ),
+  'element-plus': cdn.jsdelivr('ElementPlus', 'dist/index.full.min.js'),
+};
+```
 
 ### Polyfill
 

@@ -9,17 +9,18 @@
 
 一个 vite 插件，用来辅助开发 [Tampermonkey](https://www.tampermonkey.net/) 和 [Violentmonkey](https://violentmonkey.github.io/) 和 [Greasemonkey](https://www.greasespot.net/) 的脚本
 
-## 特性
+## feature
 
 - 支持 Tampermonkey 和 Violentmonkey 和 Greasemonkey 的脚本辅助开发
 - 打包自动注入脚本配置头部注释
 - 当 第一次启动 或 脚本配置注释改变时 自动在默认浏览器打开脚本安装
-- 友好的利用 @require 配置库的 cdn 的方案，大大减少构建脚本大小
+- 利用 @require 配置库的 cdn 的方案, 减少构建脚本大小
+- 利用 @resource 配置外部资源 cdn 的方案, 额外减少构建脚本大小
 - 通过 ESM 导入的方式使用 GM_api, 附带类型提示
 - 预览模式下自动打开浏览器安装构建好的脚本
 - 完全的 Typescript 和 Vite 的开发体验，比如模块热替换,秒启动
 
-## 快速使用 (推荐)
+## quick usage (recommend)
 
 使用方式与 vite create 一致
 
@@ -33,7 +34,7 @@ pnpm create monkey
 
 | JavaScript                                                     | TypeSript                                                            |
 | -------------------------------------------------------------- | -------------------------------------------------------------------- |
-| [empty](/packages/create-monkey/template-empty) (仅 js)        | [empty-ts](/packages/create-monkey/template-empty-ts) (仅 ts)        |
+| [empty](/packages/create-monkey/template-empty) (only js)      | [empty-ts](/packages/create-monkey/template-empty-ts) (only ts)      |
 | [vanilla](/packages/create-monkey/template-vanilla) (js + css) | [vanilla-ts](/packages/create-monkey/template-vanilla-ts) (ts + css) |
 | [vue](/packages/create-monkey/template-vue)                    | [vue-ts](/packages/create-monkey/template-vue-ts)                    |
 | [react](/packages/create-monkey/template-react)                | [react-ts](/packages/create-monkey/template-react-ts)                |
@@ -62,7 +63,7 @@ pnpm create monkey
 
 </details>
 
-## 单独安装
+## installation
 
 ```shell
 pnpm add -D vite-plugin-monkey
@@ -74,29 +75,32 @@ pnpm add -D vite-plugin-monkey
 
 ## 配置
 
-[MonkeyOption](/packages/vite-plugin-monkey/src/node/index.ts#L42)
+[MonkeyOption](/packages/vite-plugin-monkey/src/node/types.ts#L113)
+
+<details open>
+  <summary>MonkeyOption Type</summary>
 
 ```ts
-export interface MonkeyOption {
+export type MonkeyOption = {
   /**
-   * 脚本文件的入口路径
+   * userscript entry file path
    */
   entry: string;
   userscript: MonkeyUserScript;
   format?: Format;
 
   /**
-   * vite-plugin-monkey/dist/client 的别名
+   * alias of vite-plugin-monkey/dist/client
    * @default '$'
    * @example
-   * // vite.config.ts, 插件会自动设置此项
+   * // vite.config.ts, plugin will auto modify config
    * resolve: {
    *   alias: {
    *     [clientAlias]: 'vite-plugin-monkey/dist/client',
    *   },
    * }
    * @example
-   * // vite-env.d.ts, 你需要将以下内容附加到 vite-env.d.ts 中从而获得类型提示
+   * // vite-env.d.ts, you must manual modify vite-env.d.ts file for type hint
    * declare module clientAlias {
    *   export * from 'vite-plugin-monkey/dist/client';
    * }
@@ -104,22 +108,23 @@ export interface MonkeyOption {
   clientAlias?: string;
   server?: {
     /**
-     * 当 第一次启动 或 脚本配置注释改变时 自动在默认浏览器打开脚本
+     * auto open *.user.js in default browser when userscript comment change or vite server first start.
+     * if you don't want to open when vite server first start, just want to open when userscript comment change, you should set viteConfig.server.open=false
      * @default true
      */
     open?: boolean;
 
     /**
-     * 开发阶段的脚本名字前缀，用以在脚本安装列表里区分构建好的脚本, 如果你不要前缀, 设置 false 即可
+     * name prefix, distinguish server.user.js and build.user.js in monkey extension install list, if you not want prefix, set false
      * @default 'dev:'
      */
     prefix?: string | ((name: string) => string) | false;
 
     /**
-     * 挂载 GM_api 到 unsafeWindow, 不推荐使用, 你应该通过 ESM 导入使用
+     * mount GM_api to unsafeWindow, not recommend it, you should use GM_api by ESM import
      * @default false
      * @example
-     * // 如果设置 true, 你可以把以下内容附加到 vite-env.d.ts 从而获得全局作用域的类型提示
+     * // if set true, you can export all from vite-plugin-monkey/dist/client to global for type hint
      * // vite-env.d.ts
      * type MonkeyWindow = import('vite-plugin-monkey/dist/client').MonkeyWindow;
      * declare const unsafeWindow: MonkeyWindow['unsafeWindow'];
@@ -152,139 +157,135 @@ export interface MonkeyOption {
   };
   build?: {
     /**
-     * 打包构建的脚本文件名字 应该以 '.user.js' 结尾
-     * @default (package.json.name||'monkey')+'.user.js'
+     * build bundle userscript file name
+     *
+     * it should end with '.user.js'
+     * @default (package.json.name??'monkey')+'.user.js'
      */
     fileName?: string;
 
     /**
-     * 构建后的 meta 文件，此文件只包含注释
+     * build bundle userscript comment file name, this file is only include comment
      *
-     * 可被使用在 userscript.updateURL, 检查更新的时候只需下载这个小文件而不是下载整个脚本
+     * it can be used by userscript.updateURL, when checking for updates, just download this small file instead of downloading the entire script
      *
-     * 文件名应该以 '.meta.js' 结尾, 如果设置 false, 将不会生成这个文件
+     * it should end with '.meta.js', if set false, will not generate this file
      *
-     * 如果设置 true, 等价于 fileName.replace(/\\.user\\.js$/,'.meta.js')
+     * if set true, will equal to fileName.replace(/\\.user\\.js$/,'.meta.js')
      * @default false
      */
     metaFileName?: string | boolean;
 
     /**
-     * 如果值是字符串或函数, 字符串或函数的返回值将作为库的 导出变量名
+     * if value is string or function, it or its return value is exportVarName
      *
-     * 如果值是数组, 数组第一项或其返回值将作为 导出变量名, 后续项全部作为 require url
+     * if value is Array, the first [item or its return value] is exportVarName, the items after it all are url that is [require url]
      *
-     * 如果模块在代码中并没有被导入, 则 require url 不会添加到 userscript
+     * if module is unimported, plugin will not add require url to userscript
      *
      * @example
      * {
      *  vue:'Vue',
-     *  // 在build模式下, 你需要手动 userscript.require = ['https://unpkg.com/vue@3.0.0/dist/vue.global.js']
+     *  // youe need manually set userscript.require = ['https://unpkg.com/vue@3.0.0/dist/vue.global.js'], when command=='build'
      *
      *  vuex:['Vuex', (version, name)=>`https://unpkg.com/${name}@${version}/dist/vuex.global.js`],
-     *  // 插件会自动把url注入 userscript.require
+     *  // plugin will auto add this url to userscript.require
      *
      *  'prettier/parser-babel': [
      *    'prettierPlugins.babel',
-     *    (version, name, moduleName) => {
+     *    (version, name, importName) => {
      *      // name == `prettier`
-     *      // moduleName == `prettier/parser-babel`
-     *      const subpath = `${moduleName.split('/').at(-1)}.js`;
+     *      // importName == `prettier/parser-babel`
+     *      const subpath = `${importName.split('/').at(-1)}.js`;
      *      return `https://cdn.jsdelivr.net/npm/${name}@${version}/${subpath}`;
      *    },
      *  ],
-     *  // 某些情况下, 模块名不同与包名
+     *  // sometimes importName deffers from package name
      * }
      */
-    externalGlobals?: Record<
-      string,
-      string | [string, ...(string | Lib2Url)[]]
-    >;
+    externalGlobals?: ExternalGlobals;
 
     /**
-     * 自动识别代码里用到的 浏览器插件api，然后自动配置 GM_* 或 GM.* 函数到脚本配置注释头
+     * according to final code bundle, auto inject GM_* or GM.* to userscript comment grant
      *
-     * 识别依据是判断代码文本里有没有特定的函数名字
+     * the judgment is based on String.prototype.includes, if code.includes('GM_xxx'), add \@grant GM_xxx to userscript
      * @default true
      */
     autoGrant?: boolean;
 
     /**
-     * 检查所有 require cdn 链接可用性, 依据是 http 状态码为 200
+     * check all require urls for availability, just http code is 2xx, never check http.body
      * @default false
      */
     checkCDN?: boolean;
 
     /**
-     * 如果你想最小化全部, 设置 viteConfig.build.minify=true
+     * if you want minify all, just set viteConfig.build.minify=true
      * @default true
      */
     minifyCss?: boolean;
+
+    /**
+     * @example
+     * {  // resourceName default value is pkg.importName
+     *   'element-plus/dist/index.css': pkg=>`https://unpkg.com/${pkg.name}@${pkg.version}/${pkg.resolveName}`,
+     *   'element-plus/dist/index.css': {
+     *     resourceName: pkg=>pkg.importName,
+     *     resourceUrl: pkg=>`https://unpkg.com/${pkg.name}@${pkg.version}/${pkg.resolveName}`,
+     *     loader: pkg=>{ // there are default loaders that support [css, json, the assets that vite support, ?url, ?raw] file/name suffix
+     *        const css = GM_getResourceText(pkg.resourceName);
+     *        GM_addStyle(css);
+     *        return css;
+     *     },
+     *     nodeLoader: pkg=>{
+     *        return [
+     *          `export default (()=>{`,
+     *          `const css = GM_getResourceText(${JSON.stringify(pkg.resourceName)});`,
+     *          `GM_addStyle(css);`,
+     *          `return css;`,
+     *          `})();`
+     *        ].join('');
+     *     },
+     *   },
+     *   'element-plus/dist/index.css': [ // compat externalGlobals cdn function
+     *      (version, name, importName, resolveName)=>importName,
+     *      (version, name, importName, resolveName)=>`https://unpkg.com/${name}@${version}/${resolveName}`,
+     *   ],
+     *   'element-plus/dist/index.css': cdn.jsdelivr(),
+     * }
+     */
+    externalResource?: ExternalResource;
   };
-}
-```
-
-[MonkeyUserScript](/packages/vite-plugin-monkey/src/node/userscript/index.ts#L138)
-
-```ts
-/**
- * 综合后的脚本配置, 合并了来自 Greasemonkey, Tampermonkey, Violentmonkey, Greasyfork 的元数据
- */
-export type MonkeyUserScript = GreasemonkeyUserScript &
-  TampermonkeyUserScript &
-  ViolentmonkeyUserScript &
-  GreasyforkUserScript &
-  MergemonkeyUserScript;
-```
-
-- [GreasemonkeyUserScript](/packages/vite-plugin-monkey/src/node/userscript/greasemonkey.ts#L38)
-- [TampermonkeyUserScript](/packages/vite-plugin-monkey/src/node/userscript/tampermonkey.ts#L77)
-- [ViolentmonkeyUserScript](/packages/vite-plugin-monkey/src/node/userscript/violentmonkey.ts#L81)
-- [GreasyforkUserScript](/packages/vite-plugin-monkey/src/node/userscript/index.ts#L33)
-- [MergemonkeyUserScript](/packages/vite-plugin-monkey/src/node/userscript/index.ts#L61)
-
-[Format](/packages/vite-plugin-monkey/src/node/userscript/common.ts#L12)
-
-```ts
-/**
- * 格式化脚本头配置注释
- */
-export type Format = {
-  /**
-   * @description 对齐的空格数量，请注意，显示的时候，保证你的代码是等宽字体
-   * @default 2, true
-   */
-  align?: number | boolean | AlignFunc;
 };
-
-// 自定义对齐函数
-export type AlignFunc = (
-  p0: [string, ...string[]][],
-) => [string, ...string[]][];
 ```
+
+</details>
 
 ## externalGlobals cdn 工具
 
 ```js
 // 使用示例
 import { cdn } from 'vite-plugin-monkey';
-{
+const buildonfig = {
   externalGlobals: {
     'blueimp-md5': cdn.bytecdntp('md5', 'js/md5.min.js'),
   },
-}
+  externalResource: {
+    'element-plus/dist/index.css': cdn.jsdelivr(),
+  },
+};
 ```
 
 有以下 cdn 可使用，详情见 [cdn.ts](/packages/vite-plugin-monkey/src/node/cdn.ts)
 
-- [jsdelivr](/packages/vite-plugin-monkey/src/node/cdn.ts#L1) <https://www.jsdelivr.com/>
-- [unpkg](/packages/vite-plugin-monkey/src/node/cdn.ts#L43) <https://unpkg.com/>
-- [bytecdntp](/packages/vite-plugin-monkey/src/node/cdn.ts#L59) <https://cdn.bytedance.com/>
-- [bootcdn](/packages/vite-plugin-monkey/src/node/cdn.ts#L75) <https://www.bootcdn.cn/all/>
-- [baomitu](/packages/vite-plugin-monkey/src/node/cdn.ts#L91) <https://cdn.baomitu.com/>
-- [staticfile](/packages/vite-plugin-monkey/src/node/cdn.ts#L107) <https://staticfile.org/>
-- [cdnjs](/packages/vite-plugin-monkey/src/node/cdn.ts#L122) <https://cdnjs.com/libraries>
-- [zhimg](/packages/vite-plugin-monkey/src/node/cdn.ts#L138) <https://unpkg.zhimg.com/>
+- [jsdelivr](https://www.jsdelivr.com/)
+- [unpkg](https://unpkg.com/)
+- [bytecdntp](https://cdn.bytedance.com/)
+- [bootcdn](https://www.bootcdn.cn/all/)
+- [baomitu](https://cdn.baomitu.com/)
+- [staticfile](https://staticfile.org/)
+- [cdnjs](https://cdnjs.com/libraries)
+- [zhimg](https://unpkg.zhimg.com/)
 
 如果你想使用其他 cdn，请查看 [external-scripts](https://greasyfork.org/zh-CN/help/external-scripts)
 
@@ -322,11 +323,9 @@ GM_cookie &&
 
 ## 例子
 
-vite 非常容易上手，请直接看 [vite.config.ts](/playground/example/vite.config.ts)
+测试例子, 请直接看 [/playground](/playground)
 
-例子中的构建产物在 [example-project.user.js](/playground/example/dist/example.user.js)
-
-preact/react/svelte/vanilla/vue 的例子在 [create-monkey](/packages/create-monkey)
+preact/react/svelte/vanilla/vue/solid 的例子, 请直接看 [create-monkey](/packages/create-monkey)
 
 ## 注意
 
@@ -355,6 +354,30 @@ preact/react/svelte/vanilla/vue 的例子在 [create-monkey](/packages/create-mo
 - 如果 csp 允许 `*.xx.com` 这类域名, 你可以设置 `viteConfig.server.host=localhost.xx.com` 然后添加本地 dns `127.0.0.1 localhost.xx.com` 到你的 hosts 文件, 如果你需要伪装 https ca, 你可以使用 [mkcert](https://github.com/FiloSottile/mkcert)
 
 - 通过 chrome-remote-interface [issues/1#issuecomment-1236060681](https://github.com/lisonge/vite-plugin-monkey/issues/1#issuecomment-1236060681)
+
+### 通过 @require 加载的 IIFE 和 UMD 混用的问题
+
+iife-cdn 使用 `var` 声明的变量在油猴脚本作用域下不会成为 window 的属性
+
+因此如果一个 umd 库依赖了一个 iife 库, 例如 `element-plus` 依赖 `vue`, `element-plus` cdn 在这种情况下无法正常运行
+
+详情见 [issues/5](https://github.com/lisonge/vite-plugin-monkey/issues/5) 或 [greasyfork#1084](https://github.com/JasonBarnabe/greasyfork/issues/1084)
+
+解决方法是 在 iife-cdn 后面追加一个 dataUrl 脚本, 把 iife 声明的变量作为 window 的属性
+
+```js
+// 解决方案例子
+import { cdn, util } from 'vite-plugin-monkey';
+const buildonfig = {
+  vue: cdn.jsdelivr('Vue', 'dist/vue.global.prod.js').concat(
+    await util.encodeFn(() => {
+      // @ts-ignore
+      window.Vue = Vue;
+    }, []),
+  ),
+  'element-plus': cdn.jsdelivr('ElementPlus', 'dist/index.full.min.js'),
+};
+```
 
 ### Polyfill
 

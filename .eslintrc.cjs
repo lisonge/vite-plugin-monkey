@@ -20,6 +20,7 @@ module.exports = defineConfig({
     '@typescript-eslint/no-empty-function': 'off',
     'prefer-const': 'off',
     '@typescript-eslint/no-unused-vars': 'off',
+    '@typescript-eslint/no-non-null-assertion': 'off',
   },
   globals: {},
 });

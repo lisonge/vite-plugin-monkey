@@ -5,7 +5,7 @@ import path from 'node:path';
 
 export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
   const externalModNameSet = new Set<string>(
-    Object.keys(finalPluginOption.build.externalGlobals),
+    finalPluginOption.build.externalGlobals.map(([s]) => s),
   );
   const realUsedModNameSet = new Set<string>();
   const globalsPkg2VarName: Record<string, string> = {};
@@ -15,9 +15,8 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
     enforce: 'pre',
     apply: 'build',
     async config() {
-      for (const [moduleName, varName2LibUrl] of Object.entries(
-        finalPluginOption.build.externalGlobals,
-      )) {
+      for (const [moduleName, varName2LibUrl] of finalPluginOption.build
+        .externalGlobals) {
         const { name, version } = await getModuleRealInfo(moduleName);
 
         if (typeof varName2LibUrl == 'string') {

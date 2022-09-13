@@ -177,6 +177,8 @@ export type MonkeyOption = {
     metaFileName?: string | boolean;
 
     /**
+     * this object can be array or object, array=Object.entries(object)
+     *
      * if value is string or function, it or its return value is exportVarName
      *
      * if value is Array, the first [item or its return value] is exportVarName, the items after it all are url that is [require url]
@@ -184,7 +186,7 @@ export type MonkeyOption = {
      * if module is unimported, plugin will not add require url to userscript
      *
      * @example
-     * {
+     * { // map structure
      *  vue:'Vue',
      *  // youe need manually set userscript.require = ['https://unpkg.com/vue@3.0.0/dist/vue.global.js'], when command=='build'
      *
@@ -202,6 +204,25 @@ export type MonkeyOption = {
      *  ],
      *  // sometimes importName deffers from package name
      * }
+     * @example
+     * [ // array structure, this example come from playground/ex-vue-demi
+     *   [
+     *     'vue',
+     *     cdn
+     *       .jsdelivr('Vue', 'dist/vue.global.prod.js')
+     *       .concat('https://unpkg.com/vue-demi@latest/lib/index.iife.js')
+     *       .concat(
+     *         await util.encodeFn(() => {
+     *           window.Vue = Vue;
+     *         }, []),
+     *       ),
+     *   ],
+     *   ['pinia', cdn.jsdelivr('Pinia', 'dist/pinia.iife.prod.js')],
+     *   [
+     *     'element-plus',
+     *     cdn.jsdelivr('ElementPlus', 'dist/index.full.min.js'),
+     *   ],
+     * ]
      */
     externalGlobals?: ExternalGlobals;
 

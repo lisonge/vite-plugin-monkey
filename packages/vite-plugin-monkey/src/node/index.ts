@@ -10,7 +10,9 @@ import serverPlugin from './plugins/server';
 import miniClientPlugin from './plugins/miniClient';
 import type {
   FinalMonkeyOption,
+  IArray,
   IPromise,
+  Mod2UrlFn,
   MonkeyOption,
   Pkg2UrlFn,
   PkgOptions,
@@ -125,6 +127,13 @@ export default (pluginOption: MonkeyOption): PluginOption => {
     } else if (typeof prefix == 'string') {
       prefix2 = () => prefix;
     }
+    const externalGlobals2 = build?.externalGlobals ?? {};
+    const externalGlobals: [string, IArray<string | Mod2UrlFn>][] = [];
+    if (externalGlobals2 instanceof Array) {
+      externalGlobals2.forEach((s) => externalGlobals.push(s));
+    } else {
+      Object.entries(externalGlobals2).forEach((s) => externalGlobals.push(s));
+    }
     const config: FinalMonkeyOption = {
       userscript: mergeObj(pluginOption.userscript, {
         name: projectPkg.name,
@@ -145,7 +154,7 @@ export default (pluginOption: MonkeyOption): PluginOption => {
         autoGrant: build.autoGrant ?? true,
         checkCDN: build.checkCDN ?? false,
         minifyCss: build.minifyCss ?? true,
-        externalGlobals: build?.externalGlobals ?? {},
+        externalGlobals: externalGlobals,
         externalResource: externalResource2,
       },
     };

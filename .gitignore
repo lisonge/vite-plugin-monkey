@@ -1,5 +1,6 @@
 node_modules
 dist
+!/playground/*/dist
 /.vscode/
 .eslintcache
 *.local

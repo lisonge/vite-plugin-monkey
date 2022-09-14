@@ -28,6 +28,7 @@ export default defineConfig(async ({ command, mode }) => ({
           'base64-img/test/img/car.svg': cdn.unpkg(),
           'base64-img/test/img/car.svg?url': cdn.jsdelivr(),
           'base64-img/test/img/car.svg?raw': cdn.jsdelivr(),
+          'element-plus/dist/index.css?raw': cdn.jsdelivr(),
         },
       },
     }),

@@ -2,6 +2,7 @@ import type { PluginOption } from 'vite';
 import type { FinalMonkeyOption, PkgOptions } from '../types';
 import { getModuleRealInfo, miniCode } from '../_util';
 import { lookup, mimes } from 'mrmime';
+import { URLSearchParams } from 'node:url';
 
 // word come form https://github.com/vitejs/vite/blob/caf00c8c7a5c81a92182116ffa344b34ce4c3b5e/packages/vite/src/node/constants.ts#L91
 const KNOWN_ASSET_TYPES = new Set([
@@ -50,6 +51,11 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
       if (id in externalResource) {
         return '\0' + id + '\0';
       }
+      // see https://github.com/vitejs/vite/blob/5d56e421625b408879672a1dd4e774bae3df674f/packages/vite/src/node/plugins/css.ts#L431-L434
+      const id2 = id.replace('.css?used&', '.css?');
+      if (id2 in externalResource) {
+        return '\0' + id2 + '\0';
+      }
     },
     async load(id) {
       if (id[0] === '\0' && id[id.length - 1] === '\0') {
@@ -70,10 +76,46 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
         const { resource = {} } = finalPluginOption.userscript;
         resource[resourceName] = resourceUrl;
         finalPluginOption.userscript.resource = resource;
+
+        if (nodeLoader) {
+          return miniCode(
+            await nodeLoader({
+              ...pkg,
+              resourceName,
+              resourceUrl,
+              importName,
+            }),
+          );
+        } else if (loader) {
+          let fnText: string;
+          if (
+            loader.prototype && // not arrow function
+            loader.name.length > 0 &&
+            loader.name != 'function' // not anonymous function
+          ) {
+            if (Reflect.get(loader, Symbol.toStringTag) == 'AsyncFunction') {
+              fnText = loader
+                .toString()
+                .replace(/^[\s\S]+?\(/, 'async function(');
+            } else {
+              fnText = loader.toString().replace(/^[\s\S]+?\(/, 'function(');
+            }
+          } else {
+            fnText = loader.toString();
+          }
+          return miniCode(
+            `export default (${fnText})(${JSON.stringify({
+              resourceUrl,
+              importName,
+              ...pkg,
+            } as PkgOptions)})`,
+          );
+        }
+
         const ext = importName.split('?')[0].split('.').pop()!;
         const mimeType = lookup(ext) ?? 'application/octet-stream';
-
-        if (importName.endsWith('?url')) {
+        const suffixSet = new URLSearchParams(importName.split('?').pop());
+        if (suffixSet.has('url') || suffixSet.has('inline')) {
           return miniCode(
             [
               `import {urlLoader as loader} from 'virtual:plugin-monkey-loader'`,
@@ -83,7 +125,7 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
               ])})`,
             ].join(';'),
           );
-        } else if (importName.endsWith('?raw')) {
+        } else if (suffixSet.has('raw')) {
           return miniCode(
             [
               `import {rawLoader as loader} from 'virtual:plugin-monkey-loader'`,
@@ -120,40 +162,6 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
           );
         }
 
-        if (nodeLoader) {
-          return miniCode(
-            await nodeLoader({
-              ...pkg,
-              resourceName,
-              resourceUrl,
-              importName,
-            }),
-          );
-        } else if (loader) {
-          let fnText: string;
-          if (
-            loader.prototype && // not arrow function
-            loader.name.length > 0 &&
-            loader.name != 'function' // not anonymous function
-          ) {
-            if (Reflect.get(loader, Symbol.toStringTag) == 'AsyncFunction') {
-              fnText = loader
-                .toString()
-                .replace(/^[\s\S]+?\(/, 'async function(');
-            } else {
-              fnText = loader.toString().replace(/^[\s\S]+?\(/, 'function(');
-            }
-          } else {
-            fnText = loader.toString();
-          }
-          return miniCode(
-            `export default (${fnText})(${JSON.stringify({
-              resourceUrl,
-              importName,
-              ...pkg,
-            } as PkgOptions)})`,
-          );
-        }
         throw new Error(`module: ${importName} not found loader`);
       }
     },

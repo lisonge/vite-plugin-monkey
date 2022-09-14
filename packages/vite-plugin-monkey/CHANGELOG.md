@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.4.2
+
+### 2.4.2-Features
+
+- loader priority and support css?used [f97825f2](https://github.com/lisonge/vite-plugin-monkey/commit/385d694b226e1ca46f9c1892971147dff97825f2)
+
 ## 2.4.1
 
 ### 2.4.1-Features

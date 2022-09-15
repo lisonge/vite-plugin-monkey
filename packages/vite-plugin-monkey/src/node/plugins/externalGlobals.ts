@@ -3,6 +3,8 @@ import type { FinalMonkeyOption } from '../types';
 import { getModuleRealInfo } from '../_util';
 import path from 'node:path';
 
+const dynamicImportPrefix = '\0monkey-dynamic-import:';
+
 export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
   const externalModNameSet = new Set<string>(
     finalPluginOption.build.externalGlobals.map(([s]) => s),
@@ -54,7 +56,7 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
       return {
         build: {
           rollupOptions: {
-            external(source, importer, isResolved) {
+            external(source, _importer, _isResolved) {
               if (
                 !source.startsWith('./') &&
                 !source.startsWith('../') &&
@@ -66,11 +68,29 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
             },
             output: {
               globals: globalsPkg2VarName,
+              inlineDynamicImports: true, // see https://rollupjs.org/guide/en/#outputinlinedynamicimports
             },
           },
         },
       };
     },
+
+    async resolveDynamicImport(specifier, _importer) {
+      if (typeof specifier == 'string' && specifier in globalsPkg2VarName) {
+        return dynamicImportPrefix + specifier + '\0';
+      }
+    },
+
+    async load(id) {
+      if (id.startsWith(dynamicImportPrefix) && id.endsWith('\0')) {
+        const rawId = id.slice(dynamicImportPrefix.length, id.length - 1);
+        if (rawId in globalsPkg2VarName) {
+          realUsedModNameSet.add(rawId);
+          return `export default ${globalsPkg2VarName[rawId]}`;
+        }
+      }
+    },
+
     async generateBundle() {
       const { userscript } = finalPluginOption;
 

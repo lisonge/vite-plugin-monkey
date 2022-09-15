@@ -50,7 +50,7 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
     };
   });
   return {
-    name: 'monkey/server',
+    name: 'monkey:server',
     apply: 'serve',
     async config(userConfig, { command }) {
       return {

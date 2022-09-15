@@ -1,4 +1,4 @@
-import { PluginOption, transformWithEsbuild } from 'vite';
+import { PluginOption } from 'vite';
 import type { FinalMonkeyOption } from '../types';
 import { GM_keywords } from '../_util';
 
@@ -7,7 +7,7 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
   const autoGrantList = new Set<string>();
 
   return {
-    name: 'monkey/autoGrant',
+    name: 'monkey:autoGrant',
     apply: 'build',
     async transform(code, id) {
       if (

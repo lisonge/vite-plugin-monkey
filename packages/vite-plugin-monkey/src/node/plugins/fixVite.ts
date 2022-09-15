@@ -3,7 +3,7 @@ import type { FinalMonkeyOption } from '../types';
 
 export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
   return {
-    name: 'monkey/fixVite',
+    name: 'monkey:fixVite',
     apply: 'serve',
     async transform(code, id) {
       if (id.endsWith('node_modules/vite/dist/client/client.mjs')) {

@@ -10,7 +10,7 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
     responsePromise: Promise<nodeResponse | unknown>;
   }> = [];
   return {
-    name: 'monkey/checkCdn',
+    name: 'monkey:checkCdn',
     apply: 'build',
     async generateBundle() {
       if (finalPluginOption.build.checkCDN) {

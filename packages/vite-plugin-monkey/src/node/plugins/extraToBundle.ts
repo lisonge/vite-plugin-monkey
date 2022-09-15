@@ -11,7 +11,7 @@ const timeTagCode = () =>
 export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
   let viteConfig: ResolvedConfig;
   return {
-    name: 'monkey/extraToBundle',
+    name: 'monkey:extraToBundle',
     apply: 'build',
     enforce: 'post',
     async configResolved(resolvedConfig) {

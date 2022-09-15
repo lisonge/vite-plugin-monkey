@@ -34,7 +34,7 @@ const ModelCode = [
 export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
   let code: string | undefined = undefined;
   return {
-    name: 'monkey/externalLoader',
+    name: 'monkey:externalLoader',
     enforce: 'pre',
     apply: 'build',
     async resolveId(id) {

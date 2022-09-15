@@ -43,7 +43,7 @@ const KNOWN_ASSET_TYPES = new Set([
 
 export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
   return {
-    name: 'monkey/loader',
+    name: 'monkey:externalResource',
     enforce: 'pre',
     apply: 'build',
     async resolveId(id) {

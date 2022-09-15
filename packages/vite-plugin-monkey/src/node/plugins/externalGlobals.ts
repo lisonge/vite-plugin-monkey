@@ -13,7 +13,7 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
   const globalsPkg2VarName: Record<string, string> = {};
   const requirePkgList: { moduleName: string; url: string }[] = [];
   return {
-    name: 'monkey/loader',
+    name: 'monkey:externalGlobals',
     enforce: 'pre',
     apply: 'build',
     async config() {

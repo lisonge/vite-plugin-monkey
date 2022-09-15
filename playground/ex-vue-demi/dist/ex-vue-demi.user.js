@@ -14,10 +14,9 @@
 // @resource     element-plus/dist/index.css  https://cdn.jsdelivr.net/npm/element-plus@2.2.16/dist/index.css
 // @grant        GM_addStyle
 // @grant        GM_getResourceText
-// @grant        GM_getResourceURL
 // ==/UserScript==
 
-// use vite-plugin-monkey@2.4.0 at 2022-09-13T12:08:01.628Z
+// use vite-plugin-monkey@2.4.2 at 2022-09-15T10:14:27.715Z
 
 (function(vue, pinia$1, ElementPlus2) {
   "use strict";

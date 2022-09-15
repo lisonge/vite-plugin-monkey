@@ -42,6 +42,17 @@ const KNOWN_ASSET_TYPES = new Set([
 ]);
 
 export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
+  const addGant = (
+    ...args: Array<'GM_getResourceURL' | 'GM_getResourceText' | 'GM_addStyle'>
+  ) => {
+    const { grant = [] } = finalPluginOption.userscript;
+    if (grant instanceof Array) {
+      grant.push(...args);
+      finalPluginOption.userscript.grant = grant;
+    } else if (grant != '*' && grant != 'none') {
+      finalPluginOption.userscript.grant = [grant, ...args];
+    }
+  };
   return {
     name: 'monkey:externalResource',
     enforce: 'pre',
@@ -112,54 +123,58 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
           );
         }
 
+        let moduleCode: string | undefined = undefined;
         const ext = importName.split('?')[0].split('.').pop()!;
         const mimeType = lookup(ext) ?? 'application/octet-stream';
         const suffixSet = new URLSearchParams(importName.split('?').pop());
         if (suffixSet.has('url') || suffixSet.has('inline')) {
-          return miniCode(
-            [
-              `import {urlLoader as loader} from 'virtual:plugin-monkey-loader'`,
-              `export default loader(...${JSON.stringify([
-                resourceName,
-                mimeType,
-              ])})`,
-            ].join(';'),
-          );
+          moduleCode = [
+            `import {urlLoader as loader} from 'virtual:plugin-monkey-loader'`,
+            `export default loader(...${JSON.stringify([
+              resourceName,
+              mimeType,
+            ])})`,
+          ].join(';');
         } else if (suffixSet.has('raw')) {
-          return miniCode(
-            [
-              `import {rawLoader as loader} from 'virtual:plugin-monkey-loader'`,
-              `export default loader(...${JSON.stringify([resourceName])})`,
-            ].join(';'),
-          );
+          moduleCode = [
+            `import {rawLoader as loader} from 'virtual:plugin-monkey-loader'`,
+            `export default loader(...${JSON.stringify([resourceName])})`,
+          ].join(';');
         }
 
         if (ext == 'json') {
           // export name will bring side effect
-          return miniCode(
-            [
-              `import {jsonLoader as loader} from 'virtual:plugin-monkey-loader'`,
-              `export default loader(...${JSON.stringify([resourceName])})`,
-            ].join(';'),
-          );
+          moduleCode = [
+            `import {jsonLoader as loader} from 'virtual:plugin-monkey-loader'`,
+            `export default loader(...${JSON.stringify([resourceName])})`,
+          ].join(';');
         } else if (ext == 'css') {
-          return miniCode(
-            [
-              `import {cssLoader as loader} from 'virtual:plugin-monkey-loader'`,
-              `export default loader(...${JSON.stringify([resourceName])})`,
-            ].join(';'),
-          );
+          moduleCode = [
+            `import {cssLoader as loader} from 'virtual:plugin-monkey-loader'`,
+            `export default loader(...${JSON.stringify([resourceName])})`,
+          ].join(';');
         } else if (KNOWN_ASSET_TYPES.has(ext)) {
           const mediaType = mimes[ext];
-          return miniCode(
-            [
-              `import {urlLoader as loader} from 'virtual:plugin-monkey-loader'`,
-              `export default loader(...${JSON.stringify([
-                resourceName,
-                mediaType,
-              ])})`,
-            ].join(';'),
-          );
+          moduleCode = [
+            `import {urlLoader as loader} from 'virtual:plugin-monkey-loader'`,
+            `export default loader(...${JSON.stringify([
+              resourceName,
+              mediaType,
+            ])})`,
+          ].join(';');
+        }
+        if (moduleCode) {
+          if (
+            moduleCode.includes('rawLoader') ||
+            moduleCode.includes('jsonLoader')
+          ) {
+            addGant('GM_getResourceText');
+          } else if (moduleCode.includes('urlLoader')) {
+            addGant('GM_getResourceURL');
+          } else if (moduleCode.includes('cssLoader')) {
+            addGant('GM_addStyle', 'GM_getResourceText');
+          }
+          return miniCode(moduleCode);
         }
 
         throw new Error(`module: ${importName} not found loader`);

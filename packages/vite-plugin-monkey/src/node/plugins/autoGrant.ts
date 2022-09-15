@@ -13,7 +13,8 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
       if (
         finalPluginOption.build.autoGrant &&
         GM_keyword_set.size > 0 &&
-        !id.endsWith('vite-plugin-monkey/dist/client/index.mjs')
+        !id.endsWith('vite-plugin-monkey/dist/client/index.mjs') &&
+        !id.includes('virtual:plugin-monkey-loader')
       ) {
         Array.from(GM_keyword_set)
           .filter((fnName) => code.includes(fnName))

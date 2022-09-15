@@ -24,7 +24,7 @@ const urlLoader = (resourceName: string, mediaType: string) =>
 
 const rawLoader = (resourceName: string) => GM_getResourceText(resourceName);
 
-const ModelCode = [
+const moduleSourceCode = [
   `export const cssLoader = ${cssLoader}`,
   `export const jsonLoader = ${jsonLoader}`,
   `export const urlLoader = ${urlLoader}`,
@@ -45,7 +45,7 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
     async load(id) {
       if (id == '\0virtual:plugin-monkey-loader') {
         if (!code) {
-          code = await miniCode(ModelCode);
+          code = await miniCode(moduleSourceCode);
         }
         return code;
       }

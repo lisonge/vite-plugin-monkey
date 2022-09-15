@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 2.4.3
+
+### 2.4.3-Features
+
+- autoGant ignore plugin internal module [77f13cf6](https://github.com/lisonge/vite-plugin-monkey/commit/049040923c505a4825f56958ec1fc09577f13cf6)
+
+### 2.4.3-BugFixes
+
+- externalGlobals support inlineDynamicImports [9d447f61](https://github.com/lisonge/vite-plugin-monkey/commit/75f5cf4127cea99757a22bb3d5e009169d447f61)
+
 ## 2.4.2
 
 ### 2.4.2-Features

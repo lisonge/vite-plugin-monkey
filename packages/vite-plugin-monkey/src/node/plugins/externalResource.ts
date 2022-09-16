@@ -140,9 +140,7 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
             `import {rawLoader as loader} from 'virtual:plugin-monkey-loader'`,
             `export default loader(...${JSON.stringify([resourceName])})`,
           ].join(';');
-        }
-
-        if (ext == 'json') {
+        } else if (ext == 'json') {
           // export name will bring side effect
           moduleCode = [
             `import {jsonLoader as loader} from 'virtual:plugin-monkey-loader'`,

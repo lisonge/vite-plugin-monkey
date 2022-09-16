@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.4.4
+
+### 2.4.4-BugFixes
+
+- ext loader override url/raw loader [f3071c38](https://github.com/lisonge/vite-plugin-monkey/commit/3e89ebda2b3794b5d560377ca6250a52f3071c38)
+
 ## 2.4.3
 
 ### 2.4.3-Features

@@ -119,6 +119,22 @@ const FRAMEWORKS = [
       },
     ],
   },
+  {
+    name: 'solid',
+    color: red,
+    variants: [
+      {
+        name: 'solid',
+        display: 'JavaScript',
+        color: yellow,
+      },
+      {
+        name: 'solid-ts',
+        display: 'TypeScript',
+        color: blue,
+      },
+    ],
+  },
 ];
 
 const TEMPLATES = FRAMEWORKS.map(

@@ -125,13 +125,14 @@ export type MonkeyOption = {
    * @default '$'
    * @example
    * // vite.config.ts, plugin will auto modify config
+   * // your don't need to manually modify it
    * resolve: {
    *   alias: {
    *     [clientAlias]: 'vite-plugin-monkey/dist/client',
    *   },
    * }
    * @example
-   * // vite-env.d.ts, you must manual modify vite-env.d.ts file for type hint
+   * // vite-env.d.ts, you must manually modify vite-env.d.ts file for type hint
    * declare module clientAlias {
    *   export * from 'vite-plugin-monkey/dist/client';
    * }

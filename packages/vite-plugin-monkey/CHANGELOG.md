@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2.5.0
+
+### 2.5.0-Features
+
+- remove time tag, simplify css inject function code [a477bd49](https://github.com/lisonge/vite-plugin-monkey/commit/2b3bb058ff4446c2a3b4e24720667825a477bd49)
+- others
+
 ## 2.4.4
 
 ### 2.4.4-BugFixes

@@ -125,12 +125,6 @@ type MergemonkeyUserScript = {
 
   /**
    * custom extra meta
-   * @deprecated since version 1.0.0, use $extra replace it, extra will be removed in the future version
-   */
-  extra?: [string, string][] | Record<string, IArray<string>>;
-
-  /**
-   * custom extra meta
    */
   $extra?: [string, string][] | Record<string, IArray<string>>;
 };
@@ -194,17 +188,7 @@ export const userscript2comment = async (
     noframes,
   } = userscript;
 
-  const { extra } = userscript;
-  let { $extra } = userscript;
-  if (extra) {
-    delay().then(() => {
-      logger.warn(
-        'userscript#extra is deprecated, just use $extra repalce it',
-        { time: true },
-      );
-    });
-  }
-  $extra = $extra ?? extra;
+  const { $extra } = userscript;
 
   let { align } = format;
 

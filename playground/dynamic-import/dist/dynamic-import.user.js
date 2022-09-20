@@ -10,10 +10,7 @@
 // @resource     animate.css  https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.css
 // @grant        GM_addStyle
 // @grant        GM_getResourceText
-// @grant        GM_getResourceURL
 // ==/UserScript==
-
-// use vite-plugin-monkey@2.4.2 at 2022-09-15T06:05:47.711Z
 
 (function() {
   "use strict";

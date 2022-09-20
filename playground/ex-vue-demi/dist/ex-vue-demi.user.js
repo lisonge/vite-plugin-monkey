@@ -16,8 +16,6 @@
 // @grant        GM_getResourceText
 // ==/UserScript==
 
-// use vite-plugin-monkey@2.4.2 at 2022-09-15T10:14:27.715Z
-
 (function(vue, pinia$1, ElementPlus2) {
   "use strict";
   const _interopDefaultLegacy = (e) => e && typeof e === "object" && "default" in e ? e : { default: e };

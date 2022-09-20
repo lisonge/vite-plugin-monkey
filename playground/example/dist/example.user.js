@@ -26,16 +26,7 @@
 // @grant              unsafeWindow
 // ==/UserScript==
 
-// use vite-plugin-monkey@2.3.1 at 2022-09-07T13:41:02.299Z
-
-;(({ css = "" }) => {
-  const style = document.createElement("style");
-  style.innerText = css;
-  style.dataset.source = "vite-plugin-monkey";
-  document.head.appendChild(style);
-})({
-  "css": ":root{font-family:Inter,Avenir,Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;font-weight:400;color-scheme:light dark;color:#ffffffde;background-color:#242424;font-synthesis:none;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;-webkit-text-size-adjust:100%}a{font-weight:500;color:#646cff;text-decoration:inherit}a:hover{color:#535bf2}body{margin:0;display:flex;place-items:center;min-width:320px;min-height:100vh}h1{font-size:3.2em;line-height:1.1}button{border-radius:8px;border:1px solid transparent;padding:.6em 1.2em;font-size:1em;font-weight:500;font-family:inherit;background-color:#1a1a1a;cursor:pointer;transition:border-color .25s}button:hover{border-color:#646cff}button:focus,button:focus-visible{outline:4px auto -webkit-focus-ring-color}.card{padding:2em}#app{max-width:1280px;margin:0 auto;padding:2rem;text-align:center}@media (prefers-color-scheme: light){:root{color:#213547;background-color:#fff}a:hover{color:#747bff}button{background-color:#f9f9f9}}"
-});
+(e=>{const o=document.createElement("style");o.dataset.source="vite-plugin-monkey",o.innerText=e,document.head.appendChild(o)})(":root{font-family:Inter,Avenir,Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;font-weight:400;color-scheme:light dark;color:#ffffffde;background-color:#242424;font-synthesis:none;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;-webkit-text-size-adjust:100%}a{font-weight:500;color:#646cff;text-decoration:inherit}a:hover{color:#535bf2}body{margin:0;display:flex;place-items:center;min-width:320px;min-height:100vh}h1{font-size:3.2em;line-height:1.1}button{border-radius:8px;border:1px solid transparent;padding:.6em 1.2em;font-size:1em;font-weight:500;font-family:inherit;background-color:#1a1a1a;cursor:pointer;transition:border-color .25s}button:hover{border-color:#646cff}button:focus,button:focus-visible{outline:4px auto -webkit-focus-ring-color}.card{padding:2em}#app{max-width:1280px;margin:0 auto;padding:2rem;text-align:center}@media (prefers-color-scheme: light){:root{color:#213547;background-color:#fff}a:hover{color:#747bff}button{background-color:#f9f9f9}}");
 
 (function(md52, prettier2, parserBabel) {
   var _a, _b;
@@ -45,15 +36,12 @@
   const prettier__default = /* @__PURE__ */ _interopDefaultLegacy(prettier2);
   const parserBabel__default = /* @__PURE__ */ _interopDefaultLegacy(parserBabel);
   const style = "";
-  var monkeyWindow = (_a = Reflect.get(document, "__monkeyWindow")) != null ? _a : window;
-  monkeyWindow.GM;
-  monkeyWindow.unsafeWindow = (_b = monkeyWindow.unsafeWindow) != null ? _b : window;
-  var unsafeWindow = monkeyWindow.unsafeWindow;
-  monkeyWindow.GM_info;
-  var GM_cookie = monkeyWindow.GM_cookie;
-  var GM_addElement = (...args) => {
-    return monkeyWindow.GM_addElement(...args);
-  };
+  var r = (_a = Reflect.get(document, "__monkeyWindow")) != null ? _a : window;
+  r.GM;
+  r.unsafeWindow = (_b = r.unsafeWindow) != null ? _b : window;
+  var n = r.unsafeWindow;
+  r.GM_info;
+  var M = r.GM_cookie, v = (...e) => r.GM_addElement(...e);
   const plugins = [parserBabel__default.default];
   const lang2parser = {
     js: "babel",
@@ -80,14 +68,14 @@
   };
   console.log(`md5('114514')=${md5__default.default("114514")}`);
   console.log("document.readyState", document.readyState);
-  console.log(monkeyWindow);
-  GM_addElement && GM_addElement("div", { innerHTML: "hello" });
-  if (unsafeWindow == window) {
+  console.log(r);
+  v && v("div", { innerHTML: "hello" });
+  if (n == window) {
     console.log("scope->host");
   } else {
     console.log("scope->monkey");
   }
-  GM_cookie == null ? void 0 : GM_cookie.list({}, (cookies, error) => {
+  M == null ? void 0 : M.list({}, (cookies, error) => {
     if (error) {
       console.log(error);
     } else {

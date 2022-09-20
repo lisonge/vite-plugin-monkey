@@ -3,10 +3,6 @@ import { cssInjectTemplate, template2string } from '../inject_template';
 import type { FinalMonkeyOption } from '../types';
 import { userscript2comment } from '../userscript';
 import { miniCode } from '../_util';
-import selfPkg from '../../../package.json';
-
-const timeTagCode = () =>
-  `// use ${selfPkg.name}@${selfPkg.version} at ${new Date().toISOString()}`;
 
 export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
   let viteConfig: ResolvedConfig;
@@ -35,9 +31,7 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
           css = await miniCode(css, 'css');
         }
         injectCssCode = await miniCode(
-          template2string(cssInjectTemplate, {
-            css,
-          }),
+          template2string(cssInjectTemplate, [css]),
           'js',
         );
       }
@@ -48,7 +42,6 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
             finalPluginOption.userscript,
             finalPluginOption.format,
           ),
-          timeTagCode(),
           injectCssCode,
           chunk.code,
         ]

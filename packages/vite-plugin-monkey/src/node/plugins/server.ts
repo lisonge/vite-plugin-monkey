@@ -193,10 +193,12 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
                 finalPluginOption.userscript,
                 finalPluginOption.format,
               ),
-              template2string(serverInjectTemplate, {
-                entryList,
-                mountGmApi: finalPluginOption.server.mountGmApi,
-              }),
+              template2string(serverInjectTemplate, [
+                {
+                  entryList,
+                  mountGmApi: finalPluginOption.server.mountGmApi,
+                },
+              ]),
               '',
             ].join('\n\n'),
           );
@@ -248,7 +250,7 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
             res.end(
               `<script type="module" data-source="vite-plugin-monkey">${template2string(
                 redirectFn,
-                { url: '/' + fileName },
+                ['/' + fileName],
               )}</script>`,
             );
             return;
@@ -262,7 +264,7 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
         {
           tag: 'script',
           attrs: { type: 'module', 'data-source': 'vite-plugin-monkey' },
-          children: template2string(redirectFn, { url: installUserPath }),
+          children: template2string(redirectFn, [installUserPath]),
           injectTo: 'head',
         },
       ];

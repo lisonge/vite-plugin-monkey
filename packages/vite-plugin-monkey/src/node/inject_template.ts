@@ -1,8 +1,10 @@
-export const template2string = <T extends (arg: object) => void>(
-  func: T,
-  arg: Parameters<T>[0],
+/*eslint @typescript-eslint/no-explicit-any: "off"*/
+
+export const template2string = <T extends (...args: any[]) => any>(
+  fn: T,
+  args: Parameters<T>,
 ) => {
-  return `;(${func.toString()})(${JSON.stringify(arg, undefined, 2)});`;
+  return `;(${fn})(...${JSON.stringify(args)});`;
 };
 
 export const serverInjectTemplate = ({
@@ -30,14 +32,12 @@ export const serverInjectTemplate = ({
     }
   }
 
-  (() => {
-    Object.defineProperty(document, '__monkeyWindow', {
-      value: monkeyWindow,
-      writable: false,
-      enumerable: false,
-    });
-    console.log(`[vite-plugin-monkey] mount monkeyWindow to document`);
-  })();
+  Object.defineProperty(document, '__monkeyWindow', {
+    value: monkeyWindow,
+    writable: false,
+    enumerable: false,
+  });
+  console.log(`[vite-plugin-monkey] mount monkeyWindow to document`);
 
   const createScript = (src: string) => {
     const el = document.createElement('script');
@@ -56,14 +56,14 @@ export const serverInjectTemplate = ({
   );
 };
 
-export const cssInjectTemplate = ({ css = '' }) => {
+export const cssInjectTemplate = (css: string) => {
   const style = document.createElement('style');
-  style.innerText = css;
   style.dataset.source = 'vite-plugin-monkey';
+  style.innerText = css;
   document.head.appendChild(style);
 };
 
-export const redirectFn = async ({ url = '' }) => {
+export const redirectFn = async (url: string) => {
   const delay = async (n = 0) => {
     await new Promise<void>((res) => {
       setTimeout(res, n);

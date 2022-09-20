@@ -45,21 +45,21 @@ then you can choose the following template
 <details open>
   <summary>Sample: Initializing a Template</summary>
 
-![vue-ts](https://github.com/lisonge/src/raw/main/img/2022-07-17_19-15-35.gif)
+![vue-ts](https://user-images.githubusercontent.com/38517192/191197238-214abda1-f54f-4042-a046-2d7e6cf697a2.gif)
 
 </details>
 
 <details open>
   <summary>Sample: Hot Module Replacement</summary>
 
-![hmr](https://github.com/lisonge/src/raw/main/img/2022-07-18_18-00-12.gif)
+![hmr](https://user-images.githubusercontent.com/38517192/191197411-3d6f3795-e842-4cc1-a494-5d5f8425fd15.gif)
 
 </details>
 
 <details open>
   <summary>Sample: Build & Preview</summary>
 
-![build&preview](https://github.com/lisonge/src/raw/main/img/2022-08-15_11-02-58.gif)
+![build&preview](https://user-images.githubusercontent.com/38517192/191197542-9c763af0-de2e-4a85-88c6-75a6d5924af9.gif)
 
 </details>
 

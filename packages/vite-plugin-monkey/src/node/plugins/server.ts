@@ -128,7 +128,7 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
 
         if (req.url?.startsWith(installUserPath)) {
           Object.entries({
-            // 'access-control-allow-origin': '*',
+            'access-control-allow-origin': '*',
             'content-type': 'application/javascript',
           }).forEach(([k, v]) => {
             res.setHeader(k, v);
@@ -204,7 +204,7 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
           );
         } else if (req.url?.startsWith('/__vite-plugin-monkey/pull_script')) {
           Object.entries({
-            // 'access-control-allow-origin': '*',
+            'access-control-allow-origin': '*',
             'content-type': 'application/javascript',
           }).forEach(([k, v]) => {
             res.setHeader(k, v);

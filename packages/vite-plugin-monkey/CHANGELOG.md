@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.5.1
+
+### 2.5.1-BugFixes
+
+- cors pull_script [1355b96e](https://github.com/lisonge/vite-plugin-monkey/commit/417c7dec007033408fcc10b5bfb7b2681355b96e)
+
 ## 2.5.0
 
 ### 2.5.0-Features

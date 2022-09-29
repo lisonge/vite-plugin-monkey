@@ -244,9 +244,9 @@ export type MonkeyOption = {
      *       .jsdelivr('Vue', 'dist/vue.global.prod.js')
      *       .concat('https://unpkg.com/vue-demi@latest/lib/index.iife.js')
      *       .concat(
-     *         await util.encodeFn(() => {
+     *         await util.fn2dataUrl(() => {
      *           window.Vue = Vue;
-     *         }, []),
+     *         }),
      *       ),
      *   ],
      *   ['pinia', cdn.jsdelivr('Pinia', 'dist/pinia.iife.prod.js')],

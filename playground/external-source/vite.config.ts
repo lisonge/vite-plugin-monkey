@@ -14,10 +14,10 @@ export default defineConfig(async ({ command, mode }) => ({
       build: {
         externalGlobals: {
           vue: cdn.jsdelivr('Vue', 'dist/vue.global.prod.js').concat(
-            await util.encodeFn(() => {
+            await util.fn2dataUrl(() => {
               // @ts-ignore
               window.Vue = Vue;
-            }, []),
+            }),
           ),
           'element-plus': cdn.jsdelivr('ElementPlus', 'dist/index.full.min.js'),
         },

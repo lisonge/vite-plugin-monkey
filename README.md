@@ -212,9 +212,9 @@ export type MonkeyOption = {
      *       .jsdelivr('Vue', 'dist/vue.global.prod.js')
      *       .concat('https://unpkg.com/vue-demi@latest/lib/index.iife.js')
      *       .concat(
-     *         await util.encodeFn(() => {
+     *         await util.fn2dataUrl(() => {
      *           window.Vue = Vue;
-     *         }, []),
+     *         }),
      *       ),
      *   ],
      *   ['pinia', cdn.jsdelivr('Pinia', 'dist/pinia.iife.prod.js')],
@@ -391,10 +391,10 @@ the solution is that we append a dataUrl script that will set iife-variable as t
 import { cdn, util } from 'vite-plugin-monkey';
 const buildonfig = {
   vue: cdn.jsdelivr('Vue', 'dist/vue.global.prod.js').concat(
-    await util.encodeFn(() => {
+    await util.fn2dataUrl(() => {
       // @ts-ignore
       window.Vue = Vue;
-    }, []),
+    }),
   ),
   'element-plus': cdn.jsdelivr('ElementPlus', 'dist/index.full.min.js'),
 };

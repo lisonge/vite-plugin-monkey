@@ -21,10 +21,10 @@ export default defineConfig(async ({ command, mode }) => ({
               .jsdelivr('Vue', 'dist/vue.global.prod.js')
               .concat('https://unpkg.com/vue-demi@latest/lib/index.iife.js')
               .concat(
-                await util.encodeFn(() => {
+                await util.fn2dataUrl(() => {
                   // @ts-ignore
                   window.Vue = Vue; // work with element-plus
-                }, []),
+                }),
               ),
           ],
           ['pinia', cdn.jsdelivr('Pinia', 'dist/pinia.iife.prod.js')],

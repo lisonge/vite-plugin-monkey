@@ -1,7 +1,6 @@
-import { logger } from '../_logger';
-import { delay, projectPkg } from '../_util';
+import { projectPkg } from '../_util';
 import type { IArray, LocaleType } from '../types';
-import { Format } from './common';
+import type { AlignFunc, Format } from './common';
 import type {
   GreaseGrant,
   GreasemonkeyUserScript,
@@ -321,10 +320,6 @@ export const userscript2comment = async (
     attrList.push(['noframes']);
   }
 
-  attrList.sort((a, b) => {
-    return getOrder(a[0]) - getOrder(b[0]);
-  });
-
   if ($extra instanceof Array) {
     attrList.push(...$extra);
   } else if ($extra && typeof $extra == 'object') {
@@ -338,6 +333,8 @@ export const userscript2comment = async (
       }
     });
   }
+
+  attrList = defaultSortFormat(attrList);
 
   if (align === true) {
     align = 2;
@@ -384,62 +381,86 @@ export const userscript2comment = async (
     .join('\n');
 };
 
-const sortMap: Record<string, number> = (() => {
-  const tempMap: Record<string, number> = {};
-  [
-    'name',
-    'namespace',
-    'version',
-    'author',
-    'description',
-    'license',
-
-    'icon',
-    'iconURL',
-    'icon64',
-    'icon64URL',
-    'defaulticon',
-
-    'homepage',
-    'homepageURL',
-    'website',
-    'source',
-
-    'supportURL',
-    'downloadURL',
-    'updateURL',
-
-    'include',
-    'match',
-    'exclude',
-    'require',
-    'exclude-match',
-
-    'connect',
-    'resource',
-    'grant',
-
-    'inject-into',
-    'run-at',
-
-    'compatible',
-    'incompatible',
-
-    'antifeature',
-    'contributionAmount',
-    'contributionURL',
-
-    'noframes',
-  ].forEach((v, i) => {
-    tempMap[v] = i;
-  });
-  return tempMap;
-})();
-
-const getOrder = (value: string) => {
-  value = value.split(':')[0];
-  if (value in sortMap) {
-    return sortMap[value];
+const stringSort = (a: [string, ...string[]], b: [string, ...string[]]) => {
+  const v1 = a[1] ?? '';
+  const v2 = b[1] ?? '';
+  if (v1 == v2) return 0;
+  for (let i = 0; i < v1.length; i++) {
+    if (i >= v2.length) {
+      return 1;
+    }
+    if (v1.charCodeAt(i) > v2.charCodeAt(i)) {
+      return 1;
+    } else if (v1.charCodeAt(i) < v2.charCodeAt(i)) {
+      return -1;
+    }
   }
-  return Number.MIN_SAFE_INTEGER;
+  return 0;
+};
+
+const defaultSortFormat = (p0: [string, ...string[]][]) => {
+  const filter = (
+    predicate: (value: [string, ...string[]], index: number) => boolean,
+  ): [string, ...string[]][] => {
+    const notMatchList: [string, ...string[]][] = [];
+    const matchList: [string, ...string[]][] = [];
+    p0.forEach((value, index) => {
+      if (!predicate(value, index)) {
+        notMatchList.push(value);
+      } else {
+        matchList.push(value);
+      }
+    });
+    p0 = notMatchList;
+    return matchList;
+  };
+  return [
+    filter(([k]) => k == 'name'),
+    filter(([k]) => k.startsWith('name:')),
+    filter(([k]) => k == 'namespace'),
+    filter(([k]) => k == 'version'),
+    filter(([k]) => k == 'author'),
+    filter(([k]) => k == 'description'),
+    filter(([k]) => k.startsWith('description:')),
+    filter(([k]) => k == 'license'),
+
+    filter(([k]) => k == 'icon'),
+    filter(([k]) => k == 'iconURL'),
+    filter(([k]) => k == 'icon64'),
+    filter(([k]) => k == 'icon64URL'),
+    filter(([k]) => k == 'defaulticon'),
+
+    filter(([k]) => k == 'homepage'),
+    filter(([k]) => k == 'homepageURL'),
+    filter(([k]) => k == 'website'),
+    filter(([k]) => k == 'source'),
+
+    filter(([k]) => k == 'supportURL'),
+    filter(([k]) => k == 'downloadURL'),
+    filter(([k]) => k == 'updateURL'),
+
+    filter(([k]) => k == 'include'),
+    filter(([k]) => k == 'match'),
+    filter(([k]) => k == 'exclude'),
+    filter(([k]) => k == 'exclude-match'),
+
+    filter(([k]) => k == 'require'),
+
+    filter(([k]) => k == 'resource').sort(stringSort),
+
+    filter(([k]) => k == 'connect'),
+
+    filter(([k]) => k == 'grant').sort(stringSort),
+
+    filter(([k]) => k == 'inject-into'),
+    filter(([k]) => k == 'run-at'),
+
+    filter(([k]) => k == 'compatible'),
+    filter(([k]) => k == 'incompatible'),
+    filter(([k]) => k == 'antifeature'),
+    filter(([k]) => k == 'contributionAmount'),
+    filter(([k]) => k == 'contributionURL'),
+    filter(([k]) => k == 'noframes'),
+    p0,
+  ].flat(1);
 };

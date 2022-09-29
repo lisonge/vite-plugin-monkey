@@ -1,13 +1,13 @@
 /*eslint @typescript-eslint/no-explicit-any: "off"*/
 
-export const template2string = <T extends (...args: any[]) => any>(
+export const fn2string = <T extends (...args: any[]) => any>(
   fn: T,
-  args: Parameters<T>,
+  ...args: Parameters<T>
 ) => {
   return `;(${fn})(...${JSON.stringify(args)});`;
 };
 
-export const serverInjectTemplate = ({
+export const serverInjectFn = ({
   entryList = [] as string[],
   mountGmApi = false,
 }) => {
@@ -56,7 +56,7 @@ export const serverInjectTemplate = ({
   );
 };
 
-export const cssInjectTemplate = (css: string) => {
+export const cssInjectFn = (css: string) => {
   const style = document.createElement('style');
   style.dataset.source = 'vite-plugin-monkey';
   style.innerText = css;

@@ -1,5 +1,5 @@
 import type { PluginOption, ResolvedConfig } from 'vite';
-import { cssInjectTemplate, template2string } from '../inject_template';
+import { cssInjectFn, fn2string } from '../inject_template';
 import type { FinalMonkeyOption } from '../types';
 import { userscript2comment } from '../userscript';
 import { miniCode } from '../_util';
@@ -30,10 +30,7 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
         if (!viteConfig.build.minify && finalPluginOption.build.minifyCss) {
           css = await miniCode(css, 'css');
         }
-        injectCssCode = await miniCode(
-          template2string(cssInjectTemplate, [css]),
-          'js',
-        );
+        injectCssCode = await miniCode(fn2string(cssInjectFn, css), 'js');
       }
       const chunk = jsBundleList[0][1];
       if (chunk.type == 'chunk') {

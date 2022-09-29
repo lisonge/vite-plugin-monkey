@@ -4,11 +4,7 @@ import nodeFetch from 'node-fetch';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import type { PluginOption, ResolvedConfig } from 'vite';
-import {
-  redirectFn,
-  serverInjectTemplate,
-  template2string,
-} from '../inject_template';
+import { fn2string, redirectFn, serverInjectFn } from '../inject_template';
 import { openBrowser } from '../open_browser';
 import type { FinalMonkeyOption } from '../types';
 import { userscript2comment } from '../userscript';
@@ -193,12 +189,10 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
                 finalPluginOption.userscript,
                 finalPluginOption.format,
               ),
-              template2string(serverInjectTemplate, [
-                {
-                  entryList,
-                  mountGmApi: finalPluginOption.server.mountGmApi,
-                },
-              ]),
+              fn2string(serverInjectFn, {
+                entryList,
+                mountGmApi: finalPluginOption.server.mountGmApi,
+              }),
               '',
             ].join('\n\n'),
           );
@@ -248,9 +242,9 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
               res.setHeader(k, String(v));
             });
             res.end(
-              `<script type="module" data-source="vite-plugin-monkey">${template2string(
+              `<script type="module" data-source="vite-plugin-monkey">${fn2string(
                 redirectFn,
-                ['/' + fileName],
+                '/' + fileName,
               )}</script>`,
             );
             return;
@@ -264,7 +258,7 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
         {
           tag: 'script',
           attrs: { type: 'module', 'data-source': 'vite-plugin-monkey' },
-          children: template2string(redirectFn, [installUserPath]),
+          children: fn2string(redirectFn, installUserPath),
           injectTo: 'head',
         },
       ];

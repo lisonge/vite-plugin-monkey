@@ -6,7 +6,8 @@
     "prepare": "husky install",
     "format": "prettier --cache --write .",
     "lint": "eslint --cache --fix packages/*/src/** scripts/**",
-    "build": "pnpm -r --filter=./packages/* run build",
+    "build": "pnpm -F vite-plugin-monkey build",
+    "build:playground": "pnpm -r --filter=./playground/* build",
     "ci-publish": "tsx scripts/publishCI.ts"
   },
   "devDependencies": {

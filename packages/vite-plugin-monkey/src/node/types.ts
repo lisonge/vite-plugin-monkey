@@ -301,8 +301,8 @@ export type MonkeyOption = {
      *     },
      *   },
      *   'element-plus/dist/index.css': [ // compat externalGlobals cdn function
-     *      (version, name, importName, resolveName)=>importName,
-     *      (version, name, importName, resolveName)=>`https://unpkg.com/${name}@${version}/${resolveName}`,
+     *      (version, name, importName, resolveName)=>importName, // if (!!value) === false, plugin will use default value
+     *      (version, name, importName, resolveName)=>`https://unpkg.com/${name}@${version}/${resolveName}`, // if (!!value) === false, plugin will use default value
      *   ],
      *   'element-plus/dist/index.css': cdn.jsdelivr(),
      * }

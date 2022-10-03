@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2.6.0
+
+### 2.6.0-Features
+
+- addHtml [fc8178e8](https://github.com/lisonge/vite-plugin-monkey/commit/52dc474bf4a0cdc8af5033ad0b9d892ffc8178e8)
+- sort userscript key [75adf3df](https://github.com/lisonge/vite-plugin-monkey/commit/604180e3e2501c220749ead5eb2ed31575adf3df)
+- rename fn2string [5750afb4](https://github.com/lisonge/vite-plugin-monkey/commit/b0c63a52b6fc6849dbb6b9e2b84d2ad55750afb4)
+
 ## 2.5.1
 
 ### 2.5.1-BugFixes

@@ -16,7 +16,6 @@
 // @resource     element-plus/dist/index.css      https://cdn.jsdelivr.net/npm/element-plus@2.2.16/dist/index.css
 // @resource     element-plus/dist/index.css?raw  https://cdn.jsdelivr.net/npm/element-plus@2.2.16/dist/index.css
 // @resource     element-plus/package.json        https://npm.elemecdn.com/element-plus@2.2.16/package.json
-// @grant        GM.addElement
 // @grant        GM_addStyle
 // @grant        GM_getResourceText
 // @grant        GM_getResourceURL
@@ -52,7 +51,7 @@
   cssLoader("element-plus/dist/index.css");
   const ElementPlusPkg = jsonLoader("element-plus/package.json");
   cssLoader("animate.css");
-  var r = (_a = Reflect.get(document, "__monkeyWindow")) != null ? _a : window;
+  var r = (_a = document.__monkeyWindow) != null ? _a : window;
   r.GM;
   r.unsafeWindow = (_b = r.unsafeWindow) != null ? _b : window;
   var n = r.unsafeWindow;

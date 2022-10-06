@@ -36,7 +36,7 @@
   const prettier__default = /* @__PURE__ */ _interopDefaultLegacy(prettier2);
   const parserBabel__default = /* @__PURE__ */ _interopDefaultLegacy(parserBabel);
   const style = "";
-  var r = (_a = Reflect.get(document, "__monkeyWindow")) != null ? _a : window;
+  var r = (_a = document.__monkeyWindow) != null ? _a : window;
   r.GM;
   r.unsafeWindow = (_b = r.unsafeWindow) != null ? _b : window;
   var n = r.unsafeWindow;

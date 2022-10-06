@@ -94,12 +94,7 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
       }
       if (typeof prefix == 'function') {
         for (const [k, v] of Object.entries(userscript.name)) {
-          Reflect.set(
-            userscript.name as object,
-            k,
-            // @ts-ignore
-            await prefix(v),
-          );
+          Reflect.set(userscript.name as object, k, prefix(v));
         }
       }
 

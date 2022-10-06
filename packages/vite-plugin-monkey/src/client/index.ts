@@ -1,8 +1,8 @@
 import type { MonkeyWindow } from './types';
 export type { MonkeyWindow, XhrRequest } from './types';
 
-export const monkeyWindow: MonkeyWindow =
-  Reflect.get(document, '__monkeyWindow') ?? window;
+// @ts-ignore
+export const monkeyWindow: MonkeyWindow = document.__monkeyWindow ?? window;
 
 export const GM = monkeyWindow.GM;
 

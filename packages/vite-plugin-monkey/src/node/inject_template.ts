@@ -12,18 +12,21 @@ export const serverInjectFn = ({
   mountGmApi = false,
 }) => {
   // @ts-ignore
-  window.GM; // must exist
+  window.GM; // must exist, see https://github.com/Tampermonkey/tampermonkey/issues/1567
   const monkeyWindow = window;
   if (mountGmApi) {
-    const _unsafeWindow: Window = Reflect.get(monkeyWindow, 'unsafeWindow');
+    // @ts-ignore
+    const _unsafeWindow: Window = monkeyWindow.unsafeWindow;
     if (_unsafeWindow) {
-      Reflect.set(_unsafeWindow, 'unsafeWindow', _unsafeWindow);
+      // @ts-ignore
+      _unsafeWindow.unsafeWindow = _unsafeWindow;
       console.log(`[vite-plugin-monkey] mount unsafeWindow to unsafeWindow`);
       const mountedApiList: string[] = [];
       Object.entries(monkeyWindow)
         .filter(([k]) => k.startsWith('GM'))
         .forEach(([k, fn]) => {
-          Reflect.set(_unsafeWindow, k, fn);
+          // @ts-ignore
+          _unsafeWindow[k] = fn;
           mountedApiList.push(k);
         });
       console.log(

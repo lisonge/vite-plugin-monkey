@@ -8,13 +8,13 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "3.1.0",
+    "@vitejs/plugin-vue": "3.1.2",
     "vite-plugin-monkey": "workspace:*"
   },
   "dependencies": {
-    "element-plus": "2.2.16",
+    "element-plus": "2.2.17",
     "pinia": "2.0.22",
-    "vue": "3.2.38"
+    "vue": "3.2.40"
   },
   "pnpm": {
     "peerDependencyRules": {

@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2.7.0
+
+### 2.7.0-Features
+
+- virtual html, now we don't need index.html file [48484b95](https://github.com/lisonge/vite-plugin-monkey/commit/86419b55665f91407f7883740173443848484b95)
+- remove Reflect api [90e2574a](https://github.com/lisonge/vite-plugin-monkey/commit/83484864104510fe638963be2860c03c90e2574a)
+
 ## 2.6.0
 
 ### 2.6.0-Features

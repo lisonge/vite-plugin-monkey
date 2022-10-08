@@ -71,8 +71,6 @@ pnpm add -D vite-plugin-monkey
 # yarn add -D vite-plugin-monkey
 ```
 
-for make `vite serve` work normally, you should add file named `index.html` to `work directory`, its content should be same as [index.html](/packages/create-monkey/template-empty-ts/index.html)
-
 ## config
 
 [MonkeyOption](/packages/vite-plugin-monkey/src/node/types.ts#L113)

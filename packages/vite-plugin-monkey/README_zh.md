@@ -71,8 +71,6 @@ pnpm add -D vite-plugin-monkey
 # yarn add -D vite-plugin-monkey
 ```
 
-要使 `vite serve` 正常工作, 你应该在 `工作目录` 添加一个 `index.html` 文件, 它的内容应该与 [index.html](/packages/create-monkey/template-empty-ts/index.html) 一致
-
 ## 配置
 
 [MonkeyOption](/packages/vite-plugin-monkey/src/node/types.ts#L113)

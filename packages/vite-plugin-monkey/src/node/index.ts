@@ -8,7 +8,7 @@ import extraToBundlePlugin from './plugins/extraToBundle';
 import fixVitePlugin from './plugins/fixVite';
 import serverPlugin from './plugins/server';
 import miniClientPlugin from './plugins/miniClient';
-import addHtml from './plugins/addHtml';
+import virtualHtml from './plugins/virtualHtml';
 import type {
   FinalMonkeyOption,
   IArray,
@@ -210,6 +210,6 @@ export default (pluginOption: MonkeyOption): PluginOption => {
     externalResourcePlugin(finalPluginOption),
     checkCdnPlugin(finalPluginOption),
     extraToBundlePlugin(finalPluginOption),
-    addHtml(finalPluginOption),
+    virtualHtml(finalPluginOption),
   ];
 };

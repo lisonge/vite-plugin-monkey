@@ -210,7 +210,7 @@ export default (pluginOption: MonkeyOption): PluginOption => {
       iconURL,
       namespace,
       version = projectPkg.version,
-      author = projectPkg.author,
+      author = projectPkg.author ?? 'monkey',
       downloadURL,
       defaulticon,
       contributionURL,

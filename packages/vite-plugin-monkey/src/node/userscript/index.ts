@@ -151,7 +151,7 @@ export type FinalUserScript = {
   resource: Record<string, string>;
   noframes: boolean;
 
-  author?: string;
+  author: string;
   homepage?: string;
   homepageURL?: string;
   website?: string;

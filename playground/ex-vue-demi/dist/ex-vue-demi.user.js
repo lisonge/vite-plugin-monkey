@@ -6,12 +6,12 @@
 // @description  default_description
 // @icon         https://vitejs.dev/logo.svg
 // @match        https://i.songe.li/
-// @require      https://cdn.jsdelivr.net/npm/vue@3.2.38/dist/vue.global.prod.js
+// @require      https://cdn.jsdelivr.net/npm/vue@3.2.40/dist/vue.global.prod.js
 // @require      https://unpkg.com/vue-demi@latest/lib/index.iife.js
 // @require      data:application/javascript,window.Vue%3DVue%3B
 // @require      https://cdn.jsdelivr.net/npm/pinia@2.0.22/dist/pinia.iife.prod.js
-// @require      https://cdn.jsdelivr.net/npm/element-plus@2.2.16/dist/index.full.min.js
-// @resource     element-plus/dist/index.css  https://cdn.jsdelivr.net/npm/element-plus@2.2.16/dist/index.css
+// @require      https://cdn.jsdelivr.net/npm/element-plus@2.2.17/dist/index.full.min.js
+// @resource     element-plus/dist/index.css  https://cdn.jsdelivr.net/npm/element-plus@2.2.17/dist/index.css
 // @grant        GM_addStyle
 // @grant        GM_getResourceText
 // ==/UserScript==
@@ -42,7 +42,6 @@
       }
     }
   });
-  const _hoisted_1 = /* @__PURE__ */ vue.createTextVNode("main.counter++");
   const _sfc_main = /* @__PURE__ */ vue.defineComponent({
     __name: "App",
     setup(__props) {
@@ -58,7 +57,7 @@
             onClick: _cache[0] || (_cache[0] = ($event) => vue.unref(main).counter++)
           }, {
             default: vue.withCtx(() => [
-              _hoisted_1
+              vue.createTextVNode("main.counter++")
             ]),
             _: 1
           })

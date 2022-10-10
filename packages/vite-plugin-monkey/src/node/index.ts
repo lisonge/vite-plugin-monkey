@@ -135,12 +135,139 @@ export default (pluginOption: MonkeyOption): PluginOption => {
     } else {
       Object.entries(externalGlobals2).forEach((s) => externalGlobals.push(s));
     }
+
+    let {
+      name = {},
+      description = {},
+      'exclude-match': excludeMatch = [],
+      match = [],
+      exclude = [],
+      include = [],
+      antifeature = [],
+      require = [],
+      connect = [],
+      grant = [],
+      $extra = [],
+    } = pluginOption.userscript;
+    if (typeof name == 'string') {
+      name = { '': name };
+    } else if (!('' in name)) {
+      name = { '': projectPkg.name, ...name };
+    }
+    if (typeof description == 'string') {
+      description = {
+        '': description,
+      };
+    } else if (!('' in description) && projectPkg.description) {
+      description = { '': projectPkg.description, ...description };
+    }
+    if (!(excludeMatch instanceof Array)) {
+      excludeMatch = [excludeMatch];
+    }
+    if (!(match instanceof Array)) {
+      match = [match];
+    }
+    if (!(exclude instanceof Array)) {
+      exclude = [exclude];
+    }
+    if (!(include instanceof Array)) {
+      include = [include];
+    }
+    if (!(antifeature instanceof Array)) {
+      antifeature = [antifeature];
+    }
+    if (!(require instanceof Array)) {
+      require = [require];
+    }
+    if (!(connect instanceof Array)) {
+      connect = [connect];
+    }
+
+    const grantSet = new Set<string>();
+    if (typeof grant == 'string') {
+      grantSet.add(grant);
+    } else if (grant instanceof Array) {
+      grant.forEach((s) => grantSet.add(s));
+    }
+    if (!($extra instanceof Array)) {
+      const t: [string, string][] = [];
+      Object.entries($extra).forEach(([k, v]) => {
+        if (v instanceof Array) {
+          v.forEach((v2) => {
+            t.push([k, v2]);
+          });
+        } else {
+          t.push([k, v]);
+        }
+      });
+      $extra = t;
+    }
+
+    const {
+      icon64,
+      icon64URL,
+      icon,
+      iconURL,
+      namespace,
+      version = projectPkg.version,
+      author = projectPkg.author,
+      downloadURL,
+      defaulticon,
+      contributionURL,
+      updateURL,
+      supportURL = projectPkg.bugs,
+      homepageURL = projectPkg.homepage,
+      homepage = projectPkg.homepage,
+      website,
+      license = projectPkg.license,
+      incompatible,
+      source = projectPkg.repository,
+      resource = {},
+      noframes = false,
+      'run-at': runAt,
+      'inject-into': injectInto,
+      contributionAmount,
+      compatible,
+    } = pluginOption.userscript;
+
     const config: FinalMonkeyOption = {
-      userscript: mergeObj(pluginOption.userscript, {
-        name: projectPkg.name,
-        version: projectPkg.version,
-        author: projectPkg.author ?? 'monkey',
-      }),
+      userscript: {
+        name,
+        namespace,
+        version,
+        icon64,
+        icon64URL,
+        icon,
+        iconURL,
+        author,
+        downloadURL,
+        defaulticon,
+        contributionURL,
+        updateURL,
+        supportURL,
+        homepageURL,
+        homepage,
+        website,
+        license,
+        incompatible,
+        source,
+        resource,
+        noframes,
+        'run-at': runAt,
+        'inject-into': injectInto,
+        contributionAmount,
+        compatible,
+        'exclude-match': excludeMatch.map((s) => String(s)),
+        match: match.map((s) => String(s)),
+        include: include.map((s) => String(s)),
+        exclude: exclude.map((s) => String(s)),
+        antifeature,
+        require,
+        connect,
+        description,
+        $extra,
+        grant: grantSet,
+      },
       clientAlias: '$',
       entry: pluginOption.entry,
       format: pluginOption.format,

@@ -1,4 +1,4 @@
-import type { Format, MonkeyUserScript } from './userscript';
+import type { FinalUserScript, Format, MonkeyUserScript } from './userscript';
 
 export type IPromise<T> = T | Promise<T>;
 
@@ -82,11 +82,7 @@ export type ExternalResource = Record<
 export type FinalMonkeyOption = {
   entry: string;
   format?: Format;
-  userscript: MonkeyUserScript & {
-    name: string | LocaleType<string>;
-    version: string;
-    author: string;
-  };
+  userscript: FinalUserScript;
   clientAlias: string;
   server: {
     open: boolean;

@@ -1,6 +1,6 @@
 import { projectPkg } from '../_util';
 import type { IArray, LocaleType } from '../types';
-import type { AlignFunc, Format } from './common';
+import type { Format } from './common';
 import type {
   GreaseGrant,
   GreasemonkeyUserScript,
@@ -8,12 +8,13 @@ import type {
 } from './greasemonkey';
 import { GreaseGrantValueList } from './greasemonkey';
 import type {
+  AntifeatureType,
   TamperGrant,
   TampermonkeyUserScript,
   TamperRunAt,
 } from './tampermonkey';
 import { TamperGrantValueList } from './tampermonkey';
-import { ViolentGrantValueList } from './violentmonkey';
+import { ViolentGrantValueList, ViolentInjectInto } from './violentmonkey';
 import type {
   ViolentGrant,
   ViolentmonkeyUserScript,
@@ -137,18 +138,53 @@ export type MonkeyUserScript = GreasemonkeyUserScript &
   GreasyforkUserScript &
   MergemonkeyUserScript;
 
-export const userscript2comment = async (
-  userscript: MonkeyUserScript,
+export type FinalUserScript = {
+  name: LocaleType<string>;
+  namespace: string;
+  version: string;
+  description: LocaleType<string>;
+  icon?: string;
+  include: string[];
+  match: string[];
+  exclude: string[];
+  require: string[];
+  resource: Record<string, string>;
+  noframes: boolean;
+
+  author?: string;
+  homepage?: string;
+  homepageURL?: string;
+  website?: string;
+  source?: string;
+  iconURL?: string;
+  defaulticon?: string;
+  icon64?: string;
+  icon64URL?: string;
+  updateURL?: string;
+  downloadURL?: string;
+  supportURL?: string;
+  connect: string[];
+  antifeature: AntifeatureType[];
+
+  'exclude-match': string[];
+  'inject-into'?: ViolentInjectInto;
+  'run-at'?: GreaseRunAt | TamperRunAt | ViolentRunAt;
+  grant: Set<string>;
+  $extra: [string, string][];
+} & GreasyforkUserScript;
+
+export const finalUserscriptToComment = async (
+  userscript: FinalUserScript,
   format: Format = { align: 2 },
-) => {
+): Promise<string> => {
   let attrList: [string, ...string[]][] = [];
   const {
-    name = projectPkg.name,
+    name,
     namespace,
-    version = projectPkg.version,
-    author = projectPkg.author,
-    description = projectPkg.description,
-    license = projectPkg.license,
+    version,
+    author,
+    description,
+    license,
 
     icon,
     iconURL,
@@ -156,12 +192,12 @@ export const userscript2comment = async (
     icon64URL,
     defaulticon,
 
-    homepage = projectPkg.homepage,
-    homepageURL = projectPkg.homepage,
+    homepage,
+    homepageURL,
     website,
-    source = projectPkg.repository,
+    source,
 
-    supportURL = projectPkg.bugs,
+    supportURL,
     downloadURL,
     updateURL,
 
@@ -185,13 +221,9 @@ export const userscript2comment = async (
     resource,
     grant,
     noframes,
+    $extra,
   } = userscript;
-
-  const { $extra } = userscript;
-
-  let { align } = format;
-
-  Object.entries<string | undefined>({
+  Object.entries({
     namespace,
     version,
     author,
@@ -219,29 +251,18 @@ export const userscript2comment = async (
       attrList.push([k, v]);
     }
   });
-
-  Object.entries({ name, description }).forEach(([k, v]) => {
-    if (typeof v == 'string') {
-      attrList.push([k, v]);
-    } else if (v && typeof v == 'object') {
-      if (!('' in v)) {
-        if (k == 'name') {
-          // keep key sort
-          v = { '': projectPkg.name, ...v };
-        } else if (k == 'description' && projectPkg.description) {
-          v = { '': projectPkg.description, ...v };
-        }
-      } else {
-        v = { '': v[''], ...v };
-      }
-
-      Object.entries(v).forEach(([k2, v2]) => {
-        if (k2.length == 0) {
-          attrList.push([k, v2]);
-        } else {
-          attrList.push([k + ':' + k2, v2]);
-        }
-      });
+  Object.entries(name).forEach(([k, v]) => {
+    if (k == '') {
+      attrList.push(['name', v]);
+    } else {
+      attrList.push(['name:' + k, v]);
+    }
+  });
+  Object.entries(description).forEach(([k, v]) => {
+    if (k == '') {
+      attrList.push(['description', v]);
+    } else {
+      attrList.push(['description:' + k, v]);
     }
   });
 
@@ -252,89 +273,42 @@ export const userscript2comment = async (
     require,
     'exclude-match': excludeMatch,
   }).forEach(([k, v]) => {
-    if (v instanceof Array) {
-      v.forEach((s) => {
-        if (s instanceof RegExp) {
-          attrList.push([k, String(s)]);
-        } else if (typeof s == 'string') {
-          attrList.push([k, s]);
-        }
-      });
-    } else if (typeof v == 'string') {
-      attrList.push([k, v]);
-    } else if (v instanceof RegExp) {
-      attrList.push([k, String(v)]);
-    }
+    v.forEach((v2) => {
+      attrList.push([k, v2]);
+    });
   });
 
-  if (resource) {
-    Object.entries(resource).forEach(([k, v]) => {
-      attrList.push(['resource', k, v]);
-    });
-  }
+  Object.entries(resource).forEach(([k, v]) => {
+    attrList.push(['resource', k, v]);
+  });
 
-  if (typeof connect == 'string') {
-    attrList.push(['connect', connect]);
-  } else if (connect instanceof Array) {
-    connect.forEach((s) => {
-      attrList.push(['connect', s]);
-    });
-  }
+  connect.forEach((s) => {
+    attrList.push(['connect', s]);
+  });
 
-  if (antifeature instanceof Array) {
-    antifeature.forEach(({ tag, type, description }) => {
-      if (tag) {
-        attrList.push(['antifeature:' + tag, type, description]);
-      } else {
-        attrList.push(['antifeature', type, description]);
-      }
+  if (grant.has('none')) {
+    attrList.push(['grant', 'none']);
+  } else if (grant.has('*')) {
+    new Set([
+      ...GreaseGrantValueList,
+      ...ViolentGrantValueList,
+      ...TamperGrantValueList,
+    ]).forEach((s) => {
+      attrList.push(['grant', s]);
     });
-  } else if (antifeature && typeof antifeature == 'object') {
-    const { tag, type, description } = antifeature;
-    if (tag) {
-      attrList.push(['antifeature:' + tag, type, description]);
-    } else {
-      attrList.push(['antifeature', type, description]);
-    }
-  }
-
-  if (typeof grant == 'string') {
-    if (grant == '*') {
-      new Set([
-        ...GreaseGrantValueList,
-        ...ViolentGrantValueList,
-        ...TamperGrantValueList,
-      ]).forEach((s) => {
-        attrList.push(['grant', s]);
-      });
-    } else {
-      attrList.push(['grant', grant]);
-    }
-  } else if (Array.isArray(grant)) {
-    new Set(grant).forEach((s) => {
+  } else {
+    grant.forEach((s) => {
       attrList.push(['grant', s]);
     });
   }
-
-  if (noframes === true) {
+  if (noframes) {
     attrList.push(['noframes']);
   }
-
-  if ($extra instanceof Array) {
-    attrList.push(...$extra);
-  } else if ($extra && typeof $extra == 'object') {
-    Object.entries($extra).forEach(([k, v]) => {
-      if (typeof v == 'string') {
-        attrList.push([k, v]);
-      } else if (v instanceof Array) {
-        v.forEach((s) => {
-          attrList.push([k, s]);
-        });
-      }
-    });
-  }
+  attrList.push(...$extra);
 
   attrList = defaultSortFormat(attrList);
+
+  let { align = 2 } = format;
 
   if (align === true) {
     align = 2;

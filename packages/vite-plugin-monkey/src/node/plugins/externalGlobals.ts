@@ -92,20 +92,11 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
     },
 
     async generateBundle() {
-      const { userscript } = finalPluginOption;
-
-      let requireUrlList = requirePkgList
+      const requireUrlList = requirePkgList
         .filter((p) => realUsedModNameSet.has(p.moduleName))
         .map((p) => p.url);
-      {
-        const { require = [] } = userscript;
-        if (typeof require == 'string') {
-          requireUrlList = [require, ...requireUrlList];
-        } else if (require instanceof Array) {
-          requireUrlList = [...require, ...requireUrlList];
-        }
-        userscript.require = requireUrlList;
-      }
+
+      finalPluginOption.userscript.require.push(...requireUrlList);
     },
   };
 };

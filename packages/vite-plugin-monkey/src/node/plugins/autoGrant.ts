@@ -19,24 +19,9 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
         Array.from(GM_keyword_set)
           .filter((fnName) => code.includes(fnName))
           .forEach((fnName) => {
-            autoGrantList.add(fnName);
+            finalPluginOption.userscript.grant.add(fnName);
             GM_keyword_set.delete(fnName);
           });
-      }
-    },
-    async generateBundle() {
-      const { userscript } = finalPluginOption;
-
-      if (autoGrantList.size > 0 && userscript.grant != '*') {
-        let tempSet: Set<string>;
-        if (typeof userscript.grant == 'string') {
-          tempSet = new Set([userscript.grant, ...autoGrantList]);
-        } else if (userscript.grant instanceof Array) {
-          tempSet = new Set([...userscript.grant, ...autoGrantList]);
-        } else {
-          tempSet = autoGrantList;
-        }
-        userscript.grant = Array.from(tempSet) as typeof userscript.grant;
       }
     },
   };

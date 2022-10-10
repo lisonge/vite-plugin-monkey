@@ -7,7 +7,7 @@ import type { PluginOption, ResolvedConfig } from 'vite';
 import { fn2string, redirectFn, serverInjectFn } from '../inject_template';
 import { openBrowser } from '../open_browser';
 import type { FinalMonkeyOption } from '../types';
-import { userscript2comment } from '../userscript';
+import { finalUserscriptToComment } from '../userscript';
 import { logger } from '../_logger';
 import { existFile, isFirstBoot, lazy, mergeObj, projectPkg } from '../_util';
 
@@ -79,14 +79,6 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
     async configureServer(server) {
       const { userscript } = finalPluginOption;
 
-      // prefix name
-      if (typeof userscript.name == 'string') {
-        userscript.name = { '': userscript.name };
-      }
-      userscript.name = mergeObj(userscript.name, {
-        '': projectPkg.name,
-      });
-
       let prefix = finalPluginOption.server.prefix;
       if (typeof prefix == 'string') {
         const t = prefix + '';
@@ -94,15 +86,12 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
       }
       if (typeof prefix == 'function') {
         for (const [k, v] of Object.entries(userscript.name)) {
-          Reflect.set(userscript.name as object, k, prefix(v));
+          Reflect.set(userscript.name, k, prefix(v));
         }
       }
 
       // support dev env
-      const { grant } = userscript;
-      if (grant !== 'none') {
-        finalPluginOption.userscript.grant = '*';
-      }
+      finalPluginOption.userscript.grant.add('*');
 
       server.middlewares.use(async (req, res, next) => {
         let realHost = req.headers[':authority'] ?? req.headers['host'];
@@ -180,7 +169,7 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
 
           res.end(
             [
-              await userscript2comment(
+              await finalUserscriptToComment(
                 finalPluginOption.userscript,
                 finalPluginOption.format,
               ),
@@ -213,7 +202,7 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
         } else {
           await fs.mkdir(path.dirname(cacheUserPath)).catch();
         }
-        const newComment = await userscript2comment(
+        const newComment = await finalUserscriptToComment(
           finalPluginOption.userscript,
           finalPluginOption.format,
         );

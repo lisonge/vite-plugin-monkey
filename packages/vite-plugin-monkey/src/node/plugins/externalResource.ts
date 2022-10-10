@@ -42,17 +42,6 @@ const KNOWN_ASSET_TYPES = new Set([
 ]);
 
 export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
-  const addGant = (
-    ...args: Array<'GM_getResourceURL' | 'GM_getResourceText' | 'GM_addStyle'>
-  ) => {
-    const { grant = [] } = finalPluginOption.userscript;
-    if (grant instanceof Array) {
-      grant.push(...args);
-      finalPluginOption.userscript.grant = grant;
-    } else if (grant != '*' && grant != 'none') {
-      finalPluginOption.userscript.grant = [grant, ...args];
-    }
-  };
   return {
     name: 'monkey:externalResource',
     enforce: 'pre',
@@ -84,9 +73,7 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
         } = externalResource[importName];
         const resourceName = await resourceNameFn({ ...pkg, importName });
         const resourceUrl = await resourceUrlFn({ ...pkg, importName });
-        const { resource = {} } = finalPluginOption.userscript;
-        resource[resourceName] = resourceUrl;
-        finalPluginOption.userscript.resource = resource;
+        finalPluginOption.userscript.resource[resourceName] = resourceUrl;
 
         if (nodeLoader) {
           return miniCode(
@@ -166,11 +153,12 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
             moduleCode.includes('rawLoader') ||
             moduleCode.includes('jsonLoader')
           ) {
-            addGant('GM_getResourceText');
+            finalPluginOption.userscript.grant.add('GM_getResourceText');
           } else if (moduleCode.includes('urlLoader')) {
-            addGant('GM_getResourceURL');
+            finalPluginOption.userscript.grant.add('GM_getResourceURL');
           } else if (moduleCode.includes('cssLoader')) {
-            addGant('GM_addStyle', 'GM_getResourceText');
+            finalPluginOption.userscript.grant.add('GM_addStyle');
+            finalPluginOption.userscript.grant.add('GM_getResourceText');
           }
           return miniCode(moduleCode);
         }

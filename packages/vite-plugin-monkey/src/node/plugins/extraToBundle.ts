@@ -1,7 +1,7 @@
 import type { PluginOption, ResolvedConfig } from 'vite';
 import { cssInjectFn, fn2string } from '../inject_template';
 import type { FinalMonkeyOption } from '../types';
-import { userscript2comment } from '../userscript';
+import { finalUserscriptToComment } from '../userscript';
 import { miniCode } from '../_util';
 
 export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
@@ -35,7 +35,7 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
       const chunk = jsBundleList[0][1];
       if (chunk.type == 'chunk') {
         chunk.code = [
-          await userscript2comment(
+          await finalUserscriptToComment(
             finalPluginOption.userscript,
             finalPluginOption.format,
           ),
@@ -57,7 +57,7 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
         this.emitFile({
           type: 'asset',
           fileName: metaFileName,
-          source: await userscript2comment(
+          source: await finalUserscriptToComment(
             finalPluginOption.userscript,
             finalPluginOption.format,
           ),

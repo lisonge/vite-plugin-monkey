@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.7.1
+
+### 2.7.1-BugFixes
+
+- unstable fix about @formkit/vue [49566846](https://github.com/lisonge/vite-plugin-monkey/commit/ee3e4876de82deb1f9bc4b2be8c8481649566846), [issues#29](https://github.com/lisonge/vite-plugin-monkey/issues/29)
+
 ## 2.7.0
 
 ### 2.7.0-Features

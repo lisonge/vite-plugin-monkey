@@ -103,9 +103,7 @@ export const projectPkg = (() => {
   };
   Object.entries(rawTarget).forEach(([k, v]) => {
     if (typeof v == 'string') {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      target[k] = v;
+      Reflect.set(target, k, v);
     }
   });
   if (
@@ -135,6 +133,9 @@ export const projectPkg = (() => {
 })();
 
 export const compatResolve = (() => {
+  // see https://github.com/formkit/formkit/blob/c77a28c40bfecb8dbd4dca22f12e980abcaf55d9/packages/vue/package.json#L15
+  // `@formkit/vue/package.json` -> `@formkit/vue/dist/package.json`  will error
+  // I try solve it by resolvePackageJsonFromPath
   const compatRequire = createRequire(process.cwd() + '/any_filename.js');
   return (id: string) => {
     return compatRequire.resolve(id);
@@ -204,6 +205,19 @@ export const existFile = async (path: string) => {
   }
 };
 
+/**
+ * unstable
+ */
+const resolvePackageJsonFromPath = async (name: string) => {
+  const p = normalizePath(process.cwd()).split('/');
+  for (let i = p.length; i > 0; i--) {
+    const p2 = `${p.slice(0, i).join('/')}/node_modules/${name}/package.json`;
+    if (await existFile(p2)) {
+      return p2;
+    }
+  }
+};
+
 export const getModuleRealInfo = async (importName: string) => {
   const importName2 = normalizePath(importName.split('?')[0]);
   const resolveName = normalizePath(compatResolve(importName2)).replace(
@@ -215,7 +229,11 @@ export const getModuleRealInfo = async (importName: string) => {
   let pkgName = importName2;
   while (nameList.length > 0) {
     pkgName = nameList.join('/');
-    const filePath = (() => {
+    const filePath = await (async () => {
+      const p = await resolvePackageJsonFromPath(pkgName);
+      if (p) {
+        return p;
+      }
       try {
         return compatResolve(`${pkgName}/package.json`);
       } catch {

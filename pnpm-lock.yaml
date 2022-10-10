@@ -162,6 +162,15 @@ importers:
       '@vitejs/plugin-react': 2.1.0
       vite-plugin-monkey: link:../../packages/vite-plugin-monkey
 
+  playground/resolve-package-json:
+    specifiers:
+      '@formkit/vue': 1.0.0-beta.11
+      vite-plugin-monkey: workspace:*
+    dependencies:
+      '@formkit/vue': 1.0.0-beta.11
+    devDependencies:
+      vite-plugin-monkey: link:../../packages/vite-plugin-monkey
+
   playground/solid-ts:
     specifiers:
       solid-js: ^1.5.7
@@ -792,6 +801,96 @@ packages:
     resolution: {integrity: sha512-wBDiLUKWU8QNPNOTAFHiIAkBv1KlHauG2AhqjSeh2H+wR8PX+AArXfz8NkRexH5PgMJMmSOS70YS89AbWYh5dA==}
     dependencies:
       '@floating-ui/core': 1.0.1
+    dev: false
+
+  /@formkit/core/1.0.0-beta.11:
+    resolution: {integrity: sha512-1yIQUicY1ZVGkeT0AEVp3ahx5FdJg+snyc8yaitsNmQeCSq1Ju5o1nCRcpcZ7j2ezMbGUiL7nTscGGejC15N2Q==}
+    dependencies:
+      '@formkit/utils': 1.0.0-beta.11
+    dev: false
+
+  /@formkit/dev/1.0.0-beta.11:
+    resolution: {integrity: sha512-YuPfE4ZoIAOQfawKlnCxXdnNOktckGNUhtCirpgsyBuHVu15rX1E5mYRAyEBhDGeEPV8IOFNpooSKA/y9W7dtw==}
+    dependencies:
+      '@formkit/core': 1.0.0-beta.11
+      '@formkit/utils': 1.0.0-beta.11
+    dev: false
+
+  /@formkit/i18n/1.0.0-beta.11:
+    resolution: {integrity: sha512-ID4y9r5NoKy+rIiv41UGCtrg8iR3Lor30oBEUJlEDPAh34vlwh4g2jorXgysdSVMRCuLnqGyGspLnrPdxgSszw==}
+    dependencies:
+      '@formkit/core': 1.0.0-beta.11
+      '@formkit/utils': 1.0.0-beta.11
+      '@formkit/validation': 1.0.0-beta.11
+    dev: false
+
+  /@formkit/inputs/1.0.0-beta.11:
+    resolution: {integrity: sha512-DF+olkewjAE/q+alsG1t4GFX7JHzVvTCukOOEuqp8AzT+MGyZFzxikSXd8qA5zX+1BvRCgQwzWZMBaQLUo3IMA==}
+    dependencies:
+      '@formkit/core': 1.0.0-beta.11
+    dev: false
+
+  /@formkit/observer/1.0.0-beta.11:
+    resolution: {integrity: sha512-jpOqOJdpydl/2eOL0yXVZjXYdk9tY0EsAf9e5PTxXcWOZpBskSwPdjNMnx8y9ycrpj6lKPcbMfs2bjnQQue8IQ==}
+    dependencies:
+      '@formkit/core': 1.0.0-beta.11
+      '@formkit/utils': 1.0.0-beta.11
+    dev: false
+
+  /@formkit/rules/1.0.0-beta.11:
+    resolution: {integrity: sha512-6SQ+fGXTx9MLMUk832x9oR/423U4/7TpDxyx/cjz1xaQjAKzorwNGbjiiRszp4f3cSYcpyi/SZ36n0UktLaCVA==}
+    dependencies:
+      '@formkit/core': 1.0.0-beta.11
+      '@formkit/utils': 1.0.0-beta.11
+      '@formkit/validation': 1.0.0-beta.11
+    dev: false
+
+  /@formkit/themes/1.0.0-beta.11:
+    resolution: {integrity: sha512-OmefvFoLHZLnmbuT+Mqbqr681rumc62Q08Y1g82ZxG6aXWculwQYVQfZJeJFrqrJPpccsfoSflWeAuAMWiP/Yw==}
+    peerDependencies:
+      tailwindcss: ^3.0.0
+      unocss: ^0.31.0
+      windicss: ^3.0.0
+    peerDependenciesMeta:
+      tailwindcss:
+        optional: true
+      unocss:
+        optional: true
+      windicss:
+        optional: true
+    dependencies:
+      '@formkit/core': 1.0.0-beta.11
+    dev: false
+
+  /@formkit/utils/1.0.0-beta.11:
+    resolution: {integrity: sha512-ajeB6A0WJXaErwIgdHGnVZotghvWOZ+JvFKK6fM/rYQza2O4YFiPAVKqJRQjMbW5Jxia4sT7PQhPUFvZQFbuKQ==}
+    dev: false
+
+  /@formkit/validation/1.0.0-beta.11:
+    resolution: {integrity: sha512-7HePIek0Y2MsH45lHDyCekJfENNdIr8ZIkJQx4VwAlfbIyZElZx5VsxInCSLf/03aOu4PhabOxpNUt38AP2hAg==}
+    dependencies:
+      '@formkit/core': 1.0.0-beta.11
+      '@formkit/observer': 1.0.0-beta.11
+    dev: false
+
+  /@formkit/vue/1.0.0-beta.11:
+    resolution: {integrity: sha512-0tVy8JZ/j4QbmYlVPJyFGZOukWgRBTV+DhyGo82FZvvb2+YrRAbDhqJGLIjLyOO0pNTwk7arSgDiiKd/OK8LtA==}
+    peerDependencies:
+      vue: ^3.2.1
+    dependencies:
+      '@formkit/core': 1.0.0-beta.11
+      '@formkit/dev': 1.0.0-beta.11
+      '@formkit/i18n': 1.0.0-beta.11
+      '@formkit/inputs': 1.0.0-beta.11
+      '@formkit/observer': 1.0.0-beta.11
+      '@formkit/rules': 1.0.0-beta.11
+      '@formkit/themes': 1.0.0-beta.11
+      '@formkit/utils': 1.0.0-beta.11
+      '@formkit/validation': 1.0.0-beta.11
+    transitivePeerDependencies:
+      - tailwindcss
+      - unocss
+      - windicss
     dev: false
 
   /@humanwhocodes/config-array/0.10.7:

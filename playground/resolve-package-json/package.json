@@ -1,0 +1,20 @@
+{
+  "name": "resolve-package-json",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "serve": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite-plugin-monkey": "workspace:*"
+  },
+  "dependencies": {
+    "@formkit/vue": "1.0.0-beta.11"
+  },
+  "volta": {
+    "extends": "../../package.json"
+  }
+}

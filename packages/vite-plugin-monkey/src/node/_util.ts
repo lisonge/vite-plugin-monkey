@@ -254,6 +254,7 @@ export const getModuleRealInfo = async (importName: string) => {
     logger.warn(
       `not found module ${importName2} version, use ${importName2}@latest`,
     );
+    pkgName = importName2;
     version = 'latest';
   }
   return { version, name: pkgName, resolveName };

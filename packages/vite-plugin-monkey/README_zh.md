@@ -233,12 +233,6 @@ export type MonkeyOption = {
     autoGrant?: boolean;
 
     /**
-     * check all require urls for availability, just http code is 2xx, never check http.body
-     * @default false
-     */
-    checkCDN?: boolean;
-
-    /**
      * if you want minify all, just set viteConfig.build.minify=true
      * @default true
      */

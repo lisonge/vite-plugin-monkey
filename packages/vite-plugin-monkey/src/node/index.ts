@@ -1,6 +1,5 @@
 import type { PluginOption } from 'vite';
 import autoGrantPlugin from './plugins/autoGrant';
-import checkCdnPlugin from './plugins/checkCdn';
 import externalGlobalsPlugin from './plugins/externalGlobals';
 import externalLoaderPlugin from './plugins/externalLoader';
 import externalResourcePlugin from './plugins/externalResource';
@@ -280,7 +279,6 @@ export default (pluginOption: MonkeyOption): PluginOption => {
         fileName: build.fileName ?? projectPkg.name + '.user.js',
         metaFileName: build.metaFileName ?? false,
         autoGrant: build.autoGrant ?? true,
-        checkCDN: build.checkCDN ?? false,
         minifyCss: build.minifyCss ?? true,
         externalGlobals: externalGlobals,
         externalResource: externalResource2,
@@ -335,7 +333,6 @@ export default (pluginOption: MonkeyOption): PluginOption => {
     externalGlobalsPlugin(finalPluginOption),
     externalLoaderPlugin(finalPluginOption),
     externalResourcePlugin(finalPluginOption),
-    checkCdnPlugin(finalPluginOption),
     extraToBundlePlugin(finalPluginOption),
     virtualHtml(finalPluginOption),
   ];

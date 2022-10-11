@@ -93,7 +93,6 @@ export type FinalMonkeyOption = {
     fileName: string;
     metaFileName: string | boolean;
     autoGrant: boolean;
-    checkCDN: boolean;
     minifyCss: boolean;
     externalGlobals: [string, IArray<string | Mod2UrlFn>][];
     externalResource: Record<
@@ -261,12 +260,6 @@ export type MonkeyOption = {
      * @default true
      */
     autoGrant?: boolean;
-
-    /**
-     * check all require urls for availability, just http code is 2xx, never check http.body
-     * @default false
-     */
-    checkCDN?: boolean;
 
     /**
      * if you want minify all, just set viteConfig.build.minify=true

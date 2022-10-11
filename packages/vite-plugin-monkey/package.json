@@ -58,7 +58,6 @@
     "detect-port": "1.5.1",
     "htmlparser2": "8.0.1",
     "mrmime": "1.0.1",
-    "node-fetch": "2.6.7",
     "open": "8.4.0",
     "picocolors": "1.0.0"
   },

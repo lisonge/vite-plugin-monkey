@@ -1,6 +1,5 @@
 import detectPort from 'detect-port';
 import { DomUtils, ElementType, parseDocument } from 'htmlparser2';
-import nodeFetch from 'node-fetch';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import type { PluginOption, ResolvedConfig } from 'vite';
@@ -9,9 +8,9 @@ import { openBrowser } from '../open_browser';
 import type { FinalMonkeyOption } from '../types';
 import { finalUserscriptToComment } from '../userscript';
 import { logger } from '../_logger';
-import { existFile, isFirstBoot, lazy, mergeObj, projectPkg } from '../_util';
+import { existFile, isFirstBoot, lazy } from '../_util';
 
-const installUserPath = '/__vite-plugin-monkey.install.user.js';
+export const installUserPath = '/__vite-plugin-monkey.install.user.js';
 const cacheUserPath = 'node_modules/.vite/__vite-plugin-monkey.cache.user.js';
 
 export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
@@ -100,7 +99,7 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
         }
         if (!realHost) {
           logger.error('host not found', { time: true });
-          return;
+          return next();
         }
         const origin = `${
           serverConfig.isHttps ? 'https' : 'http'
@@ -114,14 +113,10 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
             res.setHeader(k, v);
           });
 
-          const response = await nodeFetch(origin);
-          if (!response.ok) {
-            logger.warn(
-              `${origin} response is not ok, check if index.html exists`,
-              { time: true },
-            );
-          }
-          const htmlText = await response.text();
+          const htmlText = await server.transformIndexHtml(
+            '/',
+            `<html><head></head></html>`,
+          );
 
           const doc = parseDocument(htmlText);
           type Element = ReturnType<typeof DomUtils.findAll> extends Array<
@@ -129,44 +124,44 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
           >
             ? T
             : never;
-          const scriptList = (
-            DomUtils.getElementsByTagType(ElementType.Script, doc) as Element[]
-          ).filter(
-            (p) =>
-              p.attribs.type == 'module' &&
-              p.attribs['data-source'] !== 'vite-plugin-monkey',
-          );
+          const scriptList = DomUtils.getElementsByTagType(
+            ElementType.Script,
+            doc,
+          ) as Element[];
 
-          const entryList = scriptList
-            .map((p) => {
-              const src = p.attribs.src ?? '';
-              const text = p.firstChild;
-              let innerText = '';
-              if (text?.type == ElementType.Text) {
-                innerText = text.data ?? '';
-              }
-              if (src) {
-                return new URL(src, origin).href;
-              } else if (innerText) {
-                const u = new URL(origin);
-                u.pathname = '/__vite-plugin-monkey/pull_script';
-                u.searchParams.set(
-                  'innerText',
-                  Buffer.from(innerText, 'utf-8').toString('base64url'),
-                );
-                return u.href;
-              }
-              return '';
-            })
-            .filter((s) => s);
+          const entryList: {
+            type: string;
+            src: string;
+          }[] = scriptList.map((p) => {
+            const src = p.attribs.src ?? '';
+            const text = p.firstChild;
+            const type = p.attribs.type;
+            let innerText = '';
+            if (text?.type == ElementType.Text) {
+              innerText = text.data ?? '';
+            }
+            if (src) {
+              return { type, src: new URL(src, origin).href };
+            } else {
+              const u = new URL(origin);
+              u.pathname = '/__vite-plugin-monkey/pull_script';
+              u.searchParams.set(
+                'innerText',
+                Buffer.from(innerText, 'utf-8').toString('base64url'),
+              );
+              return { type, src: u.href };
+            }
+          });
 
           let realEntry = finalPluginOption.entry;
           if (path.isAbsolute(realEntry)) {
             realEntry = path.relative(viteConfig.root, realEntry);
             realEntry = realEntry.replace('\\', '/');
           }
-          entryList.push(new URL(realEntry, origin).href);
-
+          entryList.push({
+            type: 'module',
+            src: new URL(realEntry, origin).href,
+          });
           res.end(
             [
               await finalUserscriptToComment(
@@ -236,16 +231,6 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
         }
         next();
       });
-    },
-    async transformIndexHtml() {
-      return [
-        {
-          tag: 'script',
-          attrs: { type: 'module', 'data-source': 'vite-plugin-monkey' },
-          children: fn2string(redirectFn, installUserPath),
-          injectTo: 'head',
-        },
-      ];
     },
   };
 };

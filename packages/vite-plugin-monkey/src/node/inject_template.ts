@@ -4,11 +4,11 @@ export const fn2string = <T extends (...args: any[]) => any>(
   fn: T,
   ...args: Parameters<T>
 ) => {
-  return `;(${fn})(...${JSON.stringify(args)});`;
+  return `;(${fn})(...${JSON.stringify(args, undefined, 2)});`;
 };
 
 export const serverInjectFn = ({
-  entryList = [] as string[],
+  entryList = [] as { src: string; type?: string }[],
   mountGmApi = false,
 }) => {
   // @ts-ignore
@@ -42,12 +42,13 @@ export const serverInjectFn = ({
   });
   console.log(`[vite-plugin-monkey] mount monkeyWindow to document`);
 
-  const createScript = (src: string) => {
+  const createScript = ({ src, type }: { src: string; type?: string }) => {
     const el = document.createElement('script');
     el.src = src;
-    el.type = 'module';
+    if (type) {
+      el.type = type;
+    }
     el.dataset.source = 'vite-plugin-monkey';
-    el.dataset.entry = '';
     return el;
   };
   const { head } = document;

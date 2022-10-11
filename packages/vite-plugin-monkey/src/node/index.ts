@@ -7,7 +7,8 @@ import extraToBundlePlugin from './plugins/extraToBundle';
 import fixVitePlugin from './plugins/fixVite';
 import serverPlugin from './plugins/server';
 import miniClientPlugin from './plugins/miniClient';
-import virtualHtml from './plugins/virtualHtml';
+import virtualHtmlPlugin from './plugins/virtualHtml';
+import perviewPlugin from './plugins/perview';
 import type {
   FinalMonkeyOption,
   IArray,
@@ -334,6 +335,7 @@ export default (pluginOption: MonkeyOption): PluginOption => {
     externalLoaderPlugin(finalPluginOption),
     externalResourcePlugin(finalPluginOption),
     extraToBundlePlugin(finalPluginOption),
-    virtualHtml(finalPluginOption),
+    virtualHtmlPlugin(finalPluginOption),
+    perviewPlugin(finalPluginOption),
   ];
 };

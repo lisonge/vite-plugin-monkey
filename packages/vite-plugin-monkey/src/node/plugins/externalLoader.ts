@@ -2,14 +2,14 @@ import type { PluginOption } from 'vite';
 import type { FinalMonkeyOption } from '../types';
 import { miniCode } from '../_util';
 
-const GM_addStyle = (css: string) => document.createElement('style');
 const GM_getResourceText = (name: string) => document.title;
-const GM_getResourceURL = (name: string, isBlobUrl?: boolean | undefined) =>
-  document.title;
+const GM_getResourceURL = (name: string, isBlobUrl?: boolean) => document.title;
 
 const cssLoader = (resourceName: string) => {
   const css = GM_getResourceText(resourceName);
-  GM_addStyle(css);
+  const style = document.createElement('style');
+  style.innerText = css;
+  document.head.append(style);
   return css;
 };
 

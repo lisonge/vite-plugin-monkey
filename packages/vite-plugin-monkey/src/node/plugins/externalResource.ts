@@ -151,14 +151,12 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
         if (moduleCode) {
           if (
             moduleCode.includes('rawLoader') ||
-            moduleCode.includes('jsonLoader')
+            moduleCode.includes('jsonLoader') ||
+            moduleCode.includes('cssLoader')
           ) {
             finalPluginOption.userscript.grant.add('GM_getResourceText');
           } else if (moduleCode.includes('urlLoader')) {
             finalPluginOption.userscript.grant.add('GM_getResourceURL');
-          } else if (moduleCode.includes('cssLoader')) {
-            finalPluginOption.userscript.grant.add('GM_addStyle');
-            finalPluginOption.userscript.grant.add('GM_getResourceText');
           }
           return miniCode(moduleCode);
         }

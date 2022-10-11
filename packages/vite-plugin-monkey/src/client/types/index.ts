@@ -362,20 +362,65 @@ export type MonkeyWindow = Window & {
   GM: {
     addStyle: MonkeyWindow['GM_addStyle'];
     addElement: MonkeyWindow['GM_addElement'];
+
+    /**
+     * @see https://wiki.greasespot.net/GM.registerMenuCommand
+     */
     registerMenuCommand: MonkeyWindow['GM_registerMenuCommand'];
+
+    /**
+     * @see https://wiki.greasespot.net/GM.info
+     */
     info: MonkeyWindow['GM_info'];
+
     /**
      * @available tampermonkey
      */
     cookie: MonkeyWindow['GM_cookie'];
+
+    /**
+     * @see https://wiki.greasespot.net/GM.notification
+     */
     notification: MonkeyWindow['GM_notification'];
+
+    /**
+     * @see https://wiki.greasespot.net/GM.openInTab
+     */
     openInTab: MonkeyWindow['GM_openInTab'];
+
+    /**
+     * @see https://wiki.greasespot.net/GM.setClipboard
+     */
     setClipboard: MonkeyWindow['GM_setClipboard'];
+
+    /**
+     * @see https://wiki.greasespot.net/GM.xmlHttpRequest
+     */
     xmlHttpRequest: MonkeyWindow['GM_xmlhttpRequest'];
+
+    /**
+     * @see https://wiki.greasespot.net/GM.deleteValue
+     */
     deleteValue: (key: string) => Promise<void>;
+
+    /**
+     * @see https://wiki.greasespot.net/GM.getResourceUrl
+     */
     getResourceURL: (name: string, isBlobUrl?: boolean) => Promise<string>;
+
+    /**
+     * @see https://wiki.greasespot.net/GM.getValue
+     */
     getValue: <T = unknown>(key: string, defaultValue: T) => Promise<T>;
+
+    /**
+     * @see https://wiki.greasespot.net/GM.listValues
+     */
     listValues: () => Promise<string[]>;
+
+    /**
+     * @see https://wiki.greasespot.net/GM.setValue
+     */
     setValue: (key: string, value: unknown) => Promise<void>;
   };
 

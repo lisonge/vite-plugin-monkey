@@ -8,14 +8,13 @@
 // @match        https://i.songe.li/*
 // @require      https://cdn.jsdelivr.net/npm/md5@2.3.0/dist/md5.min.js
 // @resource     animate.css  https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.css
-// @grant        GM_addStyle
 // @grant        GM_getResourceText
 // ==/UserScript==
 
 (function() {
   "use strict";
   if (location.href.includes("animate.css=on")) {
-    Promise.resolve().then(() => _animate$1);
+    Promise.resolve().then(() => _monkeyResourceImport_animate$1);
     document.querySelectorAll("div").forEach((div) => {
       div.classList.add("animate__shakeX");
       div.classList.add("animate__animated");
@@ -30,13 +29,13 @@
     }
   })();
   const cssLoader = (e) => {
-    const t = GM_getResourceText(e);
-    return GM_addStyle(t), t;
+    const t = GM_getResourceText(e), o = document.createElement("style");
+    return o.innerText = t, document.head.append(o), t;
   };
-  const _animate = cssLoader("animate.css");
-  const _animate$1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  const _monkeyResourceImport_animate = cssLoader("animate.css");
+  const _monkeyResourceImport_animate$1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
     __proto__: null,
-    default: _animate
+    default: _monkeyResourceImport_animate
   }, Symbol.toStringTag, { value: "Module" }));
   const MD5$1 = MD5;
   const _monkeyDynamicImport_md5_ = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({

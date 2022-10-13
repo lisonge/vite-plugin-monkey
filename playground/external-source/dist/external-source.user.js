@@ -16,7 +16,6 @@
 // @resource     element-plus/dist/index.css      https://cdn.jsdelivr.net/npm/element-plus@2.2.17/dist/index.css
 // @resource     element-plus/dist/index.css?raw  https://cdn.jsdelivr.net/npm/element-plus@2.2.17/dist/index.css
 // @resource     element-plus/package.json        https://npm.elemecdn.com/element-plus@2.2.17/package.json
-// @grant        GM_addStyle
 // @grant        GM_getResourceText
 // @grant        GM_getResourceURL
 // @grant        unsafeWindow
@@ -45,8 +44,8 @@
   }
   const Vue__namespace = /* @__PURE__ */ _interopNamespace(Vue2);
   const cssLoader = (e) => {
-    const t = GM_getResourceText(e);
-    return GM_addStyle(t), t;
+    const t = GM_getResourceText(e), o = document.createElement("style");
+    return o.innerText = t, document.head.append(o), t;
   }, jsonLoader = (e) => JSON.parse(GM_getResourceText(e)), urlLoader = (e, t) => GM_getResourceURL(e, false).replace(/^data:application;base64,/, `data:${t};base64,`), rawLoader = (e) => GM_getResourceText(e);
   cssLoader("element-plus/dist/index.css");
   const ElementPlusPkg = jsonLoader("element-plus/package.json");

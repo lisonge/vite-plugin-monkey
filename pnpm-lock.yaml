@@ -87,6 +87,17 @@ importers:
       '@types/detect-port': 1.3.2
       '@types/node-fetch': 2.6.2
 
+  playground/build-watch:
+    specifiers:
+      element-plus: 2.2.17
+      vite-plugin-monkey: workspace:*
+      vue: 3.2.40
+    dependencies:
+      element-plus: 2.2.17_vue@3.2.40
+      vue: 3.2.40
+    devDependencies:
+      vite-plugin-monkey: link:../../packages/vite-plugin-monkey
+
   playground/dynamic-import:
     specifiers:
       '@types/md5': 2.3.2

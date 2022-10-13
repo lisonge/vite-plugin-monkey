@@ -12,7 +12,6 @@
 // @require      https://cdn.jsdelivr.net/npm/pinia@2.0.22/dist/pinia.iife.prod.js
 // @require      https://cdn.jsdelivr.net/npm/element-plus@2.2.17/dist/index.full.min.js
 // @resource     element-plus/dist/index.css  https://cdn.jsdelivr.net/npm/element-plus@2.2.17/dist/index.css
-// @grant        GM_addStyle
 // @grant        GM_getResourceText
 // ==/UserScript==
 
@@ -21,8 +20,8 @@
   const _interopDefaultLegacy = (e) => e && typeof e === "object" && "default" in e ? e : { default: e };
   const ElementPlus__default = /* @__PURE__ */ _interopDefaultLegacy(ElementPlus2);
   const cssLoader = (e) => {
-    const t = GM_getResourceText(e);
-    return GM_addStyle(t), t;
+    const t = GM_getResourceText(e), o = document.createElement("style");
+    return o.innerText = t, document.head.append(o), t;
   };
   cssLoader("element-plus/dist/index.css");
   const useMainStore = pinia$1.defineStore("main", {

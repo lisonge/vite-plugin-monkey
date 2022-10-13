@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## 2.7.2
+
+### 2.7.2-BugFixes
+
+- can not correctly collect grant, require, resource when `vite build --watch` [bfca5785](https://github.com/lisonge/vite-plugin-monkey/commit/823aa336dc1bba8a78c27fe9e9a078aabfca5785), [issues#27](https://github.com/lisonge/vite-plugin-monkey/issues/27)
+- use error name when not found module, [2e6854a4](https://github.com/lisonge/vite-plugin-monkey/commit/41c504bdd6128c271abee70b384218622e6854a4), [issues#29](https://github.com/lisonge/vite-plugin-monkey/issues/29)
+
+### 2.7.2-Features
+
+- externalLoader remove GM_addStyle, [d30218e5](https://github.com/lisonge/vite-plugin-monkey/commit/b6e11888a2a0f2304da4e6fce8683c5dd30218e5)
+- remove check cdn, [4a92f9a2](https://github.com/lisonge/vite-plugin-monkey/commit/fedf8dd5fbf53aa69cb8dc64781799954a92f9a2)
+- remove node-fetch, [baf56b96](https://github.com/lisonge/vite-plugin-monkey/commit/dc1d12df85d2a43426797411ac1887f9baf56b96)
+- add greasespot wiki, [a6314e47](https://github.com/lisonge/vite-plugin-monkey/commit/3fb5506eac780df3a2f28f81080b6c09a6314e47)
+
 ## 2.7.1
 
 ### 2.7.1-BugFixes

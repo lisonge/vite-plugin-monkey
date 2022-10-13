@@ -1,5 +1,3 @@
-/*eslint @typescript-eslint/no-explicit-any: "off"*/
-
 export const fn2string = <T extends (...args: any[]) => any>(
   fn: T,
   ...args: Parameters<T>

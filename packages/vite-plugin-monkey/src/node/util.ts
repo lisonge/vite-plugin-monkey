@@ -1,6 +1,5 @@
 import { transformWithEsbuild } from 'vite';
 import { logger } from './_logger';
-/*eslint @typescript-eslint/no-explicit-any: "off"*/
 
 /**
  * transform function and parameter to iife code then mini code then transform code to data url string
@@ -8,7 +7,7 @@ import { logger } from './_logger';
  * this tool function is used to make umd-cdn and iife-cdn work normally, such as element-plus and vue
  *
  * @example
- * // this example comes form playground/ex-vue-demi/vite.config.ts
+ * // this example comes form https://github.com/lisonge/vite-plugin-monkey/blob/main/playground/ex-vue-demi/vite.config.ts
  * const externalGlobals = [
  *   [
  *     'vue',

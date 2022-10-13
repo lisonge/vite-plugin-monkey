@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "vite": "^3.1.7",
-    "vite-plugin-monkey": "^2.7.1",
+    "vite-plugin-monkey": "^2.7.2",
     "vite-plugin-solid": "^2.3.9"
   },
   "dependencies": {

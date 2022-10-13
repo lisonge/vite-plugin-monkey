@@ -73,7 +73,7 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
       if (id.startsWith(dynamicImportPrefix) && id.endsWith('\0')) {
         const rawId = id.slice(dynamicImportPrefix.length, id.length - 1);
         if (rawId in globalsPkg2VarName) {
-          return `export default ${globalsPkg2VarName[rawId]}`;
+          return `export {default} from '${rawId}';export * from '${rawId}';`;
         }
       }
     },

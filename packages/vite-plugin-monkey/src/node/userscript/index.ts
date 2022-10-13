@@ -1,5 +1,5 @@
 import { projectPkg } from '../_util';
-import type { IArray, LocaleType } from '../types';
+import type { FinalMonkeyOption, IArray, LocaleType } from '../types';
 import type { Format } from './common';
 import type {
   GreaseGrant,
@@ -173,10 +173,13 @@ export type FinalUserScript = {
   $extra: [string, string][];
 } & GreasyforkUserScript;
 
-export const finalUserscriptToComment = async (
-  userscript: FinalUserScript,
-  format: Format = { align: 2 },
-): Promise<string> => {
+export const finalMonkeyOptionToComment = async ({
+  userscript,
+  format = { align: 2 },
+  collectGrantSet,
+  collectRequireUrls,
+  collectResource,
+}: FinalMonkeyOption): Promise<string> => {
   let attrList: [string, ...string[]][] = [];
   const {
     name,
@@ -270,7 +273,6 @@ export const finalUserscriptToComment = async (
     include,
     match,
     exclude,
-    require,
     'exclude-match': excludeMatch,
   }).forEach(([k, v]) => {
     v.forEach((v2) => {
@@ -278,7 +280,11 @@ export const finalUserscriptToComment = async (
     });
   });
 
-  Object.entries(resource).forEach(([k, v]) => {
+  [...require, ...collectRequireUrls].forEach((s) => {
+    attrList.push(['require', s]);
+  });
+
+  Object.entries({ ...resource, ...collectResource }).forEach(([k, v]) => {
     attrList.push(['resource', k, v]);
   });
 
@@ -297,10 +303,19 @@ export const finalUserscriptToComment = async (
       attrList.push(['grant', s]);
     });
   } else {
-    grant.forEach((s) => {
-      attrList.push(['grant', s]);
-    });
+    new Set([...Array.from(collectGrantSet.values()).flat(), ...grant]).forEach(
+      (s) => {
+        attrList.push(['grant', s]);
+      },
+    );
   }
+  antifeature.forEach(({ description, type, tag }) => {
+    attrList.push([
+      tag ? `antifeature:${tag}` : 'antifeature',
+      type,
+      description,
+    ]);
+  });
   if (noframes) {
     attrList.push(['noframes']);
   }

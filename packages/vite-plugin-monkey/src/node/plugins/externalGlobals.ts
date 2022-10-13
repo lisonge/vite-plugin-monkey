@@ -1,15 +1,10 @@
-import type { PluginOption } from 'vite';
+import { normalizePath, PluginOption } from 'vite';
 import type { FinalMonkeyOption } from '../types';
 import { getModuleRealInfo } from '../_util';
-import path from 'node:path';
 
 const dynamicImportPrefix = '\0monkey-dynamic-import:';
 
 export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
-  const externalModNameSet = new Set<string>(
-    finalPluginOption.build.externalGlobals.map(([s]) => s),
-  );
-  const realUsedModNameSet = new Set<string>();
   const globalsPkg2VarName: Record<string, string> = {};
   const requirePkgList: { moduleName: string; url: string }[] = [];
   return {
@@ -57,14 +52,7 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
         build: {
           rollupOptions: {
             external(source, _importer, _isResolved) {
-              if (
-                !source.startsWith('./') &&
-                !source.startsWith('../') &&
-                !path.isAbsolute(source)
-              ) {
-                realUsedModNameSet.add(source);
-              }
-              return externalModNameSet.has(source);
+              return source in globalsPkg2VarName;
             },
             output: {
               globals: globalsPkg2VarName,
@@ -85,18 +73,23 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
       if (id.startsWith(dynamicImportPrefix) && id.endsWith('\0')) {
         const rawId = id.slice(dynamicImportPrefix.length, id.length - 1);
         if (rawId in globalsPkg2VarName) {
-          realUsedModNameSet.add(rawId);
           return `export default ${globalsPkg2VarName[rawId]}`;
         }
       }
     },
 
     async generateBundle() {
-      const requireUrlList = requirePkgList
-        .filter((p) => realUsedModNameSet.has(p.moduleName))
+      const usedModIdSet = new Set(
+        Array.from(this.getModuleIds()).map((s) => normalizePath(s)),
+      );
+      Array.from(usedModIdSet).forEach((id) => {
+        if (id.startsWith(dynamicImportPrefix) && id.endsWith('\0')) {
+          usedModIdSet.add(id.slice(dynamicImportPrefix.length, id.length - 1));
+        }
+      });
+      finalPluginOption.collectRequireUrls = requirePkgList
+        .filter((p) => usedModIdSet.has(p.moduleName))
         .map((p) => p.url);
-
-      finalPluginOption.userscript.require.push(...requireUrlList);
     },
   };
 };

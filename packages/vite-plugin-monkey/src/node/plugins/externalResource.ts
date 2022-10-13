@@ -1,4 +1,4 @@
-import type { PluginOption } from 'vite';
+import { normalizePath, PluginOption } from 'vite';
 import type { FinalMonkeyOption, PkgOptions } from '../types';
 import { getModuleRealInfo, miniCode } from '../_util';
 import { lookup, mimes } from 'mrmime';
@@ -41,7 +41,13 @@ const KNOWN_ASSET_TYPES = new Set([
   'txt',
 ]);
 
+const resourceImportPrefix = '\0monkey-resource-import:';
+
 export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
+  const resourceRecord: Record<
+    string,
+    { resourceName: string; resourceUrl: string }
+  > = {};
   return {
     name: 'monkey:externalResource',
     enforce: 'pre',
@@ -49,18 +55,21 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
     async resolveId(id) {
       const { externalResource } = finalPluginOption.build;
       if (id in externalResource) {
-        return '\0' + id + '\0';
+        return resourceImportPrefix + id + '\0';
       }
       // see https://github.com/vitejs/vite/blob/5d56e421625b408879672a1dd4e774bae3df674f/packages/vite/src/node/plugins/css.ts#L431-L434
       const id2 = id.replace('.css?used&', '.css?');
       if (id2 in externalResource) {
-        return '\0' + id2 + '\0';
+        return resourceImportPrefix + id2 + '\0';
       }
     },
     async load(id) {
-      if (id[0] === '\0' && id[id.length - 1] === '\0') {
+      if (id.startsWith(resourceImportPrefix) && id.endsWith('\0')) {
         const { externalResource } = finalPluginOption.build;
-        const importName = id.substring(1, id.length - 1);
+        const importName = id.substring(
+          resourceImportPrefix.length,
+          id.length - 1,
+        );
         if (!(importName in externalResource)) {
           return;
         }
@@ -73,7 +82,10 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
         } = externalResource[importName];
         const resourceName = await resourceNameFn({ ...pkg, importName });
         const resourceUrl = await resourceUrlFn({ ...pkg, importName });
-        finalPluginOption.userscript.resource[resourceName] = resourceUrl;
+        resourceRecord[importName] = {
+          resourceName,
+          resourceUrl,
+        };
 
         if (nodeLoader) {
           return miniCode(
@@ -163,6 +175,27 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
 
         throw new Error(`module: ${importName} not found loader`);
       }
+    },
+    generateBundle() {
+      const usedModIdSet = new Set(
+        Array.from(this.getModuleIds()).map((s) => normalizePath(s)),
+      );
+      Array.from(usedModIdSet).forEach((id) => {
+        if (id.startsWith(resourceImportPrefix) && id.endsWith('\0')) {
+          usedModIdSet.add(
+            id.substring(resourceImportPrefix.length, id.length - 1),
+          );
+        }
+      });
+      const collectResource: Record<string, string> = {};
+      Object.entries(resourceRecord).forEach(
+        ([importName, { resourceName, resourceUrl }]) => {
+          if (usedModIdSet.has(importName)) {
+            collectResource[resourceName] = resourceUrl;
+          }
+        },
+      );
+      finalPluginOption.collectResource = collectResource;
     },
   };
 };

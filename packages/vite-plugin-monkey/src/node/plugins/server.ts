@@ -3,10 +3,10 @@ import { DomUtils, ElementType, parseDocument } from 'htmlparser2';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import type { PluginOption, ResolvedConfig } from 'vite';
-import { fn2string, redirectFn, serverInjectFn } from '../inject_template';
+import { fn2string, serverInjectFn } from '../inject_template';
 import { openBrowser } from '../open_browser';
 import type { FinalMonkeyOption } from '../types';
-import { finalUserscriptToComment } from '../userscript';
+import { finalMonkeyOptionToComment } from '../userscript';
 import { logger } from '../_logger';
 import { existFile, isFirstBoot, lazy } from '../_util';
 
@@ -116,6 +116,7 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
           const htmlText = await server.transformIndexHtml(
             '/',
             `<html><head></head></html>`,
+            req.originalUrl,
           );
 
           const doc = parseDocument(htmlText);
@@ -164,10 +165,7 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
           });
           res.end(
             [
-              await finalUserscriptToComment(
-                finalPluginOption.userscript,
-                finalPluginOption.format,
-              ),
+              await finalMonkeyOptionToComment(finalPluginOption),
               fn2string(serverInjectFn, {
                 entryList,
                 mountGmApi: finalPluginOption.server.mountGmApi,
@@ -197,40 +195,13 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
         } else {
           await fs.mkdir(path.dirname(cacheUserPath)).catch();
         }
-        const newComment = await finalUserscriptToComment(
-          finalPluginOption.userscript,
-          finalPluginOption.format,
-        );
+        const newComment = await finalMonkeyOptionToComment(finalPluginOption);
         if (!isFirstBoot() && cacheComment != newComment) {
           openBrowser(serverConfig.installUrl, true, logger);
           logger.info('reopen, config comment has changed', { time: true });
         }
         await fs.writeFile(cacheUserPath, newComment).catch();
       }
-    },
-    async configurePreviewServer(server) {
-      server.middlewares.use(async (req, res, next) => {
-        if (['/', '/index.html'].includes((req.url ?? '').split('?')[0])) {
-          const [fileName] = (
-            await fs.readdir(path.join(process.cwd(), viteConfig.build.outDir))
-          ).filter((name) => name.endsWith('.user.js'));
-          if (fileName) {
-            Object.entries({
-              'content-type': 'text/html; charset=utf-8',
-            }).forEach(([k, v]) => {
-              res.setHeader(k, String(v));
-            });
-            res.end(
-              `<script type="module" data-source="vite-plugin-monkey">${fn2string(
-                redirectFn,
-                '/' + fileName,
-              )}</script>`,
-            );
-            return;
-          }
-        }
-        next();
-      });
     },
   };
 };

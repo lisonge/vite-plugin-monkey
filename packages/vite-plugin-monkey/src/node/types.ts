@@ -105,6 +105,9 @@ export type FinalMonkeyOption = {
       }
     >;
   };
+  collectRequireUrls: string[];
+  collectGrantSet: Set<string>;
+  collectResource: Record<string, string>;
 };
 
 export type MonkeyOption = {

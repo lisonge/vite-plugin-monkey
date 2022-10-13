@@ -284,6 +284,9 @@ export default (pluginOption: MonkeyOption): PluginOption => {
         externalGlobals: externalGlobals,
         externalResource: externalResource2,
       },
+      collectGrantSet: new Set(),
+      collectRequireUrls: [],
+      collectResource: {},
     };
     return config;
   })();

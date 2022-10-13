@@ -102,11 +102,15 @@ importers:
     specifiers:
       '@types/md5': 2.3.2
       animate.css: 4.1.1
+      element-plus: 2.2.17
       md5: 2.3.0
       vite-plugin-monkey: workspace:*
+      vue: 3.2.40
     dependencies:
       animate.css: 4.1.1
+      element-plus: 2.2.17_vue@3.2.40
       md5: 2.3.0
+      vue: 3.2.40
     devDependencies:
       '@types/md5': 2.3.2
       vite-plugin-monkey: link:../../packages/vite-plugin-monkey

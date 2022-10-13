@@ -13,4 +13,11 @@ if (location.href.includes('animate.css=on')) {
     console.log(`md5('xx')=${md5('xx')}`);
     console.log('dynamic import md5');
   }
+  const Vue = await import('vue');
+  const ElementPlus = await import('element-plus');
+  console.log({
+    Vue,
+    ElementPlus,
+    default: ElementPlus.default,
+  });
 })();

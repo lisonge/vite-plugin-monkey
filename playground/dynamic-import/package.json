@@ -13,7 +13,9 @@
   },
   "dependencies": {
     "animate.css": "4.1.1",
-    "md5": "2.3.0"
+    "element-plus": "2.2.17",
+    "md5": "2.3.0",
+    "vue": "3.2.40"
   },
   "pnpm": {
     "peerDependencyRules": {

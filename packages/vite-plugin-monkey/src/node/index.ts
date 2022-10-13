@@ -5,10 +5,10 @@ import externalLoaderPlugin from './plugins/externalLoader';
 import externalResourcePlugin from './plugins/externalResource';
 import extraToBundlePlugin from './plugins/extraToBundle';
 import fixVitePlugin from './plugins/fixVite';
-import serverPlugin from './plugins/server';
 import miniClientPlugin from './plugins/miniClient';
-import virtualHtmlPlugin from './plugins/virtualHtml';
 import perviewPlugin from './plugins/perview';
+import serverPlugin from './plugins/server';
+import virtualHtmlPlugin from './plugins/virtualHtml';
 import type {
   FinalMonkeyOption,
   IArray,
@@ -25,7 +25,7 @@ import type {
   TampermonkeyUserScript,
   ViolentmonkeyUserScript,
 } from './userscript';
-import { mergeObj, projectPkg } from './_util';
+import { projectPkg } from './_util';
 
 export * as cdn from './cdn';
 export * as util from './util';

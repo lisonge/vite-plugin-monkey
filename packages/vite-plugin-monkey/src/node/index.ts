@@ -313,6 +313,7 @@ export default (pluginOption: MonkeyOption): PluginOption => {
           sourcemap: false,
           minify: userConfig.build?.minify ?? false,
           rollupOptions: {
+            // serve pre-bundling need
             input: finalPluginOption.entry,
           },
           lib: {

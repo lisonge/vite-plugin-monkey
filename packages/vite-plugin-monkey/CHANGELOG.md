@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 2.7.3
+
+### 2.7.3-BugFixes
+
+- not pre-bundling [30ecb0f9](https://github.com/lisonge/vite-plugin-monkey/commit/30aec15ce74c57c51081a40c3215e67830ecb0f9)
+
+### 2.7.3-Features
+
+- dynamic import use rawId instead of VarName [b9a1cc93](https://github.com/lisonge/vite-plugin-monkey/commit/0efa4fea1f78713bc7920d496bd6b1e6b9a1cc93)
+
 ## 2.7.2
 
 ### 2.7.2-BugFixes

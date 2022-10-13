@@ -10,6 +10,25 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
     name: 'monkey:extraToBundle',
     apply: 'build',
     enforce: 'post',
+    config(userConfig) {
+      return {
+        build: {
+          sourcemap: false,
+          minify: userConfig.build?.minify ?? false,
+          rollupOptions: {
+            input: finalPluginOption.entry,
+          },
+          lib: {
+            entry: finalPluginOption.entry,
+            formats: ['iife'],
+            fileName: () => {
+              return finalPluginOption.build.fileName;
+            },
+            name: '__plugin_monkey_exposed',
+          },
+        },
+      };
+    },
     async configResolved(resolvedConfig) {
       viteConfig = resolvedConfig;
     },

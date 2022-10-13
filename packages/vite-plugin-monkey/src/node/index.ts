@@ -309,6 +309,21 @@ export default (pluginOption: MonkeyOption): PluginOption => {
               userConfig.mode ?? (isServe ? 'development' : 'production'),
             ),
         },
+        build: {
+          sourcemap: false,
+          minify: userConfig.build?.minify ?? false,
+          rollupOptions: {
+            input: finalPluginOption.entry,
+          },
+          lib: {
+            entry: finalPluginOption.entry,
+            formats: ['iife'],
+            fileName: () => {
+              return finalPluginOption.build.fileName;
+            },
+            name: '__plugin_monkey_exposed',
+          },
+        },
       };
     },
   };

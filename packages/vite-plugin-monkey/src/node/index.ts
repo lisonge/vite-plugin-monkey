@@ -5,7 +5,6 @@ import externalLoaderPlugin from './plugins/externalLoader';
 import externalResourcePlugin from './plugins/externalResource';
 import extraToBundlePlugin from './plugins/extraToBundle';
 import fixVitePlugin from './plugins/fixVite';
-import miniClientPlugin from './plugins/miniClient';
 import perviewPlugin from './plugins/perview';
 import serverPlugin from './plugins/server';
 import virtualHtmlPlugin from './plugins/virtualHtml';
@@ -35,6 +34,7 @@ export type {
   ViolentmonkeyUserScript,
   GreasemonkeyUserScript,
   Format,
+  MonkeyOption,
 };
 
 export default (pluginOption: MonkeyOption): PluginOption => {
@@ -333,7 +333,6 @@ export default (pluginOption: MonkeyOption): PluginOption => {
     monkeyPlugin,
     fixVitePlugin(finalPluginOption),
     serverPlugin(finalPluginOption),
-    miniClientPlugin(finalPluginOption),
     autoGrantPlugin(finalPluginOption),
     externalGlobalsPlugin(finalPluginOption),
     externalLoaderPlugin(finalPluginOption),

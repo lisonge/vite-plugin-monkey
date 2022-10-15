@@ -4,6 +4,8 @@ export type { MonkeyWindow, XhrRequest } from './types';
 // @ts-ignore
 export const monkeyWindow: MonkeyWindow = document.__monkeyWindow ?? window;
 
+// vite build see packages/vite-plugin-monkey/src/node/plugins/externalGlobals.ts
+
 export const GM = monkeyWindow.GM;
 
 monkeyWindow.unsafeWindow = monkeyWindow.unsafeWindow ?? window;
@@ -25,219 +27,125 @@ export const GM_cookie = monkeyWindow.GM_cookie;
  * @see https://www.tampermonkey.net/documentation.php#GM_setValue
  * @see https://violentmonkey.github.io/api/gm/#gm_setvalue
  */
-export const GM_setValue: MonkeyWindow['GM_setValue'] = (
-  ...args: unknown[]
-) => {
-  // @ts-ignore
-  return monkeyWindow.GM_setValue(...args);
-};
+export const GM_setValue = monkeyWindow.GM_setValue;
 
 /**
  * @see https://www.tampermonkey.net/documentation.php#GM_deleteValue
  * @see https://violentmonkey.github.io/api/gm/#gm_deletevalue
  */
-export const GM_deleteValue: MonkeyWindow['GM_deleteValue'] = (
-  ...args: unknown[]
-) => {
-  // @ts-ignore
-  return monkeyWindow.GM_deleteValue(...args);
-};
+export const GM_deleteValue = monkeyWindow.GM_deleteValue;
 
 /**
  * @see https://www.tampermonkey.net/documentation.php#GM_listValues
  * @see https://violentmonkey.github.io/api/gm/#gm_listvalues
  */
-export const GM_listValues: MonkeyWindow['GM_listValues'] = (
-  ...args: unknown[]
-) => {
-  // @ts-ignore
-  return monkeyWindow.GM_listValues(...args);
-};
+export const GM_listValues = monkeyWindow.GM_listValues;
 
 /**
  * @see https://www.tampermonkey.net/documentation.php#GM_addValueChangeListener
  * @see https://violentmonkey.github.io/api/gm/#gm_addvaluechangelistener
  */
-export const GM_addValueChangeListener: MonkeyWindow['addEventListener'] = (
-  ...args: unknown[]
-) => {
-  // @ts-ignore
-  return monkeyWindow.GM_addValueChangeListener(...args);
-};
+export const GM_addValueChangeListener = monkeyWindow.GM_addValueChangeListener;
 
 /**
  * @see https://www.tampermonkey.net/documentation.php#GM_removeValueChangeListener
  * @see https://violentmonkey.github.io/api/gm/#gm_removevaluechangelistener
  */
-export const GM_removeValueChangeListener: MonkeyWindow['removeEventListener'] =
-  (...args: unknown[]) => {
-    // @ts-ignore
-    return monkeyWindow.GM_removeValueChangeListener(...args);
-  };
+export const GM_removeValueChangeListener =
+  monkeyWindow.GM_removeValueChangeListener;
 
 /**
  * @see https://www.tampermonkey.net/documentation.php#GM_getResourceText
  * @see https://violentmonkey.github.io/api/gm/#gm_getresourcetext
  */
-export const GM_getResourceText: MonkeyWindow['GM_getResourceText'] = (
-  ...args: unknown[]
-) => {
-  // @ts-ignore
-  return monkeyWindow.GM_getResourceText(...args);
-};
+export const GM_getResourceText = monkeyWindow.GM_getResourceText;
 
 /**
  * @see https://www.tampermonkey.net/documentation.php#GM_getResourceURL
  * @see https://violentmonkey.github.io/api/gm/#gm_getresourceurl
  */
-export const GM_getResourceURL: MonkeyWindow['GM_getResourceURL'] = (
-  ...args: unknown[]
-) => {
-  // @ts-ignore
-  return monkeyWindow.GM_getResourceURL(...args);
-};
+export const GM_getResourceURL = monkeyWindow.GM_getResourceURL;
 
 /**
  * @see https://www.tampermonkey.net/documentation.php#GM_addElement
  * @see https://violentmonkey.github.io/api/gm/#gm_addelement
  */
-export const GM_addElement: MonkeyWindow['GM_addElement'] = (
-  ...args: unknown[]
-) => {
-  // @ts-ignore
-  return monkeyWindow.GM_addElement(...args);
-};
+export const GM_addElement = monkeyWindow.GM_addElement;
 
 /**
  * @see https://www.tampermonkey.net/documentation.php#GM_addStyle
  * @see https://violentmonkey.github.io/api/gm/#gm_addstyle
  */
-export const GM_addStyle: MonkeyWindow['GM_addStyle'] = (
-  ...args: unknown[]
-) => {
-  // @ts-ignore
-  return monkeyWindow.GM_addStyle(...args);
-};
+export const GM_addStyle = monkeyWindow.GM_addStyle;
 
 /**
  * @see https://www.tampermonkey.net/documentation.php#GM_openInTab
  * @see https://violentmonkey.github.io/api/gm/#gm_openintab
  */
-export const GM_openInTab: MonkeyWindow['GM_openInTab'] = (
-  ...args: unknown[]
-) => {
-  // @ts-ignore
-  return monkeyWindow.GM_openInTab(...args);
-};
+export const GM_openInTab = monkeyWindow.GM_openInTab;
 
 /**
  * @see https://www.tampermonkey.net/documentation.php#GM_registerMenuCommand
  * @see https://violentmonkey.github.io/api/gm/#gm_registermenucommand
  */
-export const GM_registerMenuCommand: MonkeyWindow['GM_registerMenuCommand'] = (
-  ...args: unknown[]
-) => {
-  // @ts-ignore
-  return monkeyWindow.GM_registerMenuCommand(...args);
-};
+export const GM_registerMenuCommand = monkeyWindow.GM_registerMenuCommand;
 
 /**
  * @see https://www.tampermonkey.net/documentation.php#GM_unregisterMenuCommand
  * @see https://violentmonkey.github.io/api/gm/#gm_unregistermenucommand
  */
-export const GM_unregisterMenuCommand: MonkeyWindow['GM_unregisterMenuCommand'] =
-  (...args: unknown[]) => {
-    // @ts-ignore
-    return monkeyWindow.GM_unregisterMenuCommand(...args);
-  };
+export const GM_unregisterMenuCommand = monkeyWindow.GM_unregisterMenuCommand;
 
 /**
  * @see https://www.tampermonkey.net/documentation.php#GM_notification
  * @see https://violentmonkey.github.io/api/gm/#gm_notification
  */
-export const GM_notification: MonkeyWindow['GM_notification'] = (
-  ...args: unknown[]
-) => {
-  // @ts-ignore
-  return monkeyWindow.GM_notification(...args);
-};
+export const GM_notification = monkeyWindow.GM_notification;
 
 /**
  * @see https://www.tampermonkey.net/documentation.php#GM_xmlhttpRequest
  * @see https://violentmonkey.github.io/api/gm/#gm_xmlhttprequest
  */
-export const GM_xmlhttpRequest: MonkeyWindow['GM_xmlhttpRequest'] = (
-  ...args: unknown[]
-) => {
-  // @ts-ignore
-  return monkeyWindow.GM_xmlhttpRequest(...args);
-};
+export const GM_xmlhttpRequest = monkeyWindow.GM_xmlhttpRequest;
 
 /**
  * @see https://www.tampermonkey.net/documentation.php#GM_setClipboard
  * @see https://violentmonkey.github.io/api/gm/#gm_setclipboard
  */
-export const GM_setClipboard: MonkeyWindow['GM_setClipboard'] = (
-  ...args: unknown[]
-) => {
-  // @ts-ignore
-  return monkeyWindow.GM_setClipboard(...args);
-};
+export const GM_setClipboard = monkeyWindow.GM_setClipboard;
 
 /**
  * @see https://www.tampermonkey.net/documentation.php#GM_download
  * @see https://violentmonkey.github.io/api/gm/#gm_download
  */
-export const GM_download: MonkeyWindow['GM_download'] = (
-  ...args: unknown[]
-) => {
-  // @ts-ignore
-  return monkeyWindow.GM_download(...args);
-};
+export const GM_download = monkeyWindow.GM_download;
 
 /**
  * @see https://www.tampermonkey.net/documentation.php#GM_log
  * @available tampermonkey
  */
-export const GM_log: MonkeyWindow['GM_log'] = (...args: unknown[]) => {
-  // @ts-ignore
-  return monkeyWindow.GM_log(...args);
-};
+export const GM_log = monkeyWindow.GM_log;
 
 /**
  * @see https://www.tampermonkey.net/documentation.php#GM_getTab
  * @available tampermonkey
  */
-export const GM_getTab: MonkeyWindow['GM_getTab'] = (...args: unknown[]) => {
-  // @ts-ignore
-  return monkeyWindow.GM_getTab(...args);
-};
+export const GM_getTab = monkeyWindow.GM_getTab;
 
 /**
  * @see https://www.tampermonkey.net/documentation.php#GM_saveTab
  * @available tampermonkey
  */
-export const GM_saveTab: MonkeyWindow['GM_saveTab'] = (...args: unknown[]) => {
-  // @ts-ignore
-  return monkeyWindow.GM_saveTab(...args);
-};
+export const GM_saveTab = monkeyWindow.GM_saveTab;
 
 /**
  * @see https://www.tampermonkey.net/documentation.php#GM_getTabs
  * @available tampermonkey
  */
-export const GM_getTabs: MonkeyWindow['GM_getTabs'] = (...args: unknown[]) => {
-  // @ts-ignore
-  return monkeyWindow.GM_getTabs(...args);
-};
+export const GM_getTabs = monkeyWindow.GM_getTabs;
 
 /**
  * @see https://www.tampermonkey.net/documentation.php#GM_getResourceURL
  * @see https://violentmonkey.github.io/api/gm/#gm_getvalue
  */
-export const GM_getValue: MonkeyWindow['GM_getValue'] = (
-  ...args: unknown[]
-) => {
-  // @ts-ignore
-  return monkeyWindow.GM_getValue(...args);
-};
+export const GM_getValue = monkeyWindow.GM_getValue;

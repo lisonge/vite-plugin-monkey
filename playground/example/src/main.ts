@@ -2,11 +2,21 @@ import './style.css';
 // import pngUrl from './asset/test.png';
 // import svgUrl from './asset/favicon.svg';
 import md5 from 'blueimp-md5';
+// import 'element-plus/dist/index.css';
+import 'element-plus/dist/index.css';
+
+// console.log({ css });
 
 console.log(`md5('114514')=${md5('114514')}`); //c4d038b4bed09fdb1471ef51ec3a32cd
 console.log('document.readyState', document.readyState); // interactive
 
-import { GM_cookie, unsafeWindow, monkeyWindow, GM_addElement } from '$';
+import {
+  GM_cookie,
+  unsafeWindow,
+  monkeyWindow,
+  GM_addElement,
+  GM_info,
+} from '$';
 
 console.log(monkeyWindow);
 
@@ -43,25 +53,25 @@ GM_cookie?.list({}, (cookies, error) => {
 });
 
 //---------test code format--------
-import { formatCode } from './format';
-console.log('format tsx code');
-const tsxCode = `const App=()=>{return(<div class={styles.App}>
-<header class={styles.header}>
-<img src={logo} class={styles.logo} alt="logo" />
-<p>
-Edit <code>src/App.tsx</code> and save to reload.
-</p>
-<a
-class={styles.link}
-href="https://github.com/solidjs/solid"
-target="_blank"
-rel="noopener noreferrer"
->
-Learn Solid
-</a>
-</header>
-</div>
-);
-};`;
-console.log(formatCode(tsxCode, 'tsx'));
+// import { formatCode } from './format';
+// console.log('format tsx code');
+// const tsxCode = `const App=()=>{return(<div class={styles.App}>
+// <header class={styles.header}>
+// <img src={logo} class={styles.logo} alt="logo" />
+// <p>
+// Edit <code>src/App.tsx</code> and save to reload.
+// </p>
+// <a
+// class={styles.link}
+// href="https://github.com/solidjs/solid"
+// target="_blank"
+// rel="noopener noreferrer"
+// >
+// Learn Solid
+// </a>
+// </header>
+// </div>
+// );
+// };`;
+// console.log(formatCode(tsxCode, 'tsx'));
 //-------------------------

@@ -19,9 +19,9 @@
 // @include            /^https:\/\/i\.songe\.li\/.*/
 // @match              https://i.songe.li/
 // @require            https://cdn.jsdelivr.net/npm/blueimp-md5@2.19.0
-// @require            https://cdn.jsdelivr.net/npm/prettier@2.7.1/standalone.js
-// @require            https://cdn.jsdelivr.net/npm/prettier@2.7.1/parser-babel.js
+// @resource           element-plus/dist/index.css  https://cdn.jsdelivr.net/npm/element-plus@2.2.17/dist/index.css
 // @grant              GM_addElement
 // @grant              GM_cookie
+// @grant              GM_getResourceText
 // @grant              unsafeWindow
 // ==/UserScript==

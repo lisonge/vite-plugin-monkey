@@ -28,16 +28,22 @@ export default defineConfig(async ({ command, mode }) => ({
         metaFileName: true,
         externalGlobals: {
           'blueimp-md5': cdn.jsdelivr('md5'),
-          prettier: cdn.jsdelivr('prettier', 'standalone.js'),
-          'prettier/parser-babel': [
-            'prettierPlugins.babel',
-            async (version, name, moduleName) => {
-              // name == `prettier`
-              // moduleName == `prettier/parser-babel`
-              const subpath = `${moduleName.split('/').at(-1)}.js`;
-              return `https://cdn.jsdelivr.net/npm/${name}@${version}/${subpath}`;
-            },
-          ],
+          // prettier: cdn.jsdelivr('prettier', 'standalone.js'),
+          // 'prettier/parser-babel': [
+          //   'prettierPlugins.babel',
+          //   async (version, name, moduleName) => {
+          //     // name == `prettier`
+          //     // moduleName == `prettier/parser-babel`
+          //     const subpath = `${moduleName.split('/').at(-1)}.js`;
+          //     return `https://cdn.jsdelivr.net/npm/${name}@${version}/${subpath}`;
+          //   },
+          // ],
+        },
+        externalResource: {
+          'element-plus/dist/index.css': cdn.jsdelivr(),
+        },
+        sourcemap: {
+          // offset: 3,
         },
       },
     }),
@@ -45,5 +51,6 @@ export default defineConfig(async ({ command, mode }) => ({
   build: {
     // if you want to minify xxx.user.js, set true
     // minify: true,
+    sourcemap: 'inline',
   },
 }));

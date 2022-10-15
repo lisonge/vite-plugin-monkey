@@ -1,6 +1,5 @@
-import type { PluginOption } from 'vite';
+import { PluginOption, transformWithEsbuild } from 'vite';
 import type { FinalMonkeyOption } from '../types';
-import { miniCode } from '../_util';
 
 const GM_getResourceText = (name: string) => document.title;
 const GM_getResourceURL = (name: string, isBlobUrl?: boolean) => document.title;
@@ -32,7 +31,6 @@ const moduleSourceCode = [
 ].join(';');
 
 export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
-  let code: string | undefined = undefined;
   return {
     name: 'monkey:externalLoader',
     enforce: 'pre',
@@ -44,10 +42,15 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
     },
     async load(id) {
       if (id == '\0virtual:plugin-monkey-loader') {
-        if (!code) {
-          code = await miniCode(moduleSourceCode);
-        }
-        return code;
+        return transformWithEsbuild(
+          moduleSourceCode,
+          '/virtual/plugin-monkey-loader/index.js',
+          {
+            minify: true,
+            sourcemap: true,
+            legalComments: 'none',
+          },
+        );
       }
     },
   };

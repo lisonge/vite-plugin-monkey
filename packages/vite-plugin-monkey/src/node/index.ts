@@ -283,6 +283,12 @@ export default (pluginOption: MonkeyOption): PluginOption => {
         minifyCss: build.minifyCss ?? true,
         externalGlobals: externalGlobals,
         externalResource: externalResource2,
+        sourcemap: {
+          offset: build.sourcemap?.offset ?? 0,
+          sourceRoot:
+            build.sourcemap?.sourceRoot ??
+            `/${namespace}/${name[''] ?? 'name'}/`,
+        },
       },
       collectGrantSet: new Set(),
       collectRequireUrls: [],
@@ -310,7 +316,7 @@ export default (pluginOption: MonkeyOption): PluginOption => {
             ),
         },
         build: {
-          sourcemap: false,
+          sourcemap: userConfig.build?.sourcemap ?? false,
           minify: userConfig.build?.minify ?? false,
           rollupOptions: {
             // serve pre-bundling need

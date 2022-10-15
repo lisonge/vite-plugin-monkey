@@ -1,3 +1,4 @@
+import path from 'node:path';
 import type { PluginOption, ResolvedConfig } from 'vite';
 import { cssInjectFn, fn2string } from '../inject_template';
 import type { FinalMonkeyOption } from '../types';
@@ -34,13 +35,58 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
       }
       const chunk = jsBundleList[0][1];
       if (chunk.type == 'chunk') {
-        chunk.code = [
+        const bannerCode = [
           await finalMonkeyOptionToComment(finalPluginOption),
           injectCssCode,
-          chunk.code,
         ]
           .filter((s) => s)
-          .join('\n\n');
+          .map((s) => s + `\n\n`)
+          .join(``);
+        // @require @resouse 会导致 map 映射错误, 这需要外部传入额外的偏移量
+        let { offset } = finalPluginOption.build.sourcemap;
+        for (const char of bannerCode) {
+          if (char == '\n') {
+            offset++;
+          }
+        }
+        if (offset < 0) {
+          offset = 0;
+        }
+        const { map } = chunk;
+        if (map) {
+          map.mappings = ';'.repeat(offset) + map.mappings;
+
+          let relativeFileList = map.sources
+            .map((filepath, i) => ({ filepath, i }))
+            .filter(({ filepath }) => !path.isAbsolute(filepath));
+          while (
+            relativeFileList.every(({ filepath }) => filepath.startsWith('../'))
+          ) {
+            relativeFileList.forEach((f) => {
+              f.filepath = f.filepath.substring(3);
+            });
+          }
+          let relativeMaxNum = 0;
+          relativeFileList.forEach(({ filepath }) => {
+            let n = 0;
+            while (filepath.substring(n * 3).startsWith('../')) {
+              n++;
+            }
+            if (relativeMaxNum < n) {
+              relativeMaxNum = n;
+            }
+          });
+          const prefix = '-/'.repeat(relativeMaxNum);
+          relativeFileList.forEach(({ filepath, i }) => {
+            map.sources[i] = prefix + filepath;
+          });
+          Reflect.set(
+            map,
+            'sourceRoot',
+            finalPluginOption.build.sourcemap.sourceRoot,
+          );
+        }
+        chunk.code = bannerCode + chunk.code;
       }
 
       let { metaFileName } = finalPluginOption.build;

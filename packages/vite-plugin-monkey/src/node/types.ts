@@ -104,6 +104,10 @@ export type FinalMonkeyOption = {
         nodeLoader?: (pkgOptions: PkgOptions) => IPromise<string>;
       }
     >;
+    sourcemap: {
+      offset: number;
+      sourceRoot: string;
+    };
   };
   collectRequireUrls: string[];
   collectGrantSet: Set<string>;
@@ -300,5 +304,14 @@ export type MonkeyOption = {
      * }
      */
     externalResource?: ExternalResource;
+
+    sourcemap?: {
+      offset?: number;
+      /**
+       * @default
+       * `/${namespace}/${name[''] ?? 'name'}/`
+       */
+      sourceRoot?: string;
+    };
   };
 };

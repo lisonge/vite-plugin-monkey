@@ -230,6 +230,18 @@ export default (pluginOption: MonkeyOption): PluginOption => {
       compatible,
     } = pluginOption.userscript;
 
+    const { sourcemap = {}, fileName = projectPkg.name + '.user.js' } =
+      pluginOption.build ?? {};
+    let { metaFileName } = pluginOption.build ?? {};
+    if (typeof metaFileName == 'string') {
+      const t = metaFileName;
+      metaFileName = () => t;
+    } else if (metaFileName === true) {
+      metaFileName = () => fileName.replace(/\\.user\\.js$/, '.meta.js');
+    } else if (metaFileName === false) {
+      metaFileName = undefined;
+    }
+
     const config: FinalMonkeyOption = {
       userscript: {
         name,
@@ -277,17 +289,16 @@ export default (pluginOption: MonkeyOption): PluginOption => {
         prefix: prefix2,
       },
       build: {
-        fileName: build.fileName ?? projectPkg.name + '.user.js',
-        metaFileName: build.metaFileName ?? false,
+        fileName,
+        metaFileName,
         autoGrant: build.autoGrant ?? true,
         minifyCss: build.minifyCss ?? true,
         externalGlobals: externalGlobals,
         externalResource: externalResource2,
         sourcemap: {
-          offset: build.sourcemap?.offset ?? 0,
+          offset: sourcemap.offset ?? 0,
           sourceRoot:
-            build.sourcemap?.sourceRoot ??
-            `/${namespace}/${name[''] ?? 'name'}/`,
+            sourcemap.sourceRoot ?? `/${namespace}/${name[''] ?? 'name'}/`,
         },
       },
       collectGrantSet: new Set(),

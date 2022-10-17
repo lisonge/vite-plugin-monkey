@@ -42,8 +42,9 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
           .filter((s) => s)
           .map((s) => s + `\n\n`)
           .join(``);
-        // @require @resouse 会导致 map 映射错误, 这需要外部传入额外的偏移量
-        let { offset } = finalPluginOption.build.sourcemap;
+        // wrap, @require, @resouse will make map error. This requires developers to manually pass the extra offset in the outside
+        // The offset of different userscript engines is different
+        let { offset, sourceRoot } = finalPluginOption.build.sourcemap;
         for (const char of bannerCode) {
           if (char == '\n') {
             offset++;
@@ -80,26 +81,16 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
           relativeFileList.forEach(({ filepath, i }) => {
             map.sources[i] = prefix + filepath;
           });
-          Reflect.set(
-            map,
-            'sourceRoot',
-            finalPluginOption.build.sourcemap.sourceRoot,
-          );
+          Reflect.set(map, 'sourceRoot', sourceRoot);
         }
         chunk.code = bannerCode + chunk.code;
       }
 
-      let { metaFileName } = finalPluginOption.build;
-      if (metaFileName === true) {
-        metaFileName = finalPluginOption.build.fileName.replace(
-          /\.user\.js$/,
-          '.meta.js',
-        );
-      }
-      if (typeof metaFileName == 'string' && metaFileName.length > 0) {
+      const { metaFileName, fileName } = finalPluginOption.build;
+      if (metaFileName) {
         this.emitFile({
           type: 'asset',
-          fileName: metaFileName,
+          fileName: metaFileName(fileName),
           source: await finalMonkeyOptionToComment(finalPluginOption),
         });
       }

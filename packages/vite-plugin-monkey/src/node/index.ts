@@ -237,7 +237,7 @@ export default (pluginOption: MonkeyOption): PluginOption => {
       const t = metaFileName;
       metaFileName = () => t;
     } else if (metaFileName === true) {
-      metaFileName = () => fileName.replace(/\\.user\\.js$/, '.meta.js');
+      metaFileName = () => fileName.replace(/\.user\.js$/, '.meta.js');
     } else if (metaFileName === false) {
       metaFileName = undefined;
     }
@@ -312,6 +312,14 @@ export default (pluginOption: MonkeyOption): PluginOption => {
     name: 'monkey',
     async config(userConfig, { command }) {
       const isServe = command == 'serve';
+      let sourcemap = userConfig.build?.sourcemap;
+      if (sourcemap === undefined) {
+        if (pluginOption.build?.sourcemap) {
+          sourcemap = 'inline';
+        } else {
+          sourcemap = false;
+        }
+      }
 
       return {
         resolve: {
@@ -327,7 +335,7 @@ export default (pluginOption: MonkeyOption): PluginOption => {
             ),
         },
         build: {
-          sourcemap: userConfig.build?.sourcemap ?? false,
+          sourcemap: sourcemap,
           minify: userConfig.build?.minify ?? false,
           rollupOptions: {
             // serve pre-bundling need

@@ -306,6 +306,11 @@ export type MonkeyOption = {
      */
     externalResource?: ExternalResource;
 
+    /**
+     * if `monkeyConfig.build.sourcemap && viteConfig.build.sourcemap===undefined`
+     *
+     * the plugin wll set `viteConfig.build.sourcemap='inline'`
+     */
     sourcemap?: {
       /**
        * It is the line number of `// ==UserScript==` -1, The offset of different userscript engines is different

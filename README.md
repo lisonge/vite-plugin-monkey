@@ -17,6 +17,7 @@ vite plugin server and build \*.user.js for [Tampermonkey](https://www.tampermon
 - external cdn url inject to userscript @require
 - external module inject to userscript @resource
 - use GM_api by ESM import with type hints
+- support to generate the correct sourceMap mapping when build dist.user.js
 - when vite preview, auto open browser install dist.user.js
 - full typescript support and vite feature
 
@@ -73,7 +74,7 @@ pnpm add -D vite-plugin-monkey
 
 ## config
 
-[MonkeyOption](/packages/vite-plugin-monkey/src/node/types.ts#L113)
+[MonkeyOption](/packages/vite-plugin-monkey/src/node/types.ts#L117)
 
 <details open>
   <summary>MonkeyOption Type</summary>
@@ -268,6 +269,34 @@ export type MonkeyOption = {
      * }
      */
     externalResource?: ExternalResource;
+
+    /**
+     * if `monkeyConfig.build.sourcemap && viteConfig.build.sourcemap===undefined`
+     *
+     * the plugin wll set `viteConfig.build.sourcemap='inline'`
+     */
+    sourcemap?: {
+      /**
+       * It is the line number of `// ==UserScript==` -1, The offset of different userscript engines is different
+       *
+       * If you don't set it, devtools console may log map error code position
+       *
+       * About it, you can see [violentmonkey#1616](https://github.com/violentmonkey/violentmonkey/issues/1616) and [tampermonkey#1621](https://github.com/Tampermonkey/tampermonkey/issues/1621)
+       *
+       * ![image](https://user-images.githubusercontent.com/38517192/196080452-4733bec5-686c-4d63-90a8-9a8eb51d7e7c.png)
+       *
+       * @default
+       * 0
+       */
+      offset?: number;
+      /**
+       * ![image](https://user-images.githubusercontent.com/38517192/196079942-835a0d25-e0bf-4373-aff8-73aba9b1d37c.png)
+       * @default
+       * `/${namespace}/${name}/`; // if name is string
+       * `/${namespace}/${name['']}/`; // if name is object
+       */
+      sourceRoot?: string;
+    };
   };
 };
 ```
@@ -279,7 +308,7 @@ export type MonkeyOption = {
 ```js
 // use example
 import { cdn } from 'vite-plugin-monkey';
-const buildonfig = {
+const buildConfig = {
   externalGlobals: {
     'blueimp-md5': cdn.bytecdntp('md5', 'js/md5.min.js'),
   },
@@ -381,7 +410,7 @@ the solution is that we append a dataUrl script that will set iife-variable as t
 ```js
 // solution example
 import { cdn, util } from 'vite-plugin-monkey';
-const buildonfig = {
+const buildConfig = {
   vue: cdn.jsdelivr('Vue', 'dist/vue.global.prod.js').concat(
     await util.fn2dataUrl(() => {
       // @ts-ignore

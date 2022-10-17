@@ -17,6 +17,7 @@
 - 利用 @require 配置库的 cdn 的方案, 减少构建脚本大小
 - 利用 @resource 配置外部资源 cdn 的方案, 额外减少构建脚本大小
 - 通过 ESM 导入的方式使用 GM_api, 附带类型提示
+- 支持为构建 dist.user.js 脚本时生成正确的 sourcemap 映射
 - 预览模式下自动打开浏览器安装构建好的脚本
 - 完全的 Typescript 和 Vite 的开发体验，比如模块热替换,秒启动
 
@@ -73,7 +74,7 @@ pnpm add -D vite-plugin-monkey
 
 ## 配置
 
-[MonkeyOption](/packages/vite-plugin-monkey/src/node/types.ts#L113)
+[MonkeyOption](/packages/vite-plugin-monkey/src/node/types.ts#L117)
 
 <details open>
   <summary>MonkeyOption Type</summary>
@@ -268,6 +269,34 @@ export type MonkeyOption = {
      * }
      */
     externalResource?: ExternalResource;
+
+    /**
+     * if `monkeyConfig.build.sourcemap && viteConfig.build.sourcemap===undefined`
+     *
+     * the plugin wll set `viteConfig.build.sourcemap='inline'`
+     */
+    sourcemap?: {
+      /**
+       * It is the line number of `// ==UserScript==` -1, The offset of different userscript engines is different
+       *
+       * If you don't set it, devtools console may log map error code position
+       *
+       * About it, you can see [violentmonkey#1616](https://github.com/violentmonkey/violentmonkey/issues/1616) and [tampermonkey#1621](https://github.com/Tampermonkey/tampermonkey/issues/1621)
+       *
+       * ![image](https://user-images.githubusercontent.com/38517192/196080452-4733bec5-686c-4d63-90a8-9a8eb51d7e7c.png)
+       *
+       * @default
+       * 0
+       */
+      offset?: number;
+      /**
+       * ![image](https://user-images.githubusercontent.com/38517192/196079942-835a0d25-e0bf-4373-aff8-73aba9b1d37c.png)
+       * @default
+       * `/${namespace}/${name}/`; // if name is string
+       * `/${namespace}/${name['']}/`; // if name is object
+       */
+      sourceRoot?: string;
+    };
   };
 };
 ```
@@ -279,7 +308,7 @@ export type MonkeyOption = {
 ```js
 // 使用示例
 import { cdn } from 'vite-plugin-monkey';
-const buildonfig = {
+const buildConfig = {
   externalGlobals: {
     'blueimp-md5': cdn.bytecdntp('md5', 'js/md5.min.js'),
   },
@@ -381,7 +410,7 @@ iife-cdn 使用 `var` 声明的变量在油猴脚本作用域下不会成为 win
 ```js
 // 解决方案例子
 import { cdn, util } from 'vite-plugin-monkey';
-const buildonfig = {
+const buildConfig = {
   vue: cdn.jsdelivr('Vue', 'dist/vue.global.prod.js').concat(
     await util.fn2dataUrl(() => {
       // @ts-ignore

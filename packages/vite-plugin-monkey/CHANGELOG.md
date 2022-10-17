@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 2.8.0
+
+### 2.8.0-Features
+
+- generate correct sourcemap mapping for build.user.js
+- metaFileName can be function
+- external vite-plugin-monkey/src/client at build mode
+- export type MonkeyOption
+
 ## 2.7.3
 
 ### 2.7.3-BugFixes

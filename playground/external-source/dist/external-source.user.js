@@ -21,26 +21,25 @@
 // @grant        unsafeWindow
 // ==/UserScript==
 
-(function(Vue2, elementPlus) {
-  var _a, _b;
+(function(Vue2, elementPlus, client) {
   "use strict";
   function _interopNamespace(e) {
     if (e && e.__esModule)
       return e;
-    const n2 = Object.create(null, { [Symbol.toStringTag]: { value: "Module" } });
+    const n = Object.create(null, { [Symbol.toStringTag]: { value: "Module" } });
     if (e) {
       for (const k in e) {
         if (k !== "default") {
           const d = Object.getOwnPropertyDescriptor(e, k);
-          Object.defineProperty(n2, k, d.get ? d : {
+          Object.defineProperty(n, k, d.get ? d : {
             enumerable: true,
             get: () => e[k]
           });
         }
       }
     }
-    n2.default = e;
-    return Object.freeze(n2);
+    n.default = e;
+    return Object.freeze(n);
   }
   const Vue__namespace = /* @__PURE__ */ _interopNamespace(Vue2);
   const cssLoader = (e) => {
@@ -50,12 +49,6 @@
   cssLoader("element-plus/dist/index.css");
   const ElementPlusPkg = jsonLoader("element-plus/package.json");
   cssLoader("animate.css");
-  var r = (_a = document.__monkeyWindow) != null ? _a : window;
-  r.GM;
-  r.unsafeWindow = (_b = r.unsafeWindow) != null ? _b : window;
-  var n = r.unsafeWindow;
-  r.GM_info;
-  r.GM_cookie;
   const carSvgUrl = urlLoader("base64-img/test/img/car.svg", "image/svg+xml");
   const tUrl = urlLoader("base64-img/test/img/car.svg?url", "image/svg+xml");
   const tRaw = rawLoader("base64-img/test/img/car.svg?raw");
@@ -65,7 +58,7 @@
     ElDatePicker: elementPlus.ElDatePicker,
     ElButton: elementPlus.ElButton,
     ElementPlusPkg,
-    unsafeWindow: n,
+    unsafeWindow: client.unsafeWindow,
     carSvgUrl,
     tUrl,
     tRaw,
@@ -78,4 +71,4 @@
       return img;
     })()
   );
-})(Vue, ElementPlus);
+})(Vue, ElementPlus, (window.monkeyWindow = window, window));

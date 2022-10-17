@@ -13,25 +13,17 @@
 // @grant      GM_setValue
 // ==/UserScript==
 
-(function(vue) {
-  var _a, _b;
+(function(client, vue) {
   "use strict";
-  var r = (_a = document.__monkeyWindow) != null ? _a : window;
-  r.GM;
-  r.unsafeWindow = (_b = r.unsafeWindow) != null ? _b : window;
-  r.unsafeWindow;
-  r.GM_info;
-  r.GM_cookie;
-  var u = (...e) => r.GM_setValue(...e), G = (...e) => r.GM_deleteValue(...e), _ = (...e) => r.GM_listValues(...e);
   const cssLoader = (e) => {
     const t = GM_getResourceText(e), o = document.createElement("style");
     return o.innerText = t, document.head.append(o), t;
   };
   cssLoader("element-plus/dist/index.css");
-  G("key");
-  u("key", "value");
-  console.log(_());
+  client.GM_deleteValue("key");
+  client.GM_setValue("key", "value");
+  console.log(client.GM_listValues());
   console.log({ createApp: vue.createApp, ref: vue.ref });
   (async () => {
   })();
-})(Vue);
+})((window.monkeyWindow = window, window), Vue);

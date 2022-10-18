@@ -173,7 +173,7 @@ export type MonkeyOption = {
      * if set true, will equal to fileName.replace(/\\.user\\.js$/,'.meta.js')
      * @default false
      */
-    metaFileName?: string | boolean;
+    metaFileName?: string | boolean | ((fileName: string) => string);
 
     /**
      * this object can be array or object, array=Object.entries(object)
@@ -271,7 +271,9 @@ export type MonkeyOption = {
     externalResource?: ExternalResource;
 
     /**
-     * if `monkeyConfig.build.sourcemap && viteConfig.build.sourcemap===undefined`
+     * if you want to enable sourcemap, you can set `viteConfig.build.sourcemap='inline'`
+     *
+     * In addition, if `monkeyConfig.build.sourcemap && viteConfig.build.sourcemap===undefined`
      *
      * the plugin wll set `viteConfig.build.sourcemap='inline'`
      */

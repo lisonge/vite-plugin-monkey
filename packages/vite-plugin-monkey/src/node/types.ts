@@ -307,14 +307,16 @@ export type MonkeyOption = {
     externalResource?: ExternalResource;
 
     /**
-     * if you want to enable sourcemap, you can set `viteConfig.build.sourcemap='inline'`
+     * if you want to enable sourcemap, you need set `viteConfig.build.sourcemap='inline'`
      *
      * In addition, if `monkeyConfig.build.sourcemap && viteConfig.build.sourcemap===undefined`
      *
-     * the plugin wll set `viteConfig.build.sourcemap='inline'`
+     * the plugin will also set `viteConfig.build.sourcemap='inline'`
      */
     sourcemap?: {
       /**
+       * you must build and install userscript in advance, then open devtools -> source -> page, find this userscript
+       *
        * It is the line number of `// ==UserScript==` -1, The offset of different userscript engines is different
        *
        * If you don't set it, devtools console may log map error code position

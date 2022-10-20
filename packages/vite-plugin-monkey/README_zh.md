@@ -17,6 +17,7 @@
 - 利用 @require 配置库的 cdn 的方案, 减少构建脚本大小
 - 利用 @resource 配置外部资源 cdn 的方案, 额外减少构建脚本大小
 - 通过 ESM 导入的方式使用 GM_api, 附带类型提示
+- 智能收集使用到的 GM_api, 自动配置 @grant 注释
 - 支持为构建 dist.user.js 脚本时生成正确的 sourcemap 映射
 - 预览模式下自动打开浏览器安装构建好的脚本
 - 完全的 Typescript 和 Vite 的开发体验，比如模块热替换,秒启动

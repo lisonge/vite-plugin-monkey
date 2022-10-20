@@ -8,11 +8,9 @@
     "build": "vite build",
     "preview": "vite preview"
   },
-  "devDependencies": {
-    "vite-plugin-monkey": "workspace:*"
-  },
   "dependencies": {
-    "@formkit/vue": "1.0.0-beta.11"
+    "@formkit/vue": "1.0.0-beta.11",
+    "vite-plugin-monkey": "workspace:*"
   },
   "volta": {
     "extends": "../../package.json"

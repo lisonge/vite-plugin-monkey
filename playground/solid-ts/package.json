@@ -8,12 +8,8 @@
     "build": "vite build",
     "preview": "vite preview"
   },
-  "devDependencies": {
-    "vite-plugin-monkey": "workspace:*",
-    "vite-plugin-solid": "^2.3.9"
-  },
   "dependencies": {
-    "solid-js": "^1.5.7"
+    "vite-plugin-monkey": "workspace:*"
   },
   "volta": {
     "extends": "../../package.json"

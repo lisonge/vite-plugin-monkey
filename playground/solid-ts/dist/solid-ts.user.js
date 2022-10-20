@@ -380,12 +380,12 @@
     }
   }
   const $$EVENTS = "_$DX_DELEGATE";
-  function render(code, element, init) {
+  function render(code, element, init, options = {}) {
     let disposer;
     createRoot((dispose) => {
       disposer = dispose;
       element === document ? code() : insert(element, code(), element.firstChild ? null : void 0, init);
-    });
+    }, options.owner);
     return () => {
       disposer();
       element.textContent = "";
@@ -578,7 +578,7 @@
     }
     return dynamic;
   }
-  function appendNodes(parent, array, marker) {
+  function appendNodes(parent, array, marker = null) {
     for (let i = 0, len = array.length; i < len; i++)
       parent.insertBefore(array[i], marker);
   }

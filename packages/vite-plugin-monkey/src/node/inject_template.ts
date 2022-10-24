@@ -33,11 +33,8 @@ export const serverInjectFn = ({
     }
   }
 
-  Object.defineProperty(document, '__monkeyWindow', {
-    value: monkeyWindow,
-    writable: false,
-    enumerable: false,
-  });
+  // @ts-ignore
+  document.__monkeyWindow = monkeyWindow;
   console.log(`[vite-plugin-monkey] mount monkeyWindow to document`);
 
   const createScript = ({ src, type }: { src: string; type?: string }) => {

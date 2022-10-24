@@ -11,9 +11,9 @@
   "devDependencies": {
     "vite": "^3.1.8",
     "vite-plugin-monkey": "^2.8.0",
-    "vite-plugin-solid": "^2.3.9"
+    "vite-plugin-solid": "^2.3.10"
   },
   "dependencies": {
-    "solid-js": "^1.5.8"
+    "solid-js": "^1.6.0"
   }
 }

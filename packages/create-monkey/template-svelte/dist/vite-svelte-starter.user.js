@@ -365,7 +365,7 @@ var __plugin_monkey_exposed = function() {
         create_component(counter.$$.fragment);
         t4 = space();
         p0 = element("p");
-        p0.innerHTML = `Check out <a href="https://github.com/sveltejs/kit#readme" target="_blank">SvelteKit</a>, the official Svelte app framework powered by Vite!`;
+        p0.innerHTML = `Check out <a href="https://github.com/sveltejs/kit#readme" target="_blank" rel="noreferrer">SvelteKit</a>, the official Svelte app framework powered by Vite!`;
         t8 = space();
         p1 = element("p");
         p1.textContent = "Click on the Vite and Svelte logos to learn more";
@@ -375,12 +375,14 @@ var __plugin_monkey_exposed = function() {
         attr(img0, "alt", "Vite Logo");
         attr(a0, "href", "https://vitejs.dev");
         attr(a0, "target", "_blank");
+        attr(a0, "rel", "noreferrer");
         if (!src_url_equal(img1.src, img1_src_value = svelteLogo))
           attr(img1, "src", img1_src_value);
         attr(img1, "class", "logo svelte svelte-c9fbf7");
         attr(img1, "alt", "Svelte Logo");
         attr(a1, "href", "https://svelte.dev");
         attr(a1, "target", "_blank");
+        attr(a1, "rel", "noreferrer");
         attr(div1, "class", "card");
         attr(p1, "class", "read-the-docs svelte-c9fbf7");
       },

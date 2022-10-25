@@ -216,8 +216,15 @@ type AbortHandle<TReturn = void> = {
 
 type ResponseBase = {
   readonly responseHeaders: string;
-  readonly readyState: ReadyState;
-  readonly response: unknown;
+  /**
+   * Unsent = 0,
+   * Opened = 1,
+   * HeadersReceived = 2,
+   * Loading = 3,
+   * Done = 4
+   */
+  readonly readyState: 0 | 1 | 2 | 3 | 4;
+  readonly response: any;
   readonly responseText: string;
   readonly responseXML: Document | null;
   readonly status: number;
@@ -567,7 +574,7 @@ export type MonkeyWindow = Window & {
    * @see https://www.tampermonkey.net/documentation.php#GM_xmlhttpRequest
    * @see https://violentmonkey.github.io/api/gm/#gm_xmlhttprequest
    */
-  GM_xmlhttpRequest: (details: XhrRequest) => AbortHandle;
+  GM_xmlhttpRequest: <TContext>(details: XhrRequest<TContext>) => AbortHandle;
 
   /**
    * @see https://www.tampermonkey.net/documentation.php#GM_download

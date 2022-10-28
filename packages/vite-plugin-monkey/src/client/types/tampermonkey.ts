@@ -45,16 +45,44 @@ type CbCookie = {
   value: string;
 };
 
+type CookieDetails = {
+  list: {
+    url?: string;
+    domain?: string;
+    name?: string;
+    path?: string;
+  };
+  set: ChromeCookie;
+  delete: { name?: string; url?: string };
+};
+type CookieCallBack = {
+  list: (cookies: CbCookie[], error: unknown) => void;
+  set: (error: unknown) => void;
+  delete: (error: unknown) => void;
+};
+
+type CookieResult = {
+  list: Promise<CbCookie[]>;
+  set: (error: unknown) => Promise<void>;
+  delete: (error: unknown) => Promise<void>;
+};
+
 export type CookieFn = {
-  delete: (details: { name?: string; url?: string }) => void;
   list: (
-    details: {
-      url?: string;
-      domain?: string;
-      name?: string;
-      path?: string;
-    },
-    cb: (cookies: CbCookie[], error: unknown) => void,
-  ) => void;
-  set: (details: ChromeCookie, callback: (error: unknown) => void) => void;
+    details: CookieDetails['list'],
+    callback?: CookieCallBack['list'],
+  ) => CookieResult['list'];
+  set: (
+    details: CookieDetails['set'],
+    callback?: CookieCallBack['set'],
+  ) => CookieResult['set'];
+  delete: (
+    details: CookieDetails['delete'],
+    callback?: CookieCallBack['delete'],
+  ) => CookieResult['delete'];
+  <Method extends 'list' | 'set' | 'delete'>(
+    method: Method,
+    details: CookieDetails[Method],
+    callback?: CookieCallBack[Method],
+  ): CookieResult[Method];
 };

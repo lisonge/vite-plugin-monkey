@@ -5,9 +5,7 @@ import { getModuleRealInfo } from '../_util';
 const dynamicImportPrefix = '\0monkey-dynamic-import:';
 
 export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
-  const globalsPkg2VarName: Record<string, string> = {
-    'vite-plugin-monkey/dist/client': `(window.monkeyWindow=window,window)`,
-  };
+  const globalsPkg2VarName: Record<string, string> = {};
   const requirePkgList: { moduleName: string; url: string }[] = [];
   return {
     name: 'monkey:externalGlobals',

@@ -171,6 +171,12 @@ importers:
     dependencies:
       vite-plugin-monkey: link:../../packages/vite-plugin-monkey
 
+  playground/xhr-fetch:
+    specifiers:
+      vite-plugin-monkey: workspace:*
+    dependencies:
+      vite-plugin-monkey: link:../../packages/vite-plugin-monkey
+
 packages:
 
   /@ampproject/remapping/2.2.0:

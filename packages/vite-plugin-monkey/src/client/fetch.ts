@@ -4,6 +4,8 @@ const xmlhttpRequest = /* @__PURE__ */ (() => {
   return monkeyWindow.GM_xmlhttpRequest ?? monkeyWindow.GM.xmlHttpRequest;
 })();
 
+// https://github.com/github/fetch/blob/master/fetch.js
+
 const fixUrl = (url = '') => {
   try {
     return url === '' && location.href ? location.href : url;
@@ -44,7 +46,10 @@ const parseHeaders = (rawHeaders = '') => {
 /**
  * polyfill window.fetch by GM_xmlhttpRequest
  */
-export const GM_fetch: typeof window.fetch = async (input, init) => {
+export const GM_fetch = async (
+  input: RequestInfo | URL,
+  init?: RequestInit,
+): Promise<Response> => {
   const request = new Request(input, init);
   if (request.signal && request.signal.aborted) {
     throw new DOMException('Aborted', 'AbortError');

@@ -1,7 +1,6 @@
 import { monkeyWindow } from './window';
 export { monkeyWindow };
 export type { MonkeyWindow, XhrRequest } from './types';
-export { GM_fetch } from './fetch';
 
 export const GM = /* @__PURE__ */ (() => monkeyWindow.GM)();
 

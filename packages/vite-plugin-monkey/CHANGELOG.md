@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## 2.9.0
+
+### 2.9.0-Features
+
+- preview support subpath [2461a31d](https://github.com/lisonge/vite-plugin-monkey/commit/e7bb19a5e107d1b655057fb423c8eb112461a31d)
+- chang default prefix to "server:" [ea92891a](https://github.com/lisonge/vite-plugin-monkey/commit/5073dccff4d07a778ad21953dac05fd2ea92891a)
+- set window by plugin [bedac6cf](https://github.com/lisonge/vite-plugin-monkey/commit/6892db083d1cac70f5ce6df7b71dc9b6bedac6cf)
+- complement gm_cookie type [b9ac1593](https://github.com/lisonge/vite-plugin-monkey/commit/dfe1481041664adbb63fcad828de73b7b9ac1593)
+
+### 2.9.0-BugFixes
+
+- error caused by repeated definitions [1c8c35a8](https://github.com/lisonge/vite-plugin-monkey/commit/29fd6d88573d84b2daaf5632b60c38af1c8c35a8)
+- fix readyState+response type [bee8b799](https://github.com/lisonge/vite-plugin-monkey/commit/2c77e97fcfaee74995a63d00d437dd94bee8b799)
+
 ## 2.8.0
 
 ### 2.8.0-Features

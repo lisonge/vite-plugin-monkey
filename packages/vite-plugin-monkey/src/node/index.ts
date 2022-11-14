@@ -123,7 +123,7 @@ export default (pluginOption: MonkeyOption): PluginOption => {
     const server = pluginOption.server ?? {};
 
     const { prefix } = server;
-    let prefix2: (name: string) => string = (s) => 'dev:' + s;
+    let prefix2: (name: string) => string = (s) => 'server:' + s;
     if (typeof prefix == 'function') {
       prefix2 = prefix;
     } else if (typeof prefix == 'string') {

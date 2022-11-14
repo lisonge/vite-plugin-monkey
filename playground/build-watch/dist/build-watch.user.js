@@ -13,17 +13,21 @@
 // @grant      GM_setValue
 // ==/UserScript==
 
-(function(client, vue) {
+(function(vue) {
   "use strict";
+  var monkeyWindow = window;
+  var GM_setValue = /* @__PURE__ */ (() => monkeyWindow.GM_setValue)();
+  var GM_deleteValue = /* @__PURE__ */ (() => monkeyWindow.GM_deleteValue)();
+  var GM_listValues = /* @__PURE__ */ (() => monkeyWindow.GM_listValues)();
   const cssLoader = (e) => {
     const t = GM_getResourceText(e), o = document.createElement("style");
     return o.innerText = t, document.head.append(o), t;
   };
   cssLoader("element-plus/dist/index.css");
-  client.GM_deleteValue("key");
-  client.GM_setValue("key", "value");
-  console.log(client.GM_listValues());
+  GM_deleteValue("key");
+  GM_setValue("key", "value");
+  console.log(GM_listValues());
   console.log({ createApp: vue.createApp, ref: vue.ref });
   (async () => {
   })();
-})((window.monkeyWindow = window, window), Vue);
+})(Vue);

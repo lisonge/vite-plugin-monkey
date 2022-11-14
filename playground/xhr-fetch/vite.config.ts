@@ -9,7 +9,7 @@ export default defineConfig({
         icon: 'https://vitejs.dev/logo.svg',
         namespace: 'npm/vite-plugin-monkey',
         match: ['https://i.songe.li/*'],
-        connect: [`httpbin.org`],
+        connect: [`httpbin.org`, `i.pximg.net`],
       },
     }),
   ],

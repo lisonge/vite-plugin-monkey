@@ -11,8 +11,8 @@
 // @require      https://cdn.jsdelivr.net/npm/element-plus@2.2.18/dist/index.full.min.js
 // @resource     animate.css                      https://cdn.bootcdn.net/ajax/libs/animate.css/4.1.1/animate.css
 // @resource     base64-img/test/img/car.svg?raw  https://cdn.jsdelivr.net/npm/base64-img@1.0.4/test/img/car.svg
-// @resource     base64-img/test/img/car.svg?url  https://cdn.jsdelivr.net/npm/base64-img@1.0.4/test/img/car.svg
 // @resource     base64-img/test/img/car.svg      https://unpkg.com/base64-img@1.0.4/test/img/car.svg
+// @resource     base64-img/test/img/car.svg?url  https://cdn.jsdelivr.net/npm/base64-img@1.0.4/test/img/car.svg
 // @resource     element-plus/dist/index.css      https://cdn.jsdelivr.net/npm/element-plus@2.2.18/dist/index.css
 // @resource     element-plus/dist/index.css?raw  https://cdn.jsdelivr.net/npm/element-plus@2.2.18/dist/index.css
 // @resource     element-plus/package.json        https://npm.elemecdn.com/element-plus@2.2.18/package.json
@@ -21,7 +21,7 @@
 // @grant        unsafeWindow
 // ==/UserScript==
 
-(function(Vue2, elementPlus, client) {
+(function(Vue2, elementPlus) {
   "use strict";
   function _interopNamespace(e) {
     if (e && e.__esModule)
@@ -49,6 +49,10 @@
   cssLoader("element-plus/dist/index.css");
   const ElementPlusPkg = jsonLoader("element-plus/package.json");
   cssLoader("animate.css");
+  var monkeyWindow = window;
+  var unsafeWindow = /* @__PURE__ */ (() => {
+    return monkeyWindow.unsafeWindow;
+  })();
   const carSvgUrl = urlLoader("base64-img/test/img/car.svg", "image/svg+xml");
   const tUrl = urlLoader("base64-img/test/img/car.svg?url", "image/svg+xml");
   const tRaw = rawLoader("base64-img/test/img/car.svg?raw");
@@ -58,7 +62,7 @@
     ElDatePicker: elementPlus.ElDatePicker,
     ElButton: elementPlus.ElButton,
     ElementPlusPkg,
-    unsafeWindow: client.unsafeWindow,
+    unsafeWindow,
     carSvgUrl,
     tUrl,
     tRaw,
@@ -71,4 +75,4 @@
       return img;
     })()
   );
-})(Vue, ElementPlus, (window.monkeyWindow = window, window));
+})(Vue, ElementPlus);

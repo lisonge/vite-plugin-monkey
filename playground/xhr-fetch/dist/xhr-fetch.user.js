@@ -6,32 +6,28 @@
 // @icon       https://vitejs.dev/logo.svg
 // @match      https://i.songe.li/*
 // @connect    httpbin.org
+// @connect    i.pximg.net
 // @grant      GM.xmlHttpRequest
 // @grant      GM_xmlhttpRequest
 // ==/UserScript==
 
 (function() {
   "use strict";
-  var monkeyWindow = /* @__PURE__ */ (() => {
-    var _a;
-    return (_a = document.__monkeyWindow) != null ? _a : window;
-  })();
+  var monkeyWindow = window;
   const xmlhttpRequest = /* @__PURE__ */ (() => {
     var _a;
     return (_a = monkeyWindow.GM_xmlhttpRequest) != null ? _a : monkeyWindow.GM.xmlHttpRequest;
   })();
-  const fixUrl = (url) => {
+  const fixUrl = (url = "") => {
     try {
       return url === "" && location.href ? location.href : url;
     } catch {
       return url;
     }
   };
-  const delay = async (n = 0) => {
-    return new Promise((res) => {
-      setTimeout(res, n);
-    });
-  };
+  const delay = async (n = 0) => new Promise((res) => {
+    setTimeout(res, n);
+  });
   const parseHeaders = (rawHeaders = "") => {
     const headers = new Headers();
     const preProcessedHeaders = rawHeaders.replace(/\r?\n[\t ]+/g, " ");
@@ -49,7 +45,7 @@
     });
     return headers;
   };
-  const GM_fetch = async (input, init) => {
+  const GM_fetch = async (input, init = {}) => {
     const request = new Request(input, init);
     if (request.signal && request.signal.aborted) {
       throw new DOMException("Aborted", "AbortError");
@@ -60,7 +56,11 @@
     request.headers.forEach((value, key) => {
       headers[key] = value;
     });
+    new Headers(init.headers).forEach((value, key) => {
+      headers[key] = value;
+    });
     return new Promise((resolve, reject) => {
+      var _a;
       const handle = xmlhttpRequest({
         method: request.method.toUpperCase(),
         url: fixUrl(request.url),
@@ -68,15 +68,15 @@
         data,
         binary,
         responseType: "blob",
-        async onload(response) {
-          var _a;
+        async onload(e) {
+          var _a2;
           await delay();
-          const resp = new Response((_a = response.response) != null ? _a : response.responseText, {
-            status: response.status,
-            statusText: response.statusText,
-            headers: parseHeaders(response.responseHeaders)
+          const resp = new Response((_a2 = e.response) != null ? _a2 : e.responseText, {
+            status: e.status,
+            statusText: e.statusText,
+            headers: parseHeaders(e.responseHeaders)
           });
-          Object.defineProperty(resp, "url", { value: response.finalUrl });
+          Object.defineProperty(resp, "url", { value: e.finalUrl });
           resolve(resp);
         },
         async onerror() {
@@ -92,34 +92,35 @@
           reject(new DOMException("Aborted", "AbortError"));
         },
         async onreadystatechange(response) {
-          if (request.signal) {
-            if (response.readyState === 4) {
-              request.signal.removeEventListener("abort", abortXhr);
-            }
+          var _a2;
+          if (response.readyState === 4) {
+            (_a2 = request.signal) == null ? void 0 : _a2.removeEventListener("abort", abortXhr);
           }
         }
       });
       function abortXhr() {
         handle.abort();
       }
-      if (request.signal) {
-        request.signal.addEventListener("abort", abortXhr);
-      }
+      (_a = request.signal) == null ? void 0 : _a.addEventListener("abort", abortXhr);
     });
   };
   (async () => {
     console.time("x");
-    const resp = await GM_fetch(`https://baidu.com/`, {
-      method: "POST",
-      body: JSON.stringify({
-        key: 114514
-      }),
-      headers: {
-        "content-type": "application/json"
+    const resp = await GM_fetch(
+      `https://i.pximg.net/img-original/img/2017/05/16/00/20/10/62921231_p0.png`,
+      {
+        headers: {
+          referer: "https://www.pixiv.net/"
+        }
       }
-    });
+    );
     console.log(resp);
-    console.log(resp.type);
     console.timeLog("x");
+    const imgBlob = await resp.blob();
+    console.log(imgBlob.size);
+    const imgUrl = URL.createObjectURL(imgBlob);
+    const img = new Image();
+    img.src = imgUrl;
+    document.body.append(img);
   })();
 })();

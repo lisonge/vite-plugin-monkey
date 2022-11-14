@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.9.2
+
+### 2.9.2-BugFixes
+
+- use define `__MONKEY_WINDOW__` [d04cf6b8](https://github.com/lisonge/vite-plugin-monkey/commit/a393287ff9877584e4a665203b3ffc36d04cf6b8)
+
 ## 2.9.1
 
 ### 2.9.1-BugFixes

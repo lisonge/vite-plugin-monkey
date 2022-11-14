@@ -13,6 +13,7 @@
 
 - error caused by repeated definitions [1c8c35a8](https://github.com/lisonge/vite-plugin-monkey/commit/29fd6d88573d84b2daaf5632b60c38af1c8c35a8)
 - fix readyState+response type [bee8b799](https://github.com/lisonge/vite-plugin-monkey/commit/2c77e97fcfaee74995a63d00d437dd94bee8b799)
+- del npmmirror, use npmjs [80ae6a9a](https://github.com/lisonge/vite-plugin-monkey/commit/df92f85fe8ff4c567a8ab6e16575404a80ae6a9a)
 
 ## 2.8.0
 

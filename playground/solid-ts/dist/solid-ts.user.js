@@ -68,11 +68,13 @@
     updateComputation(c);
   }
   function untrack(fn) {
-    let result, listener = Listener;
+    const listener = Listener;
     Listener = null;
-    result = fn();
-    Listener = listener;
-    return result;
+    try {
+      return fn();
+    } finally {
+      Listener = listener;
+    }
   }
   function readSignal() {
     const runningTransition = Transition;

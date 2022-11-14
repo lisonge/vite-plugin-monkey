@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.9.1
+
+### 2.9.1-BugFixes
+
+- `__MONKEY_WINDOW__` is not defined [a5b8baab](https://github.com/lisonge/vite-plugin-monkey/commit/97ca9a8cb34245472392cc2c6ac5714ca5b8baab)
+
 ## 2.9.0
 
 ### 2.9.0-Features

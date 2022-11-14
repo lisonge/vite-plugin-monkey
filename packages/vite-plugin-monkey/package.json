@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-monkey",
-  "version": "2.9.0",
+  "version": "2.9.1",
   "description": "vite plugin for Tampermonkey, Violentmonkey and Greasemonkey",
   "main": "dist/node/index.js",
   "module": "dist/node/index.mjs",

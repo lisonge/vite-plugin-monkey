@@ -44,11 +44,25 @@ const parseHeaders = (rawHeaders = '') => {
 };
 
 /**
- * polyfill window.fetch by GM_xmlhttpRequest
+ * simulate window.fetch with GM_xmlhttpRequest
+ *
+ * because [Request](https://developer.mozilla.org/en-US/docs/Web/API/Request) will delete [Forbidden_header_name](https://developer.mozilla.org/en-US/docs/Glossary/Forbidden_header_name)
+ *
+ * so you must manually modify these headers by set the second parameter of GM_fetch
+ * @example
+ * GM_fetch(
+ *   new Request('https://www.pixiv.net/', {
+ *     headers: { referer: 'https://www.pixiv.net/' }, // it will not work !!!
+ *   }),
+ * );
+ * GM_fetch(new Request('https://www.pixiv.net/'), {
+ *   headers: { referer: 'https://www.pixiv.net/' }, // it will work
+ *   headers: new Headers({ referer: 'https://www.pixiv.net/' }), // it will also work
+ * });
  */
 export const GM_fetch = async (
   input: RequestInfo | URL,
-  init?: RequestInit,
+  init: RequestInit = {},
 ): Promise<Response> => {
   const request = new Request(input, init);
   if (request.signal && request.signal.aborted) {
@@ -57,7 +71,11 @@ export const GM_fetch = async (
   let data = await request.text();
   let binary = true;
   const headers: Record<string, string> = {};
+  // can not get [`referer`,`user-agent`,`others`]
   request.headers.forEach((value, key) => {
+    headers[key] = value;
+  });
+  new Headers(init.headers).forEach((value, key) => {
     headers[key] = value;
   });
   return new Promise<Response>((resolve, reject) => {
@@ -68,14 +86,14 @@ export const GM_fetch = async (
       data,
       binary,
       responseType: 'blob',
-      async onload(response) {
+      async onload(e) {
         await delay();
-        const resp = new Response(response.response ?? response.responseText, {
-          status: response.status,
-          statusText: response.statusText,
-          headers: parseHeaders(response.responseHeaders),
+        const resp = new Response(e.response ?? e.responseText, {
+          status: e.status,
+          statusText: e.statusText,
+          headers: parseHeaders(e.responseHeaders),
         });
-        Object.defineProperty(resp, 'url', { value: response.finalUrl });
+        Object.defineProperty(resp, 'url', { value: e.finalUrl });
         resolve(resp);
       },
       async onerror() {

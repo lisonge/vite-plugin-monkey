@@ -150,7 +150,7 @@ export type MonkeyOption = {
 
     /**
      * name prefix, distinguish server.user.js and build.user.js in monkey extension install list, if you not want prefix, set false
-     * @default 'dev:'
+     * @default 'server:'
      */
     prefix?: string | ((name: string) => string) | false;
 

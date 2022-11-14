@@ -1,4 +1,4 @@
-import type { PluginOption, ResolvedConfig } from 'vite';
+import { normalizePath, PluginOption } from 'vite';
 import type { FinalMonkeyOption } from '../types';
 
 export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
@@ -9,6 +9,7 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
       isServe = command == 'serve';
     },
     transform(code, id) {
+      id = normalizePath(id);
       if (id.endsWith('vite-plugin-monkey/dist/client/index.mjs')) {
         return {
           code: code.replaceAll(

@@ -28,8 +28,6 @@ jobs:
 
       - name: Install deps
         run: pnpm install
-        env:
-          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
 
       - run: pnpm build
 

@@ -45,9 +45,10 @@
     updateComputation(c);
   }
   function untrack(fn) {
-    let result;
-    result = fn();
-    return result;
+    try {
+      return fn();
+    } finally {
+    }
   }
   function writeSignal(node, value, isComp) {
     let current = node.value;

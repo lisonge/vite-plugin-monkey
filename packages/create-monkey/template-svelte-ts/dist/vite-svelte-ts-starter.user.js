@@ -47,7 +47,9 @@ var __plugin_monkey_exposed = function() {
     target.insertBefore(node, anchor || null);
   }
   function detach(node) {
-    node.parentNode.removeChild(node);
+    if (node.parentNode) {
+      node.parentNode.removeChild(node);
+    }
   }
   function element(name) {
     return document.createElement(name);
@@ -365,7 +367,7 @@ var __plugin_monkey_exposed = function() {
         create_component(counter.$$.fragment);
         t4 = space();
         p0 = element("p");
-        p0.innerHTML = `Check out <a href="https://github.com/sveltejs/kit#readme" target="_blank">SvelteKit</a>, the official Svelte app framework powered by Vite!`;
+        p0.innerHTML = `Check out <a href="https://github.com/sveltejs/kit#readme" target="_blank" rel="noreferrer">SvelteKit</a>, the official Svelte app framework powered by Vite!`;
         t8 = space();
         p1 = element("p");
         p1.textContent = "Click on the Vite and Svelte logos to learn more";

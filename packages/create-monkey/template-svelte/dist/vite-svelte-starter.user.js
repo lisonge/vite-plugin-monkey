@@ -47,7 +47,9 @@ var __plugin_monkey_exposed = function() {
     target.insertBefore(node, anchor || null);
   }
   function detach(node) {
-    node.parentNode.removeChild(node);
+    if (node.parentNode) {
+      node.parentNode.removeChild(node);
+    }
   }
   function element(name) {
     return document.createElement(name);

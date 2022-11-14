@@ -6,7 +6,6 @@ export { GM_fetch } from './fetch';
 export const GM = /* @__PURE__ */ (() => monkeyWindow.GM)();
 
 export const unsafeWindow = /* @__PURE__ */ (() => {
-  monkeyWindow.unsafeWindow = monkeyWindow.unsafeWindow ?? window;
   return monkeyWindow.unsafeWindow;
 })();
 

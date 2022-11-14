@@ -1,5 +1,5 @@
 import { MonkeyWindow } from './types';
 
-export const monkeyWindow: MonkeyWindow = /* @__PURE__ */ (() =>
-  // @ts-ignore
-  document.__monkeyWindow ?? window)();
+declare const __MONKEY_WINDOW__: MonkeyWindow; // set by plugin
+
+export const monkeyWindow = __MONKEY_WINDOW__;

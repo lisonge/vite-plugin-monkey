@@ -8,6 +8,7 @@ import fixVitePlugin from './plugins/fixVite';
 import perviewPlugin from './plugins/perview';
 import serverPlugin from './plugins/server';
 import virtualHtmlPlugin from './plugins/virtualHtml';
+import windowPlugin from './plugins/window';
 import type {
   FinalMonkeyOption,
   IArray,
@@ -365,5 +366,6 @@ export default (pluginOption: MonkeyOption): PluginOption => {
     extraToBundlePlugin(finalPluginOption),
     virtualHtmlPlugin(finalPluginOption),
     perviewPlugin(finalPluginOption),
+    windowPlugin(finalPluginOption),
   ];
 };

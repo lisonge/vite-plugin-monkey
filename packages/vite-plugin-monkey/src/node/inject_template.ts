@@ -37,22 +37,14 @@ export const serverInjectFn = ({
   document.__monkeyWindow = monkeyWindow;
   console.log(`[vite-plugin-monkey] mount monkeyWindow to document`);
 
-  const createScript = ({ src, type }: { src: string; type?: string }) => {
-    const el = document.createElement('script');
-    el.src = src;
-    if (type) {
-      el.type = type;
-    }
-    el.dataset.source = 'vite-plugin-monkey';
-    return el;
-  };
-  const { head } = document;
-  entryList.reverse().forEach((s) => {
-    head.insertBefore(createScript(s), head.firstChild);
-  });
-  console.log(
-    `[vite-plugin-monkey] mount ${entryList.length} entry module to document.head`,
-  );
+  const entryScript = document.createElement('script');
+  entryScript.dataset.source = 'vite-plugin-monkey';
+  entryScript.type = 'module';
+  entryScript.text = entryList
+    .map((s) => `import ${JSON.stringify(s.src)};`)
+    .join('\n');
+  document.head.insertBefore(entryScript, document.head.firstChild);
+  console.log(`[vite-plugin-monkey] mount entry module to document.head`);
 };
 
 export const cssInjectFn = (css: string) => {

@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.9.3
+
+### 2.9.3-BugFixes
+
+- entry script not executed in order [6c9541b6](https://github.com/lisonge/vite-plugin-monkey/commit/223d8b2a3280876d55deb3e24fd0f8fa6c9541b6)
+
 ## 2.9.2
 
 ### 2.9.2-BugFixes

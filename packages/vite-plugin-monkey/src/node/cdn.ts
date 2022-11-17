@@ -59,7 +59,11 @@ export const unpkg = (
     exportVarName,
     (version, name, _importName = '', resolveName = '') => {
       pathname ||= resolveName;
-      return `https://unpkg.com/${name}@${version}/${pathname}`;
+      if (pathname) {
+        return `https://unpkg.com/${name}@${version}/${pathname}`;
+      } else {
+        return `https://unpkg.com/${name}@${version}`;
+      }
     },
   ];
 };

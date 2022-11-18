@@ -1,16 +1,40 @@
-name: Add GitHub Release Tag
+name: Publish Package + Create Release
 
 on:
   push:
     tags:
       - 'v*'
       - 'create-monkey*'
+      - 'monkey-extra*'
 
 jobs:
-  release:
+  publish_release:
+    # prevents this action from running on forks
+    if: github.repository == 'lisonge/vite-plugin-monkey'
     runs-on: ubuntu-latest
+    environment: Release
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2.2.2
+
+      - name: Set node version to 16.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          registry-url: https://registry.npmjs.org/
+
+      - name: Install deps
+        run: pnpm install
+
+      - run: pnpm build
+
+      - name: Publish package
+        run: pnpm run ci-publish ${{ github.ref_name }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Get pkgName for tag
         id: tag

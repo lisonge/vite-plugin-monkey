@@ -79,10 +79,6 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
       const { userscript } = finalPluginOption;
 
       let prefix = finalPluginOption.server.prefix;
-      if (typeof prefix == 'string') {
-        const t = prefix + '';
-        prefix = (name: string) => t + name;
-      }
       if (typeof prefix == 'function') {
         for (const [k, v] of Object.entries(userscript.name)) {
           Reflect.set(userscript.name, k, prefix(v));

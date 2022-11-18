@@ -16,11 +16,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: volta-cli/action@v3
-
       - uses: pnpm/action-setup@v2
         with:
           version: 7
+
+      - uses: volta-cli/action@v3
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - run: pnpm install
 

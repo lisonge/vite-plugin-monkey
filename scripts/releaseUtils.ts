@@ -5,11 +5,10 @@ import { existsSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import colors from 'picocolors';
-import type { ReleaseType } from 'semver';
 
 export const args = minimist(process.argv.slice(2));
 
-export const isDryRun = !!args.dry;
+const isDryRun = !!args.dry;
 
 const compatRequire = createRequire(process.cwd() + '/any_filename.js');
 
@@ -17,10 +16,6 @@ if (isDryRun) {
   console.log(colors.inverse(colors.yellow(' DRY RUN ')));
   console.log();
 }
-
-export const packages = ['vite-plugin-monkey', 'create-monkey'];
-
-export const versionIncrements: ReleaseType[] = ['patch', 'minor', 'major'];
 
 interface Pkg {
   name: string;

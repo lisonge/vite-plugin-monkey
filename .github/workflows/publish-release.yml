@@ -21,12 +21,15 @@ jobs:
           version: 7
 
       - uses: volta-cli/action@v3
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - run: pnpm install
 
       - run: pnpm build
+
+      - name: Set publishing config
+        run: pnpm config set '//registry.npmjs.org/:_authToken' "${NODE_AUTH_TOKEN}"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish package
         run: pnpm run ci-publish ${{ github.ref_name }}

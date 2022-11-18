@@ -1,0 +1,51 @@
+{
+  "name": "monkey-extra",
+  "version": "0.0.1-alpha.1",
+  "description": "monkey-extra",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "files": [
+    "src",
+    "dist",
+    "pnpm-lock.yaml",
+    "tsup.config.ts",
+    "tsconfig.json"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "scripts": {
+    "build": "tsup"
+  },
+  "keywords": [
+    "monkey",
+    "Tampermonkey",
+    "Violentmonkey",
+    "Greasemonkey",
+    "userscript",
+    "greasyfork",
+    "typescript"
+  ],
+  "author": "lisonge",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lisonge/vite-plugin-monkey.git",
+    "directory": "packages/monkey-extra"
+  },
+  "bugs": {
+    "url": "https://github.com/lisonge/vite-plugin-monkey/issues"
+  },
+  "homepage": "https://github.com/lisonge/vite-plugin-monkey#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "vite-plugin-monkey": "workspace:*"
+  },
+  "peerDependencies": {
+    "vite-plugin-monkey": "*"
+  },
+  "volta": {
+    "extends": "../../package.json"
+  }
+}

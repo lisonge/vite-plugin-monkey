@@ -128,6 +128,8 @@ export default (pluginOption: MonkeyOption): PluginOption => {
       prefix2 = prefix;
     } else if (typeof prefix == 'string') {
       prefix2 = () => prefix;
+    } else if (prefix === false) {
+      prefix2 = (name: string) => name;
     }
     const externalGlobals2 = build?.externalGlobals ?? {};
     const externalGlobals: [string, IArray<string | Mod2UrlFn>][] = [];

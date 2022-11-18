@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2.9.4
+
+### 2.9.4-BugFixes
+
+- cdn.unpkg when pathname omitted [3e45e9d8](https://github.com/lisonge/vite-plugin-monkey/commit/5e8c416d2871dac6b4a963756cbdb0833e45e9d8)
+- case when prefix=false [cec5e0bd](https://github.com/lisonge/vite-plugin-monkey/commit/f816f13024d49a87de80853cb42199c8cec5e0bd)
+
 ## 2.9.3
 
 ### 2.9.3-BugFixes

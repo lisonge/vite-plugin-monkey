@@ -34,7 +34,6 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
         if (['/', '/index.html'].includes((req.url ?? '').split('?')[0])) {
           const distDirPath = path.join(process.cwd(), viteConfig.build.outDir);
           for await (const pathname of walk(distDirPath)) {
-            console.log(pathname);
             if (pathname.endsWith('.user.js')) {
               const fileName = normalizePath(
                 path.relative(distDirPath, pathname),

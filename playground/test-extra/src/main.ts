@@ -1,4 +1,4 @@
-import { GM_fetch, asyncQuerySelector } from 'monkey-extra';
+import { GM_fetch, asyncQuerySelector, InterceptorManager } from 'monkey-extra';
 
 (async () => {
   const resp = await GM_fetch(
@@ -29,4 +29,27 @@ import { GM_fetch, asyncQuerySelector } from 'monkey-extra';
   }
 })();
 
+(async () => {
+  InterceptorManager.enable = true;
+  InterceptorManager.use(async ({ proceed, request }) => {
+    const url: URL = new URL(request.url);
+    url.searchParams.set(`k`, new Date().getTime().toString());
+    return proceed(new Request(url, request));
+  });
+  await fetch(location.href);
+})();
+
 // ![image](https://user-images.githubusercontent.com/38517192/202778567-6b211a71-c5e4-4262-b9d6-4fefada2369d.png)
+
+// class A {
+//   private _k = 0;
+//   set k(value: number) {
+//     this._k = value;
+//   }
+//   get k() {
+//     return this._k;
+//   }
+// }
+
+// const a = new A();
+// console.log(a.k);

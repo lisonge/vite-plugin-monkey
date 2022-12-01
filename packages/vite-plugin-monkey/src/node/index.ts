@@ -283,7 +283,7 @@ export default (pluginOption: MonkeyOption): PluginOption => {
         $extra,
         grant: grantSet,
       },
-      clientAlias: '$',
+      clientAlias: pluginOption.clientAlias ?? '$',
       entry: pluginOption.entry,
       format: pluginOption.format,
       server: {

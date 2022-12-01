@@ -1,5 +1,5 @@
 import { GM_xmlhttpRequest } from 'vite-plugin-monkey/dist/client';
-import { delay } from './util';
+import { delay, parseHeaders } from './util';
 
 // https://github.com/github/fetch/blob/master/fetch.js
 
@@ -9,30 +9,6 @@ const fixUrl = (url = '') => {
   } catch {
     return url;
   }
-};
-
-const parseHeaders = (rawHeaders = '') => {
-  const headers = new Headers();
-  // Replace instances of \r\n and \n followed by at least one space or horizontal tab with a space
-  // https://tools.ietf.org/html/rfc7230#section-3.2
-  const preProcessedHeaders = rawHeaders.replace(/\r?\n[\t ]+/g, ' ');
-  // Avoiding split via regex to work around a common IE11 bug with the core-js 3.6.0 regex polyfill
-  // https://github.com/github/fetch/issues/748
-  // https://github.com/zloirock/core-js/issues/751
-  preProcessedHeaders
-    .split('\r')
-    .map(function (header) {
-      return header.startsWith(`\n`) ? header.substring(1) : header;
-    })
-    .forEach(function (line) {
-      let parts = line.split(':');
-      let key = parts.shift()?.trim();
-      if (key) {
-        let value = parts.join(':').trim();
-        headers.append(key, value);
-      }
-    });
-  return headers;
 };
 
 /**
@@ -57,10 +33,10 @@ export const GM_fetch = async (
   init: RequestInit = {},
 ): Promise<Response> => {
   const request = new Request(input, init);
-  if (request.signal && request.signal.aborted) {
+  if (request.signal?.aborted) {
     throw new DOMException('Aborted', 'AbortError');
   }
-  let data = await request.text();
+  const data = await request.text();
   let binary = true;
   const headers: Record<string, string> = {};
   // can not get [`referer`,`user-agent`,`others`]

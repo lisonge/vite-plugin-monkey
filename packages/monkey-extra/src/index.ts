@@ -1,3 +1,3 @@
-export { GM_fetch } from './gm_fetch';
-export { asyncQuerySelector } from './async_query';
-export { InterceptorManager } from './interceptor';
+export * from './gm_fetch';
+export * from './async_query';
+export * from './interceptor';

@@ -1,4 +1,4 @@
-export const asyncQuerySelector = async <E extends Element = Element>(
+export const querySelector = async <E extends Element = Element>(
   root: ParentNode,
   selectors: string,
   timeout?: number,

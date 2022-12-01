@@ -1,4 +1,8 @@
-import { GM_fetch, asyncQuerySelector, InterceptorManager } from 'monkey-extra';
+import {
+  GM_fetch,
+  querySelector,
+  UnsafeWindowInterceptorManager,
+} from 'monkey-extra';
 
 (async () => {
   const resp = await GM_fetch(
@@ -23,16 +27,16 @@ import { GM_fetch, asyncQuerySelector, InterceptorManager } from 'monkey-extra';
     div.classList.add(randomKey);
     document.body.append(div);
   }, 1000);
-  const div = await asyncQuerySelector(document.body, `.` + randomKey, 1500);
+  const div = await querySelector(document.body, `.` + randomKey, 1500);
   if (div) {
     div.textContent = randomKey;
   }
 })();
 
 (async () => {
-  InterceptorManager.enable = true;
-  InterceptorManager.use(async ({ proceed, request }) => {
+  UnsafeWindowInterceptorManager.use(async ({ proceed, request }) => {
     const url: URL = new URL(request.url);
+    console.log(`hook: ${request.url}`);
     url.searchParams.set(`k`, new Date().getTime().toString());
     return proceed(new Request(url, request));
   });

@@ -456,7 +456,7 @@
       sharedConfig.done = true;
       document.querySelectorAll("[id^=pl-]").forEach((elem) => elem.remove());
     }
-    while (node !== null) {
+    while (node) {
       const handler = node[key];
       if (handler && !node.disabled) {
         const data = node[`${key}Data`];
@@ -464,7 +464,7 @@
         if (e.cancelBubble)
           return;
       }
-      node = node.host && node.host !== node && node.host instanceof Node ? node.host : node.parentNode;
+      node = node._$host || node.parentNode || node.host;
     }
   }
   function insertExpression(parent, value, current, marker, unwrapArray) {

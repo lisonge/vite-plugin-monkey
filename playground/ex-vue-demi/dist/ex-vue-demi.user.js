@@ -9,16 +9,14 @@
 // @require      https://cdn.jsdelivr.net/npm/vue@3.2.45/dist/vue.global.prod.js
 // @require      https://unpkg.com/vue-demi@latest/lib/index.iife.js
 // @require      data:application/javascript,window.Vue%3DVue%3B
-// @require      https://cdn.jsdelivr.net/npm/pinia@2.0.23/dist/pinia.iife.prod.js
-// @require      https://cdn.jsdelivr.net/npm/element-plus@2.2.21/dist/index.full.min.js
-// @resource     element-plus/dist/index.css  https://cdn.jsdelivr.net/npm/element-plus@2.2.21/dist/index.css
+// @require      https://cdn.jsdelivr.net/npm/pinia@2.0.28/dist/pinia.iife.prod.js
+// @require      https://cdn.jsdelivr.net/npm/element-plus@2.2.26/dist/index.full.min.js
+// @resource     element-plus/dist/index.css  https://cdn.jsdelivr.net/npm/element-plus@2.2.26/dist/index.css
 // @grant        GM_getResourceText
 // ==/UserScript==
 
 (function(vue, pinia$1, ElementPlus2) {
   "use strict";
-  const _interopDefaultLegacy = (e) => e && typeof e === "object" && "default" in e ? e : { default: e };
-  const ElementPlus__default = /* @__PURE__ */ _interopDefaultLegacy(ElementPlus2);
   const cssLoader = (e) => {
     const t = GM_getResourceText(e), o = document.createElement("style");
     return o.innerText = t, document.head.append(o), t;
@@ -66,7 +64,7 @@
   });
   const pinia = pinia$1.createPinia();
   const app = vue.createApp(_sfc_main);
-  app.use(ElementPlus__default.default);
+  app.use(ElementPlus2);
   app.use(pinia);
   app.mount(
     (() => {

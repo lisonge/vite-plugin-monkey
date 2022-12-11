@@ -15,8 +15,7 @@
   "use strict";
   var monkeyWindow = window;
   const xmlhttpRequest = /* @__PURE__ */ (() => {
-    var _a;
-    return (_a = monkeyWindow.GM_xmlhttpRequest) != null ? _a : monkeyWindow.GM.xmlHttpRequest;
+    return monkeyWindow.GM_xmlhttpRequest ?? monkeyWindow.GM.xmlHttpRequest;
   })();
   const fixUrl = (url = "") => {
     try {
@@ -69,9 +68,8 @@
         binary,
         responseType: "blob",
         async onload(e) {
-          var _a2;
           await delay();
-          const resp = new Response((_a2 = e.response) != null ? _a2 : e.responseText, {
+          const resp = new Response(e.response ?? e.responseText, {
             status: e.status,
             statusText: e.statusText,
             headers: parseHeaders(e.responseHeaders)

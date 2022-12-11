@@ -9,17 +9,14 @@
 // @require      https://cdn.jsdelivr.net/npm/md5@2.3.0/dist/md5.min.js
 // @require      https://cdn.jsdelivr.net/npm/vue@3.2.45/dist/vue.global.prod.js
 // @require      data:application/javascript,window.Vue%3DVue%3B
-// @require      https://cdn.jsdelivr.net/npm/element-plus@2.2.21/dist/index.full.min.js
+// @require      https://cdn.jsdelivr.net/npm/element-plus@2.2.26/dist/index.full.min.js
 // @resource     animate.css  https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.css
 // @grant        GM_getResourceText
 // ==/UserScript==
 
 (function(md5, vue, elementPlus) {
   "use strict";
-  const _interopDefaultLegacy = (e) => e && typeof e === "object" && "default" in e ? e : { default: e };
-  function _interopNamespace(e) {
-    if (e && e.__esModule)
-      return e;
+  function _interopNamespaceDefault(e) {
     const n = Object.create(null, { [Symbol.toStringTag]: { value: "Module" } });
     if (e) {
       for (const k in e) {
@@ -54,12 +51,9 @@
     }
     return Object.freeze(Object.defineProperty(n, Symbol.toStringTag, { value: "Module" }));
   }
-  const md5__namespace = /* @__PURE__ */ _interopNamespace(md5);
-  const md5__default = /* @__PURE__ */ _interopDefaultLegacy(md5);
-  const vue__namespace = /* @__PURE__ */ _interopNamespace(vue);
-  const vue__default = /* @__PURE__ */ _interopDefaultLegacy(vue);
-  const elementPlus__namespace = /* @__PURE__ */ _interopNamespace(elementPlus);
-  const elementPlus__default = /* @__PURE__ */ _interopDefaultLegacy(elementPlus);
+  const md5__namespace = /* @__PURE__ */ _interopNamespaceDefault(md5);
+  const vue__namespace = /* @__PURE__ */ _interopNamespaceDefault(vue);
+  const elementPlus__namespace = /* @__PURE__ */ _interopNamespaceDefault(elementPlus);
   if (location.href.includes("animate.css=on")) {
     Promise.resolve().then(() => _monkeyResourceImport_animate$1);
     document.querySelectorAll("div").forEach((div) => {
@@ -93,14 +87,14 @@
   }, Symbol.toStringTag, { value: "Module" }));
   const _monkeyDynamicImport_md5_ = /* @__PURE__ */ _mergeNamespaces({
     __proto__: null,
-    default: md5__default.default
+    default: md5
   }, [md5__namespace]);
   const _monkeyDynamicImport_vue_ = /* @__PURE__ */ _mergeNamespaces({
     __proto__: null,
-    default: vue__default.default
+    default: vue
   }, [vue__namespace]);
   const _monkeyDynamicImport_elementPlus_ = /* @__PURE__ */ _mergeNamespaces({
     __proto__: null,
-    default: elementPlus__default.default
+    default: elementPlus
   }, [elementPlus__namespace]);
 })(MD5, Vue, ElementPlus);

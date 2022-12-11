@@ -8,14 +8,14 @@
 // @match        https://i.songe.li/
 // @require      https://cdn.jsdelivr.net/npm/vue@3.2.45/dist/vue.global.prod.js
 // @require      data:application/javascript,window.Vue%3DVue%3B
-// @require      https://cdn.jsdelivr.net/npm/element-plus@2.2.21/dist/index.full.min.js
+// @require      https://cdn.jsdelivr.net/npm/element-plus@2.2.26/dist/index.full.min.js
 // @resource     animate.css                      https://cdn.bootcdn.net/ajax/libs/animate.css/4.1.1/animate.css
-// @resource     base64-img/test/img/car.svg      https://unpkg.com/base64-img@1.0.4/test/img/car.svg
 // @resource     base64-img/test/img/car.svg?raw  https://cdn.jsdelivr.net/npm/base64-img@1.0.4/test/img/car.svg
 // @resource     base64-img/test/img/car.svg?url  https://cdn.jsdelivr.net/npm/base64-img@1.0.4/test/img/car.svg
-// @resource     element-plus/dist/index.css      https://cdn.jsdelivr.net/npm/element-plus@2.2.21/dist/index.css
-// @resource     element-plus/dist/index.css?raw  https://cdn.jsdelivr.net/npm/element-plus@2.2.21/dist/index.css
-// @resource     element-plus/package.json        https://npm.elemecdn.com/element-plus@2.2.21/package.json
+// @resource     base64-img/test/img/car.svg      https://unpkg.com/base64-img@1.0.4/test/img/car.svg
+// @resource     element-plus/dist/index.css      https://cdn.jsdelivr.net/npm/element-plus@2.2.26/dist/index.css
+// @resource     element-plus/dist/index.css?raw  https://cdn.jsdelivr.net/npm/element-plus@2.2.26/dist/index.css
+// @resource     element-plus/package.json        https://npm.elemecdn.com/element-plus@2.2.26/package.json
 // @grant        GM_getResourceText
 // @grant        GM_getResourceURL
 // @grant        unsafeWindow
@@ -23,9 +23,7 @@
 
 (function(Vue2, elementPlus) {
   "use strict";
-  function _interopNamespace(e) {
-    if (e && e.__esModule)
-      return e;
+  function _interopNamespaceDefault(e) {
     const n = Object.create(null, { [Symbol.toStringTag]: { value: "Module" } });
     if (e) {
       for (const k in e) {
@@ -41,7 +39,7 @@
     n.default = e;
     return Object.freeze(n);
   }
-  const Vue__namespace = /* @__PURE__ */ _interopNamespace(Vue2);
+  const Vue__namespace = /* @__PURE__ */ _interopNamespaceDefault(Vue2);
   const cssLoader = (e) => {
     const t = GM_getResourceText(e), o = document.createElement("style");
     return o.innerText = t, document.head.append(o), t;

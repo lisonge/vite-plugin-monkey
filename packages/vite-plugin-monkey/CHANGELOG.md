@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 2.10.0
+
+### 2.10.0-BugFixes
+
+- clientAlias can not work [d0347a26](https://github.com/lisonge/vite-plugin-monkey/commit/685d5a369a9aa3fcea4ec47701d5136bd0347a26)
+
+### 2.10.0-Features
+
+- support vite@>=3.0.0
+
 ## 2.9.4
 
 ### 2.9.4-BugFixes

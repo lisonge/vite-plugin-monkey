@@ -1,5 +1,6 @@
 import path from 'node:path';
 import type { PluginOption, ResolvedConfig } from 'vite';
+import { resolveConfig, transformWithEsbuild } from 'vite';
 import { cssInjectFn, fn2string } from '../inject_template';
 import type { FinalMonkeyOption } from '../types';
 import { finalMonkeyOptionToComment } from '../userscript';
@@ -7,12 +8,26 @@ import { miniCode } from '../_util';
 
 export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
   let viteConfig: ResolvedConfig;
+
+  // https://github.com/vitejs/vite/blob/b9511f1ed8e36a618214944c69e2de6504ebcb3c/packages/vite/src/node/constants.ts#L20
+  let ESBUILD_MODULES_TARGET = [
+    'es2020',
+    'edge88',
+    'firefox78',
+    'chrome87',
+    'safari14',
+  ];
   return {
     name: 'monkey:extraToBundle',
     apply: 'build',
     enforce: 'post',
     async configResolved(resolvedConfig) {
       viteConfig = resolvedConfig;
+      const { target } = (await resolveConfig({ configFile: false }, 'build'))
+        .build;
+      if (Array.isArray(target) && target.length > 0) {
+        ESBUILD_MODULES_TARGET = target;
+      }
     },
     async generateBundle(_, bundle) {
       const bundleList = Object.entries(bundle);
@@ -29,7 +44,28 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
       if (cssList.length > 0) {
         let css = cssList.join('');
         if (!viteConfig.build.minify && finalPluginOption.build.minifyCss) {
-          css = await miniCode(css, 'css');
+          let { cssTarget, target } = viteConfig.build;
+          if (!cssTarget) {
+            cssTarget = target;
+          }
+          let finalTarget: string | string[] | undefined = undefined;
+          if (typeof cssTarget == 'string') {
+            if (cssTarget == 'modules') {
+              finalTarget = ESBUILD_MODULES_TARGET;
+            } else {
+              finalTarget = cssTarget;
+            }
+          } else if (cssTarget && cssTarget instanceof Array) {
+            finalTarget = cssTarget;
+          }
+          css = (
+            await transformWithEsbuild(css, 'any_name.css', {
+              sourcemap: false,
+              legalComments: 'none',
+              minify: true,
+              target: finalTarget,
+            })
+          ).code.trimEnd();
         }
         injectCssCode = await miniCode(fn2string(cssInjectFn, css), 'js');
       }

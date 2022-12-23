@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.10.1
+
+### 2.10.1-BugFixes
+
+- minify css target [fcdeca87](https://github.com/lisonge/vite-plugin-monkey/commit/0d03f407b99d28747b5fae9020c86a02fcdeca87), [#37](https://github.com/lisonge/vite-plugin-monkey/issues/37)
+
 ## 2.10.0
 
 ### 2.10.0-BugFixes

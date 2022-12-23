@@ -1,0 +1,13 @@
+.read-the-docs {
+  color: #888;
+  position: fixed;
+  top: 60px;
+  right: 0;
+  bottom: 0;
+  left: 260px;
+  background: #fff;
+  z-index: 1050;
+  padding: 10px 20px 200px 20px;
+  overflow-y: auto;
+  box-shadow: -2px 2px 6px #bbbbbb;
+}

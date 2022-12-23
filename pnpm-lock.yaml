@@ -157,6 +157,12 @@ importers:
     dependencies:
       vite-plugin-monkey: link:../../packages/vite-plugin-monkey
 
+  playground/mini-css:
+    specifiers:
+      vite-plugin-monkey: workspace:*
+    dependencies:
+      vite-plugin-monkey: link:../../packages/vite-plugin-monkey
+
   playground/react-ts:
     specifiers:
       vite-plugin-monkey: workspace:*

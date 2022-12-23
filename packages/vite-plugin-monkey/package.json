@@ -18,6 +18,7 @@
       "types": "./dist/client/index.d.ts"
     }
   },
+  "sideEffects": false,
   "files": [
     "src",
     "dist",

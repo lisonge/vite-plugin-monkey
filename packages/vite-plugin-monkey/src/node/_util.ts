@@ -142,61 +142,6 @@ export const compatResolve = (() => {
   };
 })();
 
-export const lazy = <T extends object>(fn: () => T) => {
-  let temp: T | undefined = undefined;
-  let o = {
-    get k() {
-      if (temp === undefined) {
-        temp = fn();
-      }
-      return temp;
-    },
-  };
-  return new Proxy({} as T, {
-    get(_, p, receiver) {
-      return Reflect.get(o.k, p, receiver);
-    },
-    set(_, p, newValue, receiver) {
-      return Reflect.set(o.k, p, newValue, receiver);
-    },
-    has(_, p) {
-      return Reflect.has(o.k, p);
-    },
-    ownKeys() {
-      return Reflect.ownKeys(o.k);
-    },
-    isExtensible() {
-      return Reflect.isExtensible(o.k);
-    },
-    deleteProperty(_, p) {
-      return Reflect.deleteProperty(o.k, p);
-    },
-    setPrototypeOf(_, v) {
-      return Reflect.setPrototypeOf(o.k, v);
-    },
-    getOwnPropertyDescriptor(_, p) {
-      return Reflect.getOwnPropertyDescriptor(o.k, p);
-    },
-    defineProperty(_, property, attributes) {
-      return Reflect.defineProperty(o.k, property, attributes);
-    },
-    getPrototypeOf() {
-      return Reflect.getPrototypeOf(o.k);
-    },
-    preventExtensions() {
-      return Reflect.preventExtensions(o.k);
-    },
-    apply(_, thisArg, argArray) {
-      // @ts-ignore
-      return Reflect.apply(o.k, thisArg, argArray);
-    },
-    construct(_, argArray, newTarget) {
-      // @ts-ignore
-      return Reflect.construct(o.k, argArray, newTarget);
-    },
-  });
-};
-
 export const existFile = async (path: string) => {
   try {
     return (await fs.stat(path)).isFile();

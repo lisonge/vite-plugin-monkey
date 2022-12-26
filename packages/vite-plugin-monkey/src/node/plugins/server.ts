@@ -7,8 +7,9 @@ import { fn2string, serverInjectFn } from '../inject_template';
 import { openBrowser } from '../open_browser';
 import type { FinalMonkeyOption } from '../types';
 import { finalMonkeyOptionToComment } from '../userscript';
+import { lazy } from '../_lazy';
 import { logger } from '../_logger';
-import { existFile, isFirstBoot, lazy } from '../_util';
+import { existFile, isFirstBoot } from '../_util';
 
 export const installUserPath = '/__vite-plugin-monkey.install.user.js';
 const cacheUserPath = 'node_modules/.vite/__vite-plugin-monkey.cache.user.js';

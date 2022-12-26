@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.10.2
+
+### 2.10.2-BugFixes
+
+- should modify author instead of name [3bb494ad](https://github.com/lisonge/vite-plugin-monkey/commit/c1b5664291f320f757dc06b097868cfc3bb494ad), [#38](https://github.com/lisonge/vite-plugin-monkey/issues/38)
+
 ## 2.10.1
 
 ### 2.10.1-BugFixes

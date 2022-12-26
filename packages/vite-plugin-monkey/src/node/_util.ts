@@ -110,7 +110,7 @@ export const projectPkg = (() => {
     rawTarget.author instanceof Object &&
     typeof rawTarget.author?.name == 'string'
   ) {
-    target.name = rawTarget.author?.name;
+    target.author = rawTarget.author?.name;
   }
   if (
     rawTarget.bugs instanceof Object &&

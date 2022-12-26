@@ -2,7 +2,7 @@
 // @name       mini-css
 // @namespace  npm/vite-plugin-monkey
 // @version    0.0.0
-// @author     monkey
+// @author     author_name
 // @icon       https://vitejs.dev/logo.svg
 // @match      https://i.songe.li/*
 // ==/UserScript==

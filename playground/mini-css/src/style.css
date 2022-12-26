@@ -11,3 +11,7 @@
   overflow-y: auto;
   box-shadow: -2px 2px 6px #bbbbbb;
 }
+body {
+  display: flex;
+  background-color: cyan;
+}

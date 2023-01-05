@@ -2,7 +2,7 @@ import detectPort from 'detect-port';
 import { DomUtils, ElementType, parseDocument } from 'htmlparser2';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import type { PluginOption, ResolvedConfig } from 'vite';
+import { normalizePath, PluginOption, ResolvedConfig } from 'vite';
 import { fn2string, serverInjectFn } from '../inject_template';
 import { openBrowser } from '../open_browser';
 import type { FinalMonkeyOption } from '../types';
@@ -12,6 +12,8 @@ import { logger } from '../_logger';
 import { existFile, isFirstBoot } from '../_util';
 
 export const installUserPath = '/__vite-plugin-monkey.install.user.js';
+const entryPath = '/__vite-plugin-monkey.entry.js';
+const pullPath = '/__vite-plugin-monkey.pull.js';
 const cacheUserPath = 'node_modules/.vite/__vite-plugin-monkey.cache.user.js';
 
 export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
@@ -103,13 +105,33 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
         }://${realHost}`;
 
         if (req.url?.startsWith(installUserPath)) {
+          res.end(
+            [
+              await finalMonkeyOptionToComment(finalPluginOption),
+              fn2string(serverInjectFn, {
+                entrySrc: new URL(entryPath, origin).href,
+                mountGmApi: finalPluginOption.server.mountGmApi,
+              }),
+              '',
+            ].join('\n\n'),
+          );
+        } else if (req.url?.startsWith(pullPath)) {
           Object.entries({
             'access-control-allow-origin': '*',
             'content-type': 'application/javascript',
           }).forEach(([k, v]) => {
             res.setHeader(k, v);
           });
-
+          const u = new URL(req.url, origin);
+          const text = u.searchParams.get('text') ?? '';
+          res.end(Buffer.from(text, 'base64url').toString('utf-8'));
+        } else if (req.url?.startsWith(entryPath)) {
+          Object.entries({
+            'access-control-allow-origin': '*',
+            'content-type': 'application/javascript',
+          }).forEach(([k, v]) => {
+            res.setHeader(k, v);
+          });
           const htmlText = await server.transformIndexHtml(
             '/',
             `<html><head></head></html>`,
@@ -132,20 +154,20 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
             src: string;
           }[] = scriptList.map((p) => {
             const src = p.attribs.src ?? '';
-            const text = p.firstChild;
+            const textNode = p.firstChild;
             const type = p.attribs.type;
-            let innerText = '';
-            if (text?.type == ElementType.Text) {
-              innerText = text.data ?? '';
+            let text = '';
+            if (textNode?.type == ElementType.Text) {
+              text = textNode.data ?? '';
             }
             if (src) {
               return { type, src: new URL(src, origin).href };
             } else {
               const u = new URL(origin);
-              u.pathname = '/__vite-plugin-monkey/pull_script';
+              u.pathname = pullPath;
               u.searchParams.set(
-                'innerText',
-                Buffer.from(innerText, 'utf-8').toString('base64url'),
+                'text',
+                Buffer.from(text, 'utf-8').toString('base64url'),
               );
               return { type, src: u.href };
             }
@@ -153,33 +175,17 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
 
           let realEntry = finalPluginOption.entry;
           if (path.isAbsolute(realEntry)) {
-            realEntry = path.relative(viteConfig.root, realEntry);
-            realEntry = realEntry.replace('\\', '/');
+            realEntry = normalizePath(
+              path.relative(viteConfig.root, realEntry),
+            );
           }
           entryList.push({
             type: 'module',
             src: new URL(realEntry, origin).href,
           });
           res.end(
-            [
-              await finalMonkeyOptionToComment(finalPluginOption),
-              fn2string(serverInjectFn, {
-                entryList,
-                mountGmApi: finalPluginOption.server.mountGmApi,
-              }),
-              '',
-            ].join('\n\n'),
+            entryList.map((s) => `import ${JSON.stringify(s.src)};`).join('\n'),
           );
-        } else if (req.url?.startsWith('/__vite-plugin-monkey/pull_script')) {
-          Object.entries({
-            'access-control-allow-origin': '*',
-            'content-type': 'application/javascript',
-          }).forEach(([k, v]) => {
-            res.setHeader(k, v);
-          });
-          const u = new URL(req.url, origin);
-          const innerText = u.searchParams.get('innerText') ?? '';
-          res.end(Buffer.from(innerText, 'base64url').toString('utf-8'));
         } else {
           next();
         }

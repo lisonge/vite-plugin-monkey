@@ -5,10 +5,7 @@ export const fn2string = <T extends (...args: any[]) => any>(
   return `;(${fn})(...${JSON.stringify(args, undefined, 2)});`;
 };
 
-export const serverInjectFn = ({
-  entryList = [] as { src: string; type?: string }[],
-  mountGmApi = false,
-}) => {
+export const serverInjectFn = ({ entrySrc = ``, mountGmApi = false }) => {
   // @ts-ignore
   window.GM; // must exist, see https://github.com/Tampermonkey/tampermonkey/issues/1567
   const monkeyWindow = window;
@@ -37,14 +34,14 @@ export const serverInjectFn = ({
   document.__monkeyWindow = monkeyWindow;
   console.log(`[vite-plugin-monkey] mount monkeyWindow to document`);
 
-  const entryScript = document.createElement('script');
-  entryScript.dataset.source = 'vite-plugin-monkey';
-  entryScript.type = 'module';
-  entryScript.text = entryList
-    .map((s) => `import ${JSON.stringify(s.src)};`)
-    .join('\n');
-  document.head.insertBefore(entryScript, document.head.firstChild);
-  console.log(`[vite-plugin-monkey] mount entry module to document.head`);
+  if (entrySrc) {
+    const entryScript = document.createElement('script');
+    entryScript.dataset.source = 'vite-plugin-monkey';
+    entryScript.type = 'module';
+    entryScript.src = entrySrc;
+    document.head.insertBefore(entryScript, document.head.firstChild);
+    console.log(`[vite-plugin-monkey] mount entry module to document.head`);
+  }
 };
 
 export const cssInjectFn = (css: string) => {

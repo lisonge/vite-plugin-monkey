@@ -5,3 +5,4 @@ dist
 .eslintcache
 *.local
 *.log
+/docs/.vitepress/cache

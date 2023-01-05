@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.10.3
+
+### 2.10.3-Features
+
+- use static entry [ba31e408](https://github.com/lisonge/vite-plugin-monkey/commit/8375485887e7fcf0579a25533591f6c7ba31e408)
+
 ## 2.10.2
 
 ### 2.10.2-BugFixes

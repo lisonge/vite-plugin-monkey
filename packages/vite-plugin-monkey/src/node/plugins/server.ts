@@ -3,7 +3,7 @@ import { DomUtils, ElementType, parseDocument } from 'htmlparser2';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { normalizePath, PluginOption, ResolvedConfig } from 'vite';
-import { fn2string, serverInjectFn } from '../inject_template';
+import { fn2string, mountGmApiFn, serverInjectFn } from '../inject_template';
 import { openBrowser } from '../open_browser';
 import type { FinalMonkeyOption } from '../types';
 import { finalMonkeyOptionToComment } from '../userscript';
@@ -12,6 +12,7 @@ import { logger } from '../_logger';
 import { existFile, isFirstBoot } from '../_util';
 
 export const installUserPath = '/__vite-plugin-monkey.install.user.js';
+const gmApiPath = '/__vite-plugin-monkey.gm.api.js';
 const entryPath = '/__vite-plugin-monkey.entry.js';
 const pullPath = '/__vite-plugin-monkey.pull.js';
 const cacheUserPath = 'node_modules/.vite/__vite-plugin-monkey.cache.user.js';
@@ -110,7 +111,6 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
               await finalMonkeyOptionToComment(finalPluginOption),
               fn2string(serverInjectFn, {
                 entrySrc: new URL(entryPath, origin).href,
-                mountGmApi: finalPluginOption.server.mountGmApi,
               }),
               '',
             ].join('\n\n'),
@@ -152,26 +152,31 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
           const entryList: {
             type: string;
             src: string;
-          }[] = scriptList.map((p) => {
-            const src = p.attribs.src ?? '';
-            const textNode = p.firstChild;
-            const type = p.attribs.type;
-            let text = '';
-            if (textNode?.type == ElementType.Text) {
-              text = textNode.data ?? '';
-            }
-            if (src) {
-              return { type, src: new URL(src, origin).href };
-            } else {
-              const u = new URL(origin);
-              u.pathname = pullPath;
-              u.searchParams.set(
-                'text',
-                Buffer.from(text, 'utf-8').toString('base64url'),
-              );
-              return { type, src: u.href };
-            }
-          });
+          }[] = finalPluginOption.server.mountGmApi
+            ? [{ type: 'module', src: gmApiPath }]
+            : [];
+          entryList.push(
+            ...scriptList.map((p) => {
+              const src = p.attribs.src ?? '';
+              const textNode = p.firstChild;
+              const type = p.attribs.type;
+              let text = '';
+              if (textNode?.type == ElementType.Text) {
+                text = textNode.data ?? '';
+              }
+              if (src) {
+                return { type, src: new URL(src, origin).href };
+              } else {
+                const u = new URL(origin);
+                u.pathname = pullPath;
+                u.searchParams.set(
+                  'text',
+                  Buffer.from(text, 'utf-8').toString('base64url'),
+                );
+                return { type, src: u.href };
+              }
+            }),
+          );
 
           let realEntry = finalPluginOption.entry;
           if (path.isAbsolute(realEntry)) {
@@ -186,6 +191,18 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
           res.end(
             entryList.map((s) => `import ${JSON.stringify(s.src)};`).join('\n'),
           );
+        } else if (req.url?.startsWith(gmApiPath)) {
+          Object.entries({
+            'access-control-allow-origin': '*',
+            'content-type': 'application/javascript',
+          }).forEach(([k, v]) => {
+            res.setHeader(k, v);
+          });
+          if (finalPluginOption.server.mountGmApi) {
+            res.end(fn2string(mountGmApiFn));
+          } else {
+            res.end('');
+          }
         } else {
           next();
         }

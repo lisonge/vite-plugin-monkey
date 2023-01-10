@@ -14,7 +14,6 @@ export const serverInjectFn = ({ entrySrc = `` }) => {
   console.log(`[vite-plugin-monkey] mount monkeyWindow to document`);
 
   const entryScript = document.createElement('script');
-  entryScript.dataset.source = 'vite-plugin-monkey';
   entryScript.type = 'module';
   entryScript.src = entrySrc;
   document.head.insertBefore(entryScript, document.head.firstChild);
@@ -60,7 +59,24 @@ export const redirectFn = async (url: string) => {
     });
   };
   await delay();
-  window.location.href = url;
-  await delay(500);
-  window.close();
+  const u = new URL(url, location.origin);
+  u.searchParams.set('origin', u.origin);
+  if (window == window.parent) {
+    location.href = u.href;
+    await delay(500);
+    window.close();
+    return;
+  }
+  const div = document.createElement('div');
+  div.style.minHeight = '75vh';
+  div.style.display = 'flex';
+  div.style.flexDirection = 'column';
+  div.style.justifyContent = 'center';
+  div.style.alignItems = 'center';
+  document.body.append(div);
+  const a = document.createElement('a');
+  a.href = u.href;
+  a.text = u.href;
+  a.style.fontSize = '20px';
+  div.append(a);
 };

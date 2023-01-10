@@ -106,11 +106,24 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
         }://${realHost}`;
 
         if (req.url?.startsWith(installUserPath)) {
+          const u = new URL(req.url, origin);
+          // if the request is forwarded by some gateways like stackblitz.com, then window.location.host will be not equal to viteServer.req.headers.host
+          let overrideOrigin = u.searchParams.get('origin');
+          if (overrideOrigin) {
+            try {
+              overrideOrigin = new URL(overrideOrigin).origin;
+            } catch {
+              overrideOrigin = origin;
+            }
+          } else {
+            overrideOrigin = origin;
+          }
+
           res.end(
             [
               await finalMonkeyOptionToComment(finalPluginOption),
               fn2string(serverInjectFn, {
-                entrySrc: new URL(entryPath, origin).href,
+                entrySrc: new URL(entryPath, overrideOrigin).href,
               }),
               '',
             ].join('\n\n'),
@@ -149,23 +162,19 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
             doc,
           ) as Element[];
 
-          const entryList: {
-            type: string;
-            src: string;
-          }[] = finalPluginOption.server.mountGmApi
-            ? [{ type: 'module', src: gmApiPath }]
+          const entryList: string[] = finalPluginOption.server.mountGmApi
+            ? [gmApiPath]
             : [];
           entryList.push(
             ...scriptList.map((p) => {
               const src = p.attribs.src ?? '';
               const textNode = p.firstChild;
-              const type = p.attribs.type;
               let text = '';
               if (textNode?.type == ElementType.Text) {
                 text = textNode.data ?? '';
               }
               if (src) {
-                return { type, src: new URL(src, origin).href };
+                return src;
               } else {
                 const u = new URL(origin);
                 u.pathname = pullPath;
@@ -173,7 +182,7 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
                   'text',
                   Buffer.from(text, 'utf-8').toString('base64url'),
                 );
-                return { type, src: u.href };
+                return u.pathname + u.search;
               }
             }),
           );
@@ -184,12 +193,10 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
               path.relative(viteConfig.root, realEntry),
             );
           }
-          entryList.push({
-            type: 'module',
-            src: new URL(realEntry, origin).href,
-          });
+          const entryUrl = new URL(realEntry, origin);
+          entryList.push(entryUrl.pathname + entryUrl.search);
           res.end(
-            entryList.map((s) => `import ${JSON.stringify(s.src)};`).join('\n'),
+            entryList.map((s) => `import ${JSON.stringify(s)};`).join('\n'),
           );
         } else if (req.url?.startsWith(gmApiPath)) {
           Object.entries({

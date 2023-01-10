@@ -4,3 +4,4 @@
 - create-monkey support monorepo
 - support sourcemap sourceMappingURL use external absolute url
 - standardized documentation
+- work correctly in stackblitz

@@ -80,13 +80,12 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
       }
     },
     async configureServer(server) {
-      const { userscript } = finalPluginOption;
-
-      let prefix = finalPluginOption.server.prefix;
-      if (typeof prefix == 'function') {
-        for (const [k, v] of Object.entries(userscript.name)) {
-          Reflect.set(userscript.name, k, prefix(v));
-        }
+      for (const [k, v] of Object.entries(finalPluginOption.userscript.name)) {
+        Reflect.set(
+          finalPluginOption.userscript.name,
+          k,
+          finalPluginOption.server.prefix(v),
+        );
       }
 
       // support dev env
@@ -107,7 +106,7 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
 
         if (req.url?.startsWith(installUserPath)) {
           const u = new URL(req.url, origin);
-          // if the request is forwarded by some gateways like stackblitz.com, then window.location.host will be not equal to viteServer.req.headers.host
+          // if the request is forwarded by some gateways like nginx, then window.location.host will be not equal to viteServer.req.headers.host
           let overrideOrigin = u.searchParams.get('origin');
           if (overrideOrigin) {
             try {

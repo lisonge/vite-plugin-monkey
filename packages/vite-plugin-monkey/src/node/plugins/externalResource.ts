@@ -1,45 +1,8 @@
-import { normalizePath, PluginOption } from 'vite';
+import { normalizePath, PluginOption, ResolvedConfig } from 'vite';
 import type { FinalMonkeyOption, PkgOptions } from '../types';
 import { getModuleRealInfo, miniCode } from '../_util';
 import { lookup, mimes } from 'mrmime';
 import { URLSearchParams } from 'node:url';
-
-// word come form https://github.com/vitejs/vite/blob/caf00c8c7a5c81a92182116ffa344b34ce4c3b5e/packages/vite/src/node/constants.ts#L91
-const KNOWN_ASSET_TYPES = new Set([
-  // images
-  'png',
-  'jpg',
-  'jpeg',
-  'jfif',
-  'pjpeg',
-  'pjp',
-  'gif',
-  'svg',
-  'ico',
-  'webp',
-  'avif',
-
-  // media
-  'mp4',
-  'webm',
-  'ogg',
-  'mp3',
-  'wav',
-  'flac',
-  'aac',
-
-  // fonts
-  'woff',
-  'woff2',
-  'eot',
-  'ttf',
-  'otf',
-
-  // other
-  'webmanifest',
-  'pdf',
-  'txt',
-]);
 
 const resourceImportPrefix = '\0monkey-resource-import:';
 
@@ -48,19 +11,28 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
     string,
     { resourceName: string; resourceUrl: string }
   > = {};
+  let viteConfig: ResolvedConfig;
   return {
     name: 'monkey:externalResource',
     enforce: 'pre',
     apply: 'build',
+    configResolved(config) {
+      viteConfig = config;
+    },
     async resolveId(id) {
       const { externalResource } = finalPluginOption.build;
       if (id in externalResource) {
         return resourceImportPrefix + id + '\0';
       }
       // see https://github.com/vitejs/vite/blob/5d56e421625b408879672a1dd4e774bae3df674f/packages/vite/src/node/plugins/css.ts#L431-L434
-      const id2 = id.replace('.css?used&', '.css?');
-      if (id2 in externalResource) {
-        return resourceImportPrefix + id2 + '\0';
+      const [fp, ext] = id.split('?', 1);
+      const usp = new URLSearchParams(ext);
+      if (fp.endsWith('.css') && usp.get('used') === '') {
+        usp.delete('used');
+        const id2 = fp + '?' + usp.toString();
+        if (id2 in externalResource) {
+          return resourceImportPrefix + id2 + '\0';
+        }
       }
     },
     async load(id) {
@@ -150,7 +122,7 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
             `import {cssLoader as loader} from 'virtual:plugin-monkey-loader'`,
             `export default loader(...${JSON.stringify([resourceName])})`,
           ].join(';');
-        } else if (KNOWN_ASSET_TYPES.has(ext)) {
+        } else if (viteConfig.assetsInclude(importName)) {
           const mediaType = mimes[ext];
           moduleCode = [
             `import {urlLoader as loader} from 'virtual:plugin-monkey-loader'`,

@@ -5,15 +5,30 @@
 // @author     monkey
 // @icon       https://vitejs.dev/logo.svg
 // @match      https://www.google.com/
+// @match      https://github.com/*
 // @require    https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js
 // @require    https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js
+// @resource   base64-img/test/img/car.svg      https://cdn.jsdelivr.net/npm/base64-img@1.0.4/test/img/car.svg
+// @resource   base64-img/test/img/car.svg?url  https://cdn.jsdelivr.net/npm/base64-img@1.0.4/test/img/car.svg
+// @resource   element-plus/dist/index.css      https://cdn.jsdelivr.net/npm/element-plus@2.2.28/dist/index.css
+// @resource   element-plus/dist/index.css?url  https://cdn.jsdelivr.net/npm/element-plus@2.2.28/dist/index.css
+// @grant      GM_getResourceText
+// @grant      GM_getResourceURL
 // ==/UserScript==
 
 (e=>{const o=document.createElement("style");o.dataset.source="vite-plugin-monkey",o.innerText=e,document.head.appendChild(o)})("#root{max-width:1280px;margin:0 auto;padding:2rem;text-align:center}.logo{height:6em;padding:1.5em;will-change:filter}.logo:hover{filter:drop-shadow(0 0 2em #646cffaa)}.logo.react:hover{filter:drop-shadow(0 0 2em #61dafbaa)}@keyframes logo-spin{0%{transform:rotate(0)}to{transform:rotate(360deg)}}@media (prefers-reduced-motion: no-preference){a:nth-of-type(2) .logo{animation:logo-spin infinite 20s linear}}.card{padding:2em}.read-the-docs{color:#888}:root{font-family:Inter,Avenir,Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;font-weight:400;color-scheme:light dark;color:#ffffffde;background-color:#242424;font-synthesis:none;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;-webkit-text-size-adjust:100%}a{font-weight:500;color:#646cff;text-decoration:inherit}a:hover{color:#535bf2}body{margin:0;display:flex;place-items:center;min-width:320px;min-height:100vh}h1{font-size:3.2em;line-height:1.1}button{border-radius:8px;border:1px solid transparent;padding:.6em 1.2em;font-size:1em;font-weight:500;font-family:inherit;background-color:#1a1a1a;cursor:pointer;transition:border-color .25s}button:hover{border-color:#646cff}button:focus,button:focus-visible{outline:4px auto -webkit-focus-ring-color}@media (prefers-color-scheme: light){:root{color:#213547;background-color:#fff}a:hover{color:#747bff}button{background-color:#f9f9f9}}");
 
 (function(require$$0, require$$0$1) {
   "use strict";
-  var jsxRuntime = { exports: {} };
+  var jsxRuntimeExports = {};
+  var jsxRuntime = {
+    get exports() {
+      return jsxRuntimeExports;
+    },
+    set exports(v) {
+      jsxRuntimeExports = v;
+    }
+  };
   var reactJsxRuntime_production_min = {};
   var f = require$$0, k = Symbol.for("react.element"), l = Symbol.for("react.fragment"), m$1 = Object.prototype.hasOwnProperty, n = f.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentOwner, p = { key: true, ref: true, __self: true, __source: true };
   function q(c, a, g) {
@@ -36,8 +51,8 @@
       module.exports = reactJsxRuntime_production_min;
     }
   })(jsxRuntime);
-  const jsx = jsxRuntime.exports.jsx;
-  const jsxs = jsxRuntime.exports.jsxs;
+  const jsx = jsxRuntimeExports.jsx;
+  const jsxs = jsxRuntimeExports.jsxs;
   var client = {};
   var m = require$$0$1;
   {
@@ -70,6 +85,16 @@
     ] });
   }
   const index = "";
+  const testJsonUrl = "data:application/json;base64,ew0KICAiayI6IDENCn0NCg==";
+  const cssLoader = (e) => {
+    const t = GM_getResourceText(e), o = document.createElement("style");
+    return o.innerText = t, document.head.append(o), t;
+  }, urlLoader = (e, t) => GM_getResourceURL(e, false).replace(/^data:application;base64,/, `data:${t};base64,`);
+  const imgUrl = urlLoader("base64-img/test/img/car.svg", "image/svg+xml");
+  const imgUrl2 = urlLoader("base64-img/test/img/car.svg?url", "image/svg+xml");
+  cssLoader("element-plus/dist/index.css");
+  const cssUrl = urlLoader("element-plus/dist/index.css?url", "text/css");
+  console.log({ testJsonUrl, imgUrl, imgUrl2, cssUrl });
   client.createRoot(
     (() => {
       const app = document.createElement("div");

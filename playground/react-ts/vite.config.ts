@@ -20,7 +20,24 @@ export default defineConfig({
             'umd/react-dom.production.min.js',
           ),
         },
+        externalResource: {
+          'base64-img/test/img/car.svg': cdn.jsdelivr(),
+          'base64-img/test/img/car.svg?url': cdn.jsdelivr(),
+          'element-plus/dist/index.css': cdn.jsdelivr(),
+          'element-plus/dist/index.css?url': cdn.jsdelivr(),
+        },
       },
     }),
+    {
+      name: 'test:log',
+      apply: 'serve',
+      transform(code, id) {
+        if (id.includes(`.svg`) && code.match(/^\s*export\s+default/)) {
+          return `export default ((assertUrl) => {
+            return new URL(assertUrl, new URL(import.meta['url']).origin).href
+          })(${code.replace(/^\s*export\s+default/, '')});`;
+        }
+      },
+    },
   ],
 });

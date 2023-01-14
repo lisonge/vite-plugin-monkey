@@ -9,6 +9,7 @@ import perviewPlugin from './plugins/perview';
 import serverPlugin from './plugins/server';
 import virtualHtmlPlugin from './plugins/virtualHtml';
 import windowPlugin from './plugins/window';
+import fixAsset from './plugins/fixAsset';
 import type {
   FinalMonkeyOption,
   IArray,
@@ -369,5 +370,6 @@ export default (pluginOption: MonkeyOption): PluginOption => {
     virtualHtmlPlugin(finalPluginOption),
     perviewPlugin(finalPluginOption),
     windowPlugin(finalPluginOption),
+    fixAsset(finalPluginOption),
   ];
 };

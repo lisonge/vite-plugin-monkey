@@ -25,11 +25,16 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
         return resourceImportPrefix + id + '\0';
       }
       // see https://github.com/vitejs/vite/blob/5d56e421625b408879672a1dd4e774bae3df674f/packages/vite/src/node/plugins/css.ts#L431-L434
-      const [fp, ext] = id.split('?', 1);
-      const usp = new URLSearchParams(ext);
-      if (fp.endsWith('.css') && usp.get('used') === '') {
-        usp.delete('used');
-        const id2 = fp + '?' + usp.toString();
+      const [resource, query] = id.split('?', 2);
+      if (resource.endsWith('.css') && query) {
+        const id2 = [
+          resource,
+          '?',
+          query
+            .split('&')
+            .filter((e) => e != 'used')
+            .join(`&`),
+        ].join('');
         if (id2 in externalResource) {
           return resourceImportPrefix + id2 + '\0';
         }
@@ -95,9 +100,10 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
         }
 
         let moduleCode: string | undefined = undefined;
-        const ext = importName.split('?')[0].split('.').pop()!;
+        const [resource, query] = importName.split('?', 2);
+        const ext = resource.split('.').pop()!;
         const mimeType = lookup(ext) ?? 'application/octet-stream';
-        const suffixSet = new URLSearchParams(importName.split('?').pop());
+        const suffixSet = new URLSearchParams(query);
         if (suffixSet.has('url') || suffixSet.has('inline')) {
           moduleCode = [
             `import {urlLoader as loader} from 'virtual:plugin-monkey-loader'`,
@@ -122,7 +128,7 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
             `import {cssLoader as loader} from 'virtual:plugin-monkey-loader'`,
             `export default loader(...${JSON.stringify([resourceName])})`,
           ].join(';');
-        } else if (viteConfig.assetsInclude(importName)) {
+        } else if (viteConfig.assetsInclude(importName.split('?', 1)[0])) {
           const mediaType = mimes[ext];
           moduleCode = [
             `import {urlLoader as loader} from 'virtual:plugin-monkey-loader'`,

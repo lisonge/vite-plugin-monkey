@@ -9,7 +9,7 @@ import type { FinalMonkeyOption } from '../types';
 import { finalMonkeyOptionToComment } from '../userscript';
 import { lazy } from '../_lazy';
 import { logger } from '../_logger';
-import { existFile, isFirstBoot } from '../_util';
+import { existFile, isFirstBoot, toValidURL } from '../_util';
 
 export const installUserPath = '/__vite-plugin-monkey.install.user.js';
 const gmApiPath = '/__vite-plugin-monkey.gm.api.js';
@@ -40,18 +40,18 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
         }
         return '127.0.0.1';
       },
-      get origin() {
+      get defaultOrigin() {
         return `${this.isHttps ? 'https' : 'http'}://${this.host}:${this.port}`;
       },
       get installUrl() {
-        return new URL(viteConfig.base, this.origin).href;
+        return new URL(viteConfig.base, this.defaultOrigin).href;
       },
     };
   });
   return {
     name: 'monkey:server',
     apply: 'serve',
-    async config(userConfig, { command }) {
+    async config(userConfig) {
       return {
         preview: {
           host: userConfig.preview?.host ?? '127.0.0.1',
@@ -68,7 +68,7 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
       const { server } = viteConfig;
       server.host = serverConfig.host;
       server.port = serverConfig.port;
-      server.origin = serverConfig.origin;
+      // server.origin = serverConfig.origin;
       const baseConfig = {
         host: serverConfig.host,
         protocol: serverConfig.isHttps ? 'wss' : 'ws',
@@ -92,80 +92,68 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
       finalPluginOption.userscript.grant.add('*');
 
       server.middlewares.use(async (req, res, next) => {
-        let realHost = req.headers[':authority'] ?? req.headers['host'];
-        if (realHost instanceof Array) {
-          realHost = realHost[0];
+        let viteHost = req.headers[':authority'] ?? req.headers['host'] ?? [];
+        if (viteHost instanceof Array) {
+          viteHost = viteHost[0];
         }
-        if (!realHost) {
+        if (!viteHost) {
           logger.error('host not found', { time: true });
           return next();
         }
-        const origin = `${
+        const viteOrigin = `${
           serverConfig.isHttps ? 'https' : 'http'
-        }://${realHost}`;
+        }://${viteHost}`;
 
-        if (req.url?.startsWith(installUserPath)) {
-          const u = new URL(req.url, origin);
-          // if the request is forwarded by some gateways like nginx, then window.location.host will be not equal to viteServer.req.headers.host
-          let overrideOrigin = u.searchParams.get('origin');
-          if (overrideOrigin) {
-            try {
-              overrideOrigin = new URL(overrideOrigin).origin;
-            } catch {
-              overrideOrigin = origin;
-            }
-          } else {
-            overrideOrigin = origin;
-          }
-
-          res.end(
-            [
-              await finalMonkeyOptionToComment(finalPluginOption),
-              fn2string(serverInjectFn, {
-                entrySrc: new URL(entryPath, overrideOrigin).href,
-              }),
-              '',
-            ].join('\n\n'),
-          );
-        } else if (req.url?.startsWith(pullPath)) {
+        const reqUrl = req.url;
+        if (
+          reqUrl &&
+          [installUserPath, entryPath, pullPath, gmApiPath].some((u) =>
+            reqUrl.startsWith(u),
+          )
+        ) {
           Object.entries({
             'access-control-allow-origin': '*',
             'content-type': 'application/javascript',
           }).forEach(([k, v]) => {
             res.setHeader(k, v);
           });
-          const u = new URL(req.url, origin);
-          const text = u.searchParams.get('text') ?? '';
-          res.end(Buffer.from(text, 'base64url').toString('utf-8'));
-        } else if (req.url?.startsWith(entryPath)) {
-          Object.entries({
-            'access-control-allow-origin': '*',
-            'content-type': 'application/javascript',
-          }).forEach(([k, v]) => {
-            res.setHeader(k, v);
-          });
-          const htmlText = await server.transformIndexHtml(
-            '/',
-            `<html><head></head></html>`,
-            req.originalUrl,
-          );
+          const usp = new URLSearchParams(reqUrl.split('?', 2)[1]);
+          let origin = toValidURL(usp.get(`origin`))?.origin ?? viteOrigin;
 
-          const doc = parseDocument(htmlText);
-          type Element = ReturnType<typeof DomUtils.findAll> extends Array<
-            infer T
-          >
-            ? T
-            : never;
-          const scriptList = DomUtils.getElementsByTagType(
-            ElementType.Script,
-            doc,
-          ) as Element[];
+          if (reqUrl.startsWith(installUserPath)) {
+            const u = new URL(entryPath, origin);
+            u.searchParams.set('origin', origin);
+            res.end(
+              [
+                await finalMonkeyOptionToComment(finalPluginOption),
+                fn2string(serverInjectFn, {
+                  entrySrc: u.href,
+                }),
+                '',
+              ].join('\n\n'),
+            );
+          } else if (reqUrl.startsWith(entryPath)) {
+            const htmlText = await server.transformIndexHtml(
+              '/',
+              `<html><head></head></html>`,
+              req.originalUrl,
+            );
 
-          const entryList: string[] = finalPluginOption.server.mountGmApi
-            ? [gmApiPath]
-            : [];
-          entryList.push(
-            ...scriptList.map((p) => {
+            const doc = parseDocument(htmlText);
+            type Element = ReturnType<typeof DomUtils.findAll> extends Array<
+              infer T
+            >
+              ? T
+              : never;
+            const scriptList = DomUtils.getElementsByTagType(
+              ElementType.Script,
+              doc,
+            ) as Element[];
+
+            const entryList: string[] = finalPluginOption.server.mountGmApi
+              ? [gmApiPath]
+              : [];
+            scriptList.forEach((p) => {
               const src = p.attribs.src ?? '';
               const textNode = p.firstChild;
               let text = '';
@@ -173,45 +161,44 @@ export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
                 text = textNode.data ?? '';
               }
               if (src) {
-                return src;
+                entryList.push(src);
               } else {
-                const u = new URL(origin);
-                u.pathname = pullPath;
-                u.searchParams.set(
+                const scriptUrl = new URL(origin);
+                scriptUrl.pathname = pullPath;
+                scriptUrl.searchParams.set(
                   'text',
                   Buffer.from(text, 'utf-8').toString('base64url'),
                 );
-                return u.pathname + u.search;
+                entryList.push(scriptUrl.pathname + scriptUrl.search);
               }
-            }),
-          );
+            });
 
-          let realEntry = finalPluginOption.entry;
-          if (path.isAbsolute(realEntry)) {
-            realEntry = normalizePath(
-              path.relative(viteConfig.root, realEntry),
+            let realEntry = finalPluginOption.entry;
+            if (path.isAbsolute(realEntry)) {
+              realEntry = normalizePath(
+                path.relative(viteConfig.root, realEntry),
+              );
+            }
+            const entryUrl = new URL(realEntry, origin);
+            entryList.push(entryUrl.pathname + entryUrl.search);
+            res.end(
+              entryList.map((s) => `import ${JSON.stringify(s)};`).join('\n'),
             );
+          } else if (reqUrl.startsWith(pullPath)) {
+            res.end(
+              Buffer.from(usp.get('text') ?? '', 'base64url').toString('utf-8'),
+            );
+          } else if (reqUrl.startsWith(gmApiPath)) {
+            if (finalPluginOption.server.mountGmApi) {
+              res.end(fn2string(mountGmApiFn));
+            } else {
+              res.end('');
+            }
           }
-          const entryUrl = new URL(realEntry, origin);
-          entryList.push(entryUrl.pathname + entryUrl.search);
-          res.end(
-            entryList.map((s) => `import ${JSON.stringify(s)};`).join('\n'),
-          );
-        } else if (req.url?.startsWith(gmApiPath)) {
-          Object.entries({
-            'access-control-allow-origin': '*',
-            'content-type': 'application/javascript',
-          }).forEach(([k, v]) => {
-            res.setHeader(k, v);
-          });
-          if (finalPluginOption.server.mountGmApi) {
-            res.end(fn2string(mountGmApiFn));
-          } else {
-            res.end('');
-          }
-        } else {
-          next();
+          return;
         }
+
+        next();
       });
 
       if (finalPluginOption.server.open) {

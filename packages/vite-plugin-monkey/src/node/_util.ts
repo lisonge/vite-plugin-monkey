@@ -227,3 +227,10 @@ export const miniCode = async (code: string, type: 'css' | 'js' = 'js') => {
     })
   ).code.trimEnd();
 };
+
+export const toValidURL = (url: unknown) => {
+  if (typeof url != 'string') return;
+  try {
+    return new URL(url);
+  } catch {}
+};

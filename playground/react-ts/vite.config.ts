@@ -10,7 +10,11 @@ export default defineConfig({
       userscript: {
         icon: 'https://vitejs.dev/logo.svg',
         namespace: 'npm/vite-plugin-monkey',
-        match: ['https://www.google.com/', 'https://github.com/*'],
+        match: [
+          'https://www.google.com/',
+          'https://github.com/*',
+          'https://i.songe.li/*',
+        ],
       },
       build: {
         externalGlobals: {
@@ -28,16 +32,5 @@ export default defineConfig({
         },
       },
     }),
-    {
-      name: 'test:log',
-      apply: 'serve',
-      transform(code, id) {
-        if (id.includes(`.svg`) && code.match(/^\s*export\s+default/)) {
-          return `export default ((assertUrl) => {
-            return new URL(assertUrl, new URL(import.meta['url']).origin).href
-          })(${code.replace(/^\s*export\s+default/, '')});`;
-        }
-      },
-    },
   ],
 });

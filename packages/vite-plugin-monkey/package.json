@@ -30,7 +30,8 @@
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "build": "tsup"
+    "build": "tsup",
+    "build:watch": "tsup --watch"
   },
   "keywords": [
     "vite",

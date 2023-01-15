@@ -144,7 +144,8 @@ export type MonkeyOption = {
     /**
      * auto open *.user.js in default browser when userscript comment change or vite server first start.
      * if you don't want to open when vite server first start, just want to open when userscript comment change, you should set viteConfig.server.open=false
-     * @default true
+     * @default
+     * process.platform == 'win32' || process.platform == 'darwin'
      */
     open?: boolean;
 

@@ -4,12 +4,12 @@ import externalGlobalsPlugin from './plugins/externalGlobals';
 import externalLoaderPlugin from './plugins/externalLoader';
 import externalResourcePlugin from './plugins/externalResource';
 import extraToBundlePlugin from './plugins/extraToBundle';
+import fixAsset from './plugins/fixAsset';
 import fixVitePlugin from './plugins/fixVite';
 import perviewPlugin from './plugins/perview';
 import serverPlugin from './plugins/server';
 import virtualHtmlPlugin from './plugins/virtualHtml';
 import windowPlugin from './plugins/window';
-import fixAsset from './plugins/fixAsset';
 import type {
   FinalMonkeyOption,
   IArray,
@@ -289,7 +289,9 @@ export default (pluginOption: MonkeyOption): PluginOption => {
       format: pluginOption.format,
       server: {
         mountGmApi: server.mountGmApi ?? false,
-        open: server.open ?? true,
+        open:
+          server.open ??
+          (process.platform == 'win32' || process.platform == 'darwin'),
         prefix: prefix2,
       },
       build: {

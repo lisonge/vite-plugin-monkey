@@ -6,7 +6,9 @@ import type { FinalMonkeyOption } from '../types';
 import { finalMonkeyOptionToComment } from '../userscript';
 import { miniCode } from '../_util';
 
-export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
+export const extraToBundlePlugin = (
+  finalPluginOption: FinalMonkeyOption,
+): PluginOption => {
   let viteConfig: ResolvedConfig;
 
   // https://github.com/vitejs/vite/blob/b9511f1ed8e36a618214944c69e2de6504ebcb3c/packages/vite/src/node/constants.ts#L20

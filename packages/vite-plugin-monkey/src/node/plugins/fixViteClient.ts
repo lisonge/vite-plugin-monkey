@@ -1,9 +1,11 @@
 import { PluginOption, transformWithEsbuild } from 'vite';
 import type { FinalMonkeyOption } from '../types';
 
-export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
+export const fixViteClientPlugin = (
+  finalPluginOption: FinalMonkeyOption,
+): PluginOption => {
   return {
-    name: 'monkey:fixVite',
+    name: 'monkey:fixViteClient',
     apply: 'serve',
     async transform(code, id) {
       if (id.endsWith('node_modules/vite/dist/client/client.mjs')) {

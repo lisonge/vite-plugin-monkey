@@ -5,7 +5,9 @@ import { GM_keywords } from '../_util';
 
 const GM_keyword_set = Array.from(new Set(GM_keywords));
 
-export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
+export const autoGrantPlugin = (
+  finalPluginOption: FinalMonkeyOption,
+): PluginOption => {
   const collectGrantMap = new Map<string, string[]>();
   return {
     name: 'monkey:autoGrant',

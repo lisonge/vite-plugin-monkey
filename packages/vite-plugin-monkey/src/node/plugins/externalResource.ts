@@ -6,7 +6,9 @@ import { URLSearchParams } from 'node:url';
 
 const resourceImportPrefix = '\0monkey-resource-import:';
 
-export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
+export const externalResourcePlugin = (
+  finalPluginOption: FinalMonkeyOption,
+): PluginOption => {
   const resourceRecord: Record<
     string,
     { resourceName: string; resourceUrl: string }

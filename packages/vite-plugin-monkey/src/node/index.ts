@@ -1,15 +1,5 @@
 import type { PluginOption } from 'vite';
-import autoGrantPlugin from './plugins/autoGrant';
-import externalGlobalsPlugin from './plugins/externalGlobals';
-import externalLoaderPlugin from './plugins/externalLoader';
-import externalResourcePlugin from './plugins/externalResource';
-import extraToBundlePlugin from './plugins/extraToBundle';
-import fixAsset from './plugins/fixAsset';
-import fixVitePlugin from './plugins/fixVite';
-import perviewPlugin from './plugins/perview';
-import serverPlugin from './plugins/server';
-import virtualHtmlPlugin from './plugins/virtualHtml';
-import windowPlugin from './plugins/window';
+import monkeyPluginList from './plugins';
 import type {
   FinalMonkeyOption,
   IArray,
@@ -360,18 +350,5 @@ export default (pluginOption: MonkeyOption): PluginOption => {
     },
   };
 
-  return [
-    monkeyPlugin,
-    fixVitePlugin(finalPluginOption),
-    serverPlugin(finalPluginOption),
-    autoGrantPlugin(finalPluginOption),
-    externalGlobalsPlugin(finalPluginOption),
-    externalLoaderPlugin(finalPluginOption),
-    externalResourcePlugin(finalPluginOption),
-    extraToBundlePlugin(finalPluginOption),
-    virtualHtmlPlugin(finalPluginOption),
-    perviewPlugin(finalPluginOption),
-    windowPlugin(finalPluginOption),
-    fixAsset(finalPluginOption),
-  ];
+  return [monkeyPlugin, ...monkeyPluginList.map((m) => m(finalPluginOption))];
 };

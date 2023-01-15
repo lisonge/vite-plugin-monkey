@@ -4,7 +4,9 @@ import { getModuleRealInfo } from '../_util';
 
 const dynamicImportPrefix = '\0monkey-dynamic-import:';
 
-export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
+export const externalGlobalsPlugin = (
+  finalPluginOption: FinalMonkeyOption,
+): PluginOption => {
   const globalsPkg2VarName: Record<string, string> = {};
   const requirePkgList: { moduleName: string; url: string }[] = [];
   return {

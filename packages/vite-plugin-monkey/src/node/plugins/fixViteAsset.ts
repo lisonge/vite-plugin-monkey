@@ -13,10 +13,12 @@ export default ((()=>{
 `.trimStart();
 // https://github.com/vitejs/vite/blob/9c114c5c72a6af87e3330d5573362554b4511265/packages/vite/src/node/plugins/asset.ts#L172
 
-export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
+export const fixViteAssetPlugin = (
+  finalPluginOption: FinalMonkeyOption,
+): PluginOption => {
   let viteConfig: ResolvedConfig;
   return {
-    name: 'monkey:fixAsset',
+    name: 'monkey:fixViteAsset',
     apply: 'serve',
     async configResolved(resolvedConfig) {
       viteConfig = resolvedConfig;

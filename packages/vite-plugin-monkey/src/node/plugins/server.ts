@@ -17,7 +17,9 @@ const entryPath = '/__vite-plugin-monkey.entry.js';
 const pullPath = '/__vite-plugin-monkey.pull.js';
 const cacheUserPath = 'node_modules/.vite/__vite-plugin-monkey.cache.user.js';
 
-export default (finalPluginOption: FinalMonkeyOption): PluginOption => {
+export const serverPlugin = (
+  finalPluginOption: FinalMonkeyOption,
+): PluginOption => {
   let viteConfig: ResolvedConfig;
   const serverConfig = lazy(() => {
     let availablePort = 5173;

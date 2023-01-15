@@ -29,15 +29,10 @@ export const virtualHtmlPlugin = (
       server.middlewares.use(async (req, res, next) => {
         const url = req.url || '/';
         if (['/', '/index.html'].includes(url)) {
-          try {
-            res.statusCode = 200;
-            res.setHeader('content-type', 'text/html');
-            res.setHeader('cache-control', 'no-cache');
-            res.setHeader('access-control-allow-origin', '*');
-            return res.end(htmlText);
-          } catch (e) {
-            return next(e);
-          }
+          res.setHeader('content-type', 'text/html');
+          res.setHeader('cache-control', 'no-cache');
+          res.setHeader('access-control-allow-origin', '*');
+          return res.end(htmlText);
         }
         next();
       });

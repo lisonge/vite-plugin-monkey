@@ -7,7 +7,7 @@
 
 [README](README.md) | [中文文档](README_zh.md)
 
-vite plugin server and build \*.user.js for [Tampermonkey](https://www.tampermonkey.net/) and [Violentmonkey](https://violentmonkey.github.io/) and [Greasemonkey](https://www.greasespot.net/)
+A vite plugin server and build your.user.js for userscript engine like [Tampermonkey](https://www.tampermonkey.net/) and [Violentmonkey](https://violentmonkey.github.io/) and [Greasemonkey](https://www.greasespot.net/)
 
 ## feature
 
@@ -110,7 +110,8 @@ export type MonkeyOption = {
     /**
      * auto open *.user.js in default browser when userscript comment change or vite server first start.
      * if you don't want to open when vite server first start, just want to open when userscript comment change, you should set viteConfig.server.open=false
-     * @default true
+     * @default
+     * process.platform == 'win32' || process.platform == 'darwin'
      */
     open?: boolean;
 

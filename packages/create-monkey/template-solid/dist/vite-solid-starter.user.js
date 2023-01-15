@@ -27,7 +27,7 @@
   let Effects = null;
   let ExecCount = 0;
   function createRoot(fn, detachedOwner) {
-    const owner = Owner, unowned = fn.length === 0, root = unowned && true ? UNOWNED : {
+    const owner = Owner, unowned = fn.length === 0, root = unowned ? UNOWNED : {
       owned: null,
       cleanups: null,
       context: null,
@@ -99,8 +99,13 @@
     try {
       nextValue = node.fn(value);
     } catch (err) {
-      if (node.pure)
-        node.state = STALE;
+      if (node.pure) {
+        {
+          node.state = STALE;
+          node.owned && node.owned.forEach(cleanNode);
+          node.owned = null;
+        }
+      }
       handleError(err);
     }
     if (!node.updatedAt || node.updatedAt <= time) {

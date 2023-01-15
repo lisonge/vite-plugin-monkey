@@ -100,13 +100,22 @@ var __plugin_monkey_exposed = function() {
   const seen_callbacks = /* @__PURE__ */ new Set();
   let flushidx = 0;
   function flush() {
+    if (flushidx !== 0) {
+      return;
+    }
     const saved_component = current_component;
     do {
-      while (flushidx < dirty_components.length) {
-        const component = dirty_components[flushidx];
-        flushidx++;
-        set_current_component(component);
-        update(component.$$);
+      try {
+        while (flushidx < dirty_components.length) {
+          const component = dirty_components[flushidx];
+          flushidx++;
+          set_current_component(component);
+          update(component.$$);
+        }
+      } catch (e) {
+        dirty_components.length = 0;
+        flushidx = 0;
+        throw e;
       }
       set_current_component(null);
       dirty_components.length = 0;
@@ -207,16 +216,19 @@ var __plugin_monkey_exposed = function() {
     const $$ = component.$$ = {
       fragment: null,
       ctx: [],
+      // state
       props,
       update: noop,
       not_equal,
       bound: blank_object(),
+      // lifecycle
       on_mount: [],
       on_destroy: [],
       on_disconnect: [],
       before_update: [],
       after_update: [],
       context: new Map(options.context || (parent_component ? parent_component.$$.context : [])),
+      // everything else
       callbacks: blank_object(),
       dirty,
       skip_bound: false,
@@ -290,20 +302,33 @@ var __plugin_monkey_exposed = function() {
       c() {
         button = element("button");
         t0 = text("count is ");
-        t1 = text(ctx[0]);
+        t1 = text(
+          /*count*/
+          ctx[0]
+        );
       },
       m(target, anchor) {
         insert(target, button, anchor);
         append(button, t0);
         append(button, t1);
         if (!mounted) {
-          dispose = listen(button, "click", ctx[1]);
+          dispose = listen(
+            button,
+            "click",
+            /*increment*/
+            ctx[1]
+          );
           mounted = true;
         }
       },
       p(ctx2, [dirty]) {
-        if (dirty & 1)
-          set_data(t1, ctx2[0]);
+        if (dirty & /*count*/
+        1)
+          set_data(
+            t1,
+            /*count*/
+            ctx2[0]
+          );
       },
       i: noop,
       o: noop,

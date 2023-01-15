@@ -1,5 +1,26 @@
 # CHANGELOG
 
+## 2.11.0
+
+### 2.11.0-Features
+
+- move mountGmApi code to server [6534c454](https://github.com/lisonge/vite-plugin-monkey/commit/64d1679384d90afeed9e9be8985eaf366534c454)
+- match file by assetsInclude [19dbe791](https://github.com/lisonge/vite-plugin-monkey/commit/12d91c6fbeaf7310cd92b89e90063df219dbe791) [b00a1e37](https://github.com/lisonge/vite-plugin-monkey/commit/3acf828dfa3cbfc1807b4a3f00af2170b00a1e37)
+- unset server origin [9d1e49d9](https://github.com/lisonge/vite-plugin-monkey/commit/e1afc7b87b9ef46c142abe50150493f99d1e49d9) [2c20e20c](https://github.com/lisonge/vite-plugin-monkey/commit/f5a3d400eccd3d5e83b3965ecccec0902c20e20c)
+- set server.open default value by process.platform [2287b45d](https://github.com/lisonge/vite-plugin-monkey/commit/61075edb304e328a260db39ddc5a662b2287b45d)
+- iframe tip ui [8340cc80](https://github.com/lisonge/vite-plugin-monkey/commit/a1112f04713f2bf8cd82355e8e3d6d738340cc80)
+
+now vite-plugin-monkey is available at [codesandbox](https://codesandbox.io/), online demo [vite-monkey-test-9e0vbi](https://codesandbox.io/p/sandbox/vite-monkey-test-9e0vbi)
+
+<details open>
+  <summary>Sample: vite-monkey-test-9e0vbi</summary>
+
+![image](https://user-images.githubusercontent.com/38517192/212538093-8923ddf5-80f4-483a-bc31-c227681402f0.png)
+
+</details>
+
+note: vite-plugin-monkey is unavailable at online IDE that base [Service Worker](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API) like [stackblitz](https://stackblitz.com/)
+
 ## 2.10.3
 
 ### 2.10.3-Features

@@ -67,16 +67,58 @@ export const redirectFn = async (url: string) => {
     window.close();
     return;
   }
+  const style = document.createElement('style');
+  document.body.append(style);
+  style.innerText = /* css */ `
+.App {
+  margin-top: 20vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.App > a {
+  font-size: 32px;
+  text-align: center;
+}
+.App > .copy {
+  margin-top: 20px;
+  padding: 4px;
+  font-size: 15px;
+  border: 2px solid;
+  cursor: pointer;
+  user-select: none;
+}
+.App > .copied {
+  opacity: 0;
+  margin-top: 10px;
+  font-size: 12px;
+  padding: 8px;
+  border-radius: 5px;
+  background-color: black;
+  color: white;
+}
+.App > .copy:active + .copied {
+  opacity: 1;
+}
+.App > .copy:not(:active) + .copied {
+  transition: opacity 750ms;
+}
+`.trim();
   const div = document.createElement('div');
-  div.style.minHeight = '75vh';
-  div.style.display = 'flex';
-  div.style.flexDirection = 'column';
-  div.style.justifyContent = 'center';
-  div.style.alignItems = 'center';
   document.body.append(div);
-  const a = document.createElement('a');
-  a.href = u.href;
-  a.text = u.href;
-  a.style.fontSize = '20px';
-  div.append(a);
+  div.innerHTML = /* html */ `
+<div class="App">
+  <a target="_blank"></a>
+  <div class="copy">COPY</div>
+  <div class="copied">Copied!</div>
+</div>
+  `.trim();
+  await delay();
+  const a = div.querySelector('a')!;
+  a.href = location.href;
+  a.text = location.href;
+  const copy = document.querySelector<HTMLElement>('.copy')!;
+  copy.addEventListener('click', async () => {
+    await navigator.clipboard.writeText(u.href);
+  });
 };

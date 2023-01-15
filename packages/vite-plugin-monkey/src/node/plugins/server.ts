@@ -124,7 +124,6 @@ export const serverPlugin = (
 
           if (reqUrl.startsWith(installUserPath)) {
             const u = new URL(entryPath, origin);
-            u.searchParams.set('origin', origin);
             res.end(
               [
                 await finalMonkeyOptionToComment(finalPluginOption),

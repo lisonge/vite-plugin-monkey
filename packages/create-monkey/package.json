@@ -15,9 +15,13 @@
   },
   "files": [
     "index.js",
+    "dist",
     "template-*"
   ],
-  "scripts": {},
+  "scripts": {
+    "build": "tsup",
+    "build:watch": "tsup --watch"
+  },
   "keywords": [
     "create",
     "vite"

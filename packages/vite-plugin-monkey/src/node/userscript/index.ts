@@ -344,7 +344,7 @@ export const finalMonkeyOptionToComment = async ({
         return s;
       })
       .forEach((s) => {
-        s[1] += '\x20'.repeat(alignN + maxLen - s[1].length - 1);
+        s[1] += '\x20'.repeat(alignN + maxLen - s[1].length);
       });
 
     // format all
@@ -355,7 +355,9 @@ export const finalMonkeyOptionToComment = async ({
       }
     });
     attrList.forEach((s) => {
-      s[0] += '\x20'.repeat(alignN + maxLen - s[0].length - 1);
+      if (s[1]) {
+        s[0] = s[0].padEnd(alignN + maxLen, '\x20');
+      }
     });
   } else if (typeof align == 'function') {
     attrList = await align(attrList);
@@ -363,7 +365,7 @@ export const finalMonkeyOptionToComment = async ({
 
   return [
     '==UserScript==',
-    ...attrList.map((s) => '@' + s.join('\x20')),
+    ...attrList.map((s) => '@' + s.join('')),
     '==/UserScript==',
   ]
     .map((s) => '//\x20' + s)

@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2.11.1
+
+### 2.11.1-BugFixes
+
+- remove extra space [c365e309](https://github.com/lisonge/vite-plugin-monkey/commit/a2e1112b16ad8acc33130bf7b98c70bcc365e309), [#41](https://github.com/lisonge/vite-plugin-monkey/issues/41)
+- node target node14 [8ff87105](https://github.com/lisonge/vite-plugin-monkey/commit/4d2f2f0ddf22123941db15d9e29e9a1e8ff87105), [#42](https://github.com/lisonge/vite-plugin-monkey/issues/42)
+
 ## 2.11.0
 
 ### 2.11.0-Features

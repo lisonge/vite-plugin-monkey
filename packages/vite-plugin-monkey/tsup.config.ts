@@ -8,6 +8,7 @@ export default defineConfig([
     dts: true,
     outDir: 'dist/node',
     format: ['cjs', 'esm'],
+    target: 'node14',
   },
   {
     entry: ['src/client/index.ts'],

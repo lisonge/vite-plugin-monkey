@@ -209,7 +209,10 @@ export const serverPlugin = (
         } else {
           await fs.mkdir(path.dirname(cacheUserPath)).catch();
         }
-        const newComment = await finalMonkeyOptionToComment(finalPluginOption);
+        const newComment = [
+          await finalMonkeyOptionToComment(finalPluginOption),
+          `// entry: ${finalPluginOption.entry}`,
+        ].join('\n');
         if (!isFirstBoot() && cacheComment != newComment) {
           openBrowser(serverConfig.installUrl, true, logger);
           logger.info('reopen, config comment has changed', { time: true });

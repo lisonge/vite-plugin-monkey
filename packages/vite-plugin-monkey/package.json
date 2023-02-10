@@ -14,7 +14,6 @@
     },
     "./dist/client": {
       "import": "./dist/client/index.mjs",
-      "require": "./dist/client/index.js",
       "types": "./dist/client/index.d.ts"
     }
   },

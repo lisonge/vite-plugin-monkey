@@ -1,8 +1,3 @@
 /// <reference types="vite/client" />
-
-/**
- * alias of vite-plugin-monkey/dist/client
- */
-declare module '$' {
-  export * from 'vite-plugin-monkey/dist/client';
-}
+/// <reference types="vite-plugin-monkey/client" />
+//// <reference types="vite-plugin-monkey/global" />

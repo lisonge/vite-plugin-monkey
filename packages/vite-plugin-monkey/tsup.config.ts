@@ -9,6 +9,7 @@ export default defineConfig([
     outDir: 'dist/node',
     format: ['cjs', 'esm'],
     target: 'node14',
+    shims: true,
   },
   {
     entry: ['src/client/index.ts'],
@@ -18,5 +19,6 @@ export default defineConfig([
     target: 'esnext',
     outDir: 'dist/client',
     format: ['esm'],
+    platform: 'browser',
   },
 ]);

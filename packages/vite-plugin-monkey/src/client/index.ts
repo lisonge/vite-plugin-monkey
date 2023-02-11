@@ -1,6 +1,12 @@
 import { monkeyWindow } from './window';
 export { monkeyWindow };
-export type { MonkeyWindow, XhrRequest } from './types';
+export type {
+  MonkeyWindow,
+  XhrRequest,
+  DownloadRequest,
+  NotificationDetails,
+  OpenInTabDetails,
+} from './types';
 
 export const GM = /* @__PURE__ */ (() => monkeyWindow.GM)();
 

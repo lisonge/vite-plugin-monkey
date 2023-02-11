@@ -77,7 +77,7 @@ type AddElementFn = {
   ): HTMLElement;
 };
 
-type OpenInTabDetails = {
+export type OpenInTabDetails = {
   active?: boolean;
   insert?: boolean;
   /**
@@ -111,7 +111,7 @@ type OpenInTabFn = {
   };
 };
 
-type NotificationDetails = {
+export type NotificationDetails = {
   text: string;
   title?: string;
   image?: string;
@@ -189,7 +189,7 @@ type DownloadProgressResponse = ProgressResponseBase & {
   readonly finalUrl: string;
 };
 
-type DownloadRequest = {
+export type DownloadRequest = {
   /** URL from where the data should be downloaded */
   url: string;
   /**

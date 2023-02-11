@@ -1,10 +1,11 @@
 {
   "name": "vite-plugin-monkey",
   "version": "2.11.1",
-  "description": "vite plugin for Tampermonkey, Violentmonkey and Greasemonkey",
+  "description": "A vite plugin server and build your.user.js for userscript engine like Tampermonkey and Violentmonkey and Greasemonkey",
   "main": "dist/node/index.js",
   "module": "dist/node/index.mjs",
   "types": "dist/node/index.d.ts",
+  "type": "module",
   "exports": {
     "./package.json": "./package.json",
     ".": {
@@ -19,17 +20,15 @@
   },
   "sideEffects": false,
   "files": [
-    "src",
     "dist",
-    "pnpm-lock.yaml",
-    "tsup.config.ts",
-    "tsconfig.json"
+    "global.d.ts",
+    "client.d.ts"
   ],
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && tsx ./scripts/transform_type.ts",
     "build:watch": "tsup --watch"
   },
   "keywords": [

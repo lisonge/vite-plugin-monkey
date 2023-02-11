@@ -40,39 +40,40 @@ type CommonInfo = {
  */
 export type ScriptInfo = CommonInfo & TamperInfo & ViolentInfo;
 
-type IfEquals<X, Y, A = X, B = never> = (<T>() => T extends X ? 1 : 2) extends <
-  T,
->() => T extends Y ? 1 : 2
-  ? A
-  : B;
+// type IfEquals<X, Y, A = X, B = never> = (<T>() => T extends X ? 1 : 2) extends <
+//   T,
+// >() => T extends Y ? 1 : 2
+//   ? A
+//   : B;
 
-type WritableKeys<T> = {
-  [P in keyof T]-?: IfEquals<
-    { [Q in P]: T[P] },
-    { -readonly [Q in P]: T[P] },
-    P
-  >;
-}[keyof T];
+// type WritableKeys<T> = {
+//   [P in keyof T]-?: IfEquals<
+//     { [Q in P]: T[P] },
+//     { -readonly [Q in P]: T[P] },
+//     P
+//   >;
+// }[keyof T];
 
-type KV<T = unknown> = Partial<Pick<T, WritableKeys<T>>>;
+// type KV<T = unknown> = Partial<T>;
+type HTMLElementTagName = keyof HTMLElementTagNameMap;
 
 type AddElementFn = {
-  <K extends keyof HTMLElementTagNameMap>(
+  <K extends HTMLElementTagName>(
     tagName: K,
-    attributes?: KV<HTMLElementTagNameMap[K]>,
+    attributes?: Partial<HTMLElementTagNameMap[K]>,
   ): HTMLElementTagNameMap[K];
 
-  (tagName: string, attributes?: KV<HTMLElement>): HTMLElement;
+  (tagName: string, attributes?: Partial<HTMLElement>): HTMLElement;
 
-  <K extends keyof HTMLElementTagNameMap>(
+  <K extends HTMLElementTagName>(
     parentNode: Node | Element | ShadowRoot,
     tagName: K,
-    attributes?: KV<HTMLElementTagNameMap[K]>,
+    attributes?: Partial<HTMLElementTagNameMap[K]>,
   ): HTMLElementTagNameMap[K];
   (
     parentNode: Node | Element | ShadowRoot,
     tagName: string,
-    attributes?: KV<HTMLElement>,
+    attributes?: Partial<HTMLElement>,
   ): HTMLElement;
 };
 

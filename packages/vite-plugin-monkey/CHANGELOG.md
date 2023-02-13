@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 2.12.0
+
+### 2.12.0-Features
+
+- new usage for gm api type hint [#44](https://github.com/lisonge/vite-plugin-monkey/issues/44)
+
+### 2.12.0-BugFixes
+
+- not reopen when entry changed [c29d6a55](https://github.com/lisonge/vite-plugin-monkey/commit/fcd032d7a5c34eac1a30c3fe317bfa31c29d6a55)
+- dts error [d994c69d](https://github.com/lisonge/vite-plugin-monkey/commit/800d970e2c39f298475e1b5ada0a7ee2d994c69d)
+- duplicated client type hint in vscode [a31cd6f1](https://github.com/lisonge/vite-plugin-monkey/commit/5e61aa5f6a61f0593020a2cf8c5d5834a31cd6f1)
+
 ## 2.11.1
 
 ### 2.11.1-BugFixes

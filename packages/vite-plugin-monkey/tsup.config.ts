@@ -1,5 +1,9 @@
 import { defineConfig } from 'tsup';
 
+const outExtension = (ctx: { format: 'esm' | 'cjs' | 'iife' }) => ({
+  js: { esm: '.mjs', cjs: '.js', iife: '.js' }[ctx.format],
+});
+
 export default defineConfig([
   {
     entry: ['src/node/index.ts'],
@@ -10,6 +14,7 @@ export default defineConfig([
     format: ['cjs', 'esm'],
     target: 'node14',
     shims: true,
+    outExtension,
   },
   {
     entry: ['src/client/index.ts'],
@@ -20,5 +25,6 @@ export default defineConfig([
     outDir: 'dist/client',
     format: ['esm'],
     platform: 'browser',
+    outExtension,
   },
 ]);

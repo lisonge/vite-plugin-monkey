@@ -185,6 +185,7 @@
     } catch (err) {
       if (!Updates)
         Effects = null;
+      Updates = null;
       handleError(err);
     }
   }

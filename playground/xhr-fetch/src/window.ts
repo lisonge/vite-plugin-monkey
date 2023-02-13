@@ -1,1 +1,1 @@
-export { monkeyWindow } from 'vite-plugin-monkey/dist/client';
+export { monkeyWindow } from '$';

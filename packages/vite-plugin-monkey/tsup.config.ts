@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsup';
 
 const outExtension = (ctx: { format: 'esm' | 'cjs' | 'iife' }) => ({
-  js: { esm: '.mjs', cjs: '.js', iife: '.js' }[ctx.format],
+  js: { esm: '.mjs', cjs: '.cjs', iife: '.js' }[ctx.format],
 });
 
 export default defineConfig([

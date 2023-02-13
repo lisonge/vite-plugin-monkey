@@ -6,11 +6,7 @@
   "types": "dist/index.d.ts",
   "type": "module",
   "files": [
-    "src",
-    "dist",
-    "pnpm-lock.yaml",
-    "tsup.config.ts",
-    "tsconfig.json"
+    "dist"
   ],
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"

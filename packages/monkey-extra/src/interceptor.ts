@@ -1,4 +1,10 @@
 import { monkeyWindow } from 'vite-plugin-monkey/dist/client';
+import type {
+  FetchType,
+  WindowLike,
+  XhrOnloadType,
+  XhrOnreadystatechangeType,
+} from './types';
 import { lazy, parseHeaders } from './util';
 
 type InterceptorChain = {
@@ -12,12 +18,6 @@ type InterceptorChain = {
 type NetworkInterceptor = (
   chain: InterceptorChain,
 ) => Response | Promise<Response>;
-
-type FetchType = typeof fetch;
-
-type WindowLike = {
-  fetch: FetchType;
-};
 
 const produceChain = (
   originalFetch: FetchType,
@@ -44,7 +44,7 @@ const produceChain = (
 
 export class InterceptorManager {
   private interceptors: (NetworkInterceptor | null)[] = [];
-  private FetchKey = Symbol(`originalFetch`);
+  private cache = new WeakMap<object, FetchType>();
 
   use = (interceptor: NetworkInterceptor): number => {
     this.interceptors.push(interceptor);
@@ -58,11 +58,11 @@ export class InterceptorManager {
       this.interceptors[i] = null;
     }
   };
-  hook = (target: WindowLike) => {
-    if (Reflect.get(target, this.FetchKey)) {
-      return;
+  hook = (target: WindowLike, originalFetch: FetchType = target.fetch) => {
+    const oldFakeFetch = this.cache.get(target);
+    if (oldFakeFetch) {
+      return target.fetch == oldFakeFetch;
     }
-    const originalFetch = target.fetch;
     const fakeFetch: FetchType = async (input, init) => {
       return produceChain(
         originalFetch,
@@ -70,20 +70,19 @@ export class InterceptorManager {
         new Request(input, init),
       ).proceed();
     };
-    Reflect.set(target, this.FetchKey, target.fetch);
+    this.cache.set(target, target.fetch);
     target.fetch = fakeFetch;
+    return target.fetch == fakeFetch;
   };
 
   unhook = (target: WindowLike) => {
-    if (!Reflect.get(target, this.FetchKey)) {
-      return;
+    const oldFakeFetch = this.cache.get(target);
+    this.cache.delete(target);
+    if (!oldFakeFetch) {
+      return true;
     }
-    Reflect.set(
-      target,
-      this.FetchKey,
-      Reflect.get(target, this.FetchKey) ?? target.fetch,
-    );
-    Reflect.deleteProperty(target, this.FetchKey);
+    target.fetch = oldFakeFetch;
+    return target.fetch == oldFakeFetch;
   };
 }
 
@@ -92,10 +91,6 @@ export const UnsafeWindowInterceptorManager = /* @__PURE__ */ lazy(() => {
   t.hook(monkeyWindow.unsafeWindow ?? window);
   return t;
 });
-
-type OnloadType = typeof XMLHttpRequest.prototype.onload;
-type OnreadystatechangeType =
-  typeof XMLHttpRequest.prototype.onreadystatechange;
 
 class FakeXMLHttpRequest extends XMLHttpRequest {
   _method = 'GET';
@@ -154,13 +149,13 @@ class FakeXMLHttpRequest extends XMLHttpRequest {
     this._responseType = value;
   }
 
-  _onreadystatechange: OnreadystatechangeType = null;
+  _onreadystatechange: XhrOnreadystatechangeType = null;
 
-  _onload: OnloadType = null;
-  get onload(): OnloadType {
+  _onload: XhrOnloadType = null;
+  get onload(): XhrOnloadType {
     return this._onload;
   }
-  set onload(value: OnloadType) {
+  set onload(value: XhrOnloadType) {
     if (value === null) {
       this._onload = null;
     } else {

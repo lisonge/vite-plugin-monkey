@@ -1,9 +1,9 @@
+import type { AnyFunction } from './types';
+
 export const delay = async (n = 0) =>
   new Promise((res) => {
     setTimeout(res, n);
   });
-
-type AnyFunction = (...args: any[]) => any;
 
 const lazyValuePlaceholder = {};
 

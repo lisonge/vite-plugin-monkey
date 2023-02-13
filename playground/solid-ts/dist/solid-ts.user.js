@@ -32,7 +32,7 @@
   let Effects = null;
   let ExecCount = 0;
   function createRoot(fn, detachedOwner) {
-    const listener = Listener, owner = Owner, unowned = fn.length === 0, root = unowned && true ? UNOWNED : {
+    const listener = Listener, owner = Owner, unowned = fn.length === 0, root = unowned ? UNOWNED : {
       owned: null,
       cleanups: null,
       context: null,
@@ -157,8 +157,13 @@
     try {
       nextValue = node.fn(value);
     } catch (err) {
-      if (node.pure)
-        node.state = STALE;
+      if (node.pure) {
+        {
+          node.state = STALE;
+          node.owned && node.owned.forEach(cleanNode);
+          node.owned = null;
+        }
+      }
       handleError(err);
     }
     if (!node.updatedAt || node.updatedAt <= time) {
@@ -238,6 +243,7 @@
     } catch (err) {
       if (!Updates)
         Effects = null;
+      Updates = null;
       handleError(err);
     }
   }
@@ -454,7 +460,14 @@
     });
     if (sharedConfig.registry && !sharedConfig.done) {
       sharedConfig.done = true;
-      document.querySelectorAll("[id^=pl-]").forEach((elem) => elem.remove());
+      document.querySelectorAll("[id^=pl-]").forEach((elem) => {
+        while (elem && elem.nodeType !== 8 && elem.nodeValue !== "pl-" + e) {
+          let x = elem.nextSibling;
+          elem.remove();
+          elem = x;
+        }
+        elem && elem.remove();
+      });
     }
     while (node) {
       const handler = node[key];

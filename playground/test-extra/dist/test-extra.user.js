@@ -234,7 +234,7 @@ var __publicField = (obj, key, value) => {
   var InterceptorManager = class {
     constructor() {
       __publicField(this, "interceptors", []);
-      __publicField(this, "FetchKey", Symbol(`originalFetch`));
+      __publicField(this, "cache", /* @__PURE__ */ new WeakMap());
       __publicField(this, "use", (interceptor) => {
         this.interceptors.push(interceptor);
         return this.interceptors.length - 1;
@@ -247,11 +247,11 @@ var __publicField = (obj, key, value) => {
           this.interceptors[i] = null;
         }
       });
-      __publicField(this, "hook", (target) => {
-        if (Reflect.get(target, this.FetchKey)) {
-          return;
+      __publicField(this, "hook", (target, originalFetch = target.fetch) => {
+        const oldFakeFetch = this.cache.get(target);
+        if (oldFakeFetch) {
+          return target.fetch == oldFakeFetch;
         }
-        const originalFetch = target.fetch;
         const fakeFetch = async (input, init) => {
           return produceChain(
             originalFetch,
@@ -259,19 +259,18 @@ var __publicField = (obj, key, value) => {
             new Request(input, init)
           ).proceed();
         };
-        Reflect.set(target, this.FetchKey, target.fetch);
+        this.cache.set(target, target.fetch);
         target.fetch = fakeFetch;
+        return target.fetch == fakeFetch;
       });
       __publicField(this, "unhook", (target) => {
-        if (!Reflect.get(target, this.FetchKey)) {
-          return;
+        const oldFakeFetch = this.cache.get(target);
+        this.cache.delete(target);
+        if (!oldFakeFetch) {
+          return true;
         }
-        Reflect.set(
-          target,
-          this.FetchKey,
-          Reflect.get(target, this.FetchKey) ?? target.fetch
-        );
-        Reflect.deleteProperty(target, this.FetchKey);
+        target.fetch = oldFakeFetch;
+        return target.fetch == oldFakeFetch;
       });
     }
   };

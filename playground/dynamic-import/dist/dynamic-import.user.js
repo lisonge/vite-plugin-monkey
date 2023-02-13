@@ -7,9 +7,9 @@
 // @icon         https://vitejs.dev/logo.svg
 // @match        https://i.songe.li/*
 // @require      https://cdn.jsdelivr.net/npm/md5@2.3.0/dist/md5.min.js
-// @require      https://cdn.jsdelivr.net/npm/vue@3.2.45/dist/vue.global.prod.js
+// @require      https://cdn.jsdelivr.net/npm/vue@3.2.47/dist/vue.global.prod.js
 // @require      data:application/javascript,window.Vue%3DVue%3B
-// @require      https://cdn.jsdelivr.net/npm/element-plus@2.2.26/dist/index.full.min.js
+// @require      https://cdn.jsdelivr.net/npm/element-plus@2.2.30/dist/index.full.min.js
 // @resource     animate.css  https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.css
 // @grant        GM_getResourceText
 // ==/UserScript==

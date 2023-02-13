@@ -6,12 +6,12 @@
 // @description  default_description
 // @icon         https://vitejs.dev/logo.svg
 // @match        https://i.songe.li/
-// @require      https://cdn.jsdelivr.net/npm/vue@3.2.45/dist/vue.global.prod.js
+// @require      https://cdn.jsdelivr.net/npm/vue@3.2.47/dist/vue.global.prod.js
 // @require      https://unpkg.com/vue-demi@latest/lib/index.iife.js
 // @require      data:application/javascript,window.Vue%3DVue%3B
-// @require      https://cdn.jsdelivr.net/npm/pinia@2.0.28/dist/pinia.iife.prod.js
-// @require      https://cdn.jsdelivr.net/npm/element-plus@2.2.26/dist/index.full.min.js
-// @resource     element-plus/dist/index.css  https://cdn.jsdelivr.net/npm/element-plus@2.2.26/dist/index.css
+// @require      https://cdn.jsdelivr.net/npm/pinia@2.0.30/dist/pinia.iife.prod.js
+// @require      https://cdn.jsdelivr.net/npm/element-plus@2.2.30/dist/index.full.min.js
+// @resource     element-plus/dist/index.css  https://cdn.jsdelivr.net/npm/element-plus@2.2.30/dist/index.css
 // @grant        GM_getResourceText
 // ==/UserScript==
 
@@ -23,16 +23,21 @@
   };
   cssLoader("element-plus/dist/index.css");
   const useMainStore = pinia$1.defineStore("main", {
+    // a function that returns a fresh state
     state: () => ({
       counter: 0,
       name: "Eduardo"
     }),
+    // optional getters
     getters: {
+      // getters receive the state as first parameter
       doubleCounter: (state) => state.counter * 2,
+      // use getters in other getters
       doubleCounterPlusOne() {
         return this.doubleCounter + 1;
       }
     },
+    // optional actions
     actions: {
       reset() {
         this.counter = 0;

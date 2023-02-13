@@ -5,8 +5,8 @@
 // @author     monkey
 // @icon       https://vitejs.dev/logo.svg
 // @match      https://www.google.com/
-// @require    https://cdn.jsdelivr.net/npm/vue@3.2.45/dist/vue.global.prod.js
-// @resource   element-plus/dist/index.css  https://cdn.jsdelivr.net/npm/element-plus@2.2.26/dist/index.css
+// @require    https://cdn.jsdelivr.net/npm/vue@3.2.47/dist/vue.global.prod.js
+// @resource   element-plus/dist/index.css  https://cdn.jsdelivr.net/npm/element-plus@2.2.30/dist/index.css
 // @grant      GM_deleteValue
 // @grant      GM_getResourceText
 // @grant      GM_listValues

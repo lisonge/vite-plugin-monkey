@@ -4,6 +4,7 @@
   "private": true,
   "author": "lisonge",
   "license": "MIT",
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lisonge/vite-plugin-monkey.git"

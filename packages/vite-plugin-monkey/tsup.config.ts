@@ -26,5 +26,6 @@ export default defineConfig([
     format: ['esm'],
     platform: 'browser',
     outExtension,
+    metafile: true,
   },
 ]);

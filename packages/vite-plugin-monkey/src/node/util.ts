@@ -1,3 +1,4 @@
+import type { InlinePreset } from 'unimport';
 import { transformWithEsbuild } from 'vite';
 import { logger } from './_logger';
 
@@ -56,4 +57,41 @@ export const encodeFn = async <T extends (...args: any[]) => any>(
 ) => {
   logger.warn('util.encodeFn is deprecated, use util.fn2dataUrl');
   return fn2dataUrl(fn, ...args);
+};
+
+/**
+ * GM api preset when you use unimport/unplugin-auto-import
+ *
+ * Note, there is not comment in unimport.d.ts/auto-imports.d.ts file
+ */
+export const unimportPreset: InlinePreset = {
+  from: 'vite-plugin-monkey/dist/client',
+  imports: [
+    'GM',
+    'GM_addElement',
+    'GM_addStyle',
+    'GM_addValueChangeListener',
+    'GM_cookie',
+    'GM_deleteValue',
+    'GM_download',
+    'GM_getResourceText',
+    'GM_getResourceURL',
+    'GM_getTab',
+    'GM_getTabs',
+    'GM_getValue',
+    'GM_info',
+    'GM_listValues',
+    'GM_log',
+    'GM_notification',
+    'GM_openInTab',
+    'GM_registerMenuCommand',
+    'GM_removeValueChangeListener',
+    'GM_saveTab',
+    'GM_setClipboard',
+    'GM_setValue',
+    'GM_unregisterMenuCommand',
+    'GM_xmlhttpRequest',
+    'unsafeWindow',
+    'monkeyWindow',
+  ],
 };

@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
-import monkey from 'vite-plugin-monkey';
+import monkey, { util } from 'vite-plugin-monkey';
+import AutoImport from 'unplugin-auto-import/vite';
 
 export default defineConfig({
   plugins: [
@@ -11,6 +12,9 @@ export default defineConfig({
         match: ['https://i.songe.li/*'],
         connect: [`httpbin.org`, `i.pximg.net`],
       },
+    }),
+    AutoImport({
+      imports: [util.unimportPreset],
     }),
   ],
 });

@@ -14,7 +14,8 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "baseUrl": "."
   },
-  "include": ["src"]
+  "include": ["src", "auto-imports.d.ts"]
 }

@@ -1,7 +1,7 @@
-import { monkeyWindow } from './window';
+// import { monkeyWindow } from './window';
 
 const xmlhttpRequest = /* @__PURE__ */ (() => {
-  return monkeyWindow.GM_xmlhttpRequest ?? monkeyWindow.GM.xmlHttpRequest;
+  return GM_xmlhttpRequest ?? GM.xmlHttpRequest;
 })();
 
 // https://github.com/github/fetch/blob/master/fetch.js

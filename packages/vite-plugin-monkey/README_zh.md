@@ -7,11 +7,11 @@
 
 [README](README.md) | [中文文档](README_zh.md)
 
-一个 vite 插件，用来辅助开发 [Tampermonkey](https://www.tampermonkey.net/) 和 [Violentmonkey](https://violentmonkey.github.io/) 和 [Greasemonkey](https://www.greasespot.net/) 的脚本
+一个 vite 插件，用来辅助开发 [Tampermonkey](https://www.tampermonkey.net/), [Violentmonkey](https://violentmonkey.github.io/), [Greasemonkey](https://www.greasespot.net/), [ScriptCat](https://docs.scriptcat.org/) 的脚本
 
 ## feature
 
-- 支持 Tampermonkey 和 Violentmonkey 和 Greasemonkey 的脚本辅助开发
+- 支持 Tampermonkey, Violentmonkey, Greasemonkey, ScriptCat 等脚本引擎的辅助开发
 - 打包自动注入脚本配置头部注释
 - 当 第一次启动 或 脚本配置注释改变时 自动在默认浏览器打开脚本安装
 - 利用 @require 配置库的 cdn 的方案, 减少构建脚本大小

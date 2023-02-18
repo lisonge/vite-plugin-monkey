@@ -7,11 +7,11 @@
 
 [README](README.md) | [中文文档](README_zh.md)
 
-A vite plugin server and build your.user.js for userscript engine like [Tampermonkey](https://www.tampermonkey.net/) and [Violentmonkey](https://violentmonkey.github.io/) and [Greasemonkey](https://www.greasespot.net/)
+A vite plugin server and build your.user.js for userscript engine like [Tampermonkey](https://www.tampermonkey.net/) and [Violentmonkey](https://violentmonkey.github.io/), [Greasemonkey](https://www.greasespot.net/), [ScriptCat](https://docs.scriptcat.org/)
 
 ## feature
 
-- support Tampermonkey and Violentmonkey and Greasemonkey
+- support Tampermonkey, Violentmonkey, Greasemonkey, ScriptCat, etc
 - inject userscript comment to build bundle
 - auto open \*.user.js in default browser when userscript change
 - external cdn url inject to userscript @require

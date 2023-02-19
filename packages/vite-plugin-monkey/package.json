@@ -58,7 +58,7 @@
     "detect-port": "1.5.1",
     "htmlparser2": "8.0.1",
     "mrmime": "1.0.1",
-    "open": "8.4.0",
+    "open": "8.4.1",
     "picocolors": "1.0.0"
   },
   "devDependencies": {

@@ -126,26 +126,24 @@ export type MonkeyOption = {
    * alias of vite-plugin-monkey/dist/client
    * @default '$'
    * @example
-   * // vite.config.ts, plugin will auto modify config
-   * // your don't need to manually modify it
-   * resolve: {
-   *   alias: {
-   *     [clientAlias]: 'vite-plugin-monkey/dist/client',
-   *   },
-   * }
-   * @example
-   * // vite-env.d.ts, you must manually modify vite-env.d.ts file for type hint
-   * declare module clientAlias {
+   * // vite-env.d.ts for type hint
+   *
+   * // if you use default value `$`
+   * /// <reference types="vite-plugin-monkey/client" />
+   *
+   * // if you use other_alias
+   * declare module other_alias {
    *   export * from 'vite-plugin-monkey/dist/client';
    * }
    */
   clientAlias?: string;
   server?: {
     /**
-     * auto open *.user.js in default browser when userscript comment change or vite server first start.
-     * if you don't want to open when vite server first start, just want to open when userscript comment change, you should set viteConfig.server.open=false
+     * auto open install url in default browser when userscript comment change
+     *
+     * and set `viteConfig.server.open ??== monkeyConfig.server.open`
      * @default
-     * process.platform == 'win32' || process.platform == 'darwin'
+     * process.platform == 'win32' || process.platform == 'darwin' // if platform is Win/Mac
      */
     open?: boolean;
 
@@ -156,7 +154,7 @@ export type MonkeyOption = {
     prefix?: string | ((name: string) => string) | false;
 
     /**
-     * mount GM_api to unsafeWindow, not recommend it, you should use GM_api by ESM import
+     * mount GM_api to unsafeWindow, not recommend it, you should use GM_api by ESM import, or use [unplugin-auto-import](https://github.com/antfu/unplugin-auto-import)
      * @default false
      * @example
      * // if set true, you can use `vite-plugin-monkey/global` for type hint
@@ -188,7 +186,7 @@ export type MonkeyOption = {
     metaFileName?: string | boolean | ((fileName: string) => string);
 
     /**
-     * this object can be array or object, array=Object.entries(object)
+     * this config can be array or object, array=Object.entries(object)
      *
      * if value is string or function, it or its return value is exportVarName
      *
@@ -199,7 +197,8 @@ export type MonkeyOption = {
      * @example
      * { // map structure
      *  vue:'Vue',
-     *  // youe need manually set userscript.require = ['https://unpkg.com/vue@3.0.0/dist/vue.global.js'], when command=='build'
+     *  // if set this
+     *  // you need manually set userscript.require = ['https://unpkg.com/vue@3.0.0/dist/vue.global.js'], when `vite build`
      *
      *  vuex:['Vuex', (version, name)=>`https://unpkg.com/${name}@${version}/dist/vuex.global.js`],
      *  // plugin will auto add this url to userscript.require
@@ -216,7 +215,7 @@ export type MonkeyOption = {
      *  // sometimes importName deffers from package name
      * }
      * @example
-     * [ // array structure, this example come from playground/ex-vue-demi
+     * [ // array structure, this example come from [playground/ex-vue-demi](https://github.com/lisonge/vite-plugin-monkey/tree/main/playground/ex-vue-demi)
      *   [
      *     'vue',
      *     cdn
@@ -240,7 +239,7 @@ export type MonkeyOption = {
     /**
      * according to final code bundle, auto inject GM_* or GM.* to userscript comment grant
      *
-     * the judgment is based on String.prototype.includes, if code.includes('GM_xxx'), add \@grant GM_xxx to userscript
+     * tree shaking code, then if code.includes('GM_xxx'), add \@grant GM_xxx to userscript
      * @default true
      */
     autoGrant?: boolean;
@@ -273,9 +272,10 @@ export type MonkeyOption = {
      *        ].join('');
      *     },
      *   },
-     *   'element-plus/dist/index.css': [ // compat externalGlobals cdn function
-     *      (version, name, importName, resolveName)=>importName, // if (!!value) === false, plugin will use default value
-     *      (version, name, importName, resolveName)=>`https://unpkg.com/${name}@${version}/${resolveName}`, // if (!!value) === false, plugin will use default value
+     *   'element-plus/dist/index.css': [
+     *      (version, name, importName, resolveName)=>importName,
+     *      (version, name, importName, resolveName)=>`https://unpkg.com/${name}@${version}/${resolveName}`,
+     *       // for compat externalGlobals cdn function, if (version/name/importName/resolveName) == '', plugin will use their own default values
      *   ],
      *   'element-plus/dist/index.css': cdn.jsdelivr(),
      * }

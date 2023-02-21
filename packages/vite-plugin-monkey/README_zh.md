@@ -7,7 +7,7 @@
 
 [README](README.md) | [中文文档](README_zh.md)
 
-一个 vite 插件，用来辅助开发 [Tampermonkey](https://www.tampermonkey.net/), [Violentmonkey](https://violentmonkey.github.io/), [Greasemonkey](https://www.greasespot.net/), [ScriptCat](https://docs.scriptcat.org/) 的脚本
+一个 vite 插件，用来辅助开发 [Tampermonkey](https://www.tampermonkey.net/), [Violentmonkey](https://violentmonkey.github.io/), [Greasemonkey](https://www.greasespot.net/), [ScriptCat](https://docs.scriptcat.org/) 等脚本引擎 的脚本
 
 ## feature
 
@@ -22,7 +22,7 @@
 - 预览模式下自动打开浏览器安装构建好的脚本
 - 完全的 Typescript 和 Vite 的开发体验，比如模块热替换,秒启动
 
-## quick usage (recommend)
+## 快速开始
 
 使用方式与 vite create 一致
 
@@ -65,7 +65,7 @@ pnpm create monkey
 
 </details>
 
-## installation
+## 单独安装
 
 ```shell
 pnpm add -D vite-plugin-monkey
@@ -93,25 +93,24 @@ export type MonkeyOption = {
    * alias of vite-plugin-monkey/dist/client
    * @default '$'
    * @example
-   * // vite.config.ts, plugin will auto modify config
-   * resolve: {
-   *   alias: {
-   *     [clientAlias]: 'vite-plugin-monkey/dist/client',
-   *   },
-   * }
-   * @example
-   * // vite-env.d.ts, you must manual modify vite-env.d.ts file for type hint
-   * declare module clientAlias {
+   * // vite-env.d.ts for type hint
+   *
+   * // if you use default value `$`
+   * /// <reference types="vite-plugin-monkey/client" />
+   *
+   * // if you use other_alias
+   * declare module other_alias {
    *   export * from 'vite-plugin-monkey/dist/client';
    * }
    */
   clientAlias?: string;
   server?: {
     /**
-     * auto open *.user.js in default browser when userscript comment change or vite server first start.
-     * if you don't want to open when vite server first start, just want to open when userscript comment change, you should set viteConfig.server.open=false
+     * auto open install url in default browser when userscript comment change
+     *
+     * and set `viteConfig.server.open ??== monkeyConfig.server.open`
      * @default
-     * process.platform == 'win32' || process.platform == 'darwin'
+     * process.platform == 'win32' || process.platform == 'darwin' // if platform is Win/Mac
      */
     open?: boolean;
 
@@ -122,7 +121,7 @@ export type MonkeyOption = {
     prefix?: string | ((name: string) => string) | false;
 
     /**
-     * mount GM_api to unsafeWindow, not recommend it, you should use GM_api by ESM import
+     * mount GM_api to unsafeWindow, not recommend it, you should use GM_api by ESM import, or use [unplugin-auto-import](https://github.com/antfu/unplugin-auto-import)
      * @default false
      * @example
      * // if set true, you can use `vite-plugin-monkey/global` for type hint
@@ -148,12 +147,13 @@ export type MonkeyOption = {
      * it should end with '.meta.js', if set false, will not generate this file
      *
      * if set true, will equal to fileName.replace(/\\.user\\.js$/,'.meta.js')
+     *
      * @default false
      */
     metaFileName?: string | boolean | ((fileName: string) => string);
 
     /**
-     * this object can be array or object, array=Object.entries(object)
+     * this config can be array or object, array=Object.entries(object)
      *
      * if value is string or function, it or its return value is exportVarName
      *
@@ -164,7 +164,8 @@ export type MonkeyOption = {
      * @example
      * { // map structure
      *  vue:'Vue',
-     *  // youe need manually set userscript.require = ['https://unpkg.com/vue@3.0.0/dist/vue.global.js'], when command=='build'
+     *  // if set this
+     *  // you need manually set userscript.require = ['https://unpkg.com/vue@3.0.0/dist/vue.global.js'], when `vite build`
      *
      *  vuex:['Vuex', (version, name)=>`https://unpkg.com/${name}@${version}/dist/vuex.global.js`],
      *  // plugin will auto add this url to userscript.require
@@ -181,7 +182,7 @@ export type MonkeyOption = {
      *  // sometimes importName deffers from package name
      * }
      * @example
-     * [ // array structure, this example come from playground/ex-vue-demi
+     * [ // array structure, this example come from [playground/ex-vue-demi](https://github.com/lisonge/vite-plugin-monkey/tree/main/playground/ex-vue-demi)
      *   [
      *     'vue',
      *     cdn
@@ -205,7 +206,7 @@ export type MonkeyOption = {
     /**
      * according to final code bundle, auto inject GM_* or GM.* to userscript comment grant
      *
-     * the judgment is based on String.prototype.includes, if code.includes('GM_xxx'), add \@grant GM_xxx to userscript
+     * tree shaking code, then if code.includes('GM_xxx'), add \@grant GM_xxx to userscript
      * @default true
      */
     autoGrant?: boolean;
@@ -238,9 +239,10 @@ export type MonkeyOption = {
      *        ].join('');
      *     },
      *   },
-     *   'element-plus/dist/index.css': [ // compat externalGlobals cdn function
-     *      (version, name, importName, resolveName)=>importName, // if (!!value) === false, plugin will use default value
-     *      (version, name, importName, resolveName)=>`https://unpkg.com/${name}@${version}/${resolveName}`, // if (!!value) === false, plugin will use default value
+     *   'element-plus/dist/index.css': [
+     *      (version, name, importName, resolveName)=>importName,
+     *      (version, name, importName, resolveName)=>`https://unpkg.com/${name}@${version}/${resolveName}`,
+     *       // for compat externalGlobals cdn function, if (version/name/importName/resolveName) == '', plugin will use their own default values
      *   ],
      *   'element-plus/dist/index.css': cdn.jsdelivr(),
      * }
@@ -248,14 +250,16 @@ export type MonkeyOption = {
     externalResource?: ExternalResource;
 
     /**
-     * if you want to enable sourcemap, you can set `viteConfig.build.sourcemap='inline'`
+     * if you want to enable sourcemap, you need set `viteConfig.build.sourcemap='inline'`
      *
      * In addition, if `monkeyConfig.build.sourcemap && viteConfig.build.sourcemap===undefined`
      *
-     * the plugin wll set `viteConfig.build.sourcemap='inline'`
+     * the plugin will also set `viteConfig.build.sourcemap='inline'`
      */
     sourcemap?: {
       /**
+       * you must build and install userscript in advance, then open devtools -> source -> page, find this userscript
+       *
        * It is the line number of `// ==UserScript==` -1, The offset of different userscript engines is different
        *
        * If you don't set it, devtools console may log map error code position
@@ -282,19 +286,25 @@ export type MonkeyOption = {
 
 </details>
 
-## externalGlobals cdn 工具
+## 排除依赖的 CDN 工具
 
-```js
-// 使用示例
-import { cdn } from 'vite-plugin-monkey';
-const buildConfig = {
-  externalGlobals: {
-    'blueimp-md5': cdn.bytecdntp('md5', 'js/md5.min.js'),
-  },
-  externalResource: {
-    'element-plus/dist/index.css': cdn.jsdelivr(),
-  },
-};
+```ts
+import { defineConfig } from 'vite';
+import monkey, { cdn } from 'vite-plugin-monkey';
+export default defineConfig({
+  plugins: [
+    monkey({
+      build: {
+        externalGlobals: {
+          react: cdn.jsdelivr('React', 'umd/react.production.min.js'),
+        },
+        externalResource: {
+          'element-plus/dist/index.css': cdn.jsdelivr(),
+        },
+      },
+    }),
+  ],
+});
 ```
 
 有以下 cdn 可使用，详情见 [cdn.ts](/packages/vite-plugin-monkey/src/node/cdn.ts)
@@ -310,36 +320,95 @@ const buildConfig = {
 
 如果你想使用其他 cdn，请查看 [external-scripts](https://greasyfork.org/zh-CN/help/external-scripts)
 
-## ESM GM_api
+## GM_api 用法
 
-我们通过 esm 模块来使用 GM_api
+### ESM 用法
+
+我们可以通过 ESM 模块来使用 GM_api
 
 ```ts
+// main.ts
 import { GM_cookie, unsafeWindow, monkeyWindow, GM_addElement } from '$';
-// $ 是 vite-plugin-monkey/dist/client 的别名, 你也可以设置其他别名
+// $ is the default alias of vite-plugin-monkey/dist/client
+// if you want use 'others', set monkeyConfig.clientAlias='others'
 
-// 无论当前运行环境是开发环境还是构建环境, monkeyWindow 总是脚本作用域的 window
+// whatever it is serve or build mode, monkeyWindow is always the window of [UserScript Scope]
 console.log(monkeyWindow);
 
-GM_addElement && GM_addElement(document.body, 'div', { innerHTML: 'hello' });
+GM_addElement(document.body, 'div', { innerHTML: 'hello' });
 
-// 无论当前运行环境是开发环境还是构建环境, unsafeWindow 总是宿主作用域的 window
+// whatever it is serve or build mode, unsafeWindow is always host window
 if (unsafeWindow == window) {
-  console.log('scope->host, esm mode');
+  console.log('scope->host, host esm scope');
 } else {
-  console.log('scope->monkey, iife mode');
+  console.log('scope->monkey, userscript scope');
 }
-GM_cookie &&
-  GM_cookie.list({}, (cookies, error) => {
-    if (error) {
-      console.log(error);
-    } else {
-      const [cookie] = cookies;
-      if (cookie) {
-        console.log(cookie);
-      }
+
+GM_cookie.list({}, (cookies, error) => {
+  if (error) {
+    console.log(error);
+  } else {
+    const [cookie] = cookies;
+    if (cookie) {
+      console.log(cookie);
     }
-  });
+  }
+});
+```
+
+### 全局变量用法
+
+先配置 `monkeyConfig.server.mountGmApi=true`
+
+```ts
+// vite.config.ts
+import { defineConfig } from 'vite';
+import monkey from 'vite-plugin-monkey';
+
+export default defineConfig({
+  plugins: [
+    monkey({
+      // ...
+      server: { mountGmApi: true },
+    }),
+  ],
+});
+```
+
+GM_api 将会变成宿主域的全局变量, 可以在任意作用域访问
+
+```ts
+// main.ts
+console.log(GM_cookie == globalThis.GM_cookie);
+console.log({ GM_cookie, unsafeWindow, monkeyWindow, GM_addElement });
+```
+
+### 自动导入用法
+
+配置插件 [unplugin-auto-import](https://github.com/antfu/unplugin-auto-import)
+
+```ts
+// vite.config.ts
+import { defineConfig } from 'vite';
+import monkey, { util } from 'vite-plugin-monkey';
+import AutoImport from 'unplugin-auto-import/vite';
+
+export default defineConfig({
+  plugins: [
+    monkey({
+      // ...
+    }),
+    AutoImport({
+      imports: [util.unimportPreset],
+    }),
+  ],
+});
+```
+
+```ts
+// main.ts
+// auto import example
+console.log({ GM_cookie, unsafeWindow, monkeyWindow, GM_addElement });
 ```
 
 ## 例子
@@ -349,6 +418,32 @@ GM_cookie &&
 preact/react/svelte/vanilla/vue/solid 的例子, 请直接看 [create-monkey](/packages/create-monkey)
 
 ## 注意
+
+### 动态导入
+
+当 `vite build`, 插件将使构建你的代码为 iife 格式
+
+并且设置 `inlineDynamicImports=true`, 代码里的动态导入会变成静态导入, 副作用也会立刻执行
+
+```ts
+// main.ts
+if (xxx) {
+  import('vue');
+}
+```
+
+将变成
+
+```ts
+import * as module_0 from 'vue';
+if (xxx) {
+  Promise.resolve(module_0);
+}
+```
+
+### Top Level await
+
+它在 `vite build` 下不可用
 
 ### [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)
 
@@ -409,7 +504,6 @@ const buildConfig = {
 ```ts
 import { defineConfig } from 'vite';
 import monkey from 'vite-plugin-monkey';
-
 export default defineConfig({
   plugins: [
     monkey({

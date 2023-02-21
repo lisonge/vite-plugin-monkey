@@ -9,7 +9,7 @@
 
 A vite plugin server and build your.user.js for userscript engine like [Tampermonkey](https://www.tampermonkey.net/) and [Violentmonkey](https://violentmonkey.github.io/), [Greasemonkey](https://www.greasespot.net/), [ScriptCat](https://docs.scriptcat.org/)
 
-## feature
+## Feature
 
 - support Tampermonkey, Violentmonkey, Greasemonkey, ScriptCat, etc
 - inject userscript comment to build bundle
@@ -22,7 +22,7 @@ A vite plugin server and build your.user.js for userscript engine like [Tampermo
 - when vite preview, auto open browser install dist.user.js
 - full typescript support and vite feature
 
-## quick usage (recommend)
+## Quick Start
 
 just like vite create
 
@@ -65,7 +65,7 @@ then you can choose the following template
 
 </details>
 
-## installation
+## Installation
 
 ```shell
 pnpm add -D vite-plugin-monkey
@@ -73,7 +73,9 @@ pnpm add -D vite-plugin-monkey
 # yarn add -D vite-plugin-monkey
 ```
 
-## config
+## Config
+
+<!-- template-start-MonkeyOption -->
 
 [MonkeyOption](/packages/vite-plugin-monkey/src/node/types.ts#L117)
 
@@ -93,25 +95,24 @@ export type MonkeyOption = {
    * alias of vite-plugin-monkey/dist/client
    * @default '$'
    * @example
-   * // vite.config.ts, plugin will auto modify config
-   * resolve: {
-   *   alias: {
-   *     [clientAlias]: 'vite-plugin-monkey/dist/client',
-   *   },
-   * }
-   * @example
-   * // vite-env.d.ts, you must manual modify vite-env.d.ts file for type hint
-   * declare module clientAlias {
+   * // vite-env.d.ts for type hint
+   *
+   * // if you use default value `$`
+   * /// <reference types="vite-plugin-monkey/client" />
+   *
+   * // if you use other_alias
+   * declare module other_alias {
    *   export * from 'vite-plugin-monkey/dist/client';
    * }
    */
   clientAlias?: string;
   server?: {
     /**
-     * auto open *.user.js in default browser when userscript comment change or vite server first start.
-     * if you don't want to open when vite server first start, just want to open when userscript comment change, you should set viteConfig.server.open=false
+     * auto open install url in default browser when userscript comment change
+     *
+     * and set `viteConfig.server.open ??== monkeyConfig.server.open`
      * @default
-     * process.platform == 'win32' || process.platform == 'darwin'
+     * process.platform == 'win32' || process.platform == 'darwin' // if platform is Win/Mac
      */
     open?: boolean;
 
@@ -122,7 +123,7 @@ export type MonkeyOption = {
     prefix?: string | ((name: string) => string) | false;
 
     /**
-     * mount GM_api to unsafeWindow, not recommend it, you should use GM_api by ESM import
+     * mount GM_api to unsafeWindow, not recommend it, you should use GM_api by ESM import, or use [unplugin-auto-import](https://github.com/antfu/unplugin-auto-import)
      * @default false
      * @example
      * // if set true, you can use `vite-plugin-monkey/global` for type hint
@@ -148,12 +149,13 @@ export type MonkeyOption = {
      * it should end with '.meta.js', if set false, will not generate this file
      *
      * if set true, will equal to fileName.replace(/\\.user\\.js$/,'.meta.js')
+     *
      * @default false
      */
     metaFileName?: string | boolean | ((fileName: string) => string);
 
     /**
-     * this object can be array or object, array=Object.entries(object)
+     * this config can be array or object, array=Object.entries(object)
      *
      * if value is string or function, it or its return value is exportVarName
      *
@@ -164,7 +166,8 @@ export type MonkeyOption = {
      * @example
      * { // map structure
      *  vue:'Vue',
-     *  // youe need manually set userscript.require = ['https://unpkg.com/vue@3.0.0/dist/vue.global.js'], when command=='build'
+     *  // if set this
+     *  // you need manually set userscript.require = ['https://unpkg.com/vue@3.0.0/dist/vue.global.js'], when `vite build`
      *
      *  vuex:['Vuex', (version, name)=>`https://unpkg.com/${name}@${version}/dist/vuex.global.js`],
      *  // plugin will auto add this url to userscript.require
@@ -181,7 +184,7 @@ export type MonkeyOption = {
      *  // sometimes importName deffers from package name
      * }
      * @example
-     * [ // array structure, this example come from playground/ex-vue-demi
+     * [ // array structure, this example come from [playground/ex-vue-demi](https://github.com/lisonge/vite-plugin-monkey/tree/main/playground/ex-vue-demi)
      *   [
      *     'vue',
      *     cdn
@@ -205,7 +208,7 @@ export type MonkeyOption = {
     /**
      * according to final code bundle, auto inject GM_* or GM.* to userscript comment grant
      *
-     * the judgment is based on String.prototype.includes, if code.includes('GM_xxx'), add \@grant GM_xxx to userscript
+     * tree shaking code, then if code.includes('GM_xxx'), add \@grant GM_xxx to userscript
      * @default true
      */
     autoGrant?: boolean;
@@ -238,9 +241,10 @@ export type MonkeyOption = {
      *        ].join('');
      *     },
      *   },
-     *   'element-plus/dist/index.css': [ // compat externalGlobals cdn function
-     *      (version, name, importName, resolveName)=>importName, // if (!!value) === false, plugin will use default value
-     *      (version, name, importName, resolveName)=>`https://unpkg.com/${name}@${version}/${resolveName}`, // if (!!value) === false, plugin will use default value
+     *   'element-plus/dist/index.css': [
+     *      (version, name, importName, resolveName)=>importName,
+     *      (version, name, importName, resolveName)=>`https://unpkg.com/${name}@${version}/${resolveName}`,
+     *       // for compat externalGlobals cdn function, if (version/name/importName/resolveName) == '', plugin will use their own default values
      *   ],
      *   'element-plus/dist/index.css': cdn.jsdelivr(),
      * }
@@ -248,14 +252,16 @@ export type MonkeyOption = {
     externalResource?: ExternalResource;
 
     /**
-     * if you want to enable sourcemap, you can set `viteConfig.build.sourcemap='inline'`
+     * if you want to enable sourcemap, you need set `viteConfig.build.sourcemap='inline'`
      *
      * In addition, if `monkeyConfig.build.sourcemap && viteConfig.build.sourcemap===undefined`
      *
-     * the plugin wll set `viteConfig.build.sourcemap='inline'`
+     * the plugin will also set `viteConfig.build.sourcemap='inline'`
      */
     sourcemap?: {
       /**
+       * you must build and install userscript in advance, then open devtools -> source -> page, find this userscript
+       *
        * It is the line number of `// ==UserScript==` -1, The offset of different userscript engines is different
        *
        * If you don't set it, devtools console may log map error code position
@@ -282,19 +288,27 @@ export type MonkeyOption = {
 
 </details>
 
-## externalGlobals cdn util
+<!-- template-end-MonkeyOption -->
 
-```js
-// use example
-import { cdn } from 'vite-plugin-monkey';
-const buildConfig = {
-  externalGlobals: {
-    'blueimp-md5': cdn.bytecdntp('md5', 'js/md5.min.js'),
-  },
-  externalResource: {
-    'element-plus/dist/index.css': cdn.jsdelivr(),
-  },
-};
+## CDN util for external
+
+```ts
+import { defineConfig } from 'vite';
+import monkey, { cdn } from 'vite-plugin-monkey';
+export default defineConfig({
+  plugins: [
+    monkey({
+      build: {
+        externalGlobals: {
+          react: cdn.jsdelivr('React', 'umd/react.production.min.js'),
+        },
+        externalResource: {
+          'element-plus/dist/index.css': cdn.jsdelivr(),
+        },
+      },
+    }),
+  ],
+});
 ```
 
 there is the following cdn to use, full detail see [cdn.ts](/packages/vite-plugin-monkey/src/node/cdn.ts)
@@ -310,51 +324,136 @@ there is the following cdn to use, full detail see [cdn.ts](/packages/vite-plugi
 
 if you want use other cdn, you can see [external-scripts](https://greasyfork.org/help/external-scripts)
 
-## ESM GM_api
+## GM_api usage
+
+### ESM usage
 
 we can use GM_api by esm module
 
 ```ts
+// main.ts
 import { GM_cookie, unsafeWindow, monkeyWindow, GM_addElement } from '$';
-// $ is the alias of vite-plugin-monkey/dist/client, you can use others
+// $ is the default alias of vite-plugin-monkey/dist/client
+// if you want use 'others', set monkeyConfig.clientAlias='others'
 
 // whatever it is serve or build mode, monkeyWindow is always the window of [UserScript Scope]
 console.log(monkeyWindow);
 
-GM_addElement && GM_addElement(document.body, 'div', { innerHTML: 'hello' });
+GM_addElement(document.body, 'div', { innerHTML: 'hello' });
 
 // whatever it is serve or build mode, unsafeWindow is always host window
 if (unsafeWindow == window) {
-  console.log('scope->host, esm mode');
+  console.log('scope->host, host esm scope');
 } else {
-  console.log('scope->monkey, iife mode');
+  console.log('scope->monkey, userscript scope');
 }
-GM_cookie &&
-  GM_cookie.list({}, (cookies, error) => {
-    if (error) {
-      console.log(error);
-    } else {
-      const [cookie] = cookies;
-      if (cookie) {
-        console.log(cookie);
-      }
+
+GM_cookie.list({}, (cookies, error) => {
+  if (error) {
+    console.log(error);
+  } else {
+    const [cookie] = cookies;
+    if (cookie) {
+      console.log(cookie);
     }
-  });
+  }
+});
 ```
 
-## example
+### Global variables usage
 
-test example, see [/playground](/playground)
+set `monkeyConfig.server.mountGmApi=true`
+
+```ts
+// vite.config.ts
+import { defineConfig } from 'vite';
+import monkey from 'vite-plugin-monkey';
+
+export default defineConfig({
+  plugins: [
+    monkey({
+      // ...
+      server: { mountGmApi: true },
+    }),
+  ],
+});
+```
+
+GM_api will mount to the property of `host window/globalThis`
+
+```ts
+// main.ts
+console.log(GM_cookie == globalThis.GM_cookie);
+console.log({ GM_cookie, unsafeWindow, monkeyWindow, GM_addElement });
+```
+
+### Auto import usage
+
+use [unplugin-auto-import](https://github.com/antfu/unplugin-auto-import)
+
+```ts
+// vite.config.ts
+import { defineConfig } from 'vite';
+import monkey, { util } from 'vite-plugin-monkey';
+import AutoImport from 'unplugin-auto-import/vite';
+
+export default defineConfig({
+  plugins: [
+    monkey({
+      // ...
+    }),
+    AutoImport({
+      imports: [util.unimportPreset],
+    }),
+  ],
+});
+```
+
+```ts
+// main.ts
+// auto import example
+console.log({ GM_cookie, unsafeWindow, monkeyWindow, GM_addElement });
+```
+
+## Example
+
+test examples, see [/playground](/playground)
 
 and preact/react/svelte/vanilla/vue/solid examples, see [create-monkey](/packages/create-monkey)
 
-## some note
+## Some note
+
+### Dynamic Import
+
+when `vite build`, plugin will build your code to iife formats
+
+and set `inlineDynamicImports=true`, the dynamic import in code will become static import, the `side effects` are also effective immediately
+
+```ts
+// main.ts
+if (xxx) {
+  import('vue');
+}
+```
+
+will become
+
+```ts
+import * as module_0 from 'vue';
+if (xxx) {
+  Promise.resolve(module_0);
+}
+```
+
+### Top Level await
+
+when `vite build`, it is unavailable
 
 ### [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)
 
 in `vite serve` mode, the code entry is added as script to target host document.head, code need work between two origins
 
-#### for http header csp
+#### For http header csp
 
 you can use [Tampermonkey](https://www.tampermonkey.net/) then open `extension://iikmkjmpaadaobahmlepeloendndfphd/options.html#nav=settings`
 
@@ -368,7 +467,7 @@ and if you use `Violentmonkey`/`Greasemonkey`, you can solve it in the following
 - edge - [Disable Content-Security-Policy](https://microsoftedge.microsoft.com/addons/detail/disable-contentsecurity/ecmfamimnofkleckfamjbphegacljmbp?hl=zh-CN)
 - firefox - disable `security.csp.enable` in the `about:config` menu
 
-#### for html csp
+#### For html csp
 
 - MITM modify html by <https://wproxy.org/whistle/>
 
@@ -378,7 +477,7 @@ and if you use `Violentmonkey`/`Greasemonkey`, you can solve it in the following
 
 ### Mixed IIFE and UMD at @require
 
-the variable declared by `var` from iife-cdn will not become the property of window at monkeyWindow scope
+the variable declared by `var` from iife-cdn will not become the property of window at monkeyWindow scope, because monkeyWindow scope is not global scope
 
 so if an umd lib is dependent on an iife lib, such as `element-plus` is dependent on `vue`, `element-plus` cdn will not work
 
@@ -386,18 +485,28 @@ detail see [issues/5](https://github.com/lisonge/vite-plugin-monkey/issues/5) or
 
 the solution is that we append a dataUrl script that will set iife-variable as the property of window after iife-cdn
 
-```js
-// solution example
-import { cdn, util } from 'vite-plugin-monkey';
-const buildConfig = {
-  vue: cdn.jsdelivr('Vue', 'dist/vue.global.prod.js').concat(
-    await util.fn2dataUrl(() => {
-      // @ts-ignore
-      window.Vue = Vue;
+```ts
+import { defineConfig } from 'vite';
+import monkey, { cdn, util } from 'vite-plugin-monkey';
+
+export default defineConfig(async ({ command, mode }) => ({
+  plugins: [
+    monkey({
+      // ...
+      build: {
+        externalGlobals: {
+          vue: cdn.jsdelivr('Vue', 'dist/vue.global.prod.js').concat(
+            await util.fn2dataUrl(() => {
+              // @ts-ignore
+              window.Vue = Vue; // work with element-plus
+            }),
+          ),
+          'element-plus': cdn.jsdelivr('ElementPlus', 'dist/index.full.min.js'),
+        },
+      },
     }),
-  ),
-  'element-plus': cdn.jsdelivr('ElementPlus', 'dist/index.full.min.js'),
-};
+  ],
+}));
 ```
 
 ### Polyfill
@@ -413,6 +522,7 @@ import monkey from 'vite-plugin-monkey';
 export default defineConfig({
   plugins: [
     monkey({
+      // ...
       userscript: {
         require: [
           // polyfill all

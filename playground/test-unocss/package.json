@@ -1,0 +1,17 @@
+{
+  "name": "test-unocss",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "serve": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vite-plugin-monkey": "workspace:*"
+  },
+  "volta": {
+    "extends": "../../package.json"
+  }
+}

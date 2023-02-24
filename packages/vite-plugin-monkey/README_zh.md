@@ -419,6 +419,12 @@ preact/react/svelte/vanilla/vue/solid 的例子, 请直接看 [create-monkey](/p
 
 ## 注意
 
+### 和其他插件一起使用
+
+插件将通过 [generateBundle](https://rollupjs.org/plugin-development/#generatebundle) 重新构建你的代码
+
+请尽量确保插件的顺序是**最后一个**
+
 ### 动态导入
 
 当 `vite build`, 插件将使构建你的代码为 iife 格式

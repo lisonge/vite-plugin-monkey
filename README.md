@@ -423,6 +423,12 @@ and preact/react/svelte/vanilla/vue/solid examples, see [create-monkey](/package
 
 ## Some note
 
+### Work with other plugins
+
+plugin will rebuild your code by [generateBundle](https://rollupjs.org/plugin-development/#generatebundle) hook
+
+please try to ensure that the order of the plugin is **the last one**
+
 ### Dynamic Import
 
 when `vite build`, plugin will build your code to iife formats

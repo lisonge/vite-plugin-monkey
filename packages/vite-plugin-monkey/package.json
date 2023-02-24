@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-monkey",
-  "version": "2.12.0",
+  "version": "2.12.1",
   "description": "A vite plugin server and build your.user.js for userscript engine like Tampermonkey and Violentmonkey and Greasemonkey",
   "main": "dist/node/index.cjs",
   "module": "dist/node/index.mjs",

@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.12.1
+
+### 2.12.1-BugFixes
+
+- compatible unocss placeholder [e080da3d](https://github.com/lisonge/vite-plugin-monkey/commit/e930063853628cd3c0f3d14b6b9798e7e080da3d), [#45](https://github.com/lisonge/vite-plugin-monkey/issues/45)
+
 ## 2.12.0
 
 ### 2.12.0-Features

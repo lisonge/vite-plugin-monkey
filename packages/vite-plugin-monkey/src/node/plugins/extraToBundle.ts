@@ -69,7 +69,10 @@ export const extraToBundlePlugin = (
             })
           ).code.trimEnd();
         }
-        injectCssCode = await miniCode(fn2string(cssInjectFn, css), 'js');
+        injectCssCode = await miniCode(
+          fn2string(cssInjectFn, '\x20' + css + '\x20'),
+          'js',
+        );
       }
       const chunk = jsBundleList[0][1];
       if (chunk.type == 'chunk') {

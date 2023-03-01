@@ -19,7 +19,9 @@ export default defineConfig(async ({ command, mode }) => ({
             'vue',
             cdn
               .jsdelivr('Vue', 'dist/vue.global.prod.js')
-              .concat('https://unpkg.com/vue-demi@latest/lib/index.iife.js')
+              .concat(
+                cdn.jsdelivr('', 'lib/index.iife.js')[1]('latest', 'vue-demi'),
+              )
               .concat(
                 await util.fn2dataUrl(() => {
                   // @ts-ignore

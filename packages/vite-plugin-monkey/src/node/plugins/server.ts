@@ -17,9 +17,7 @@ const entryPath = '/__vite-plugin-monkey.entry.js';
 const pullPath = '/__vite-plugin-monkey.pull.js';
 const cacheUserPath = 'node_modules/.vite/__vite-plugin-monkey.cache.user.js';
 
-export const serverPlugin = (
-  finalPluginOption: FinalMonkeyOption,
-): PluginOption => {
+export const serverPlugin = (finalOption: FinalMonkeyOption): PluginOption => {
   let viteConfig: ResolvedConfig;
   const serverConfig = lazy(() => {
     let availablePort = 5173;
@@ -60,7 +58,7 @@ export const serverPlugin = (
           cors: true,
         },
         server: {
-          open: userConfig.server?.open ?? finalPluginOption.server.open,
+          open: userConfig.server?.open ?? finalOption.server.open,
           cors: true,
         },
       };
@@ -82,16 +80,16 @@ export const serverPlugin = (
       }
     },
     async configureServer(server) {
-      for (const [k, v] of Object.entries(finalPluginOption.userscript.name)) {
+      for (const [k, v] of Object.entries(finalOption.userscript.name)) {
         Reflect.set(
-          finalPluginOption.userscript.name,
+          finalOption.userscript.name,
           k,
-          finalPluginOption.server.prefix(v),
+          finalOption.server.prefix(v),
         );
       }
 
       // support dev env
-      finalPluginOption.userscript.grant.add('*');
+      finalOption.userscript.grant.add('*');
 
       server.middlewares.use(async (req, res, next) => {
         let viteHost = req.headers[':authority'] ?? req.headers['host'] ?? [];
@@ -126,7 +124,7 @@ export const serverPlugin = (
             const u = new URL(entryPath, origin);
             res.end(
               [
-                await finalMonkeyOptionToComment(finalPluginOption),
+                await finalMonkeyOptionToComment(finalOption),
                 fn2string(serverInjectFn, {
                   entrySrc: u.href,
                 }),
@@ -151,7 +149,7 @@ export const serverPlugin = (
               doc,
             ) as Element[];
 
-            const entryList: string[] = finalPluginOption.server.mountGmApi
+            const entryList: string[] = finalOption.server.mountGmApi
               ? [gmApiPath]
               : [];
             scriptList.forEach((p) => {
@@ -174,7 +172,7 @@ export const serverPlugin = (
               }
             });
 
-            let realEntry = finalPluginOption.entry;
+            let realEntry = finalOption.entry;
             if (path.isAbsolute(realEntry)) {
               realEntry = normalizePath(
                 path.relative(viteConfig.root, realEntry),
@@ -190,7 +188,7 @@ export const serverPlugin = (
               Buffer.from(usp.get('text') ?? '', 'base64url').toString('utf-8'),
             );
           } else if (reqUrl.startsWith(gmApiPath)) {
-            if (finalPluginOption.server.mountGmApi) {
+            if (finalOption.server.mountGmApi) {
               res.end(fn2string(mountGmApiFn));
             } else {
               res.end('');
@@ -202,7 +200,7 @@ export const serverPlugin = (
         next();
       });
 
-      if (finalPluginOption.server.open) {
+      if (finalOption.server.open) {
         let cacheComment = '';
         if (await existFile(cacheUserPath)) {
           cacheComment = (await fs.readFile(cacheUserPath)).toString('utf-8');
@@ -210,8 +208,8 @@ export const serverPlugin = (
           await fs.mkdir(path.dirname(cacheUserPath)).catch();
         }
         const newComment = [
-          await finalMonkeyOptionToComment(finalPluginOption),
-          `// entry: ${finalPluginOption.entry}`,
+          await finalMonkeyOptionToComment(finalOption),
+          `// entry: ${finalOption.entry}`,
         ].join('\n');
         if (!isFirstBoot() && cacheComment != newComment) {
           openBrowser(serverConfig.installUrl, true, logger);

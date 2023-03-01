@@ -234,3 +234,31 @@ export const toValidURL = (url: unknown) => {
     return new URL(url);
   } catch {}
 };
+
+export const isTopLevelAwaitAvailableTarget = async (
+  target?: string | string[],
+) => {
+  target = getFinalTarget(target);
+  return transformWithEsbuild(`await 1`, 'any.js', {
+    target,
+    logLevel: 'silent',
+  })
+    .then(() => true)
+    .catch(() => false);
+};
+
+// https://github.com/vitejs/vite/blob/b9511f1ed8e36a618214944c69e2de6504ebcb3c/packages/vite/src/node/constants.ts#L20
+export const ESBUILD_MODULES_TARGET = [
+  'es2020',
+  'edge88',
+  'firefox78',
+  'chrome87',
+  'safari14',
+];
+
+export const getFinalTarget = (target?: string | string[]) => {
+  if (target === 'modules') {
+    target = ESBUILD_MODULES_TARGET;
+  }
+  return target;
+};

@@ -23,8 +23,8 @@ export const serverInjectFn = ({ entrySrc = `` }) => {
 export const cssInjectFn = (css: string) => {
   const style = document.createElement('style');
   style.dataset.source = 'vite-plugin-monkey';
-  style.innerText = css;
-  document.head.appendChild(style);
+  style.textContent = css;
+  document.head.append(style);
 };
 
 export const mountGmApiFn = () => {

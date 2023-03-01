@@ -20,7 +20,7 @@ const htmlText = `
 // https://github.com/vitejs/vite/blob/2401253b9aa487c50edb5ec571d5ba7adc949e27/packages/vite/src/node/server/middlewares/indexHtml.ts#L275
 
 export const virtualHtmlPlugin = (
-  finalPluginOption: FinalMonkeyOption,
+  finalOption: FinalMonkeyOption,
 ): PluginOption => {
   return {
     name: 'monkey:virtualHtml',

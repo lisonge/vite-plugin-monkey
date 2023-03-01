@@ -2,19 +2,18 @@ import { normalizePath, PluginOption } from 'vite';
 import type { FinalMonkeyOption } from '../types';
 import { getModuleRealInfo } from '../_util';
 
-const dynamicImportPrefix = '\0monkey-dynamic-import:';
+// const dynamicImportPrefix = '\0monkey-dynamic-import:';
 
 export const externalGlobalsPlugin = (
-  finalPluginOption: FinalMonkeyOption,
+  finalOption: FinalMonkeyOption,
 ): PluginOption => {
-  const globalsPkg2VarName: Record<string, string> = {};
-  const requirePkgList: { moduleName: string; url: string }[] = [];
+  const { globalsPkg2VarName, requirePkgList } = finalOption;
   return {
     name: 'monkey:externalGlobals',
     enforce: 'pre',
     apply: 'build',
     async config() {
-      for (const [moduleName, varName2LibUrl] of finalPluginOption.build
+      for (const [moduleName, varName2LibUrl] of finalOption.build
         .externalGlobals) {
         const { name, version } = await getModuleRealInfo(moduleName);
 
@@ -56,40 +55,40 @@ export const externalGlobalsPlugin = (
             external(source, _importer, _isResolved) {
               return source in globalsPkg2VarName;
             },
-            output: {
-              globals: globalsPkg2VarName,
-              inlineDynamicImports: true, // see https://rollupjs.org/guide/en/#outputinlinedynamicimports
-            },
+            // output: {
+            //   globals: globalsPkg2VarName,
+            //   inlineDynamicImports: true, // see https://rollupjs.org/guide/en/#outputinlinedynamicimports
+            // },
           },
         },
       };
     },
 
-    async resolveDynamicImport(specifier, _importer) {
-      if (typeof specifier == 'string' && specifier in globalsPkg2VarName) {
-        return dynamicImportPrefix + specifier + '\0';
-      }
-    },
+    // async resolveDynamicImport(specifier, _importer) {
+    //   if (typeof specifier == 'string' && specifier in globalsPkg2VarName) {
+    //     return dynamicImportPrefix + specifier + '\0';
+    //   }
+    // },
 
-    async load(id) {
-      if (id.startsWith(dynamicImportPrefix) && id.endsWith('\0')) {
-        const rawId = id.slice(dynamicImportPrefix.length, id.length - 1);
-        if (rawId in globalsPkg2VarName) {
-          return `export {default} from '${rawId}';export * from '${rawId}';`;
-        }
-      }
-    },
+    // async load(id) {
+    //   if (id.startsWith(dynamicImportPrefix) && id.endsWith('\0')) {
+    //     const rawId = id.slice(dynamicImportPrefix.length, id.length - 1);
+    //     if (rawId in globalsPkg2VarName) {
+    //       return `export {default} from '${rawId}';export * from '${rawId}';`;
+    //     }
+    //   }
+    // },
 
     async generateBundle() {
       const usedModIdSet = new Set(
         Array.from(this.getModuleIds()).map((s) => normalizePath(s)),
       );
-      Array.from(usedModIdSet).forEach((id) => {
-        if (id.startsWith(dynamicImportPrefix) && id.endsWith('\0')) {
-          usedModIdSet.add(id.slice(dynamicImportPrefix.length, id.length - 1));
-        }
-      });
-      finalPluginOption.collectRequireUrls = requirePkgList
+      // Array.from(usedModIdSet).forEach((id) => {
+      //   if (id.startsWith(dynamicImportPrefix) && id.endsWith('\0')) {
+      //     usedModIdSet.add(id.slice(dynamicImportPrefix.length, id.length - 1));
+      //   }
+      // });
+      finalOption.collectRequireUrls = requirePkgList
         .filter((p) => usedModIdSet.has(p.moduleName))
         .map((p) => p.url);
     },

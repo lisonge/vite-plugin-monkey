@@ -31,7 +31,7 @@ export const jsdelivr = (
  */
 export const jsdelivrFastly = (
   exportVarName = '',
-  pathname?: string,
+  pathname = '',
 ): [string, Mod2UrlFn2] => {
   return [
     exportVarName,

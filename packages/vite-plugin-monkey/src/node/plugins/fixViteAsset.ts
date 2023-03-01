@@ -13,8 +13,10 @@ export default ((()=>{
 `.trimStart();
 // https://github.com/vitejs/vite/blob/9c114c5c72a6af87e3330d5573362554b4511265/packages/vite/src/node/plugins/asset.ts#L172
 
+// TODO the relative path of the *.vue file template does not work
+
 export const fixViteAssetPlugin = (
-  finalPluginOption: FinalMonkeyOption,
+  finalOption: FinalMonkeyOption,
 ): PluginOption => {
   let viteConfig: ResolvedConfig;
   return {

@@ -1,4 +1,3 @@
-import { projectPkg } from '../_util';
 import type { FinalMonkeyOption, IArray, LocaleType } from '../types';
 import type { Format } from './common';
 import type {
@@ -14,12 +13,12 @@ import type {
   TamperRunAt,
 } from './tampermonkey';
 import { TamperGrantValueList } from './tampermonkey';
-import { ViolentGrantValueList, ViolentInjectInto } from './violentmonkey';
 import type {
   ViolentGrant,
   ViolentmonkeyUserScript,
   ViolentRunAt,
 } from './violentmonkey';
+import { ViolentGrantValueList, ViolentInjectInto } from './violentmonkey';
 
 export type {
   GreasemonkeyUserScript,
@@ -65,6 +64,11 @@ type MergemonkeyUserScript = {
    * @default {...{'':package.json.name??'monkey'},...name} // if name is object
    */
   name?: string | LocaleType<string>;
+
+  /**
+   * @default 'vite-plugin-monkey'
+   */
+  namespace?: string;
 
   /**
    * @default package.json.version??'1.0.0'

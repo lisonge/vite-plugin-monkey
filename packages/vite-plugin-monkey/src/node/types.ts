@@ -112,6 +112,12 @@ export type FinalMonkeyOption = {
   collectRequireUrls: string[];
   collectGrantSet: Set<string>;
   collectResource: Record<string, string>;
+  hasTopLevelAwait: boolean;
+  hasDynamicImport: boolean;
+  useSystemJs: boolean;
+  injectCssCode: string;
+  globalsPkg2VarName: Record<string, string>;
+  requirePkgList: { moduleName: string; url: string }[];
 };
 
 export type MonkeyOption = {
@@ -119,7 +125,7 @@ export type MonkeyOption = {
    * userscript entry file path
    */
   entry: string;
-  userscript: MonkeyUserScript;
+  userscript?: MonkeyUserScript;
   format?: Format;
 
   /**

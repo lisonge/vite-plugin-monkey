@@ -49,6 +49,24 @@ export const fn2dataUrl = async <T extends (...args: any[]) => any>(
 };
 
 /**
+ * string -> javascript data url
+ */
+export function toDataUrl(code: string): string;
+/**
+ * function and it parameters -> iife -> mini_iife -> javascript data url
+ */
+export function toDataUrl<T extends (...args: any[]) => any>(
+  fn: T,
+  ...args: Parameters<T>
+): Promise<string>;
+export function toDataUrl(p0: any, ...args: any[]): string | Promise<string> {
+  if (typeof p0 == 'string') {
+    return `data:application/javascript,` + encodeURIComponent(p0);
+  }
+  return fn2dataUrl(p0, ...args);
+}
+
+/**
  * @deprecated use fn2dataUrl
  */
 export const encodeFn = async <T extends (...args: any[]) => any>(

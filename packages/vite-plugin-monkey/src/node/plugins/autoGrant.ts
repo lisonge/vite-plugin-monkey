@@ -6,7 +6,7 @@ import { GM_keywords } from '../_util';
 const GM_keyword_set = Array.from(new Set(GM_keywords));
 
 export const autoGrantPlugin = (
-  finalPluginOption: FinalMonkeyOption,
+  finalOption: FinalMonkeyOption,
 ): PluginOption => {
   const collectGrantMap = new Map<string, string[]>();
   return {
@@ -15,7 +15,7 @@ export const autoGrantPlugin = (
     async transform(code, id) {
       id = normalizePath(id);
       if (
-        finalPluginOption.build.autoGrant &&
+        finalOption.build.autoGrant &&
         !id.endsWith('vite-plugin-monkey/dist/client/index.mjs') &&
         !id.includes('virtual:plugin-monkey-loader')
       ) {
@@ -34,7 +34,7 @@ export const autoGrantPlugin = (
           collectGrantMap.delete(s);
         }
       });
-      finalPluginOption.collectGrantSet = new Set(
+      finalOption.collectGrantSet = new Set(
         Array.from(collectGrantMap.values()).flat(),
       );
     },

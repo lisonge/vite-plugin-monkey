@@ -31,7 +31,7 @@ const moduleSourceCode = [
 ].join(';');
 
 export const externalLoaderPlugin = (
-  finalPluginOption: FinalMonkeyOption,
+  finalOption: FinalMonkeyOption,
 ): PluginOption => {
   return {
     name: 'monkey:externalLoader',

@@ -44,7 +44,7 @@ export interface GreasemonkeyUserScript {
   /**
    * @see https://wiki.greasespot.net/Metadata_Block#.40namespace
    */
-  namespace: string;
+  namespace?: string;
 
   /**
    * @see https://wiki.greasespot.net/Metadata_Block#.40version

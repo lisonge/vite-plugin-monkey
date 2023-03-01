@@ -24,15 +24,10 @@ jobs:
 
       - run: pnpm build
 
-      - name: Set publishing config
-        run: pnpm config set '//registry.npmjs.org/:_authToken' "${NODE_AUTH_TOKEN}"
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
       - name: Publish package
         run: pnpm run ci-publish ${{ github.ref_name }}
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Get pkgName for tag
         id: tag

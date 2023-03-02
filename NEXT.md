@@ -5,7 +5,7 @@
 - support `top level await` by systemjs
 - support `dynamic import` in single file by systemjs
 - use original build mode instead of library-mode
-- vite legacy is unavailable
+- vite legacy is available
 
 ```mermaid
 graph LR;

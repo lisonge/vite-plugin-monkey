@@ -105,7 +105,7 @@ type MergemonkeyUserScript = {
   /**
    * @see https://wiki.greasespot.net/Metadata_Block#.40run-at
    *
-   * @see https://www.tampermonkey.net/documentation.php#_run_at
+   * @see https://www.tampermonkey.net/documentation.php#meta:run_at
    *
    * @see https://violentmonkey.github.io/api/metadata-block/#run-at
    *
@@ -115,7 +115,7 @@ type MergemonkeyUserScript = {
   /**
    * @see https://wiki.greasespot.net/Metadata_Block#.40grant
    *
-   * @see https://www.tampermonkey.net/documentation.php#_grant
+   * @see https://www.tampermonkey.net/documentation.php#meta:grant
    *
    * @see https://violentmonkey.github.io/api/metadata-block/#grant
    *

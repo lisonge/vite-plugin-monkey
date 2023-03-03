@@ -77,144 +77,144 @@ export type AntifeatureType = {
  */
 export interface TampermonkeyUserScript {
   /**
-   * @see https://www.tampermonkey.net/documentation.php#_name
+   * @see https://www.tampermonkey.net/documentation.php#meta:name
    *
    */
   name?: string | LocaleType<string>;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#_namespace
+   * @see https://www.tampermonkey.net/documentation.php#meta:namespace
    */
   namespace: string;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#_version
+   * @see https://www.tampermonkey.net/documentation.php#meta:version
    *
    */
   version?: string;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#_author
+   * @see https://www.tampermonkey.net/documentation.php#meta:author
    *
    */
   author?: string;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#_description
+   * @see https://www.tampermonkey.net/documentation.php#meta:description
    *
    */
   description?: string | LocaleType<string>;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#_homepage
+   * @see https://www.tampermonkey.net/documentation.php#meta:homepage
    *
    */
   homepage?: string;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#_homepage
+   * @see https://www.tampermonkey.net/documentation.php#meta:homepage
    *
    */
   homepageURL?: string;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#_homepage
+   * @see https://www.tampermonkey.net/documentation.php#meta:homepage
    */
   website?: string;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#_homepage
+   * @see https://www.tampermonkey.net/documentation.php#meta:homepage
    */
   source?: string;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#_icon
+   * @see https://www.tampermonkey.net/documentation.php#meta:icon
    */
   icon?: string;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#_icon
+   * @see https://www.tampermonkey.net/documentation.php#meta:icon
    */
   iconURL?: string;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#_icon
+   * @see https://www.tampermonkey.net/documentation.php#meta:icon
    */
   defaulticon?: string;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#_icon64_and_icon64URL
+   * @see https://www.tampermonkey.net/documentation.php#meta:icon64_and_icon64URL
    */
   icon64?: string;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#_icon64_and_icon64URL
+   * @see https://www.tampermonkey.net/documentation.php#meta:icon64_and_icon64URL
    */
   icon64URL?: string;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#_updateURL
+   * @see https://www.tampermonkey.net/documentation.php#meta:updateURL
    */
   updateURL?: string;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#_downloadURL
+   * @see https://www.tampermonkey.net/documentation.php#meta:downloadURL
    */
   downloadURL?: string;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#_supportURL
+   * @see https://www.tampermonkey.net/documentation.php#meta:supportURL
    */
   supportURL?: string;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#_include
+   * @see https://www.tampermonkey.net/documentation.php#meta:include
    */
   include?: IArray<string | RegExp>;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#_match
+   * @see https://www.tampermonkey.net/documentation.php#meta:match
    */
   match?: IArray<string | RegExp>;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#_exclude
+   * @see https://www.tampermonkey.net/documentation.php#meta:exclude
    */
   exclude?: IArray<string | RegExp>;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#_require
+   * @see https://www.tampermonkey.net/documentation.php#meta:require
    */
   require?: IArray<string>;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#_resource
+   * @see https://www.tampermonkey.net/documentation.php#meta:resource
    */
   resource?: Record<string, string>;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#_connect
+   * @see https://www.tampermonkey.net/documentation.php#meta:connect
    */
   connect?: IArray<string>;
 
   // /**
-  //  * @see https://www.tampermonkey.net/documentation.php#_run_at
+  //  * @see https://www.tampermonkey.net/documentation.php#meta:run_at
   //  */
   // 'run-at'?: TamperRunAt;
 
   // /**
-  //  * @see https://www.tampermonkey.net/documentation.php#_grant
+  //  * @see https://www.tampermonkey.net/documentation.php#meta:grant
   //  *
   //  */
   // grant?: IArray<TamperGrant> | 'none' | '*';
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#_antifeature
+   * @see https://www.tampermonkey.net/documentation.php#meta:antifeature
    */
   antifeature?: IArray<AntifeatureType>;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#_noframes
+   * @see https://www.tampermonkey.net/documentation.php#meta:noframes
    */
   noframes?: boolean;
 

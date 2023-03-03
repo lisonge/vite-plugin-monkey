@@ -332,25 +332,25 @@ export type MonkeyWindow = Window & {
   unsafeWindow: Window;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#_grant
+   * @see https://www.tampermonkey.net/documentation.php#meta:grant
    * @see https://violentmonkey.github.io/api/metadata-block/#grant
    */
   close: () => void;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#_grant
+   * @see https://www.tampermonkey.net/documentation.php#meta:grant
    * @see https://violentmonkey.github.io/api/metadata-block/#grant
    */
   focus: () => void;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#_grant
+   * @see https://www.tampermonkey.net/documentation.php#meta:grant
    * @available tampermonkey
    */
   onurlchange?: null;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#_grant
+   * @see https://www.tampermonkey.net/documentation.php#meta:grant
    * @available tampermonkey
    */
   addEventListener: (
@@ -359,7 +359,7 @@ export type MonkeyWindow = Window & {
   ) => void;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#_grant
+   * @see https://www.tampermonkey.net/documentation.php#meta:grant
    * @available tampermonkey
    */
   removeEventListener: (

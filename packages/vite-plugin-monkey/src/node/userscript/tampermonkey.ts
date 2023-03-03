@@ -143,12 +143,12 @@ export interface TampermonkeyUserScript {
   defaulticon?: string;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#meta:icon64_and_icon64URL
+   * @see https://www.tampermonkey.net/documentation.php#meta:icon64
    */
   icon64?: string;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#meta:icon64_and_icon64URL
+   * @see https://www.tampermonkey.net/documentation.php#meta:icon64
    */
   icon64URL?: string;
 

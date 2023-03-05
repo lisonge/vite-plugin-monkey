@@ -459,6 +459,9 @@ export type MonkeyWindow = Window & {
   ) => string;
 
   /**
+   * @see https://www.tampermonkey.net/documentation.php#api:GM_cookie.list
+   * @see https://www.tampermonkey.net/documentation.php##api:GM_cookie.set
+   * @see https://www.tampermonkey.net/documentation.php##api:GM_cookie.delete
    * @see https://github.com/Tampermonkey/tampermonkey/issues/465#issuecomment-429058294
    * @available tampermonkey
    */

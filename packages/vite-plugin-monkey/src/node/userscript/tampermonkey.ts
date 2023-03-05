@@ -88,6 +88,11 @@ export interface TampermonkeyUserScript {
   namespace: string;
 
   /**
+   * @see https://www.tampermonkey.net/documentation.php#meta:copyright
+   */
+  copyright?: string;
+
+  /**
    * @see https://www.tampermonkey.net/documentation.php#meta:version
    *
    */

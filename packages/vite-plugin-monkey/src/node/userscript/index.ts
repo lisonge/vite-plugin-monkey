@@ -152,6 +152,7 @@ export type FinalUserScript = {
   noframes: boolean;
 
   author: string;
+  copyright?: string;
   homepage?: string;
   homepageURL?: string;
   website?: string;
@@ -188,6 +189,7 @@ export const finalMonkeyOptionToComment = async ({
     author,
     description,
     license,
+    copyright,
 
     icon,
     iconURL,
@@ -231,6 +233,7 @@ export const finalMonkeyOptionToComment = async ({
     version,
     author,
     license,
+    copyright,
     icon,
     iconURL,
     icon64,
@@ -414,6 +417,7 @@ const defaultSortFormat = (p0: [string, ...string[]][]) => {
     filter(([k]) => k == 'description'),
     filter(([k]) => k.startsWith('description:')),
     filter(([k]) => k == 'license'),
+    filter(([k]) => k == 'copyright'),
 
     filter(([k]) => k == 'icon'),
     filter(([k]) => k == 'iconURL'),

@@ -85,7 +85,7 @@ export interface TampermonkeyUserScript {
   /**
    * @see https://www.tampermonkey.net/documentation.php#meta:namespace
    */
-  namespace: string;
+  namespace?: string;
 
   /**
    * @see https://www.tampermonkey.net/documentation.php#meta:copyright

@@ -28,8 +28,11 @@
     "@types/semver": "7.3.13",
     "@typescript-eslint/eslint-plugin": "5.52.0",
     "@typescript-eslint/parser": "5.52.0",
+    "@vitejs/plugin-legacy": "4.0.1",
     "@vitejs/plugin-react": "3.1.0",
     "@vitejs/plugin-vue": "4.0.0",
+    "acorn": "8.8.2",
+    "acorn-walk": "8.2.0",
     "animate.css": "4.1.1",
     "base64-img": "1.0.4",
     "blueimp-md5": "2.19.0",
@@ -41,6 +44,7 @@
     "fs-extra": "11.1.0",
     "husky": "8.0.3",
     "lint-staged": "13.1.2",
+    "magic-string": "0.30.0",
     "md5": "2.3.0",
     "medium-zoom": "1.0.8",
     "minimist": "1.2.8",
@@ -49,9 +53,11 @@
     "prettier": "2.8.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "rollup": "3.17.3",
     "sass": "1.58.3",
     "semver": "7.3.8",
     "solid-js": "1.6.11",
+    "terser": "5.16.5",
     "tsup": "6.6.3",
     "tsx": "3.12.3",
     "typescript": "4.9.5",
@@ -69,5 +75,5 @@
   "volta": {
     "node": "16.17.0"
   },
-  "packageManager": "pnpm@7.25.0"
+  "packageManager": "pnpm@7.28.0"
 }

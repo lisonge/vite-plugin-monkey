@@ -1,9 +1,7 @@
 import type { PluginOption } from 'vite';
 import type { FinalMonkeyOption } from '../types';
 
-export const windowPlugin = (
-  finalPluginOption: FinalMonkeyOption,
-): PluginOption => {
+export const windowPlugin = (finalOption: FinalMonkeyOption): PluginOption => {
   return {
     name: 'monkey:window',
     config(_, { command }) {

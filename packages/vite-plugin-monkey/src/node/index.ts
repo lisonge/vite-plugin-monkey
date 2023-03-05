@@ -142,7 +142,7 @@ export default (pluginOption: MonkeyOption): PluginOption => {
       connect = [],
       grant = [],
       $extra = [],
-    } = pluginOption.userscript;
+    } = pluginOption.userscript ?? {};
     if (typeof name == 'string') {
       name = { '': name };
     } else if (!('' in name)) {
@@ -202,7 +202,7 @@ export default (pluginOption: MonkeyOption): PluginOption => {
       icon64URL,
       icon,
       iconURL,
-      namespace,
+      namespace = `vite-plugin-monkey`,
       version = projectPkg.version,
       author = projectPkg.author ?? 'monkey',
       copyright,
@@ -224,7 +224,7 @@ export default (pluginOption: MonkeyOption): PluginOption => {
       contributionAmount,
       compatible,
       sandbox,
-    } = pluginOption.userscript;
+    } = pluginOption.userscript ?? {};
 
     const { sourcemap = {}, fileName = projectPkg.name + '.user.js' } =
       pluginOption.build ?? {};
@@ -304,12 +304,20 @@ export default (pluginOption: MonkeyOption): PluginOption => {
       collectGrantSet: new Set(),
       collectRequireUrls: [],
       collectResource: {},
+      hasTopLevelAwait: false,
+      hasDynamicImport: false,
+      get useSystemJs() {
+        return config.hasDynamicImport || config.hasTopLevelAwait;
+      },
+      injectCssCode: ``,
+      globalsPkg2VarName: {},
+      requirePkgList: [],
     };
     return config;
   })();
 
   const monkeyPlugin: PluginOption = {
-    name: 'monkey',
+    name: 'monkey:entry',
     async config(userConfig, { command }) {
       const isServe = command == 'serve';
       let sourcemap = userConfig.build?.sourcemap;
@@ -335,20 +343,27 @@ export default (pluginOption: MonkeyOption): PluginOption => {
             ),
         },
         build: {
-          sourcemap: sourcemap,
+          assetsInlineLimit: Number.MAX_SAFE_INTEGER,
+          modulePreload: false,
+          assetsDir: './',
+          cssCodeSplit: false,
           minify: userConfig.build?.minify ?? false,
           rollupOptions: {
             // serve pre-bundling need
             input: finalPluginOption.entry,
           },
-          lib: {
-            entry: finalPluginOption.entry,
-            formats: ['iife'],
-            fileName: () => {
-              return finalPluginOption.build.fileName;
-            },
-            name: '__plugin_monkey_exposed',
-          },
+
+          // TODO
+          // sourcemap: sourcemap,
+
+          // lib: {
+          //   entry: finalPluginOption.entry,
+          //   formats: ['system' as any],
+          //   fileName: () => {
+          //     return finalPluginOption.build.fileName;
+          //   },
+          //   name: '__exposed__',
+          // },
         },
       };
     },

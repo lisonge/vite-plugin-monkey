@@ -87,7 +87,7 @@ export interface ViolentmonkeyUserScript {
   /**
    * @see https://violentmonkey.github.io/api/metadata-block/#namespace
    */
-  namespace: string;
+  namespace?: string;
 
   /**
    * @see https://violentmonkey.github.io/api/metadata-block/#version

@@ -21,9 +21,7 @@ async function* walk(dirPath: string) {
   }
 }
 
-export const perviewPlugin = (
-  finalPluginOption: FinalMonkeyOption,
-): PluginOption => {
+export const perviewPlugin = (finalOption: FinalMonkeyOption): PluginOption => {
   let viteConfig: ResolvedConfig;
   return {
     name: 'monkey:perview',

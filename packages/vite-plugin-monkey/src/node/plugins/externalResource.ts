@@ -7,7 +7,7 @@ import { URLSearchParams } from 'node:url';
 const resourceImportPrefix = '\0monkey-resource-import:';
 
 export const externalResourcePlugin = (
-  finalPluginOption: FinalMonkeyOption,
+  finalOption: FinalMonkeyOption,
 ): PluginOption => {
   const resourceRecord: Record<
     string,
@@ -22,7 +22,7 @@ export const externalResourcePlugin = (
       viteConfig = config;
     },
     async resolveId(id) {
-      const { externalResource } = finalPluginOption.build;
+      const { externalResource } = finalOption.build;
       if (id in externalResource) {
         return resourceImportPrefix + id + '\0';
       }
@@ -44,7 +44,7 @@ export const externalResourcePlugin = (
     },
     async load(id) {
       if (id.startsWith(resourceImportPrefix) && id.endsWith('\0')) {
-        const { externalResource } = finalPluginOption.build;
+        const { externalResource } = finalOption.build;
         const importName = id.substring(
           resourceImportPrefix.length,
           id.length - 1,
@@ -146,9 +146,9 @@ export const externalResourcePlugin = (
             moduleCode.includes('jsonLoader') ||
             moduleCode.includes('cssLoader')
           ) {
-            finalPluginOption.userscript.grant.add('GM_getResourceText');
+            finalOption.userscript.grant.add('GM_getResourceText');
           } else if (moduleCode.includes('urlLoader')) {
-            finalPluginOption.userscript.grant.add('GM_getResourceURL');
+            finalOption.userscript.grant.add('GM_getResourceURL');
           }
           return miniCode(moduleCode);
         }
@@ -175,7 +175,7 @@ export const externalResourcePlugin = (
           }
         },
       );
-      finalPluginOption.collectResource = collectResource;
+      finalOption.collectResource = collectResource;
     },
   };
 };

@@ -165,6 +165,7 @@ export type FinalUserScript = {
   downloadURL?: string;
   supportURL?: string;
   connect: string[];
+  sandbox?: string;
   antifeature: AntifeatureType[];
 
   'exclude-match': string[];
@@ -223,6 +224,7 @@ export const finalMonkeyOptionToComment = async ({
     contributionURL,
 
     connect,
+    sandbox,
     resource,
     grant,
     noframes,
@@ -252,6 +254,7 @@ export const finalMonkeyOptionToComment = async ({
     incompatible,
     contributionAmount,
     contributionURL,
+    sandbox,
   }).forEach(([k, v]) => {
     if (typeof v == 'string') {
       attrList.push([k, v]);
@@ -442,6 +445,8 @@ const defaultSortFormat = (p0: [string, ...string[]][]) => {
     filter(([k]) => k == 'require'),
 
     filter(([k]) => k == 'resource').sort(stringSort),
+
+    filter(([k]) => k == 'sandbox'),
 
     filter(([k]) => k == 'connect'),
 

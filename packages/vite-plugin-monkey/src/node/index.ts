@@ -223,6 +223,7 @@ export default (pluginOption: MonkeyOption): PluginOption => {
       'inject-into': injectInto,
       contributionAmount,
       compatible,
+      sandbox,
     } = pluginOption.userscript;
 
     const { sourcemap = {}, fileName = projectPkg.name + '.user.js' } =
@@ -275,6 +276,7 @@ export default (pluginOption: MonkeyOption): PluginOption => {
         description,
         $extra,
         grant: grantSet,
+        sandbox,
       },
       clientAlias: pluginOption.clientAlias ?? '$',
       entry: pluginOption.entry,

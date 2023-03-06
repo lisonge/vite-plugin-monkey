@@ -50,9 +50,7 @@ export const finalBundlePlugin = (
           }
         }
       }
-      if (polyfillChunks) {
-        entryChunks.unshift(...polyfillChunks);
-      }
+      entryChunks.unshift(...polyfillChunks);
       if (entryChunks.length == 0) {
         throw new Error(`not found entry chunk`);
       }
@@ -98,7 +96,7 @@ export const finalBundlePlugin = (
       })) as RollupOutput[];
 
       // clear tempFiles
-      // await fs.rm(cacheDistDir, { recursive: true });
+      await fs.rm(cacheDistDir, { recursive: true }).catch(console.error);
 
       const finalBundle = Object.assign({}, esmBundle, buildResult[0].output);
       let finalJsCode = ``;

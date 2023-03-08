@@ -136,15 +136,15 @@ importers:
     specifiers:
       '@types/cross-spawn': 6.0.2
       '@types/detect-port': 1.3.2
-      acorn-walk: 8.2.0
-      cross-spawn: 7.0.3
-      detect-port: 1.5.1
-      htmlparser2: 8.0.1
-      magic-string: 0.30.0
-      mrmime: 1.0.1
-      open: 8.4.1
-      picocolors: 1.0.0
-      systemjs: 6.14.0
+      acorn-walk: ^8.2.0
+      cross-spawn: ^7.0.3
+      detect-port: ^1.5.1
+      htmlparser2: ^8.0.1
+      magic-string: ^0.30.0
+      mrmime: ^1.0.1
+      open: ^8.4.1
+      picocolors: ^1.0.0
+      systemjs: ^6.14.0
     dependencies:
       acorn-walk: 8.2.0
       cross-spawn: 7.0.3

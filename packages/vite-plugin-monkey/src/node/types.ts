@@ -118,6 +118,7 @@ export type FinalMonkeyOption = {
   injectCssCode: string;
   globalsPkg2VarName: Record<string, string>;
   requirePkgList: { moduleName: string; url: string }[];
+  systemjs: 'inline' | Mod2UrlFn2;
 };
 
 export type MonkeyOption = {
@@ -319,5 +320,11 @@ export type MonkeyOption = {
        */
       sourceRoot?: string;
     };
+
+    /**
+     * @default
+     * cdn.jsdelivr()[1]
+     */
+    systemjs?: 'inline' | Mod2UrlFn2;
   };
 };

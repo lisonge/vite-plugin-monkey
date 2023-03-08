@@ -1,11 +1,16 @@
-import fs from 'node:fs/promises';
-import path from 'node:path';
 import type { OutputChunk, RollupOutput } from 'rollup';
 import type { PluginOption } from 'vite';
 import { build } from 'vite';
-import { systemjsRequireUrls } from '../systemjs';
+import { getSystemjsRequireUrls, systemjsTexts } from '../systemjs';
 import type { FinalMonkeyOption } from '../types';
 import { finalMonkeyOptionToComment } from '../userscript';
+
+const __entry_name = `__monkey.entry.js`;
+
+// https://github.com/vitejs/vite/blob/1df2cfcbebd95a139da7dc30aad487c81b153b45/packages/plugin-legacy/src/index.ts#L718
+const polyfillId = '\0vite/legacy-polyfills';
+
+const systemJsImportMapPrefix = `user`;
 
 export const finalBundlePlugin = (
   finalOption: FinalMonkeyOption,
@@ -14,66 +19,68 @@ export const finalBundlePlugin = (
     name: 'monkey:finalBundle',
     apply: 'build',
     enforce: 'post',
-    async generateBundle(_, esmBundle) {
-      const cacheDistDir = path.join(
-        process.cwd(),
-        `./node_modules/.vite/__plugin_monkey/dist-${new Date().getTime()}`,
-      );
-
-      if (
-        await fs
-          .stat(cacheDistDir)
-          .then(() => false)
-          .catch(() => true)
-      ) {
-        await fs.mkdir(cacheDistDir, { recursive: true });
-      }
-
-      // https://github.com/vitejs/vite/blob/a8fa9cc704bb9a697975e95179dfe21ab4e1d8de/packages/plugin-legacy/src/index.ts#L718
-      const polyfillId = '\0vite/legacy-polyfills';
-      let polyfillChunks: OutputChunk[] = [];
-      const tempFiles: string[] = [];
-      let entryChunks: OutputChunk[] = [];
-      for (const [k, chunk] of Object.entries(esmBundle)) {
-        if (chunk.type == 'asset') {
-          continue;
-        }
-        const fp = `${cacheDistDir}/${k}`;
-        await fs.writeFile(fp, chunk.code, 'utf-8');
-        tempFiles.push(fp);
-        delete esmBundle[k];
-        if (chunk.isEntry) {
-          if (chunk.facadeModuleId == polyfillId) {
-            polyfillChunks.push(chunk);
-          } else {
-            entryChunks.push(chunk);
+    async generateBundle(_, rawBundle) {
+      const entryChunks = (() => {
+        const polyfillChunks: OutputChunk[] = [];
+        const chunks: OutputChunk[] = [];
+        Object.values(rawBundle).forEach((chunk) => {
+          if (chunk.type == 'chunk' && chunk.isEntry) {
+            if (chunk.facadeModuleId == polyfillId) {
+              polyfillChunks.push(chunk);
+            } else {
+              chunks.push(chunk);
+            }
           }
-        }
-      }
-      entryChunks.unshift(...polyfillChunks);
-      if (entryChunks.length == 0) {
-        throw new Error(`not found entry chunk`);
-      }
+        });
+        return polyfillChunks.concat(chunks);
+      })();
+
       finalOption.hasDynamicImport = entryChunks.some(
         (e) => e.dynamicImports.length > 0,
       );
-      let entry = `${cacheDistDir}/__entry.js`;
-      if (entryChunks.length == 1) {
-        entry = `${cacheDistDir}/${entryChunks[0].fileName}`;
-      } else {
-        tempFiles.push(entry);
-        await fs.writeFile(
-          entry,
-          entryChunks
-            .map((a) => `import ${JSON.stringify(`./${a.fileName}`)};`)
-            .join('\n'),
-          'utf-8',
-        );
-      }
+
       const buildResult = (await build({
         logLevel: 'error',
         configFile: false,
         esbuild: false,
+        plugins: [
+          {
+            name: 'mokey:mock',
+            enforce: 'pre',
+            resolveId(source, importer, options) {
+              if (!importer && options.isEntry) {
+                return '\0' + source;
+              }
+              const chunk = Object.values(rawBundle).find(
+                (chunk) =>
+                  chunk.type == 'chunk' && source.endsWith(chunk.fileName),
+              ) as OutputChunk | undefined;
+              if (chunk) {
+                return '\0' + source;
+              }
+            },
+            load(id) {
+              if (!id.startsWith('\0')) return;
+
+              if (id.endsWith(__entry_name)) {
+                return entryChunks
+                  .map((a) => `import ${JSON.stringify(`./${a.fileName}`)};`)
+                  .join('\n');
+              }
+              const [k, chunk] =
+                Object.entries(rawBundle).find(([k, chunk]) =>
+                  id.endsWith(chunk.fileName),
+                ) ?? [];
+              if (chunk && chunk.type == 'chunk' && k) {
+                delete rawBundle[k];
+                return {
+                  code: chunk.code,
+                  map: chunk.map,
+                };
+              }
+            },
+          },
+        ],
         build: {
           write: false,
           minify: false,
@@ -87,7 +94,7 @@ export const finalBundlePlugin = (
             },
           },
           lib: {
-            entry: entry,
+            entry: __entry_name,
             formats: [finalOption.useSystemJs ? 'system' : 'iife'] as any,
             name: finalOption.useSystemJs ? undefined : '__expose__',
             fileName: () => `__entry.js`,
@@ -95,58 +102,68 @@ export const finalBundlePlugin = (
         },
       })) as RollupOutput[];
 
-      // clear tempFiles
-      await fs.rm(cacheDistDir, { recursive: true }).catch(console.error);
-
-      const finalBundle = Object.assign({}, esmBundle, buildResult[0].output);
+      const finalBundle = Object.assign({}, rawBundle, buildResult[0].output);
       let finalJsCode = ``;
       if (finalOption.useSystemJs) {
-        const codes: string[] = [];
-        let entryName = `__entry.js`;
-        Object.entries(finalBundle).forEach(([k, asset]) => {
-          if (asset.type == 'chunk') {
-            const name = JSON.stringify(`./` + asset.fileName);
-            codes.push(
-              asset.code
+        const systemJsModules: string[] = [];
+        let entryName = '';
+        Object.entries(finalBundle).forEach(([k, chunk]) => {
+          if (chunk.type == 'chunk') {
+            const name = JSON.stringify(`./` + chunk.fileName);
+            systemJsModules.push(
+              chunk.code
                 .trimStart()
                 .replace(/^System\.register\(/, `System.register(${name}, `),
             );
-            if (asset.isEntry) {
+            if (chunk.isEntry) {
               entryName = name;
             }
           }
         });
-        codes.push(`System.import(${entryName}, "./");`);
-        finalJsCode = codes.join('\n');
+        systemJsModules.push(`System.import(${entryName}, "./");`);
+        finalJsCode = systemJsModules.join('\n');
         const usedModuleIds = Array.from(this.getModuleIds()).filter(
           (d) => d in finalOption.globalsPkg2VarName,
         );
-        const imports = usedModuleIds.reduce((p: Record<string, string>, c) => {
-          p[c] = `x:` + c;
-          return p;
-        }, {});
+        // {vue:'xxx:vue'}
+        const importsMap = usedModuleIds.reduce(
+          (p: Record<string, string>, c) => {
+            p[c] = `${systemJsImportMapPrefix}:${c}`;
+            return p;
+          },
+          {},
+        );
         // inject SystemJs external globals
         finalJsCode = [
-          Object.keys(imports).length > 0
-            ? `System.addImportMap({ imports: ${JSON.stringify(imports)} });`
+          Object.keys(importsMap).length > 0
+            ? `System.addImportMap({ imports: ${JSON.stringify(importsMap)} });`
             : ``,
           ...usedModuleIds.map(
             (id) =>
-              `System.set(${JSON.stringify(`x:` + id)}, ${
-                finalOption.globalsPkg2VarName[id]
-              });`,
+              `System.set(${JSON.stringify(
+                `${systemJsImportMapPrefix}:${id}`,
+              )}, ${finalOption.globalsPkg2VarName[id]});`,
           ),
           '\n' + finalJsCode,
         ]
           .filter((s) => s)
           .join('\n');
-        // TODO or use inline code
-        finalOption.collectRequireUrls.push(...systemjsRequireUrls);
+
+        if (finalOption.useSystemJs) {
+          if (typeof finalOption.systemjs == 'function') {
+            finalOption.collectRequireUrls.push(
+              ...getSystemjsRequireUrls(finalOption.systemjs),
+            );
+          } else {
+            finalJsCode =
+              (await systemjsTexts.value).join('\n') + '\n' + finalJsCode;
+          }
+        }
       } else {
         // use iife
-        Object.entries(finalBundle).forEach(([k, asset]) => {
-          if (asset.type == 'chunk' && asset.isEntry) {
-            finalJsCode = asset.code;
+        Object.entries(finalBundle).forEach(([k, chunk]) => {
+          if (chunk.type == 'chunk' && chunk.isEntry) {
+            finalJsCode = chunk.code;
           }
         });
       }

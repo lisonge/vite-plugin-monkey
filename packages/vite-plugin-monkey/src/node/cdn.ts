@@ -13,9 +13,9 @@ export const jsdelivr = (
   return [
     exportVarName,
     (version, name, _importName = '', resolveName = '') => {
-      pathname ||= resolveName;
-      if (pathname) {
-        return `https://cdn.jsdelivr.net/npm/${name}@${version}/${pathname}`;
+      const p = pathname || resolveName;
+      if (p) {
+        return `https://cdn.jsdelivr.net/npm/${name}@${version}/${p}`;
       } else {
         return `https://cdn.jsdelivr.net/npm/${name}@${version}`;
       }
@@ -36,9 +36,9 @@ export const jsdelivrFastly = (
   return [
     exportVarName,
     (version, name, _importName = '', resolveName = '') => {
-      pathname ||= resolveName;
-      if (pathname) {
-        return `https://fastly.jsdelivr.net/npm/${name}@${version}/${pathname}`;
+      const p = pathname || resolveName;
+      if (p) {
+        return `https://fastly.jsdelivr.net/npm/${name}@${version}/${p}`;
       } else {
         return `https://fastly.jsdelivr.net/npm/${name}@${version}`;
       }
@@ -58,9 +58,9 @@ export const unpkg = (
   return [
     exportVarName,
     (version, name, _importName = '', resolveName = '') => {
-      pathname ||= resolveName;
-      if (pathname) {
-        return `https://unpkg.com/${name}@${version}/${pathname}`;
+      const p = pathname || resolveName;
+      if (p) {
+        return `https://unpkg.com/${name}@${version}/${p}`;
       } else {
         return `https://unpkg.com/${name}@${version}`;
       }
@@ -80,8 +80,8 @@ export const bytecdntp = (
   return [
     exportVarName,
     (version, name, _importName = '', resolveName = '') => {
-      pathname ||= resolveName;
-      return `https://lf9-cdn-tos.bytecdntp.com/cdn/expire-10-y/${name}/${version}/${pathname}`;
+      const p = pathname || resolveName;
+      return `https://lf9-cdn-tos.bytecdntp.com/cdn/expire-10-y/${name}/${version}/${p}`;
     },
   ];
 };
@@ -98,8 +98,8 @@ export const bootcdn = (
   return [
     exportVarName,
     (version, name, _importName = '', resolveName = '') => {
-      pathname ||= resolveName;
-      return `https://cdn.bootcdn.net/ajax/libs/${name}/${version}/${pathname}`;
+      const p = pathname || resolveName;
+      return `https://cdn.bootcdn.net/ajax/libs/${name}/${version}/${p}`;
     },
   ];
 };
@@ -116,8 +116,8 @@ export const baomitu = (
   return [
     exportVarName,
     (version, name, _importName = '', resolveName = '') => {
-      pathname ||= resolveName;
-      return `https://lib.baomitu.com/${name}/${version}/${pathname}`;
+      const p = pathname || resolveName;
+      return `https://lib.baomitu.com/${name}/${version}/${p}`;
     },
   ];
 };
@@ -134,8 +134,8 @@ export const staticfile = (
   return [
     exportVarName,
     (version, name, _importName = '', resolveName = '') => {
-      pathname ||= resolveName;
-      return `https://cdn.staticfile.org/${name}/${version}/${pathname}`;
+      const p = pathname || resolveName;
+      return `https://cdn.staticfile.org/${name}/${version}/${p}`;
     },
   ];
 };
@@ -151,8 +151,8 @@ export const cdnjs = (
   return [
     exportVarName,
     (version, name, _importName = '', resolveName = '') => {
-      pathname ||= resolveName;
-      return `https://cdnjs.cloudflare.com/ajax/libs/${name}/${version}/${pathname}`;
+      const p = pathname || resolveName;
+      return `https://cdnjs.cloudflare.com/ajax/libs/${name}/${version}/${p}`;
     },
   ];
 };
@@ -169,8 +169,8 @@ export const zhimg = (
   return [
     exportVarName,
     (version, name, _importName = '', resolveName = '') => {
-      pathname ||= resolveName;
-      return `https://unpkg.zhimg.com/${name}/${version}/${pathname}`;
+      const p = pathname || resolveName;
+      return `https://unpkg.zhimg.com/${name}/${version}/${p}`;
     },
   ];
 };
@@ -186,8 +186,8 @@ export const elemecdn = (
   return [
     exportVarName,
     (version, name, _importName = '', resolveName = '') => {
-      pathname ||= resolveName;
-      return `https://npm.elemecdn.com/${name}@${version}/${pathname}`;
+      const p = pathname || resolveName;
+      return `https://npm.elemecdn.com/${name}@${version}/${p}`;
     },
   ];
 };
@@ -203,8 +203,8 @@ export const bdstatic = (
   return [
     exportVarName,
     (version, name, _importName = '', resolveName = '') => {
-      pathname ||= resolveName;
-      return `https://code.bdstatic.com/npm/${name}@${version}/${pathname}`;
+      const p = pathname || resolveName;
+      return `https://code.bdstatic.com/npm/${name}@${version}/${p}`;
     },
   ];
 };

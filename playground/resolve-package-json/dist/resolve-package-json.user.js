@@ -8,7 +8,9 @@
 // @require    https://cdn.jsdelivr.net/npm/@formkit/vue@1.0.0-beta.11/dist/formkit-vue.js
 // ==/UserScript==
 
-(function(vue) {
-  "use strict";
-  console.log({ plugin: vue.plugin, defaultConfig: vue.defaultConfig });
+(function (vue) {
+	'use strict';
+
+	console.log({ plugin: vue.plugin, defaultConfig: vue.defaultConfig });
+
 })(FormKit);

@@ -7,16 +7,17 @@
 // @icon         https://vitejs.dev/logo.svg
 // @match        https://i.songe.li/
 // @require      https://cdn.jsdelivr.net/npm/vue@3.2.47/dist/vue.global.prod.js
-// @require      https://unpkg.com/vue-demi@latest/lib/index.iife.js
+// @require      https://cdn.jsdelivr.net/npm/vue-demi@latest/lib/index.iife.js
 // @require      data:application/javascript,window.Vue%3DVue%3B
 // @require      https://cdn.jsdelivr.net/npm/pinia@2.0.30/dist/pinia.iife.prod.js
-// @require      https://cdn.jsdelivr.net/npm/element-plus@2.2.30/dist/index.full.min.js
-// @resource     element-plus/dist/index.css  https://cdn.jsdelivr.net/npm/element-plus@2.2.30/dist/index.css
+// @require      https://cdn.jsdelivr.net/npm/element-plus@2.2.31/dist/index.full.min.js
+// @resource     element-plus/dist/index.css  https://cdn.jsdelivr.net/npm/element-plus@2.2.31/dist/index.css
 // @grant        GM_getResourceText
 // ==/UserScript==
 
-(function(vue, pinia$1, ElementPlus2) {
-  "use strict";
+(function (vue, pinia$1, ElementPlus) {
+  'use strict';
+
   const cssLoader = (e) => {
     const t = GM_getResourceText(e), o = document.createElement("style");
     return o.innerText = t, document.head.append(o), t;
@@ -69,7 +70,7 @@
   });
   const pinia = pinia$1.createPinia();
   const app = vue.createApp(_sfc_main);
-  app.use(ElementPlus2);
+  app.use(ElementPlus);
   app.use(pinia);
   app.mount(
     (() => {
@@ -78,4 +79,5 @@
       return div;
     })()
   );
+
 })(Vue, Pinia, ElementPlus);

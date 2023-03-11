@@ -8,26 +8,27 @@
 // @match        https://i.songe.li/
 // @require      https://cdn.jsdelivr.net/npm/vue@3.2.47/dist/vue.global.prod.js
 // @require      data:application/javascript,window.Vue%3DVue%3B
-// @require      https://cdn.jsdelivr.net/npm/element-plus@2.2.30/dist/index.full.min.js
+// @require      https://cdn.jsdelivr.net/npm/element-plus@2.2.31/dist/index.full.min.js
 // @resource     animate.css                      https://cdn.bootcdn.net/ajax/libs/animate.css/4.1.1/animate.css
 // @resource     base64-img/test/img/car.svg?raw  https://cdn.jsdelivr.net/npm/base64-img@1.0.4/test/img/car.svg
 // @resource     base64-img/test/img/car.svg?url  https://cdn.jsdelivr.net/npm/base64-img@1.0.4/test/img/car.svg
 // @resource     base64-img/test/img/car.svg      https://unpkg.com/base64-img@1.0.4/test/img/car.svg
-// @resource     element-plus/dist/index.css      https://cdn.jsdelivr.net/npm/element-plus@2.2.30/dist/index.css
-// @resource     element-plus/dist/index.css?raw  https://cdn.jsdelivr.net/npm/element-plus@2.2.30/dist/index.css
-// @resource     element-plus/package.json        https://npm.elemecdn.com/element-plus@2.2.30/package.json
+// @resource     element-plus/dist/index.css      https://cdn.jsdelivr.net/npm/element-plus@2.2.31/dist/index.css
+// @resource     element-plus/dist/index.css?raw  https://cdn.jsdelivr.net/npm/element-plus@2.2.31/dist/index.css
+// @resource     element-plus/package.json        https://npm.elemecdn.com/element-plus@2.2.31/package.json
 // @grant        GM_getResourceText
 // @grant        GM_getResourceURL
 // @grant        unsafeWindow
 // ==/UserScript==
 
-(function(Vue2, elementPlus) {
-  "use strict";
+(function (Vue, elementPlus) {
+  'use strict';
+
   function _interopNamespaceDefault(e) {
-    const n = Object.create(null, { [Symbol.toStringTag]: { value: "Module" } });
+    const n = Object.create(null, { [Symbol.toStringTag]: { value: 'Module' } });
     if (e) {
       for (const k in e) {
-        if (k !== "default") {
+        if (k !== 'default') {
           const d = Object.getOwnPropertyDescriptor(e, k);
           Object.defineProperty(n, k, d.get ? d : {
             enumerable: true,
@@ -39,7 +40,9 @@
     n.default = e;
     return Object.freeze(n);
   }
-  const Vue__namespace = /* @__PURE__ */ _interopNamespaceDefault(Vue2);
+
+  const Vue__namespace = /*#__PURE__*/_interopNamespaceDefault(Vue);
+
   const cssLoader = (e) => {
     const t = GM_getResourceText(e), o = document.createElement("style");
     return o.innerText = t, document.head.append(o), t;
@@ -47,10 +50,7 @@
   cssLoader("element-plus/dist/index.css");
   const ElementPlusPkg = jsonLoader("element-plus/package.json");
   cssLoader("animate.css");
-  var monkeyWindow = window;
-  var unsafeWindow = /* @__PURE__ */ (() => {
-    return monkeyWindow.unsafeWindow;
-  })();
+  var _unsafeWindow = /* @__PURE__ */ (() => typeof unsafeWindow != "undefined" ? unsafeWindow : void 0)();
   const carSvgUrl = urlLoader("base64-img/test/img/car.svg", "image/svg+xml");
   const tUrl = urlLoader("base64-img/test/img/car.svg?url", "image/svg+xml");
   const tRaw = rawLoader("base64-img/test/img/car.svg?raw");
@@ -60,7 +60,7 @@
     ElDatePicker: elementPlus.ElDatePicker,
     ElButton: elementPlus.ElButton,
     ElementPlusPkg,
-    unsafeWindow,
+    unsafeWindow: _unsafeWindow,
     carSvgUrl,
     tUrl,
     tRaw,
@@ -76,4 +76,5 @@
       return img;
     })()
   );
+
 })(Vue, ElementPlus);

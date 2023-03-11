@@ -11,16 +11,17 @@
 // @grant      unsafeWindow
 // ==/UserScript==
 
-var __defProp = Object.defineProperty;
-var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-var __publicField = (obj, key, value) => {
-  __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
-  return value;
-};
-(function() {
-  "use strict";
-  var monkeyWindow = window;
-  var GM_xmlhttpRequest = /* @__PURE__ */ (() => monkeyWindow.GM_xmlhttpRequest)();
+(function () {
+  'use strict';
+
+  var __defProp = Object.defineProperty;
+  var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+  var __publicField = (obj, key, value) => {
+    __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
+    return value;
+  };
+  var _GM_xmlhttpRequest = /* @__PURE__ */ (() => typeof GM_xmlhttpRequest != "undefined" ? GM_xmlhttpRequest : void 0)();
+  var _monkeyWindow = /* @__PURE__ */ (() => window)();
   var delay = async (n = 0) => new Promise((res) => {
     setTimeout(res, n);
   });
@@ -140,7 +141,7 @@ var __publicField = (obj, key, value) => {
     });
     return new Promise((resolve, reject) => {
       var _a2;
-      const handle = GM_xmlhttpRequest({
+      const handle = _GM_xmlhttpRequest({
         method: request.method.toUpperCase(),
         url: fixUrl(request.url),
         headers,
@@ -276,7 +277,7 @@ var __publicField = (obj, key, value) => {
   };
   var UnsafeWindowInterceptorManager = /* @__PURE__ */ lazy(() => {
     const t = new InterceptorManager();
-    t.hook(monkeyWindow.unsafeWindow ?? window);
+    t.hook(_monkeyWindow.unsafeWindow ?? window);
     return t;
   });
   (async () => {
@@ -315,4 +316,5 @@ var __publicField = (obj, key, value) => {
     });
     await fetch(location.href);
   })();
+
 })();

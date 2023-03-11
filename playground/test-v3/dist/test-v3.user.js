@@ -11,8 +11,8 @@
 
 (a=>{const e=document.createElement("style");e.dataset.source="vite-plugin-monkey",e.textContent=a,document.head.append(e)})(" #b .b2{display:flex}div[data-v-2c9b759a]{font-size:40px}.logo[data-v-2c9b759a]{height:6em;padding:1.5em;will-change:filter}.logo[data-v-2c9b759a]:hover{filter:drop-shadow(0 0 2em #646cffaa)}.logo.vue[data-v-2c9b759a]:hover{filter:drop-shadow(0 0 2em #42b883aa)} ");
 
-System.addImportMap({ imports: {"vue":"x:vue"} });
-System.set("x:vue", Vue);
+System.addImportMap({ imports: {"vue":"user:vue"} });
+System.set("user:vue", Vue);
 
 System.register("./__entry.js", ['vue'], (function (exports, module) {
   'use strict';

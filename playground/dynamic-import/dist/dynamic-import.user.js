@@ -9,92 +9,63 @@
 // @require      https://cdn.jsdelivr.net/npm/md5@2.3.0/dist/md5.min.js
 // @require      https://cdn.jsdelivr.net/npm/vue@3.2.47/dist/vue.global.prod.js
 // @require      data:application/javascript,window.Vue%3DVue%3B
-// @require      https://cdn.jsdelivr.net/npm/element-plus@2.2.30/dist/index.full.min.js
+// @require      https://cdn.jsdelivr.net/npm/element-plus@2.2.31/dist/index.full.min.js
+// @require      https://cdn.jsdelivr.net/npm/systemjs@6.14.0/dist/system.min.js
+// @require      https://cdn.jsdelivr.net/npm/systemjs@6.14.0/dist/extras/named-register.min.js
 // @resource     animate.css  https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.css
 // @grant        GM_getResourceText
 // ==/UserScript==
 
-(function(md5, vue, elementPlus) {
-  "use strict";
-  function _interopNamespaceDefault(e) {
-    const n = Object.create(null, { [Symbol.toStringTag]: { value: "Module" } });
-    if (e) {
-      for (const k in e) {
-        if (k !== "default") {
-          const d = Object.getOwnPropertyDescriptor(e, k);
-          Object.defineProperty(n, k, d.get ? d : {
-            enumerable: true,
-            get: () => e[k]
-          });
-        }
+System.addImportMap({ imports: {"md5":"user:md5","vue":"user:vue","element-plus":"user:element-plus"} });
+System.set("user:md5", MD5);
+System.set("user:vue", Vue);
+System.set("user:element-plus", ElementPlus);
+
+System.register("./__entry.js", [], (function (exports, module) {
+  'use strict';
+  return {
+    execute: (function () {
+
+      if (location.href.includes("animate.css=on")) {
+        module.import('./_monkey-resource-import_animate-26edfbdf-491681fd.js');
+        document.querySelectorAll("div").forEach((div) => {
+          div.classList.add("animate__shakeX");
+          div.classList.add("animate__animated");
+        });
+        console.log("dynamic import animate.css");
       }
-    }
-    n.default = e;
-    return Object.freeze(n);
-  }
-  function _mergeNamespaces(n, m) {
-    for (var i = 0; i < m.length; i++) {
-      const e = m[i];
-      if (typeof e !== "string" && !Array.isArray(e)) {
-        for (const k in e) {
-          if (k !== "default" && !(k in n)) {
-            const d = Object.getOwnPropertyDescriptor(e, k);
-            if (d) {
-              Object.defineProperty(n, k, d.get ? d : {
-                enumerable: true,
-                get: () => e[k]
-              });
-            }
-          }
+      (async () => {
+        if (location.href.includes("md5=on")) {
+          const md5 = (await module.import('md5')).default;
+          console.log(`md5('xx')=${md5("xx")}`);
+          console.log("dynamic import md5");
         }
-      }
-    }
-    return Object.freeze(Object.defineProperty(n, Symbol.toStringTag, { value: "Module" }));
-  }
-  const md5__namespace = /* @__PURE__ */ _interopNamespaceDefault(md5);
-  const vue__namespace = /* @__PURE__ */ _interopNamespaceDefault(vue);
-  const elementPlus__namespace = /* @__PURE__ */ _interopNamespaceDefault(elementPlus);
-  if (location.href.includes("animate.css=on")) {
-    Promise.resolve().then(() => _monkeyResourceImport_animate$1);
-    document.querySelectorAll("div").forEach((div) => {
-      div.classList.add("animate__shakeX");
-      div.classList.add("animate__animated");
-    });
-    console.log("dynamic import animate.css");
-  }
-  (async () => {
-    if (location.href.includes("md5=on")) {
-      const md52 = (await Promise.resolve().then(() => _monkeyDynamicImport_md5_)).default;
-      console.log(`md5('xx')=${md52("xx")}`);
-      console.log("dynamic import md5");
-    }
-    const Vue2 = await Promise.resolve().then(() => _monkeyDynamicImport_vue_);
-    const ElementPlus2 = await Promise.resolve().then(() => _monkeyDynamicImport_elementPlus_);
-    console.log({
-      Vue: Vue2,
-      ElementPlus: ElementPlus2,
-      default: ElementPlus2.default
-    });
-  })();
-  const cssLoader = (e) => {
-    const t = GM_getResourceText(e), o = document.createElement("style");
-    return o.innerText = t, document.head.append(o), t;
+        const Vue = await module.import('vue');
+        const ElementPlus = await module.import('element-plus');
+        console.log({
+          Vue,
+          ElementPlus,
+          default: ElementPlus.default
+        });
+      })();
+
+    })
   };
-  const _monkeyResourceImport_animate = cssLoader("animate.css");
-  const _monkeyResourceImport_animate$1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
-    __proto__: null,
-    default: _monkeyResourceImport_animate
-  }, Symbol.toStringTag, { value: "Module" }));
-  const _monkeyDynamicImport_md5_ = /* @__PURE__ */ _mergeNamespaces({
-    __proto__: null,
-    default: md5
-  }, [md5__namespace]);
-  const _monkeyDynamicImport_vue_ = /* @__PURE__ */ _mergeNamespaces({
-    __proto__: null,
-    default: vue
-  }, [vue__namespace]);
-  const _monkeyDynamicImport_elementPlus_ = /* @__PURE__ */ _mergeNamespaces({
-    __proto__: null,
-    default: elementPlus
-  }, [elementPlus__namespace]);
-})(MD5, Vue, ElementPlus);
+}));
+
+System.register("./_monkey-resource-import_animate-26edfbdf-491681fd.js", [], (function (exports, module) {
+  'use strict';
+  return {
+    execute: (function () {
+
+      const cssLoader = (e) => {
+        const t = GM_getResourceText(e), o = document.createElement("style");
+        return o.innerText = t, document.head.append(o), t;
+      };
+      const _monkeyResourceImport_animate = exports('default', cssLoader("animate.css"));
+
+    })
+  };
+}));
+
+System.import("./__entry.js", "./");

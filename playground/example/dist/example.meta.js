@@ -21,7 +21,7 @@
 // @require            https://cdn.jsdelivr.net/npm/blueimp-md5@2.19.0
 // @require            https://cdn.jsdelivr.net/npm/prettier@2.8.4/standalone.js
 // @require            https://cdn.jsdelivr.net/npm/prettier@2.8.4/parser-babel.js
-// @resource           element-plus/dist/index.css  https://cdn.jsdelivr.net/npm/element-plus@2.2.30/dist/index.css
+// @resource           element-plus/dist/index.css  https://cdn.jsdelivr.net/npm/element-plus@2.2.31/dist/index.css
 // @grant              GM_addElement
 // @grant              GM_cookie
 // @grant              GM_getResourceText

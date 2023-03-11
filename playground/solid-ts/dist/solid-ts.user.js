@@ -7,10 +7,11 @@
 // @match      https://www.google.com/
 // ==/UserScript==
 
-(o=>{const e=document.createElement("style");e.dataset.source="vite-plugin-monkey",e.innerText=o,document.head.appendChild(e)})("body{margin:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;display:flex}code{font-family:source-code-pro,Menlo,Monaco,Consolas,Courier New,monospace}._App_9g4xh_1{text-align:center}._logo_9g4xh_5{animation:_logo-spin_9g4xh_1 infinite 20s linear;height:40vmin;pointer-events:none}._header_9g4xh_11{background-color:#282c34;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:calc(10px + 2vmin);color:#fff}._link_9g4xh_22{color:#b318f0}@keyframes _logo-spin_9g4xh_1{0%{transform:rotate(0)}to{transform:rotate(360deg)}}");
+(o=>{const e=document.createElement("style");e.dataset.source="vite-plugin-monkey",e.textContent=o,document.head.append(e)})(" body{margin:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;display:flex}code{font-family:source-code-pro,Menlo,Monaco,Consolas,Courier New,monospace}._App_9g4xh_1{text-align:center}._logo_9g4xh_5{animation:_logo-spin_9g4xh_1 infinite 20s linear;height:40vmin;pointer-events:none}._header_9g4xh_11{background-color:#282c34;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:calc(10px + 2vmin);color:#fff}._link_9g4xh_22{color:#b318f0}@keyframes _logo-spin_9g4xh_1{0%{transform:rotate(0)}to{transform:rotate(360deg)}} ");
 
-(function() {
-  "use strict";
+(function () {
+  'use strict';
+
   const sharedConfig = {};
   const equalFn = (a, b) => a === b;
   const signalOptions = {
@@ -36,7 +37,7 @@
       owned: null,
       cleanups: null,
       context: null,
-      owner: detachedOwner || owner
+      owner: detachedOwner === void 0 ? owner : detachedOwner
     }, updateFn = unowned ? fn : () => fn(() => untrack(() => cleanNode(root)));
     Owner = root;
     Listener = null;
@@ -68,6 +69,8 @@
     updateComputation(c);
   }
   function untrack(fn) {
+    if (Listener === null)
+      return fn();
     const listener = Listener;
     Listener = null;
     try {
@@ -241,7 +244,7 @@
       completeUpdates(wait);
       return res;
     } catch (err) {
-      if (!Updates)
+      if (!wait)
         Effects = null;
       Updates = null;
       handleError(err);
@@ -618,7 +621,6 @@
       parent.insertBefore(node, marker);
     return [node];
   }
-  const main = "";
   const App$1 = "_App_9g4xh_1";
   const logo = "_logo_9g4xh_5";
   const header = "_header_9g4xh_11";
@@ -688,4 +690,5 @@
     document.body.append(app);
     return app;
   })());
+
 })();

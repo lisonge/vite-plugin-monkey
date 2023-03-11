@@ -11,11 +11,13 @@
 // @grant      GM_xmlhttpRequest
 // ==/UserScript==
 
-(function() {
-  "use strict";
-  var monkeyWindow = window;
+(function () {
+  'use strict';
+
+  var _GM = /* @__PURE__ */ (() => typeof GM != "undefined" ? GM : void 0)();
+  var _GM_xmlhttpRequest = /* @__PURE__ */ (() => typeof GM_xmlhttpRequest != "undefined" ? GM_xmlhttpRequest : void 0)();
   const xmlhttpRequest = /* @__PURE__ */ (() => {
-    return monkeyWindow.GM_xmlhttpRequest ?? monkeyWindow.GM.xmlHttpRequest;
+    return _GM_xmlhttpRequest ?? _GM.xmlHttpRequest;
   })();
   const fixUrl = (url = "") => {
     try {
@@ -121,4 +123,5 @@
     img.src = imgUrl;
     document.body.append(img);
   })();
+
 })();

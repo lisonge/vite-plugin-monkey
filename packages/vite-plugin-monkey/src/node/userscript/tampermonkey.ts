@@ -1,3 +1,4 @@
+import { WebRequestRule } from '../../shared/types';
 import { IArray, LocaleType } from '../types';
 
 export type TamperRunAt =
@@ -34,7 +35,8 @@ export type TamperGrant =
   | 'GM_notification'
   | 'GM_setClipboard'
   | 'GM_info'
-  | 'GM_cookie';
+  | 'GM_cookie'
+  | 'GM_webRequest';
 
 export const TamperGrantValueList: TamperGrant[] = [
   'unsafeWindow',
@@ -64,6 +66,7 @@ export const TamperGrantValueList: TamperGrant[] = [
   'GM_setClipboard',
   'GM_info',
   'GM_cookie',
+  'GM_webRequest',
 ];
 
 export type AntifeatureType = {
@@ -207,17 +210,6 @@ export interface TampermonkeyUserScript {
    */
   sandbox?: 'raw' | 'JavaScript' | 'DOM';
 
-  // /**
-  //  * @see https://www.tampermonkey.net/documentation.php#meta:run_at
-  //  */
-  // 'run-at'?: TamperRunAt;
-
-  // /**
-  //  * @see https://www.tampermonkey.net/documentation.php#meta:grant
-  //  *
-  //  */
-  // grant?: IArray<TamperGrant> | 'none' | '*';
-
   /**
    * @see https://www.tampermonkey.net/documentation.php#meta:antifeature
    */
@@ -228,5 +220,13 @@ export interface TampermonkeyUserScript {
    */
   noframes?: boolean;
 
-  // extra?: [string, string][] | Record<string, IArray<string>>;
+  /**
+   * @see https://www.tampermonkey.net/documentation.php#meta:webRequest
+   */
+  webRequest?: IArray<WebRequestRule>;
+
+  /**
+   * @see https://www.tampermonkey.net/documentation.php#meta:unwrap
+   */
+  unwrap?: boolean;
 }

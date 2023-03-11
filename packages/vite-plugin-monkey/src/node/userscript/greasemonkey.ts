@@ -88,21 +88,8 @@ export interface GreasemonkeyUserScript {
    */
   resource?: Record<string, string>;
 
-  // /**
-  //  * @see https://wiki.greasespot.net/Metadata_Block#.40run-at
-  //  */
-  // 'run-at'?: GreaseRunAt;
-
-  // /**
-  //  * @see https://wiki.greasespot.net/Metadata_Block#.40grant
-  //  * @see https://wiki.greasespot.net/Greasemonkey_Manual:API
-  //  */
-  // grant?: IArray<GreaseGrant> | 'none' | '*';
-
   /**
    * @see https://wiki.greasespot.net/Metadata_Block#.40noframes
    */
   noframes?: boolean;
-
-  // extra?: [string, string][] | Record<string, IArray<string>>;
 }

@@ -109,6 +109,7 @@ export const unimportPreset: InlinePreset = {
     'GM_setValue',
     'GM_unregisterMenuCommand',
     'GM_xmlhttpRequest',
+    'GM_webRequest',
     'unsafeWindow',
     'monkeyWindow',
   ],

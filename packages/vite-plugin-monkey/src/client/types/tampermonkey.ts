@@ -1,3 +1,5 @@
+import type { WebRequestRule } from '../../shared/types';
+
 export type TamperScriptMeta = {
   name_i18n: Record<string, string>;
   description_i18n: Record<string, string>;
@@ -80,9 +82,15 @@ export type CookieFn = {
     details: CookieDetails['delete'],
     callback?: CookieCallBack['delete'],
   ) => CookieResult['delete'];
-  <Method extends 'list' | 'set' | 'delete'>(
-    method: Method,
-    details: CookieDetails[Method],
-    callback?: CookieCallBack[Method],
-  ): CookieResult[Method];
 };
+
+export type WebRequestListener = (
+  info: 'cancel' | 'redirect',
+  message: 'ok' | 'error',
+  details: {
+    rule: WebRequestRule;
+    url: string;
+    redirect_url: string;
+    description: string;
+  },
+) => void;

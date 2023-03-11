@@ -154,6 +154,8 @@ export type FinalUserScript = {
   require: string[];
   resource: Record<string, string>;
   noframes: boolean;
+  unwrap: boolean;
+  webRequest: string[];
 
   author: string;
   copyright?: string;
@@ -232,6 +234,8 @@ export const finalMonkeyOptionToComment = async ({
     resource,
     grant,
     noframes,
+    unwrap,
+    webRequest,
     $extra,
   } = userscript;
   Object.entries({
@@ -302,6 +306,10 @@ export const finalMonkeyOptionToComment = async ({
     attrList.push(['connect', s]);
   });
 
+  webRequest.forEach((s) => {
+    attrList.push(['webRequest', s]);
+  });
+
   if (grant.has('none')) {
     attrList.push(['grant', 'none']);
   } else if (grant.has('*')) {
@@ -328,6 +336,9 @@ export const finalMonkeyOptionToComment = async ({
   });
   if (noframes) {
     attrList.push(['noframes']);
+  }
+  if (unwrap) {
+    attrList.push(['unwrap']);
   }
   attrList.push(...$extra);
 
@@ -445,6 +456,7 @@ const defaultSortFormat = (p0: [string, ...string[]][]) => {
     filter(([k]) => k == 'match'),
     filter(([k]) => k == 'exclude'),
     filter(([k]) => k == 'exclude-match'),
+    filter(([k]) => k == 'webRequest'),
 
     filter(([k]) => k == 'require'),
 
@@ -465,6 +477,7 @@ const defaultSortFormat = (p0: [string, ...string[]][]) => {
     filter(([k]) => k == 'contributionAmount'),
     filter(([k]) => k == 'contributionURL'),
     filter(([k]) => k == 'noframes'),
+    filter(([k]) => k == 'unwrap'),
     p0,
   ].flat(1);
 };

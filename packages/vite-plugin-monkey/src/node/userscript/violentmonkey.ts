@@ -156,17 +156,6 @@ export interface ViolentmonkeyUserScript {
    */
   resource?: Record<string, string>;
 
-  // /**
-  //  * @see https://violentmonkey.github.io/api/metadata-block/#resource
-  //  */
-  // 'run-at'?: ViolentRunAt;
-
-  // /**
-  //  * @see https://violentmonkey.github.io/api/metadata-block/#grant
-  //  * @see https://violentmonkey.github.io/api/gm/
-  //  */
-  // grant?: IArray<ViolentGrant> | 'none' | '*';
-
   /**
    * @see https://violentmonkey.github.io/api/metadata-block/#noframes
    */
@@ -177,5 +166,8 @@ export interface ViolentmonkeyUserScript {
    */
   'inject-into'?: ViolentInjectInto;
 
-  // extra?: [string, string][] | Record<string, IArray<string>>;
+  /**
+   * @see https://violentmonkey.github.io/api/metadata-block/#unwrap
+   */
+  unwrap?: boolean;
 }

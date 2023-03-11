@@ -118,6 +118,7 @@ export const resolvedOption = (
     require = [],
     connect = [],
     grant = [],
+    webRequest = [],
     $extra = [],
   } = pluginOption.userscript ?? {};
   if (typeof name == 'string') {
@@ -152,6 +153,9 @@ export const resolvedOption = (
   }
   if (!(connect instanceof Array)) {
     connect = [connect];
+  }
+  if (!(webRequest instanceof Array)) {
+    webRequest = [webRequest];
   }
 
   const grantSet = new Set<string>();
@@ -201,6 +205,7 @@ export const resolvedOption = (
     contributionAmount,
     compatible,
     sandbox,
+    unwrap = false,
   } = pluginOption.userscript ?? {};
 
   const { sourcemap = {}, fileName = projectPkg.name + '.user.js' } = build;
@@ -253,6 +258,8 @@ export const resolvedOption = (
       $extra,
       grant: grantSet,
       sandbox,
+      unwrap,
+      webRequest: webRequest.map((w) => JSON.stringify(w)),
     },
     clientAlias: pluginOption.clientAlias ?? '$',
     entry: pluginOption.entry,

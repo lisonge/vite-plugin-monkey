@@ -1,4 +1,10 @@
-import type { CookieFn, TamperInfo, TamperScriptMeta } from './tampermonkey';
+import type { WebRequestRule } from '../../shared/types';
+import type {
+  CookieFn,
+  TamperInfo,
+  TamperScriptMeta,
+  WebRequestListener,
+} from './tampermonkey';
 import type { ViolentInfo, ViolentScriptMeta } from './violentmonkey';
 
 type CommonScriptMeta = {
@@ -462,7 +468,6 @@ export type MonkeyWindow = Window & {
    * @see https://www.tampermonkey.net/documentation.php#api:GM_cookie.list
    * @see https://www.tampermonkey.net/documentation.php##api:GM_cookie.set
    * @see https://www.tampermonkey.net/documentation.php##api:GM_cookie.delete
-   * @see https://github.com/Tampermonkey/tampermonkey/issues/465#issuecomment-429058294
    * @available tampermonkey
    */
   GM_cookie: CookieFn;
@@ -588,4 +593,12 @@ export type MonkeyWindow = Window & {
     (options: DownloadRequest): AbortHandle<boolean>;
     (url: string, name?: string): AbortHandle<boolean>;
   };
+
+  /**
+   * @see https://www.tampermonkey.net/documentation.php#api:GM_webRequest
+   */
+  GM_webRequest: (
+    rules: WebRequestRule[],
+    listener: WebRequestListener,
+  ) => void;
 };

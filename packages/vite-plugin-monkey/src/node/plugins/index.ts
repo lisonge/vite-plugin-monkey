@@ -2,7 +2,6 @@ import { virtualHtmlPlugin } from './virtualHtml';
 import { fixViteAssetPlugin } from './fixViteAsset';
 import { fixViteClientPlugin } from './fixViteClient';
 import { serverPlugin } from './server';
-import { windowPlugin } from './window';
 import { autoGrantPlugin } from './autoGrant';
 import { externalGlobalsPlugin } from './externalGlobals';
 import { externalLoaderPlugin } from './externalLoader';
@@ -11,6 +10,7 @@ import { finalBundlePlugin } from './finalBundle';
 import { perviewPlugin } from './perview';
 import { topLevelAwaitPlugin } from './topLevelAwait';
 import { collectCssPlugin } from './collectCss';
+import { redirectClient } from './redirectClient';
 
 const monkeyPluginList = [
   // only serve
@@ -19,10 +19,8 @@ const monkeyPluginList = [
   fixViteClientPlugin,
   serverPlugin,
 
-  // common
-  windowPlugin,
-
   // only build
+  redirectClient,
   autoGrantPlugin,
   externalGlobalsPlugin,
   externalLoaderPlugin,

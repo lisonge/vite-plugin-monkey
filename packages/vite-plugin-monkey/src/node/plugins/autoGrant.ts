@@ -17,6 +17,7 @@ export const autoGrantPlugin = (
       if (
         finalOption.build.autoGrant &&
         !id.endsWith('vite-plugin-monkey/dist/client/index.mjs') &&
+        !id.endsWith('vite-plugin-monkey/dist/native/index.mjs') &&
         !id.includes('virtual:plugin-monkey-loader')
       ) {
         collectGrantMap.set(

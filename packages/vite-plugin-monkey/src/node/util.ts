@@ -1,6 +1,5 @@
 import type { InlinePreset } from 'unimport';
 import { transformWithEsbuild } from 'vite';
-import { logger } from './_logger';
 
 /**
  * transform function and parameter to iife code then mini code then transform code to data url string
@@ -51,31 +50,20 @@ export const fn2dataUrl = async <T extends (...args: any[]) => any>(
 /**
  * string -> javascript data url
  */
-export function toDataUrl(code: string): string;
+export function dataUrl(code: string): string;
 /**
  * function and it parameters -> iife -> mini_iife -> javascript data url
  */
-export function toDataUrl<T extends (...args: any[]) => any>(
+export function dataUrl<T extends (...args: any[]) => any>(
   fn: T,
   ...args: Parameters<T>
 ): Promise<string>;
-export function toDataUrl(p0: any, ...args: any[]): string | Promise<string> {
+export function dataUrl(p0: any, ...args: any[]): string | Promise<string> {
   if (typeof p0 == 'string') {
     return `data:application/javascript,` + encodeURIComponent(p0);
   }
   return fn2dataUrl(p0, ...args);
 }
-
-/**
- * @deprecated use fn2dataUrl
- */
-export const encodeFn = async <T extends (...args: any[]) => any>(
-  fn: T,
-  args: Parameters<T>,
-) => {
-  logger.warn('util.encodeFn is deprecated, use util.fn2dataUrl');
-  return fn2dataUrl(fn, ...args);
-};
 
 /**
  * GM api preset when you use unimport/unplugin-auto-import

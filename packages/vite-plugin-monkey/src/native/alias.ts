@@ -87,9 +87,4 @@ export const _GM_webRequest = /* @__PURE__ */ (() =>
 export const _unsafeWindow = /* @__PURE__ */ (() =>
   typeof unsafeWindow != 'undefined' ? unsafeWindow : void 0)();
 
-export const _monkeyWindow = /* @__PURE__ */ (() => (
-  // @ts-ignore
-  window.GM, window
-))();
-// https://github.com/Tampermonkey/tampermonkey/issues/1567
-// if not `window.GM`, _monkeyWindow.GM may be undefined
+export const _monkeyWindow = /* @__PURE__ */ (() => window)();

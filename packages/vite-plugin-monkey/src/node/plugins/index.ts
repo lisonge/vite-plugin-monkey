@@ -10,7 +10,8 @@ import { finalBundlePlugin } from './finalBundle';
 import { perviewPlugin } from './perview';
 import { topLevelAwaitPlugin } from './topLevelAwait';
 import { collectCssPlugin } from './collectCss';
-import { redirectClient } from './redirectClient';
+import { redirectClientPlugin } from './redirectClient';
+import { inlinesAssetPlugin } from './inlinesAsset';
 
 const monkeyPluginList = [
   // only serve
@@ -20,7 +21,8 @@ const monkeyPluginList = [
   serverPlugin,
 
   // only build
-  redirectClient,
+  inlinesAssetPlugin,
+  redirectClientPlugin,
   autoGrantPlugin,
   externalGlobalsPlugin,
   externalLoaderPlugin,

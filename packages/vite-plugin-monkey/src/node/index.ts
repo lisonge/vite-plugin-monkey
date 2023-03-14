@@ -44,6 +44,7 @@ export default (pluginOption: MonkeyOption): PluginOption => {
         },
         build: {
           assetsInlineLimit: Number.MAX_SAFE_INTEGER,
+          chunkSizeWarningLimit: Number.MAX_SAFE_INTEGER,
           modulePreload: false,
           assetsDir: './',
           cssCodeSplit: false,

@@ -20,13 +20,15 @@ const monkeyPluginList = [
   fixViteClientPlugin,
   serverPlugin,
 
-  // only build
-  inlinesAssetPlugin,
+  // only build pre
   redirectClientPlugin,
-  autoGrantPlugin,
-  externalGlobalsPlugin,
   externalLoaderPlugin,
   externalResourcePlugin,
+  externalGlobalsPlugin,
+
+  // only build post
+  autoGrantPlugin,
+  inlinesAssetPlugin,
   topLevelAwaitPlugin,
   collectCssPlugin,
 

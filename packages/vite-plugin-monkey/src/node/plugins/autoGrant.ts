@@ -12,6 +12,7 @@ export const autoGrantPlugin = (
   return {
     name: 'monkey:autoGrant',
     apply: 'build',
+    enforce: 'post',
     async transform(code, id) {
       id = normalizePath(id);
       if (

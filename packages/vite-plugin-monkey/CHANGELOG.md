@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.0.1
+
+- fix:inline svg asset [fb8000d5](https://github.com/lisonge/vite-plugin-monkey/commit/9c294ee636c2925184a1f6fe4e2fd3f7fb8000d5)
+
 ## 3.0.0
 
 - support `top level await` by systemjs

@@ -11,6 +11,7 @@ type CallAcornNode = AcornNode & {
 };
 
 const awaitOffset = `await`.length;
+const tlaIdentifier = `__TOP_LEVEL_AWAIT__`;
 
 export const topLevelAwaitPlugin = (
   finalOption: FinalMonkeyOption,
@@ -49,7 +50,7 @@ export const topLevelAwaitPlugin = (
           ms.appendRight(node.end, `)`);
 
           // await (xxx) -> __topLevelAwait__ (xxx)
-          ms.update(node.start, node.start + awaitOffset, `__topLevelAwait__`);
+          ms.update(node.start, node.start + awaitOffset, tlaIdentifier);
         });
         return {
           code: ms.toString(),
@@ -64,7 +65,7 @@ export const topLevelAwaitPlugin = (
       finalOption.hasTopLevelAwait = false; // reset when watch mode
       Object.entries(bundle).forEach(([name, chunk]) => {
         if (chunk.type == 'chunk') {
-          if (!chunk.code.includes(`__topLevelAwait__`)) {
+          if (!chunk.code.includes(tlaIdentifier)) {
             return;
           }
           const ast = this.parse(chunk.code);
@@ -77,7 +78,7 @@ export const topLevelAwaitPlugin = (
                 // top level await
                 if (
                   node.callee?.type === `Identifier` &&
-                  node.callee?.name === `__topLevelAwait__`
+                  node.callee?.name === tlaIdentifier
                 ) {
                   tlaCallNodes.push(node);
                 }
@@ -97,7 +98,9 @@ export const topLevelAwaitPlugin = (
             chunk.code = ms.toString();
             // TODO sourcemap
             // https://github.com/keik/merge-source-map
-            chunk.map;
+            if (chunk.map) {
+              chunk.map;
+            }
           }
         }
       });

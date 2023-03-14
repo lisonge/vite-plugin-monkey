@@ -381,11 +381,11 @@ import AutoImport from 'unplugin-auto-import/vite';
 
 export default defineConfig({
   plugins: [
-    monkey({
-      // ...
-    }),
     AutoImport({
       imports: [util.unimportPreset],
+    }),
+    monkey({
+      // ...
     }),
   ],
 });

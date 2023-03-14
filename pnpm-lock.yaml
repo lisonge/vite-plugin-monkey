@@ -223,6 +223,12 @@ importers:
       monkey-extra: link:../../packages/monkey-extra
       vite-plugin-monkey: link:../../packages/vite-plugin-monkey
 
+  playground/test-sourcemap:
+    specifiers:
+      vite-plugin-monkey: workspace:*
+    dependencies:
+      vite-plugin-monkey: link:../../packages/vite-plugin-monkey
+
   playground/test-unocss:
     specifiers:
       vite-plugin-monkey: workspace:*

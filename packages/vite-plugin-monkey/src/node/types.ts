@@ -104,10 +104,6 @@ export type FinalMonkeyOption = {
         nodeLoader?: (pkgOptions: PkgOptions) => IPromise<string>;
       }
     >;
-    sourcemap: {
-      offset: number;
-      sourceRoot: string;
-    };
   };
   collectRequireUrls: string[];
   collectGrantSet: Set<string>;
@@ -290,38 +286,8 @@ export type MonkeyOption = {
     externalResource?: ExternalResource;
 
     /**
-     * if you want to enable sourcemap, you need set `viteConfig.build.sourcemap='inline'`
+     * ![img](https://user-images.githubusercontent.com/38517192/222153432-f27e1f3d-af1e-4d7f-a370-60d6a2eefb57.png)
      *
-     * In addition, if `monkeyConfig.build.sourcemap && viteConfig.build.sourcemap===undefined`
-     *
-     * the plugin will also set `viteConfig.build.sourcemap='inline'`
-     */
-    sourcemap?: {
-      /**
-       * you must build and install userscript in advance, then open devtools -> source -> page, find this userscript
-       *
-       * It is the line number of `// ==UserScript==` -1, The offset of different userscript engines is different
-       *
-       * If you don't set it, devtools console may log map error code position
-       *
-       * About it, you can see [violentmonkey#1616](https://github.com/violentmonkey/violentmonkey/issues/1616) and [tampermonkey#1621](https://github.com/Tampermonkey/tampermonkey/issues/1621)
-       *
-       * ![image](https://user-images.githubusercontent.com/38517192/196080452-4733bec5-686c-4d63-90a8-9a8eb51d7e7c.png)
-       *
-       * @default
-       * 0
-       */
-      offset?: number;
-      /**
-       * ![image](https://user-images.githubusercontent.com/38517192/196079942-835a0d25-e0bf-4373-aff8-73aba9b1d37c.png)
-       * @default
-       * `/${namespace}/${name}/`; // if name is string
-       * `/${namespace}/${name['']}/`; // if name is object
-       */
-      sourceRoot?: string;
-    };
-
-    /**
      * @default
      * cdn.jsdelivr()[1]
      */

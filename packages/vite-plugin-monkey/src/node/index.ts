@@ -28,14 +28,6 @@ export default (pluginOption: MonkeyOption): PluginOption => {
     name: 'monkey:entry',
     async config(userConfig, { command }) {
       const isServe = command == 'serve';
-      let sourcemap = userConfig.build?.sourcemap;
-      if (sourcemap === undefined) {
-        if (pluginOption.build?.sourcemap) {
-          sourcemap = 'inline';
-        } else {
-          sourcemap = false;
-        }
-      }
 
       return {
         resolve: {
@@ -60,18 +52,10 @@ export default (pluginOption: MonkeyOption): PluginOption => {
             // serve pre-bundling need
             input: finalPluginOption.entry,
           },
+          sourcemap: false,
 
           // TODO
           // sourcemap: sourcemap,
-
-          // lib: {
-          //   entry: finalPluginOption.entry,
-          //   formats: ['system' as any],
-          //   fileName: () => {
-          //     return finalPluginOption.build.fileName;
-          //   },
-          //   name: '__exposed__',
-          // },
         },
       };
     },

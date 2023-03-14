@@ -208,7 +208,7 @@ export const resolvedOption = (
     unwrap = false,
   } = pluginOption.userscript ?? {};
 
-  const { sourcemap = {}, fileName = projectPkg.name + '.user.js' } = build;
+  const { fileName = projectPkg.name + '.user.js' } = build;
   let { metaFileName } = build;
   if (typeof metaFileName == 'string') {
     const t = metaFileName;
@@ -278,11 +278,6 @@ export const resolvedOption = (
       minifyCss: build.minifyCss ?? true,
       externalGlobals: externalGlobals,
       externalResource: externalResource2,
-      sourcemap: {
-        offset: sourcemap.offset ?? 0,
-        sourceRoot:
-          sourcemap.sourceRoot ?? `/${namespace}/${name[''] ?? 'name'}/`,
-      },
     },
     collectGrantSet: new Set(),
     collectRequireUrls: [],

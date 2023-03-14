@@ -1,5 +1,40 @@
 # CHANGELOG
 
+## 3.0.0
+
+- support `top level await` by systemjs
+- support `dynamic import` in single file by systemjs
+- use original build mode instead of library-mode
+- vite legacy is available
+- add gm_webRequest, unwrap, copyright, sandbox type hint, others
+- redirect client when build
+- fix: monkeyWindow.GM may be undefined
+- fix: cdn util suport multiple call
+
+plugin@v2 use inlineDynamicImport and not support TopLevelAwait
+
+```mermaid
+graph LR;
+    A(your code)-- vite build library mode -- others plugins -- vite-plugin-monkey  -->B(iife)
+```
+
+---
+
+plugin@v3
+
+```mermaid
+graph LR;
+    A(your code)-- vite build -- others plugins -->B(esm)
+    B -- vite-plugin-monkey -- vite build library mode --> C{has TopLevelAwait\nor DynamicImport}
+    C -- yes --> D(systemjs)
+    C -- no --> E(iife)
+```
+
+## 3.0.0-BreakChanges
+
+- vite-plugin-monkey must be the `last one` of plugin list
+- sourcemap is `temporarily` unavailable
+
 ## 2.12.1
 
 ### 2.12.1-BugFixes

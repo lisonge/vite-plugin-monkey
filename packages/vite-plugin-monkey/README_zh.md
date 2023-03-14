@@ -18,7 +18,7 @@
 - 利用 @resource 配置外部资源 cdn 的方案, 额外减少构建脚本大小
 - 通过 ESM 导入的方式使用 GM_api, 附带类型提示
 - 智能收集使用到的 GM_api, 自动配置 @grant 注释
-- 支持为构建 dist.user.js 脚本时生成正确的 sourcemap 映射
+- 支持 `top level await` 和单文件下的 `dynamic import`
 - 预览模式下自动打开浏览器安装构建好的脚本
 - 完全的 Typescript 和 Vite 的开发体验，比如模块热替换,秒启动
 
@@ -73,9 +73,19 @@ pnpm add -D vite-plugin-monkey
 # yarn add -D vite-plugin-monkey
 ```
 
+注意: vite-plugin-monkey 必须是插件列表的最后一项
+
+```mermaid
+graph LR;
+    A(your code)-- vite build -- others plugins -->B(esm)
+    B -- vite-plugin-monkey -- vite build library mode --> C{has TopLevelAwait\nor DynamicImport}
+    C -- yes --> D(systemjs)
+    C -- no --> E(iife)
+```
+
 ## 配置
 
-[MonkeyOption](/packages/vite-plugin-monkey/src/node/types.ts#L117)
+[MonkeyOption](/packages/vite-plugin-monkey/src/node/types.ts#L120)
 
 <details open>
   <summary>MonkeyOption Type</summary>
@@ -86,7 +96,7 @@ export type MonkeyOption = {
    * userscript entry file path
    */
   entry: string;
-  userscript: MonkeyUserScript;
+  userscript?: MonkeyUserScript;
   format?: Format;
 
   /**
@@ -250,36 +260,12 @@ export type MonkeyOption = {
     externalResource?: ExternalResource;
 
     /**
-     * if you want to enable sourcemap, you need set `viteConfig.build.sourcemap='inline'`
+     * ![img](https://user-images.githubusercontent.com/38517192/222153432-f27e1f3d-af1e-4d7f-a370-60d6a2eefb57.png)
      *
-     * In addition, if `monkeyConfig.build.sourcemap && viteConfig.build.sourcemap===undefined`
-     *
-     * the plugin will also set `viteConfig.build.sourcemap='inline'`
+     * @default
+     * cdn.jsdelivr()[1]
      */
-    sourcemap?: {
-      /**
-       * you must build and install userscript in advance, then open devtools -> source -> page, find this userscript
-       *
-       * It is the line number of `// ==UserScript==` -1, The offset of different userscript engines is different
-       *
-       * If you don't set it, devtools console may log map error code position
-       *
-       * About it, you can see [violentmonkey#1616](https://github.com/violentmonkey/violentmonkey/issues/1616) and [tampermonkey#1621](https://github.com/Tampermonkey/tampermonkey/issues/1621)
-       *
-       * ![image](https://user-images.githubusercontent.com/38517192/196080452-4733bec5-686c-4d63-90a8-9a8eb51d7e7c.png)
-       *
-       * @default
-       * 0
-       */
-      offset?: number;
-      /**
-       * ![image](https://user-images.githubusercontent.com/38517192/196079942-835a0d25-e0bf-4373-aff8-73aba9b1d37c.png)
-       * @default
-       * `/${namespace}/${name}/`; // if name is string
-       * `/${namespace}/${name['']}/`; // if name is object
-       */
-      sourceRoot?: string;
-    };
+    systemjs?: 'inline' | Mod2UrlFn2;
   };
 };
 ```
@@ -425,32 +411,6 @@ preact/react/svelte/vanilla/vue/solid 的例子, 请直接看 [create-monkey](/p
 
 请尽量确保插件的顺序是**最后一个**
 
-### 动态导入
-
-当 `vite build`, 插件将使构建你的代码为 iife 格式
-
-并且设置 `inlineDynamicImports=true`, 代码里的动态导入会变成静态导入, 副作用也会立刻执行
-
-```ts
-// main.ts
-if (xxx) {
-  import('vue');
-}
-```
-
-将变成
-
-```ts
-import * as module_0 from 'vue';
-if (xxx) {
-  Promise.resolve(module_0);
-}
-```
-
-### Top Level await
-
-它在 `vite build` 下不可用
-
 ### [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)
 
 在 `vite serve` 模式下, 代码入口被作为 script 添加到目标环境 document.head, 代码需要在两个源之间正常工作
@@ -503,26 +463,22 @@ const buildConfig = {
 
 ### Polyfill
 
-由于 <https://github.com/vitejs/vite/issues/1639>, 你暂时不能使用 `@vitejs/plugin-legacy`
-
-一种可行的方案是直接在 @require 加 cdn 去 polyfill
+与 vite legacy 一起使用时, 需要设置 `renderLegacyChunks=false`
 
 ```ts
+// vite.config.ts
+import legacy from '@vitejs/plugin-legacy';
 import { defineConfig } from 'vite';
 import monkey from 'vite-plugin-monkey';
+
 export default defineConfig({
   plugins: [
+    legacy({
+      renderLegacyChunks: false,
+      modernPolyfills: true,
+    }),
     monkey({
-      userscript: {
-        require: [
-          // polyfill 全部
-          'https://cdn.jsdelivr.net/npm/core-js-bundle@latest/minified.js',
-          // 或者使用 polyfill.io 智能 polyfill, 不过 polyfill.io 在大陆网络连通性很差, 几乎不能用
-          // https://polyfill.io/v3/polyfill.min.js
-          // 或者使用字节的cdn
-          // https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/core-js/3.21.1/minified.min.js
-        ],
-      },
+      entry: './src/main.ts',
     }),
   ],
 });

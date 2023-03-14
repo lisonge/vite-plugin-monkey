@@ -18,7 +18,7 @@ A vite plugin server and build your.user.js for userscript engine like [Tampermo
 - external module inject to userscript @resource
 - use GM_api by ESM import with type hints
 - intelligently collect GM_api that is used and automatically configure userscript @grant comment
-- support to generate the correct sourceMap mapping when build dist.user.js
+- support `top level await` and `dynamic import` in single
 - when vite preview, auto open browser install dist.user.js
 - full typescript support and vite feature
 
@@ -73,11 +73,21 @@ pnpm add -D vite-plugin-monkey
 # yarn add -D vite-plugin-monkey
 ```
 
+note: vite-plugin-monkey must be the `last item` of plugin list
+
+```mermaid
+graph LR;
+    A(your code)-- vite build -- others plugins -->B(esm)
+    B -- vite-plugin-monkey -- vite build library mode --> C{has TopLevelAwait\nor DynamicImport}
+    C -- yes --> D(systemjs)
+    C -- no --> E(iife)
+```
+
 ## Config
 
 <!-- template-start-MonkeyOption -->
 
-[MonkeyOption](/packages/vite-plugin-monkey/src/node/types.ts#L117)
+[MonkeyOption](/packages/vite-plugin-monkey/src/node/types.ts#L120)
 
 <details open>
   <summary>MonkeyOption Type</summary>
@@ -88,7 +98,7 @@ export type MonkeyOption = {
    * userscript entry file path
    */
   entry: string;
-  userscript: MonkeyUserScript;
+  userscript?: MonkeyUserScript;
   format?: Format;
 
   /**
@@ -252,36 +262,12 @@ export type MonkeyOption = {
     externalResource?: ExternalResource;
 
     /**
-     * if you want to enable sourcemap, you need set `viteConfig.build.sourcemap='inline'`
+     * ![img](https://user-images.githubusercontent.com/38517192/222153432-f27e1f3d-af1e-4d7f-a370-60d6a2eefb57.png)
      *
-     * In addition, if `monkeyConfig.build.sourcemap && viteConfig.build.sourcemap===undefined`
-     *
-     * the plugin will also set `viteConfig.build.sourcemap='inline'`
+     * @default
+     * cdn.jsdelivr()[1]
      */
-    sourcemap?: {
-      /**
-       * you must build and install userscript in advance, then open devtools -> source -> page, find this userscript
-       *
-       * It is the line number of `// ==UserScript==` -1, The offset of different userscript engines is different
-       *
-       * If you don't set it, devtools console may log map error code position
-       *
-       * About it, you can see [violentmonkey#1616](https://github.com/violentmonkey/violentmonkey/issues/1616) and [tampermonkey#1621](https://github.com/Tampermonkey/tampermonkey/issues/1621)
-       *
-       * ![image](https://user-images.githubusercontent.com/38517192/196080452-4733bec5-686c-4d63-90a8-9a8eb51d7e7c.png)
-       *
-       * @default
-       * 0
-       */
-      offset?: number;
-      /**
-       * ![image](https://user-images.githubusercontent.com/38517192/196079942-835a0d25-e0bf-4373-aff8-73aba9b1d37c.png)
-       * @default
-       * `/${namespace}/${name}/`; // if name is string
-       * `/${namespace}/${name['']}/`; // if name is object
-       */
-      sourceRoot?: string;
-    };
+    systemjs?: 'inline' | Mod2UrlFn2;
   };
 };
 ```
@@ -427,33 +413,7 @@ and preact/react/svelte/vanilla/vue/solid examples, see [create-monkey](/package
 
 plugin will rebuild your code by [generateBundle](https://rollupjs.org/plugin-development/#generatebundle) hook
 
-please try to ensure that the order of the plugin is **the last one**
-
-### Dynamic Import
-
-when `vite build`, plugin will build your code to iife formats
-
-and set `inlineDynamicImports=true`, the dynamic import in code will become static import, the `side effects` are also effective immediately
-
-```ts
-// main.ts
-if (xxx) {
-  import('vue');
-}
-```
-
-will become
-
-```ts
-import * as module_0 from 'vue';
-if (xxx) {
-  Promise.resolve(module_0);
-}
-```
-
-### Top Level await
-
-when `vite build`, it is unavailable
+please ensure that the order of the plugin is **the last one**
 
 ### [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)
 
@@ -517,26 +477,22 @@ export default defineConfig(async ({ command, mode }) => ({
 
 ### Polyfill
 
-because of [vite/issues/1639](https://github.com/vitejs/vite/issues/1639), now you can not use `@vitejs/plugin-legacy`
-
-the following is a feasible solution by @require cdn
+when plugin works with vite legacy, it is necessary to set `renderLegacyChunks=false`
 
 ```ts
+// vite.config.ts
+import legacy from '@vitejs/plugin-legacy';
 import { defineConfig } from 'vite';
 import monkey from 'vite-plugin-monkey';
 
 export default defineConfig({
   plugins: [
+    legacy({
+      renderLegacyChunks: false,
+      modernPolyfills: true,
+    }),
     monkey({
-      // ...
-      userscript: {
-        require: [
-          // polyfill all
-          'https://cdn.jsdelivr.net/npm/core-js-bundle@latest/minified.js',
-          // or use polyfill.io
-          // https://polyfill.io/v3/polyfill.min.js
-        ],
-      },
+      entry: './src/main.ts',
     }),
   ],
 });

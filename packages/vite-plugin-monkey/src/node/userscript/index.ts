@@ -385,20 +385,26 @@ export const finalMonkeyOptionToComment = async ({
 };
 
 const stringSort = (a: [string, ...string[]], b: [string, ...string[]]) => {
-  const v1 = a[1] ?? '';
-  const v2 = b[1] ?? '';
-  if (v1 == v2) return 0;
-  for (let i = 0; i < v1.length; i++) {
-    if (i >= v2.length) {
+  const [firstStringA, ...restOfStringsA] = a;
+  const [firstStringB, ...restOfStringsB] = b;
+  
+  const v1 = restOfStringsA.join('');
+  const v2 = restOfStringsB.join('');
+
+  if (v1 === v2) return 0;
+
+  for (let i = 0; i < Math.min(v1.length, v2.length); i++) {
+    const charCodeA = v1.charCodeAt(i);
+    const charCodeB = v2.charCodeAt(i);
+
+    if (charCodeA > charCodeB) {
       return 1;
-    }
-    if (v1.charCodeAt(i) > v2.charCodeAt(i)) {
-      return 1;
-    } else if (v1.charCodeAt(i) < v2.charCodeAt(i)) {
+    } else if (charCodeA < charCodeB) {
       return -1;
     }
   }
-  return 0;
+
+  return v1.length > v2.length ? 1 : -1;
 };
 
 const defaultSortFormat = (p0: [string, ...string[]][]) => {

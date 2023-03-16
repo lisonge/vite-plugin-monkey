@@ -391,9 +391,10 @@ const stringSort = (a: [string, ...string[]], b: [string, ...string[]]) => {
   for (let i = 0; i < v1.length; i++) {
     if (i >= v2.length) {
       return 1;
-    } else if (v1.charCodeAt(i) > v2.charCodeAt(i)) {
+    }
+    if (v1.charCodeAt(i) > v2.charCodeAt(i)) {
       return 1;
-    } else {
+    } else if (v1.charCodeAt(i) < v2.charCodeAt(i)) {
       return -1;
     }
   }

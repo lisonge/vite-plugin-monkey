@@ -353,31 +353,22 @@ export const finalMonkeyOptionToComment = async ({
   // format
   if (typeof align == 'number' && Number.isInteger(align) && align >= 1) {
     const alignN = align;
-    let maxLen = 0;
-
-    // format resource key value
-    attrList
-      .filter((s) => s[0] == 'resource')
-      .map((s) => {
-        if (s[1].length > maxLen) {
-          maxLen = s[1].length;
+    let maxResourceLen = 0;
+    let maxAttrLen = 0;
+    
+    attrList.forEach(([attr, value]) => {
+      if (attr === 'resource') {
+        if (value.length > maxResourceLen) {
+          maxResourceLen = value.length;
         }
-        return s;
-      })
-      .forEach((s) => {
-        s[1] += '\x20'.repeat(alignN + maxLen - s[1].length);
-      });
-
-    // format all
-    maxLen = 0;
-    attrList.forEach((s) => {
-      if (s[0].length > maxLen) {
-        maxLen = s[0].length;
+        value += '\x20'.repeat(alignN + maxResourceLen - value.length);
       }
-    });
-    attrList.forEach((s) => {
-      if (s[1]) {
-        s[0] = s[0].padEnd(alignN + maxLen, '\x20');
+      
+      if (attr.length > maxAttrLen) {
+        maxAttrLen = attr.length;
+      }
+      if (value) {
+        attr = attr.padEnd(alignN + maxAttrLen, '\x20');
       }
     });
   } else if (typeof align == 'function') {

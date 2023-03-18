@@ -43,6 +43,7 @@
     "execa": "7.0.0",
     "fs-extra": "11.1.0",
     "husky": "8.0.3",
+    "immer": "9.0.19",
     "lint-staged": "13.1.2",
     "magic-string": "0.30.0",
     "md5": "2.3.0",
@@ -75,5 +76,5 @@
   "volta": {
     "node": "16.17.0"
   },
-  "packageManager": "pnpm@7.28.0"
+  "packageManager": "pnpm@7.29.1"
 }

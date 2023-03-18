@@ -34,6 +34,7 @@ importers:
       execa: 7.0.0
       fs-extra: 11.1.0
       husky: 8.0.3
+      immer: 9.0.19
       lint-staged: 13.1.2
       magic-string: 0.30.0
       md5: 2.3.0
@@ -90,6 +91,7 @@ importers:
       execa: 7.0.0
       fs-extra: 11.1.0
       husky: 8.0.3
+      immer: 9.0.19
       lint-staged: 13.1.2
       magic-string: 0.30.0
       md5: 2.3.0
@@ -131,6 +133,9 @@ importers:
       vite-plugin-monkey: workspace:*
     devDependencies:
       vite-plugin-monkey: link:../vite-plugin-monkey
+
+  packages/server-preview:
+    specifiers: {}
 
   packages/vite-plugin-monkey:
     specifiers:
@@ -4904,6 +4909,10 @@ packages:
   /ignore/5.2.4:
     resolution: {integrity: sha512-MAb38BcSbH0eHNBxn7ql2NH/kX33OkB3lZ1BNdh7ENeRChHTYsTvWrMubiIAMNS2llXEEgZ1MUOBtXChP3kaFQ==}
     engines: {node: '>= 4'}
+    dev: false
+
+  /immer/9.0.19:
+    resolution: {integrity: sha512-eY+Y0qcsB4TZKwgQzLaE/lqYMlKhv5J9dyd2RhhtGhNo2njPXDqU9XPfcNfa3MIDsdtZt5KlkIsirlo4dHsWdQ==}
     dev: false
 
   /immutable/4.1.0:

@@ -497,3 +497,7 @@ export default defineConfig({
   ],
 });
 ```
+
+## Contribution
+
+please commit your changes to [dev](https://github.com/lisonge/vite-plugin-monkey/tree/dev) branch

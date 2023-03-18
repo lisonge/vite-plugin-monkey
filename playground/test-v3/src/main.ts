@@ -22,3 +22,7 @@ if (location.href) {
 }
 
 console.log({ svgUrl2 });
+
+for await (const v of location.href.split('')) {
+  console.log(v);
+}

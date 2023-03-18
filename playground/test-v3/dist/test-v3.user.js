@@ -74,6 +74,11 @@ System.register("./__entry.js", ['vue'], (function (exports, module) {
         (await module.import('./chunk-a4de7bed-27053969.js')).out();
       }
       console.log({ svgUrl2 });
+      (await (async () => {
+        for await (const v of location.href.split("")) {
+          console.log(v);
+        }
+      })());
 
     })
   };

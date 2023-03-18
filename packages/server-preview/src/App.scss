@@ -1,0 +1,33 @@
+.App {
+  margin-top: 20vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  a {
+    font-size: 32px;
+    text-align: center;
+  }
+  .copy {
+    margin-top: 20px;
+    padding: 4px;
+    font-size: 15px;
+    border: 2px solid;
+    cursor: pointer;
+    user-select: none;
+  }
+  .copied {
+    opacity: 0;
+    margin-top: 10px;
+    font-size: 12px;
+    padding: 8px;
+    border-radius: 5px;
+    background-color: black;
+    color: white;
+  }
+  .copy:active + .copied {
+    opacity: 1;
+  }
+  .copy:not(:active) + .copied {
+    transition: opacity 750ms;
+  }
+}

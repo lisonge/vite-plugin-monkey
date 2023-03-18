@@ -1,0 +1,43 @@
+{
+  "name": "server-preview",
+  "version": "0.0.0",
+  "private": true,
+  "main": "dist/node/index.cjs",
+  "module": "dist/node/index.mjs",
+  "types": "dist/node/index.d.ts",
+  "type": "module",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "import": "./dist/node/index.mjs",
+      "require": "./dist/node/index.cjs",
+      "types": "./dist/node/index.d.ts"
+    },
+    "./dist/client": {
+      "import": "./dist/client/index.mjs",
+      "types": "./dist/client/index.d.ts"
+    },
+    "./dist/native": {
+      "import": "./dist/native/index.mjs",
+      "types": "./dist/native/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "vite build",
+    "serve": "vite serve"
+  },
+  "author": "lisonge",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lisonge/vite-plugin-monkey.git",
+    "directory": "packages/vite-plugin-monkey"
+  },
+  "bugs": {
+    "url": "https://github.com/lisonge/vite-plugin-monkey/issues"
+  },
+  "homepage": "https://github.com/lisonge/vite-plugin-monkey#readme",
+  "volta": {
+    "extends": "../../package.json"
+  }
+}

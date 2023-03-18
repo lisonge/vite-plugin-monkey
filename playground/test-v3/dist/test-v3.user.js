@@ -1,12 +1,22 @@
 // ==UserScript==
-// @name       test-v3
-// @namespace  vite-plugin-monkey
-// @version    0.0.0
-// @author     monkey
-// @match      https://lisonge.com/*
-// @require    https://cdn.jsdelivr.net/npm/vue@3.2.47/dist/vue.global.prod.js
-// @require    https://cdn.jsdelivr.net/npm/systemjs@6.14.0/dist/system.min.js
-// @require    https://cdn.jsdelivr.net/npm/systemjs@6.14.0/dist/extras/named-register.min.js
+// @name              test-v3
+// @namespace         vite-plugin-monkey
+// @version           0.0.0
+// @author            monkey
+// @match             https://lisonge.com/*
+// @require           https://cdn.jsdelivr.net/npm/vue@3.2.47/dist/vue.global.prod.js
+// @require           https://cdn.jsdelivr.net/npm/systemjs@6.14.0/dist/system.min.js
+// @require           https://cdn.jsdelivr.net/npm/systemjs@6.14.0/dist/extras/named-register.min.js
+// @resource          resource1  https://github.com/1
+// @resource          resource2  https://github.com/2
+// @resource          resource3  https://github.com/3
+// @resource          resource4  https://github.com/4
+// @antifeature:tag1  tracking  test
+// @antifeature:tag1  tracking  test_h
+// @antifeature:tag2  miner     hello
+// @tag1              sub_tag1 sub_tag1
+// @tag0              sub_tag2 sub_tag1
+// @tag1              sub_tag0 sub_tag1 sub_tag1
 // ==/UserScript==
 
 (a=>{const e=document.createElement("style");e.dataset.source="vite-plugin-monkey",e.textContent=a,document.head.append(e)})(" #b .b2{display:flex}div[data-v-2c9b759a]{font-size:40px}.logo[data-v-2c9b759a]{height:6em;padding:1.5em;will-change:filter}.logo[data-v-2c9b759a]:hover{filter:drop-shadow(0 0 2em #646cffaa)}.logo.vue[data-v-2c9b759a]:hover{filter:drop-shadow(0 0 2em #42b883aa)} ");

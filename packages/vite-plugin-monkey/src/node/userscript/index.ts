@@ -353,32 +353,26 @@ export const finalMonkeyOptionToComment = async ({
   // format
   if (typeof align == 'number' && Number.isInteger(align) && align >= 1) {
     const alignN = align;
-    let maxLen = 0;
 
-    // format resource key value
-    attrList
-      .filter((s) => s[0] == 'resource')
-      .map((s) => {
-        if (s[1].length > maxLen) {
-          maxLen = s[1].length;
-        }
-        return s;
-      })
-      .forEach((s) => {
-        s[1] += '\x20'.repeat(alignN + maxLen - s[1].length);
+    const formatKey = (subAttrList: [string, ...string[]][]) => {
+      if (subAttrList.length == 0) return;
+      const maxLen = Math.max(...subAttrList.map((s) => s[1].length));
+      subAttrList.forEach((s) => {
+        s[1] = s[1].padEnd(alignN + maxLen);
       });
+    };
+
+    formatKey(attrList.filter((s) => s[0] == 'resource'));
+    formatKey(
+      attrList.filter(
+        (s) => s[0] == 'antifeature' || s[0].startsWith('antifeature:'),
+      ),
+    );
 
     // format all
-    maxLen = 0;
+    const maxLen = Math.max(...attrList.map((s) => s[0].length));
     attrList.forEach((s) => {
-      if (s[0].length > maxLen) {
-        maxLen = s[0].length;
-      }
-    });
-    attrList.forEach((s) => {
-      if (s[1]) {
-        s[0] = s[0].padEnd(alignN + maxLen, '\x20');
-      }
+      s[0] = s[0].padEnd(alignN + maxLen);
     });
   } else if (typeof align == 'function') {
     attrList = await align(attrList);
@@ -386,7 +380,16 @@ export const finalMonkeyOptionToComment = async ({
 
   return [
     '==UserScript==',
-    ...attrList.map((s) => '@' + s.join('')),
+    ...attrList.map(
+      (attr) =>
+        '@' +
+        attr
+          .map((v) => {
+            return v.endsWith('\x20') ? v : v + '\x20';
+          })
+          .join('')
+          .trimEnd(),
+    ),
     '==/UserScript==',
   ]
     .map((s) => '//\x20' + s)
@@ -473,7 +476,8 @@ const defaultSortFormat = (p0: [string, ...string[]][]) => {
 
     filter(([k]) => k == 'compatible'),
     filter(([k]) => k == 'incompatible'),
-    filter(([k]) => k == 'antifeature'),
+    filter(([k]) => k == 'antifeature').sort(stringSort),
+    filter(([k]) => k.startsWith('antifeature:')).sort(stringSort),
     filter(([k]) => k == 'contributionAmount'),
     filter(([k]) => k == 'contributionURL'),
     filter(([k]) => k == 'noframes'),

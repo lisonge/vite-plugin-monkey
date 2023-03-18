@@ -164,19 +164,13 @@ export const resolvedOption = (
   } else if (grant instanceof Array) {
     grant.forEach((s) => grantSet.add(s));
   }
-  if (!($extra instanceof Array)) {
-    const t: [string, string][] = [];
-    Object.entries($extra).forEach(([k, v]) => {
-      if (v instanceof Array) {
-        v.forEach((v2) => {
-          t.push([k, v2]);
-        });
-      } else {
-        t.push([k, v]);
-      }
-    });
-    $extra = t;
-  }
+
+  const extra: [string, ...string[]][] = [];
+  ($extra instanceof Array ? $extra : Object.entries($extra)).forEach(
+    ([k, v]) => {
+      extra.push([k, ...(v instanceof Array ? v : [v])]);
+    },
+  );
 
   const {
     icon64,
@@ -255,7 +249,7 @@ export const resolvedOption = (
       require,
       connect,
       description,
-      $extra,
+      $extra: extra,
       grant: grantSet,
       sandbox,
       unwrap,

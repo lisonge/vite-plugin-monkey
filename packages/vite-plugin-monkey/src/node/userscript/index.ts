@@ -129,8 +129,12 @@ type MergemonkeyUserScript = {
 
   /**
    * custom extra meta
+   * @example
+   * [['antifeature', ['miner', 'hello233']]]
+   * // -->
+   * // \@antifeature  miner     hello233
    */
-  $extra?: [string, string][] | Record<string, IArray<string>>;
+  $extra?: [string, IArray<string>][] | Record<string, IArray<string>>;
 };
 
 /**
@@ -178,7 +182,7 @@ export type FinalUserScript = {
   'inject-into'?: ViolentInjectInto;
   'run-at'?: GreaseRunAt | TamperRunAt | ViolentRunAt;
   grant: Set<string>;
-  $extra: [string, string][];
+  $extra: [string, ...string[]][];
 } & GreasyforkUserScript;
 
 export const finalMonkeyOptionToComment = async ({

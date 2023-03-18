@@ -401,18 +401,18 @@ export const finalMonkeyOptionToComment = async ({
 };
 
 const stringSort = (a: [string, ...string[]], b: [string, ...string[]]) => {
-  const v1 = a[1] ?? '';
-  const v2 = b[1] ?? '';
-  if (v1 == v2) return 0;
-  for (let i = 0; i < v1.length; i++) {
-    if (i >= v2.length) {
+  const minLen = Math.min(a.length, b.length);
+  for (let i = 0; i < minLen; i++) {
+    if (a[i] > b[i]) {
       return 1;
-    }
-    if (v1.charCodeAt(i) > v2.charCodeAt(i)) {
-      return 1;
-    } else if (v1.charCodeAt(i) < v2.charCodeAt(i)) {
+    } else if (a[i] < b[i]) {
       return -1;
     }
+  }
+  if (a.length > b.length) {
+    return 1;
+  } else if (a.length < b.length) {
+    return -1;
   }
   return 0;
 };

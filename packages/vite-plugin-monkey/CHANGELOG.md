@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 3.0.2
+
+- fix: support top level for await of [c4b8f318](https://github.com/lisonge/vite-plugin-monkey/commit/f9087df849647a7e979a3019b791dbd3c4b8f318)
+- fix: format key [ea373ea5](https://github.com/lisonge/vite-plugin-monkey/commit/629797857735ee4176727f36dcb4847eea373ea5)
+- fix: extra data [7761fcb7](https://github.com/lisonge/vite-plugin-monkey/commit/d6e6b133fd095de464b35e1b9af45b647761fcb7)
+- perf: better stringSort [a8593f06](https://github.com/lisonge/vite-plugin-monkey/commit/df8365fbd3a6e24fa12597e9d2940e4ca8593f06)
+
 ## 3.0.1
 
 - fix:inline svg asset [fb8000d5](https://github.com/lisonge/vite-plugin-monkey/commit/9c294ee636c2925184a1f6fe4e2fd3f7fb8000d5)

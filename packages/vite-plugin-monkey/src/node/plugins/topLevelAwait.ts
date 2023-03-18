@@ -32,6 +32,7 @@ export const topLevelAwaitPlugin = (
       }
       const ast = this.parse(code);
       const tlaNodes: AcornNode[] = [];
+      const tlaForOfNodes: AcornNode[] = [];
       acornWalk.simple(
         ast,
         {
@@ -39,10 +40,16 @@ export const topLevelAwaitPlugin = (
             // top level await
             tlaNodes.push(node);
           },
+          // @ts-ignore
+          ForOfStatement(node: AcornNode & { await: boolean }) {
+            if (node.await === true) {
+              tlaForOfNodes.push(node);
+            }
+          },
         },
         { ...acornWalk.base, Function: () => {} },
       );
-      if (tlaNodes.length > 0) {
+      if (tlaNodes.length > 0 || tlaForOfNodes.length > 0) {
         const ms = new MagicString(code);
         tlaNodes.forEach((node) => {
           // await xxx -> await (xxx)
@@ -51,6 +58,11 @@ export const topLevelAwaitPlugin = (
 
           // await (xxx) -> __topLevelAwait__ (xxx)
           ms.update(node.start, node.start + awaitOffset, tlaIdentifier);
+        });
+        tlaForOfNodes.forEach((node) => {
+          // for await(const x of xxx){} -> __topLevelAwait__ ((async()=>{ /*start*/for await(const x of xxx){}/*end*/  })());
+          ms.appendLeft(node.start, `${tlaIdentifier}((async()=>{`);
+          ms.appendRight(node.end, `})());`);
         });
         return {
           code: ms.toString(),

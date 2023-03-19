@@ -494,7 +494,7 @@ export type MonkeyWindow = Window & {
    * @see https://www.tampermonkey.net/documentation.php#api:GM_getValue
    * @see https://violentmonkey.github.io/api/gm/#gm_getvalue
    */
-  GM_getValue: <T = unknown>(key: string, defaultValue: T) => T;
+  GM_getValue: <T = unknown>(key: string, defaultValue?: T) => T;
 
   /**
    * @see https://www.tampermonkey.net/documentation.php#GM_getTab

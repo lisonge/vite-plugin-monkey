@@ -491,7 +491,7 @@ export type MonkeyWindow = Window & {
   GM_getResourceURL: (name: string, isBlobUrl?: boolean) => string;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#GM_getResourceURL
+   * @see https://www.tampermonkey.net/documentation.php#api:GM_getValue
    * @see https://violentmonkey.github.io/api/gm/#gm_getvalue
    */
   GM_getValue: <T = unknown>(key: string, defaultValue: T) => T;

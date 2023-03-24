@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.0.3
+
+- fix: wrong function type [#63](https://github.com/lisonge/vite-plugin-monkey/pull/63)
+
 ## 3.0.2
 
 - fix: support top level for await of [c4b8f318](https://github.com/lisonge/vite-plugin-monkey/commit/f9087df849647a7e979a3019b791dbd3c4b8f318)

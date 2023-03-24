@@ -1,98 +1,7 @@
-import { monkeyWindow } from 'vite-plugin-monkey/dist/client';
-import type {
-  FetchType,
-  WindowLike,
-  XhrOnloadType,
-  XhrOnreadystatechangeType,
-} from './types';
-import { lazy, parseHeaders } from './util';
+import type { XhrOnloadType, XhrOnreadystatechangeType } from './types';
+import { parseHeaders } from './util';
 
-type InterceptorChain = {
-  request: Request;
-  /**
-   * @param request if not set, use chain.request
-   */
-  proceed: (request?: Request) => Promise<Response>;
-};
-
-type NetworkInterceptor = (
-  chain: InterceptorChain,
-) => Response | Promise<Response>;
-
-const produceChain = (
-  originalFetch: FetchType,
-  interceptors: (NetworkInterceptor | null)[],
-  request: Request,
-  index = 0,
-): InterceptorChain => {
-  return {
-    request,
-    proceed: async (req = request) => {
-      while (index < interceptors.length) {
-        const target = interceptors[index];
-        if (target) {
-          return target(
-            produceChain(originalFetch, interceptors, req, index + 1),
-          );
-        }
-        index++;
-      }
-      return originalFetch(req);
-    },
-  };
-};
-
-export class InterceptorManager {
-  private interceptors: (NetworkInterceptor | null)[] = [];
-  private cache = new WeakMap<object, FetchType>();
-
-  use = (interceptor: NetworkInterceptor): number => {
-    this.interceptors.push(interceptor);
-    return this.interceptors.length - 1;
-  };
-  eject = (id: number) => {
-    this.interceptors[id] = null;
-  };
-  clear = () => {
-    for (let i = 0; i < this.interceptors.length; i++) {
-      this.interceptors[i] = null;
-    }
-  };
-  hook = (target: WindowLike, originalFetch: FetchType = target.fetch) => {
-    const oldFakeFetch = this.cache.get(target);
-    if (oldFakeFetch) {
-      return target.fetch == oldFakeFetch;
-    }
-    const fakeFetch: FetchType = async (input, init) => {
-      return produceChain(
-        originalFetch,
-        this.interceptors,
-        new Request(input, init),
-      ).proceed();
-    };
-    this.cache.set(target, target.fetch);
-    target.fetch = fakeFetch;
-    return target.fetch == fakeFetch;
-  };
-
-  unhook = (target: WindowLike) => {
-    const oldFakeFetch = this.cache.get(target);
-    this.cache.delete(target);
-    if (!oldFakeFetch) {
-      return true;
-    }
-    target.fetch = oldFakeFetch;
-    return target.fetch == oldFakeFetch;
-  };
-}
-
-export const UnsafeWindowInterceptorManager = /* @__PURE__ */ lazy(() => {
-  const t = new InterceptorManager();
-  t.hook(monkeyWindow.unsafeWindow ?? window);
-  return t;
-});
-
-class FakeXMLHttpRequest extends XMLHttpRequest {
+export class FakeXMLHttpRequest extends XMLHttpRequest {
   _method = 'GET';
   _url: URL = new URL(location.origin);
   _reqHeaders = new Headers();
@@ -103,7 +12,7 @@ class FakeXMLHttpRequest extends XMLHttpRequest {
     async = true,
     username?: string | null | undefined,
     password?: string | null | undefined,
-  ): void {
+  ) {
     const u = new URL(url, location.pathname);
     if (username) {
       u.username = username;
@@ -115,7 +24,7 @@ class FakeXMLHttpRequest extends XMLHttpRequest {
     this._method = method;
     return super.open(method, url, async, username, password);
   }
-  setRequestHeader(name: string, value: string): void {
+  setRequestHeader(name: string, value: string) {
     this._reqHeaders.append(name, value);
   }
   async send(body: Document | XMLHttpRequestBodyInit | null = null) {
@@ -186,6 +95,8 @@ class FakeXMLHttpRequest extends XMLHttpRequest {
     }
   }
 }
+
+export class InterceptorXhrManager {}
 
 /**
  * https://juejin.cn/post/6938308842849566727#heading-16

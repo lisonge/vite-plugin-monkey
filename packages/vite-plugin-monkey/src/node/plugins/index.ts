@@ -8,7 +8,6 @@ import { externalLoaderPlugin } from './externalLoader';
 import { externalResourcePlugin } from './externalResource';
 import { finalBundlePlugin } from './finalBundle';
 import { perviewPlugin } from './perview';
-import { topLevelAwaitPlugin } from './topLevelAwait';
 import { collectCssPlugin } from './collectCss';
 import { redirectClientPlugin } from './redirectClient';
 import { inlinesAssetPlugin } from './inlinesAsset';
@@ -29,7 +28,6 @@ const monkeyPluginList = [
   // only build post
   autoGrantPlugin,
   inlinesAssetPlugin,
-  topLevelAwaitPlugin,
   collectCssPlugin,
 
   // only build, final build

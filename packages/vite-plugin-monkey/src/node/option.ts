@@ -276,11 +276,7 @@ export const resolvedOption = (
     collectGrantSet: new Set(),
     collectRequireUrls: [],
     collectResource: {},
-    hasTopLevelAwait: false,
     hasDynamicImport: false,
-    get useSystemJs() {
-      return config.hasDynamicImport || config.hasTopLevelAwait;
-    },
     injectCssCode: ``,
     globalsPkg2VarName: {},
     requirePkgList: [],

@@ -42,6 +42,11 @@ export default (pluginOption: MonkeyOption): PluginOption => {
               userConfig.mode ?? (isServe ? 'development' : 'production'),
             ),
         },
+        esbuild: {
+          supported: {
+            'top-level-await': true,
+          },
+        },
         build: {
           assetsInlineLimit: Number.MAX_SAFE_INTEGER,
           chunkSizeWarningLimit: Number.MAX_SAFE_INTEGER,

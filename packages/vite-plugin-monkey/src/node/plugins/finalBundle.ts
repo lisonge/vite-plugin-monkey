@@ -1,7 +1,10 @@
 import type { OutputChunk, RollupOutput } from 'rollup';
-import type { PluginOption } from 'vite';
-import { build } from 'vite';
+import { build, PluginOption } from 'vite';
 import { getSystemjsRequireUrls, systemjsTexts } from '../systemjs';
+import {
+  transformIdentifierToTla,
+  transformTlaToIdentifier,
+} from '../topLevelAwait';
 import type { FinalMonkeyOption } from '../types';
 import { finalMonkeyOptionToComment } from '../userscript';
 
@@ -59,7 +62,7 @@ export const finalBundlePlugin = (
                 return '\0' + source;
               }
             },
-            load(id) {
+            async load(id) {
               if (!id.startsWith('\0')) return;
 
               if (id.endsWith(__entry_name)) {
@@ -73,11 +76,23 @@ export const finalBundlePlugin = (
                 ) ?? [];
               if (chunk && chunk.type == 'chunk' && k) {
                 delete rawBundle[k];
+                if (!finalOption.hasDynamicImport) {
+                  const ch = transformTlaToIdentifier(this, chunk);
+                  if (ch) return ch;
+                }
                 return {
                   code: chunk.code,
                   map: chunk.map,
                 };
               }
+            },
+            generateBundle(_, iifeBundle) {
+              if (finalOption.hasDynamicImport) {
+                return;
+              }
+              Object.entries(iifeBundle).forEach(([k, chunk]) => {
+                transformIdentifierToTla(this, chunk);
+              });
             },
           },
         ],
@@ -95,8 +110,8 @@ export const finalBundlePlugin = (
           },
           lib: {
             entry: __entry_name,
-            formats: [finalOption.useSystemJs ? 'system' : 'iife'] as any,
-            name: finalOption.useSystemJs ? undefined : '__expose__',
+            formats: [finalOption.hasDynamicImport ? 'system' : 'iife'] as any,
+            name: finalOption.hasDynamicImport ? undefined : '__expose__',
             fileName: () => `__entry.js`,
           },
         },
@@ -104,7 +119,7 @@ export const finalBundlePlugin = (
 
       const finalBundle = Object.assign({}, rawBundle, buildResult[0].output);
       let finalJsCode = ``;
-      if (finalOption.useSystemJs) {
+      if (finalOption.hasDynamicImport) {
         const systemJsModules: string[] = [];
         let entryName = '';
         Object.entries(finalBundle).forEach(([k, chunk]) => {
@@ -149,7 +164,7 @@ export const finalBundlePlugin = (
           .filter((s) => s)
           .join('\n');
 
-        if (finalOption.useSystemJs) {
+        if (finalOption.hasDynamicImport) {
           if (typeof finalOption.systemjs == 'function') {
             finalOption.collectRequireUrls.push(
               ...getSystemjsRequireUrls(finalOption.systemjs),

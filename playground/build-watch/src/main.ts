@@ -1,12 +1,12 @@
-import { GM_setValue, GM_listValues } from '$';
 import './b';
-import { createApp, ref } from 'vue';
 
-GM_setValue('key', 'value');
-console.log(GM_listValues());
-console.log({ createApp, ref });
+await fetch(`/`);
 
-(async () => {
-  // const { reactive, watch } = await import('vue');
-  // console.log({ reactive, watch });
-})();
+export default await fetch(`/`);
+
+const fn = async () => {
+  const r = await fetch(`/`);
+  console.log(r);
+};
+
+await fn();

@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.1.0
+
+- feat: support top level await in iife [acddbaf3](https://github.com/lisonge/vite-plugin-monkey/commit/ec2e4fe134bbb8ab09e83c51e7269b21acddbaf3)
+
 ## 3.0.3
 
 - fix: wrong function type [#63](https://github.com/lisonge/vite-plugin-monkey/pull/63)

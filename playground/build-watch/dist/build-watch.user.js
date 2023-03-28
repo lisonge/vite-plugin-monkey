@@ -14,6 +14,7 @@
   'use strict';
 
   var _GM_deleteValue = /* @__PURE__ */ (() => typeof GM_deleteValue != "undefined" ? GM_deleteValue : void 0)();
+  var _monkeyWindow = /* @__PURE__ */ (() => window)();
   const cssLoader = (e) => {
     const t = GM_getResourceText(e), o = document.createElement("style");
     return o.innerText = t, document.head.append(o), t;
@@ -22,6 +23,10 @@
   _GM_deleteValue("key");
   (await fetch(`/`));
   (await fetch(`/`));
+  console.log(_monkeyWindow.onurlchange);
+  (await (async()=>{for await (const x of [1, 2, 3, 4, 5]) {
+    (await fetch(`/` + x));
+  }})());
   const fn = async () => {
     const r = await fetch(`/`);
     console.log(r);

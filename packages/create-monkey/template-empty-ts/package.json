@@ -11,6 +11,6 @@
   "devDependencies": {
     "typescript": "^5.0.2",
     "vite": "^4.2.1",
-    "vite-plugin-monkey": "^3.0.3"
+    "vite-plugin-monkey": "^3.1.0"
   }
 }

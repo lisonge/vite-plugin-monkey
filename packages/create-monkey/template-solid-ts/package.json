@@ -11,10 +11,10 @@
   "devDependencies": {
     "typescript": "^5.0.2",
     "vite": "^4.2.1",
-    "vite-plugin-monkey": "^3.0.3",
+    "vite-plugin-monkey": "^3.1.0",
     "vite-plugin-solid": "^2.6.1"
   },
   "dependencies": {
-    "solid-js": "^1.6.15"
+    "solid-js": "^1.6.16"
   }
 }

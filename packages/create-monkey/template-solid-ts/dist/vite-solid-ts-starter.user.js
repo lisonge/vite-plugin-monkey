@@ -384,8 +384,18 @@ ${html}. Is your HTML properly formed?`;
     createRenderEffect((current) => insertExpression(parent, accessor(), current, marker), initial);
   }
   function insertExpression(parent, value, current, marker, unwrapArray) {
-    if (sharedConfig.context && !current)
-      current = [...parent.childNodes];
+    if (sharedConfig.context) {
+      !current && (current = [...parent.childNodes]);
+      let cleaned = [];
+      for (let i = 0; i < current.length; i++) {
+        const node = current[i];
+        if (node.nodeType === 8 && node.data === "!")
+          node.remove();
+        else
+          cleaned.push(node);
+      }
+      current = cleaned;
+    }
     while (typeof current === "function")
       current = current();
     if (value === current)
@@ -488,10 +498,8 @@ ${html}. Is your HTML properly formed?`;
         }
       } else {
         const value = String(item);
-        if (value === "<!>") {
-          if (prev && prev.nodeType === 8)
-            normalized.push(prev);
-        } else if (prev && prev.nodeType === 3 && prev.data === value) {
+        if (prev && prev.nodeType === 3) {
+          prev.data = value;
           normalized.push(prev);
         } else
           normalized.push(document.createTextNode(value));

@@ -61,7 +61,7 @@ System.register("./__entry.js", ['vue'], (function (exports, module) {
       const delay = (n = 0) => {
         return new Promise((res) => setTimeout(res, n));
       };
-      (await delay());
+      await delay();
       createApp(App).mount(
         (() => {
           const app = document.createElement("div");
@@ -74,11 +74,9 @@ System.register("./__entry.js", ['vue'], (function (exports, module) {
         (await module.import('./chunk-a4de7bed-27053969.js')).out();
       }
       console.log({ svgUrl2 });
-      (await (async () => {
-        for await (const v of location.href.split("")) {
-          console.log(v);
-        }
-      })());
+      for await (const v of location.href.split("")) {
+        console.log(v);
+      }
 
     })
   };

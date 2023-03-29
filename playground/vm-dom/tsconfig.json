@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "declaration": false,
+    "allowSyntheticDefaultImports": true,
+    "jsx": "preserve",
+    "lib": ["DOM", "ESNext"]
+  },
+  "include": ["src/**/*", "../../node_modules/@violentmonkey/types"]
+}

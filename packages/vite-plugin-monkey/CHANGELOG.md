@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.1.1
+
+- fix: export client/global type, [1e3a9954](https://github.com/lisonge/vite-plugin-monkey/commit/eb12ad337a25f6a31988a953864bcbeb1e3a9954) [#69](https://github.com/lisonge/vite-plugin-monkey/issues/69)
+
 ## 3.1.0
 
 - feat: support top level await in iife [acddbaf3](https://github.com/lisonge/vite-plugin-monkey/commit/ec2e4fe134bbb8ab09e83c51e7269b21acddbaf3)

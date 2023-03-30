@@ -25,9 +25,9 @@ jobs:
       - run: pnpm build
 
       - name: Publish package
-        run: pnpm run ci-publish ${{ github.ref_name }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          pnpm config set //registry.npmjs.org/:_authToken ${{ secrets.NPM_TOKEN }}
+          pnpm run ci-publish ${{ github.ref_name }}
 
       - name: Get pkgName for tag
         id: tag

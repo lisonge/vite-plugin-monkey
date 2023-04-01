@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 3.1.2
+
+- fix: use custom system instance [231b0c70](https://github.com/lisonge/vite-plugin-monkey/commit/8c5f4fa13404898f35d45cc33663df5f231b0c70)
+- fix: systemjs set external globals default export [c1ee2ef1](https://github.com/lisonge/vite-plugin-monkey/commit/12179209554029dec9de000a6e11171ec1ee2ef1) [#70](https://github.com/lisonge/vite-plugin-monkey/issues/70)
+
 ## 3.1.1
 
 - fix: export client/global type, [1e3a9954](https://github.com/lisonge/vite-plugin-monkey/commit/eb12ad337a25f6a31988a953864bcbeb1e3a9954) [#69](https://github.com/lisonge/vite-plugin-monkey/issues/69)

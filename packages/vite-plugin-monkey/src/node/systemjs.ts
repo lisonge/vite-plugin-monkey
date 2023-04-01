@@ -3,6 +3,7 @@ import type systemjsPkgT from 'systemjs/package.json';
 import { Mod2UrlFn2 } from './types';
 import fs from 'node:fs/promises';
 import { lazyValue } from './_lazy';
+import { dataUrl } from './util';
 
 const _require = module.createRequire(import.meta.url);
 
@@ -13,26 +14,33 @@ const systemjsSubPaths = [
   'dist/extras/named-register.min.js',
 ];
 
-export const systemjsAbsolutePaths = systemjsSubPaths.map((s) => {
+// https://github.com/systemjs/systemjs/blob/main/docs/api.md#systemconstructor
+const customSystemInstanceCode = `;(typeof System!='undefined')&&(System=new System.constructor());`;
+
+const systemjsAbsolutePaths = systemjsSubPaths.map((s) => {
   return _require.resolve(`systemjs/` + s);
 });
 
 export const systemjsTexts = lazyValue(() => {
   return Promise.all(
-    systemjsAbsolutePaths.map((s) =>
-      fs.readFile(s, 'utf-8').then((s) =>
-        s
-          .trim()
-          .replace(/^\/\*[\s\S]*?\*\//, '')
-          .replace(/\/\/.*map$/, '')
-          .trim(),
-      ),
-    ),
+    systemjsAbsolutePaths
+      .map((s) =>
+        fs.readFile(s, 'utf-8').then((s) =>
+          s
+            .trim()
+            .replace(/^\/\*[\s\S]*?\*\//, '')
+            .replace(/\/\/.*map$/, '')
+            .trim(),
+        ),
+      )
+      .concat([Promise.resolve(customSystemInstanceCode)]),
   );
 });
 
 export const getSystemjsRequireUrls = (fn: Mod2UrlFn2) => {
-  return systemjsSubPaths.map((p) => {
-    return fn(systemjsPkg.version, systemjsPkg.name, p, p);
-  });
+  return systemjsSubPaths
+    .map((p) => {
+      return fn(systemjsPkg.version, systemjsPkg.name, p, p);
+    })
+    .concat([dataUrl(customSystemInstanceCode)]);
 };

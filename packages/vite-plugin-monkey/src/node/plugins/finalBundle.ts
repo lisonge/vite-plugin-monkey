@@ -7,6 +7,7 @@ import {
 } from '../topLevelAwait';
 import type { FinalMonkeyOption } from '../types';
 import { finalMonkeyOptionToComment } from '../userscript';
+import { moduleExportExpressionWrapper } from '../_util';
 
 const __entry_name = `__monkey.entry.js`;
 
@@ -157,7 +158,9 @@ export const finalBundlePlugin = (
             (id) =>
               `System.set(${JSON.stringify(
                 `${systemJsImportMapPrefix}:${id}`,
-              )}, ${finalOption.globalsPkg2VarName[id]});`,
+              )}, ${moduleExportExpressionWrapper(
+                finalOption.globalsPkg2VarName[id],
+              )});`,
           ),
           '\n' + finalJsCode,
         ]

@@ -262,3 +262,13 @@ export const getFinalTarget = (target?: string | string[]) => {
   }
   return target;
 };
+
+export const moduleExportExpressionWrapper = (expression: string) => {
+  let n = 0;
+  let identifier = ``;
+  while (expression.includes(identifier)) {
+    identifier = `_${(n || ``).toString(16)}`;
+  }
+  // https://github.com/lisonge/vite-plugin-monkey/issues/70
+  return `(()=>{const ${identifier}=${expression};('default' in ${identifier})||(${identifier}.default=${identifier});return ${identifier}})()`;
+};

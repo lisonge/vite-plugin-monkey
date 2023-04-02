@@ -268,6 +268,7 @@ export const moduleExportExpressionWrapper = (expression: string) => {
   let identifier = ``;
   while (expression.includes(identifier)) {
     identifier = `_${(n || ``).toString(16)}`;
+    n++;
   }
   // https://github.com/lisonge/vite-plugin-monkey/issues/70
   return `(()=>{const ${identifier}=${expression};('default' in ${identifier})||(${identifier}.default=${identifier});return ${identifier}})()`;

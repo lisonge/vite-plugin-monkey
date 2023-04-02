@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.1.3
+
+- fix: case infinite loop when get identifier [a8aa663f](https://github.com/lisonge/vite-plugin-monkey/commit/7cee3c69be2ac98d259360071940a9a7a8aa663f)
+
 ## 3.1.2
 
 - fix: use custom system instance [231b0c70](https://github.com/lisonge/vite-plugin-monkey/commit/8c5f4fa13404898f35d45cc33663df5f231b0c70)

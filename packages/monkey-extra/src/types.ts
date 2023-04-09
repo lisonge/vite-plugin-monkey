@@ -6,3 +6,6 @@ export type WindowLike = {
 export type XhrOnloadType = typeof XMLHttpRequest.prototype.onload;
 export type XhrOnreadystatechangeType =
   typeof XMLHttpRequest.prototype.onreadystatechange;
+
+export type XMLHttpRequestType = typeof XMLHttpRequest;
+export type IPromise<T = unknown> = Promise<T> | T;

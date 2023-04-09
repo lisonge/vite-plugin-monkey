@@ -1,5 +1,5 @@
 import { monkeyWindow } from 'vite-plugin-monkey/dist/client';
-import type { FetchType, WindowLike } from './types';
+import type { FetchType, IPromise } from './types';
 import { lazy } from './util';
 
 type InterceptorChain = {
@@ -7,12 +7,10 @@ type InterceptorChain = {
   /**
    * @param request if not set, use chain.request
    */
-  proceed: (request?: Request) => Promise<Response> | Response;
+  proceed: (request?: Request) => IPromise<Response>;
 };
 
-type NetworkInterceptor = (
-  chain: InterceptorChain,
-) => Response | Promise<Response>;
+type NetworkInterceptor = (chain: InterceptorChain) => IPromise<Response>;
 
 const produceChain = (
   originalFetch: FetchType,
@@ -26,9 +24,13 @@ const produceChain = (
       while (index < interceptors.length) {
         const target = interceptors[index];
         if (target) {
-          return target(
-            produceChain(originalFetch, interceptors, req, index + 1),
+          const chain = produceChain(
+            originalFetch,
+            interceptors,
+            req,
+            index + 1,
           );
+          return await target(chain);
         }
         index++;
       }
@@ -37,59 +39,34 @@ const produceChain = (
   };
 };
 
-export class InterceptorManager {
-  private interceptors: (NetworkInterceptor | null)[] = [];
-  private backupFetchMap = new WeakMap<object, FetchType>();
-
-  use = (interceptor: NetworkInterceptor): number => {
-    this.interceptors.push(interceptor);
-    return this.interceptors.length - 1;
+export const buildFetchInterceptorManager = (originalFetch: FetchType) => {
+  const interceptors: (NetworkInterceptor | null)[] = [];
+  const fakeFetch: FetchType = async (input, init) => {
+    return produceChain(
+      originalFetch,
+      [...interceptors],
+      new Request(input, init),
+    ).proceed();
   };
-  eject = (id: number) => {
-    this.interceptors[id] = null;
+  return {
+    fetch: fakeFetch,
+    use: (interceptor: NetworkInterceptor): number => {
+      interceptors.push(interceptor);
+      return interceptors.length - 1;
+    },
+    eject: (id: number) => {
+      interceptors[id] = null;
+    },
+    clear: () => {
+      for (let i = 0; i < interceptors.length; i++) {
+        interceptors[i] = null;
+      }
+    },
   };
-  clear = () => {
-    for (let i = 0; i < this.interceptors.length; i++) {
-      this.interceptors[i] = null;
-    }
-  };
-
-  // (() => {
-  //   const t = document.createElement('iframe');
-  //   document.body.append(t);
-  //   return t;
-  // })().contentWindow.fetch;
-
-  hook = (target: WindowLike, baseFetch: FetchType = target.fetch) => {
-    const backupFetch = this.backupFetchMap.get(target);
-    if (backupFetch) {
-      return target.fetch != backupFetch;
-    }
-    const fakeFetch: FetchType = async (input, init) => {
-      return produceChain(
-        baseFetch,
-        this.interceptors,
-        new Request(input, init),
-      ).proceed();
-    };
-    this.backupFetchMap.set(target, target.fetch);
-    target.fetch = fakeFetch;
-    return target.fetch == fakeFetch;
-  };
-
-  unhook = (target: WindowLike) => {
-    const backupFetch = this.backupFetchMap.get(target);
-    this.backupFetchMap.delete(target);
-    if (!backupFetch) {
-      return true;
-    }
-    target.fetch = backupFetch;
-    return target.fetch == backupFetch;
-  };
-}
+};
 
 export const UnsafeWindowInterceptorManager = /* @__PURE__ */ lazy(() => {
-  const t = new InterceptorManager();
-  t.hook(monkeyWindow.unsafeWindow ?? window);
+  const t = buildFetchInterceptorManager(monkeyWindow.unsafeWindow.fetch);
+  monkeyWindow.unsafeWindow.fetch = t.fetch;
   return t;
 });

@@ -43,7 +43,7 @@ export default defineConfig({
         externalGlobals: {
           vue: cdn.jsdelivr('Vue', 'dist/vue.global.prod.js'),
         },
-        // systemjs: 'inline',
+        systemjs: 'inline',
       },
     }),
   ],

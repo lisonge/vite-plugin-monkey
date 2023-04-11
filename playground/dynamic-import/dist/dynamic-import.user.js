@@ -12,14 +12,15 @@
 // @require      https://cdn.jsdelivr.net/npm/element-plus@2.2.31/dist/index.full.min.js
 // @require      https://cdn.jsdelivr.net/npm/systemjs@6.14.0/dist/system.min.js
 // @require      https://cdn.jsdelivr.net/npm/systemjs@6.14.0/dist/extras/named-register.min.js
+// @require      data:application/javascript,%3B(typeof%20System!%3D'undefined')%26%26(System%3Dnew%20System.constructor())%3B
 // @resource     animate.css  https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.css
 // @grant        GM_getResourceText
 // ==/UserScript==
 
 System.addImportMap({ imports: {"md5":"user:md5","vue":"user:vue","element-plus":"user:element-plus"} });
-System.set("user:md5", MD5);
-System.set("user:vue", Vue);
-System.set("user:element-plus", ElementPlus);
+System.set("user:md5", (()=>{const _=MD5;('default' in _)||(_.default=_);return _})());
+System.set("user:vue", (()=>{const _=Vue;('default' in _)||(_.default=_);return _})());
+System.set("user:element-plus", (()=>{const _=ElementPlus;('default' in _)||(_.default=_);return _})());
 
 System.register("./__entry.js", [], (function (exports, module) {
   'use strict';

@@ -120,7 +120,7 @@ export type MonkeyOption = {
     /**
      * auto open install url in default browser when userscript comment change
      *
-     * and set `viteConfig.server.open ??== monkeyConfig.server.open`
+     * and set `viteConfig.server.open ??= monkeyConfig.server.open`
      * @default
      * process.platform == 'win32' || process.platform == 'darwin' // if platform is Win/Mac
      */
@@ -262,7 +262,11 @@ export type MonkeyOption = {
     externalResource?: ExternalResource;
 
     /**
-     * ![img](https://user-images.githubusercontent.com/38517192/222153432-f27e1f3d-af1e-4d7f-a370-60d6a2eefb57.png)
+     * when use dynamic-import, plugin will use systemjs build your code
+     *
+     * `cdn.jsdelivr()[1]` example -> [dynamic-import.user.js](https://github.com/lisonge/vite-plugin-monkey/blob/7645b185605faf9b48c43116db5ea01726188e03/playground/dynamic-import/dist/dynamic-import.user.js)
+     *
+     * `'inline'` exmple -> [test-v3.user.js](https://github.com/lisonge/vite-plugin-monkey/blob/7645b185605faf9b48c43116db5ea01726188e03/playground/test-v3/dist/test-v3.user.js)
      *
      * @default
      * cdn.jsdelivr()[1]

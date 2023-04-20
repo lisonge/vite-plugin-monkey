@@ -124,7 +124,7 @@ export type NotificationDetails = {
   /**
    * @available tampermonkey
    */
-  highlight?: string;
+  highlight?: boolean;
   /**
    * @available tampermonkey
    */

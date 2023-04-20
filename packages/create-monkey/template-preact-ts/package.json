@@ -13,8 +13,8 @@
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.5.0",
-    "typescript": "^5.0.2",
-    "vite": "^4.2.1",
-    "vite-plugin-monkey": "^3.1.1"
+    "typescript": "^5.0.4",
+    "vite": "^4.2.2",
+    "vite-plugin-monkey": "^3.1.4"
   }
 }

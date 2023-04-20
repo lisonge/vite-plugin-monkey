@@ -75,8 +75,9 @@
   }
   function set_data(text2, data) {
     data = "" + data;
-    if (text2.wholeText !== data)
-      text2.data = data;
+    if (text2.data === data)
+      return;
+    text2.data = data;
   }
   let current_component;
   function set_current_component(component) {

@@ -12,7 +12,6 @@
 (function () {
   'use strict';
 
-  const sharedConfig = {};
   let runEffects = runQueue;
   const STALE = 1;
   const PENDING = 2;
@@ -70,7 +69,7 @@
             const TransitionRunning = Transition && Transition.running;
             if (TransitionRunning && Transition.disposed.has(o))
               ;
-            if (TransitionRunning && !o.tState || !TransitionRunning && !o.state) {
+            if (TransitionRunning ? !o.tState : !o.state) {
               if (o.pure)
                 Updates.push(o);
               else
@@ -78,9 +77,7 @@
               if (o.observers)
                 markDownstream(o);
             }
-            if (TransitionRunning)
-              ;
-            else
+            if (!TransitionRunning)
               o.state = STALE;
           }
           if (Updates.length > 1e6) {
@@ -154,23 +151,22 @@
     return c;
   }
   function runTop(node) {
-    const runningTransition = Transition;
-    if (node.state === 0 || runningTransition)
+    if (node.state === 0)
       return;
-    if (node.state === PENDING || runningTransition)
+    if (node.state === PENDING)
       return lookUpstream(node);
     if (node.suspense && untrack(node.suspense.inFallback))
       return node.suspense.effects.push(node);
     const ancestors = [node];
     while ((node = node.owner) && (!node.updatedAt || node.updatedAt < ExecCount)) {
-      if (node.state || runningTransition)
+      if (node.state)
         ancestors.push(node);
     }
     for (let i = ancestors.length - 1; i >= 0; i--) {
       node = ancestors[i];
-      if (node.state === STALE || runningTransition) {
+      if (node.state === STALE) {
         updateComputation(node);
-      } else if (node.state === PENDING || runningTransition) {
+      } else if (node.state === PENDING) {
         const updates = Updates;
         Updates = null;
         runUpdates(() => lookUpstream(node, ancestors[0]), false);
@@ -217,24 +213,23 @@
       runTop(queue[i]);
   }
   function lookUpstream(node, ignore) {
-    const runningTransition = Transition;
     node.state = 0;
     for (let i = 0; i < node.sources.length; i += 1) {
       const source = node.sources[i];
       if (source.sources) {
-        if (source.state === STALE || runningTransition) {
+        const state = source.state;
+        if (state === STALE) {
           if (source !== ignore && (!source.updatedAt || source.updatedAt < ExecCount))
             runTop(source);
-        } else if (source.state === PENDING || runningTransition)
+        } else if (state === PENDING)
           lookUpstream(source, ignore);
       }
     }
   }
   function markDownstream(node) {
-    const runningTransition = Transition;
     for (let i = 0; i < node.observers.length; i += 1) {
       const o = node.observers[i];
-      if (!o.state || runningTransition) {
+      if (!o.state) {
         o.state = PENDING;
         if (o.pure)
           Updates.push(o);
@@ -260,25 +255,19 @@
       }
     }
     if (node.owned) {
-      for (i = 0; i < node.owned.length; i++)
+      for (i = node.owned.length - 1; i >= 0; i--)
         cleanNode(node.owned[i]);
       node.owned = null;
     }
     if (node.cleanups) {
-      for (i = 0; i < node.cleanups.length; i++)
+      for (i = node.cleanups.length - 1; i >= 0; i--)
         node.cleanups[i]();
       node.cleanups = null;
     }
     node.state = 0;
     node.context = null;
   }
-  function castError(err) {
-    if (err instanceof Error || typeof err === "string")
-      return err;
-    return new Error("Unknown error");
-  }
   function handleError(err) {
-    err = castError(err);
     throw err;
   }
   function createComponent(Comp, props) {
@@ -351,18 +340,16 @@
       element.textContent = "";
     };
   }
-  function template(html, check, isSVG) {
-    const t = document.createElement("template");
-    t.innerHTML = html;
-    if (check && t.innerHTML.split("<").length - 1 !== check)
-      throw `The browser resolved template HTML does not match JSX input:
-${t.innerHTML}
-
-${html}. Is your HTML properly formed?`;
-    let node = t.content.firstChild;
-    if (isSVG)
-      node = node.firstChild;
-    return node;
+  function template(html, isCE, isSVG) {
+    let node;
+    const create = () => {
+      const t = document.createElement("template");
+      t.innerHTML = html;
+      return isSVG ? t.content.firstChild.firstChild : t.content.firstChild;
+    };
+    const fn = isCE ? () => (node || (node = create())).cloneNode(true) : () => untrack(() => document.importNode(node || (node = create()), true));
+    fn.cloneNode = fn;
+    return fn;
   }
   function setAttribute(node, name, value) {
     if (value == null)
@@ -384,18 +371,6 @@ ${html}. Is your HTML properly formed?`;
     createRenderEffect((current) => insertExpression(parent, accessor(), current, marker), initial);
   }
   function insertExpression(parent, value, current, marker, unwrapArray) {
-    if (sharedConfig.context) {
-      !current && (current = [...parent.childNodes]);
-      let cleaned = [];
-      for (let i = 0; i < current.length; i++) {
-        const node = current[i];
-        if (node.nodeType === 8 && node.data === "!")
-          node.remove();
-        else
-          cleaned.push(node);
-      }
-      current = cleaned;
-    }
     while (typeof current === "function")
       current = current();
     if (value === current)
@@ -403,8 +378,6 @@ ${html}. Is your HTML properly formed?`;
     const t = typeof value, multi = marker !== void 0;
     parent = multi && current[0] && current[0].parentNode || parent;
     if (t === "string" || t === "number") {
-      if (sharedConfig.context)
-        return current;
       if (t === "number")
         value = value.toString();
       if (multi) {
@@ -421,8 +394,6 @@ ${html}. Is your HTML properly formed?`;
           current = parent.textContent = value;
       }
     } else if (value == null || t === "boolean") {
-      if (sharedConfig.context)
-        return current;
       current = cleanChildren(parent, current, marker);
     } else if (t === "function") {
       createRenderEffect(() => {
@@ -439,14 +410,6 @@ ${html}. Is your HTML properly formed?`;
         createRenderEffect(() => current = insertExpression(parent, array, current, marker, true));
         return () => current;
       }
-      if (sharedConfig.context) {
-        if (!array.length)
-          return current;
-        for (let i = 0; i < array.length; i++) {
-          if (array[i].parentNode)
-            return current = array;
-        }
-      }
       if (array.length === 0) {
         current = cleanChildren(parent, current, marker);
         if (multi)
@@ -462,8 +425,6 @@ ${html}. Is your HTML properly formed?`;
       }
       current = array;
     } else if (value instanceof Node) {
-      if (sharedConfig.context && value.parentNode)
-        return current = multi ? [value] : value;
       if (Array.isArray(current)) {
         if (multi)
           return current = cleanChildren(parent, current, marker, value);
@@ -544,10 +505,10 @@ ${html}. Is your HTML properly formed?`;
     header,
     link
   };
-  const _tmpl$ = /* @__PURE__ */ template(`<div><header><img alt="logo"><p>Edit <code>src/App.jsx</code> and save to reload.</p><a href="https://github.com/solidjs/solid" target="_blank" rel="noopener noreferrer">Learn Solid</a></header></div>`, 11);
+  const _tmpl$ = /* @__PURE__ */ template(`<div><header><img alt="logo"><p>Edit <code>src/App.jsx</code> and save to reload.</p><a href="https://github.com/solidjs/solid" target="_blank" rel="noopener noreferrer">Learn Solid`);
   function App() {
     return (() => {
-      const _el$ = _tmpl$.cloneNode(true), _el$2 = _el$.firstChild, _el$3 = _el$2.firstChild, _el$4 = _el$3.nextSibling, _el$5 = _el$4.nextSibling;
+      const _el$ = _tmpl$(), _el$2 = _el$.firstChild, _el$3 = _el$2.firstChild, _el$4 = _el$3.nextSibling, _el$5 = _el$4.nextSibling;
       setAttribute(_el$3, "src", logo$1);
       createRenderEffect((_p$) => {
         const _v$ = styles.App, _v$2 = styles.header, _v$3 = styles.logo, _v$4 = styles.link;

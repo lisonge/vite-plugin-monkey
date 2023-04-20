@@ -1,8 +1,0 @@
-{
-  "$schema": "https://json.schemastore.org/lintstagedrc.schema.json",
-  "*": ["prettier --cache --write --ignore-unknown"],
-  "packages/*/src/**/*.{js,ts}": [
-    "eslint --cache --fix",
-    "prettier --cache --write"
-  ]
-}

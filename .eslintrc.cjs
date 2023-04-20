@@ -8,11 +8,7 @@ module.exports = defineConfig({
     'plugin:@typescript-eslint/recommended',
     'prettier',
   ],
-  parserOptions: {
-    parser: '@typescript-eslint/parser',
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-  },
+  parser: '@typescript-eslint/parser',
   plugins: ['@typescript-eslint'],
   rules: {
     '@typescript-eslint/ban-ts-comment': 'off',
@@ -23,5 +19,4 @@ module.exports = defineConfig({
     '@typescript-eslint/no-non-null-assertion': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
   },
-  globals: {},
 });

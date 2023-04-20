@@ -10,6 +10,9 @@ importers:
       '@commitlint/config-conventional':
         specifier: 17.4.4
         version: 17.4.4
+      '@commitlint/types':
+        specifier: 17.4.4
+        version: 17.4.4
       '@gera2ld/jsx-dom':
         specifier: 2.2.1
         version: 2.2.1

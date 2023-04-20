@@ -4,7 +4,7 @@
   "scripts": {
     "prepare": "husky install",
     "format": "prettier --cache --write .",
-    "lint": "eslint --cache --fix packages/*/src/** scripts/**",
+    "lint": "eslint --cache --fix packages/*/src/**/*.{js,ts,jsx,tsx}",
     "build": "pnpm -r --filter=./packages/* build",
     "build:playground": "pnpm -r --filter=./playground/* build",
     "ci-publish": "tsx scripts/publishCI.ts",
@@ -15,6 +15,7 @@
   "dependencies": {
     "@commitlint/cli": "17.4.4",
     "@commitlint/config-conventional": "17.4.4",
+    "@commitlint/types": "17.4.4",
     "@gera2ld/jsx-dom": "2.2.1",
     "@types/blueimp-md5": "2.18.0",
     "@types/cross-spawn": "6.0.2",

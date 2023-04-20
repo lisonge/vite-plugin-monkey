@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.1.4
+
+- fix: notification highlight types [21a95648](https://github.com/lisonge/vite-plugin-monkey/commit/9369c74a1a7bcc02b023b0364318422d21a95648)
+
 ## 3.1.3
 
 - fix: case infinite loop when get identifier [a8aa663f](https://github.com/lisonge/vite-plugin-monkey/commit/7cee3c69be2ac98d259360071940a9a7a8aa663f)

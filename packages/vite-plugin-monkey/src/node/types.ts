@@ -94,6 +94,8 @@ export type FinalMonkeyOption = {
     metaFileName?: (fileName: string) => string;
     autoGrant: boolean;
     minifyCss: boolean;
+    cssPlaceholder?: string;
+    injectCss: boolean;
     externalGlobals: [string, IArray<string | Mod2UrlFn>][];
     externalResource: Record<
       string,
@@ -109,7 +111,7 @@ export type FinalMonkeyOption = {
   collectGrantSet: Set<string>;
   collectResource: Record<string, string>;
   hasDynamicImport: boolean;
-  injectCssCode: string;
+  cssCode?: string;
   globalsPkg2VarName: Record<string, string>;
   requirePkgList: { moduleName: string; url: string }[];
   systemjs: 'inline' | Mod2UrlFn2;
@@ -250,6 +252,17 @@ export type MonkeyOption = {
      * @default true
      */
     minifyCss?: boolean;
+
+    /**
+     * The placeholder for css place to.
+     */
+    cssPlaceholder?: string;
+
+    /**
+     * Inject css to docuement head.
+     *  @default true
+     */
+    injectCss?: boolean;
 
     /**
      * @example

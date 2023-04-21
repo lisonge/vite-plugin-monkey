@@ -7,7 +7,8 @@ import {
 } from '../topLevelAwait';
 import type { FinalMonkeyOption } from '../types';
 import { finalMonkeyOptionToComment } from '../userscript';
-import { moduleExportExpressionWrapper } from '../_util';
+import { miniCode, moduleExportExpressionWrapper } from '../_util';
+import { cssInjectFn, fn2string } from '../inject_template';
 
 const __entry_name = `__monkey.entry.js`;
 
@@ -186,9 +187,25 @@ export const finalBundlePlugin = (
         });
       }
 
+      if (finalOption.build.cssPlaceholder) {
+        finalJsCode = finalJsCode.replace(
+          finalOption.build.cssPlaceholder,
+          finalOption.cssCode?.replace(/\\/g, '\\\\') ?? '',
+        );
+      }
+
+      const injectCssCode = finalOption.build.injectCss
+        ? await miniCode(
+            fn2string(cssInjectFn, '\x20' + finalOption.cssCode + '\x20'),
+            // use \x20 to compat unocss, see https://github.com/lisonge/vite-plugin-monkey/issues/45
+            // TODO check the order of plugin-monkey is last in vite plugin list, if not, logger warn message
+            'js',
+          )
+        : '';
+
       const bannerCode = [
         await finalMonkeyOptionToComment(finalOption),
-        finalOption.injectCssCode,
+        injectCssCode,
       ]
         .filter((s) => s)
         .map((s) => s + `\n\n`)

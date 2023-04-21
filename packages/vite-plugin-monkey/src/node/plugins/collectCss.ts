@@ -1,7 +1,6 @@
 import { PluginOption, ResolvedConfig, transformWithEsbuild } from 'vite';
-import { cssInjectFn, fn2string } from '../inject_template';
 import type { FinalMonkeyOption } from '../types';
-import { getFinalTarget, miniCode } from '../_util';
+import { getFinalTarget } from '../_util';
 
 export const collectCssPlugin = (
   finalOption: FinalMonkeyOption,
@@ -28,7 +27,10 @@ export const collectCssPlugin = (
       });
       if (cssList.length > 0) {
         let css = cssList.join('');
-        if (!viteConfig.build.minify && finalOption.build.minifyCss) {
+        if (
+          finalOption.build.cssPlaceholder ||
+          (!viteConfig.build.minify && finalOption.build.minifyCss)
+        ) {
           const { cssTarget, target } = viteConfig.build;
           const finalCssTarget = getFinalTarget(cssTarget || target || []);
           css = (
@@ -40,12 +42,15 @@ export const collectCssPlugin = (
             })
           ).code.trimEnd();
         }
-        finalOption.injectCssCode = await miniCode(
-          fn2string(cssInjectFn, '\x20' + css + '\x20'),
-          // use \x20 to compat unocss, see https://github.com/lisonge/vite-plugin-monkey/issues/45
-          // TODO check the order of plugin-monkey is last in vite plugin list, if not, logger warn message
-          'js',
-        );
+
+        finalOption.cssCode = css;
+
+        // finalOption.injectCssCode = await miniCode(
+        //   fn2string(cssInjectFn, '\x20' + css + '\x20'),
+        //   // use \x20 to compat unocss, see https://github.com/lisonge/vite-plugin-monkey/issues/45
+        //   // TODO check the order of plugin-monkey is last in vite plugin list, if not, logger warn message
+        //   'js',
+        // );
       }
     },
   };

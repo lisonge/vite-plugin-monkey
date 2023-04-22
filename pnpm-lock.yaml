@@ -314,6 +314,12 @@ importers:
         specifier: workspace:*
         version: link:../../packages/vite-plugin-monkey
 
+  playground/test-shadow-dom:
+    dependencies:
+      vite-plugin-monkey:
+        specifier: workspace:*
+        version: link:../../packages/vite-plugin-monkey
+
   playground/test-sourcemap:
     dependencies:
       vite-plugin-monkey:

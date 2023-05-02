@@ -454,9 +454,9 @@ export type MonkeyWindow = Window & {
    * @see https://www.tampermonkey.net/documentation.php#GM_addValueChangeListener
    * @see https://violentmonkey.github.io/api/gm/#gm_addvaluechangelistener
    */
-  GM_addValueChangeListener: (
+  GM_addValueChangeListener: <T = unknown>(
     name: string,
-    callback: <T = unknown>(
+    callback: (
       name: string,
       oldValue?: T,
       newValue?: T,

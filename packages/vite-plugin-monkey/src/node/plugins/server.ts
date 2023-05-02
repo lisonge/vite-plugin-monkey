@@ -207,10 +207,7 @@ export const serverPlugin = (finalOption: FinalMonkeyOption): PluginOption => {
         } else {
           await fs.mkdir(path.dirname(cacheUserPath)).catch();
         }
-        const newComment = [
-          await finalMonkeyOptionToComment(finalOption),
-          `// entry: ${finalOption.entry}`,
-        ].join('\n');
+        const newComment = await finalMonkeyOptionToComment(finalOption);
         if (!isFirstBoot() && cacheComment != newComment) {
           openBrowser(serverConfig.installUrl, true, logger);
           logger.info('reopen, config comment has changed', { time: true });

@@ -189,7 +189,7 @@ export const serverPlugin = (finalOption: FinalMonkeyOption): PluginOption => {
             );
           } else if (reqUrl.startsWith(gmApiPath)) {
             if (finalOption.server.mountGmApi) {
-              res.end(fn2string(mountGmApiFn));
+              res.end(`;(${mountGmApiFn})(import.meta);`);
             } else {
               res.end('');
             }

@@ -9,8 +9,9 @@ export const serverInjectFn = ({ entrySrc = `` }) => {
   // @ts-ignore
   window.GM; // must exist, see https://github.com/Tampermonkey/tampermonkey/issues/1567
 
+  const key = `__monkeyWindow-` + new URL(entrySrc).origin;
   // @ts-ignore
-  document.__monkeyWindow = window;
+  document[key] = window;
   console.log(`[vite-plugin-monkey] mount monkeyWindow to document`);
 
   const entryScript = document.createElement('script');
@@ -27,9 +28,10 @@ export const cssInjectFn = (css: string) => {
   document.head.append(style);
 };
 
-export const mountGmApiFn = () => {
+export const mountGmApiFn = (meta: ImportMeta) => {
+  const key = `__monkeyWindow-` + new URL(meta.url).origin;
   // @ts-ignore
-  const monkeyWindow: Window = document.__monkeyWindow;
+  const monkeyWindow: Window = document[key];
   if (!monkeyWindow) {
     console.log(`[vite-plugin-monkey] not found monkeyWindow`);
     return;

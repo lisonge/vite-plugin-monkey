@@ -2,7 +2,7 @@ import { monkeyWindow } from 'vite-plugin-monkey/dist/client';
 import type { FetchType, IPromise } from './types';
 import { lazy } from './util';
 
-type InterceptorChain = {
+export type InterceptorChain = {
   request: Request;
   /**
    * @param request if not set, use chain.request
@@ -11,6 +11,14 @@ type InterceptorChain = {
 };
 
 type NetworkInterceptor = (chain: InterceptorChain) => IPromise<Response>;
+
+export type FetchInterceptorManager = {
+  originalFetch: FetchType;
+  fakeFetch: FetchType;
+  use: (interceptor: NetworkInterceptor) => number;
+  eject: (id: number) => void;
+  clear: () => void;
+};
 
 const produceChain = (
   originalFetch: FetchType,
@@ -39,7 +47,9 @@ const produceChain = (
   };
 };
 
-export const buildFetchInterceptorManager = (originalFetch: FetchType) => {
+export const buildFetchInterceptorManager = (
+  originalFetch: FetchType,
+): FetchInterceptorManager => {
   const interceptors: (NetworkInterceptor | null)[] = [];
   const fakeFetch: FetchType = async (input, init) => {
     return produceChain(
@@ -49,7 +59,8 @@ export const buildFetchInterceptorManager = (originalFetch: FetchType) => {
     ).proceed();
   };
   return {
-    fetch: fakeFetch,
+    originalFetch,
+    fakeFetch,
     use: (interceptor: NetworkInterceptor): number => {
       interceptors.push(interceptor);
       return interceptors.length - 1;
@@ -67,6 +78,6 @@ export const buildFetchInterceptorManager = (originalFetch: FetchType) => {
 
 export const UnsafeWindowInterceptorManager = /* @__PURE__ */ lazy(() => {
   const t = buildFetchInterceptorManager(monkeyWindow.unsafeWindow.fetch);
-  monkeyWindow.unsafeWindow.fetch = t.fetch;
+  monkeyWindow.unsafeWindow.fetch = t.fakeFetch;
   return t;
 });

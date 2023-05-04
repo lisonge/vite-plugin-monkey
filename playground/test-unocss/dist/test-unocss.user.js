@@ -16,15 +16,7 @@
 (function (require$$0, require$$0$1) {
   'use strict';
 
-  var jsxRuntimeExports = {};
-  var jsxRuntime = {
-    get exports() {
-      return jsxRuntimeExports;
-    },
-    set exports(v) {
-      jsxRuntimeExports = v;
-    }
-  };
+  var jsxRuntime = { exports: {} };
   var reactJsxRuntime_production_min = {};
   /**
    * @license React
@@ -51,12 +43,10 @@
   reactJsxRuntime_production_min.Fragment = l;
   reactJsxRuntime_production_min.jsx = q;
   reactJsxRuntime_production_min.jsxs = q;
-  (function(module) {
-    {
-      module.exports = reactJsxRuntime_production_min;
-    }
-  })(jsxRuntime);
-  const jsx = jsxRuntimeExports.jsx;
+  {
+    jsxRuntime.exports = reactJsxRuntime_production_min;
+  }
+  var jsxRuntimeExports = jsxRuntime.exports;
   var client = {};
   var m = require$$0$1;
   {
@@ -64,7 +54,7 @@
     client.hydrateRoot = m.hydrateRoot;
   }
   function App() {
-    return /* @__PURE__ */ jsx("div", { className: "flex", children: "Hello Unocss" });
+    return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex", children: "Hello Unocss" });
   }
   client.createRoot(
     (() => {
@@ -73,7 +63,7 @@
       return app;
     })()
   ).render(
-    /* @__PURE__ */ jsx(require$$0.StrictMode, { children: /* @__PURE__ */ jsx(App, {}) })
+    /* @__PURE__ */ jsxRuntimeExports.jsx(require$$0.StrictMode, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(App, {}) })
   );
 
 })(React, ReactDOM);

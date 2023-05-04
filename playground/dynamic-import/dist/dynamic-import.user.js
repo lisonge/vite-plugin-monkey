@@ -9,9 +9,9 @@
 // @require      https://cdn.jsdelivr.net/npm/md5@2.3.0/dist/md5.min.js
 // @require      https://cdn.jsdelivr.net/npm/vue@3.2.47/dist/vue.global.prod.js
 // @require      data:application/javascript,window.Vue%3DVue%3B
-// @require      https://cdn.jsdelivr.net/npm/element-plus@2.2.31/dist/index.full.min.js
-// @require      https://cdn.jsdelivr.net/npm/systemjs@6.14.0/dist/system.min.js
-// @require      https://cdn.jsdelivr.net/npm/systemjs@6.14.0/dist/extras/named-register.min.js
+// @require      https://cdn.jsdelivr.net/npm/element-plus@2.3.4/dist/index.full.min.js
+// @require      https://cdn.jsdelivr.net/npm/systemjs@6.14.1/dist/system.min.js
+// @require      https://cdn.jsdelivr.net/npm/systemjs@6.14.1/dist/extras/named-register.min.js
 // @require      data:application/javascript,%3B(typeof%20System!%3D'undefined')%26%26(System%3Dnew%20System.constructor())%3B
 // @resource     animate.css  https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.css
 // @grant        GM_getResourceText
@@ -28,7 +28,7 @@ System.register("./__entry.js", [], (function (exports, module) {
     execute: (function () {
 
       if (location.href.includes("animate.css=on")) {
-        module.import('./_monkey-resource-import_animate-26edfbdf-491681fd.js');
+        module.import('./_monkey-resource-import_animate-a2152b62-ea523879.js');
         document.querySelectorAll("div").forEach((div) => {
           div.classList.add("animate__shakeX");
           div.classList.add("animate__animated");
@@ -54,7 +54,7 @@ System.register("./__entry.js", [], (function (exports, module) {
   };
 }));
 
-System.register("./_monkey-resource-import_animate-26edfbdf-491681fd.js", [], (function (exports, module) {
+System.register("./_monkey-resource-import_animate-a2152b62-ea523879.js", [], (function (exports, module) {
   'use strict';
   return {
     execute: (function () {
@@ -63,7 +63,7 @@ System.register("./_monkey-resource-import_animate-26edfbdf-491681fd.js", [], (f
         const t = GM_getResourceText(e), o = document.createElement("style");
         return o.innerText = t, document.head.append(o), t;
       };
-      const _monkeyResourceImport_animate = exports('default', cssLoader("animate.css"));
+      cssLoader("animate.css");
 
     })
   };

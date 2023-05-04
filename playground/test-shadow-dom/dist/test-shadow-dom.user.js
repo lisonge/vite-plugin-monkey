@@ -12,7 +12,10 @@
 (function () {
   'use strict';
 
-  const sharedConfig = {};
+  const sharedConfig = {
+    context: void 0,
+    registry: void 0
+  };
   const equalFn = (a, b) => a === b;
   const signalOptions = {
     equals: equalFn
@@ -68,6 +71,13 @@
     const c = createComputation(fn, value, false, STALE);
     updateComputation(c);
   }
+  function createEffect(fn, value, options) {
+    runEffects = runUserEffects;
+    const c = createComputation(fn, value, false, STALE);
+    if (!options || !options.render)
+      c.user = true;
+    Effects ? Effects.push(c) : updateComputation(c);
+  }
   function untrack(fn) {
     if (Listener === null)
       return fn();
@@ -88,10 +98,26 @@
       Owner.cleanups.push(fn);
     return fn;
   }
+  function getOwner() {
+    return Owner;
+  }
+  function runWithOwner(o, fn) {
+    const prev = Owner;
+    const prevListener = Listener;
+    Owner = o;
+    Listener = null;
+    try {
+      return runUpdates(fn, true);
+    } catch (err) {
+      handleError(err);
+    } finally {
+      Owner = prev;
+      Listener = prevListener;
+    }
+  }
   function readSignal() {
-    const runningTransition = Transition;
-    if (this.sources && (this.state || runningTransition)) {
-      if (this.state === STALE || runningTransition)
+    if (this.sources && this.state) {
+      if (this.state === STALE)
         updateComputation(this);
       else {
         const updates = Updates;
@@ -130,7 +156,7 @@
             const TransitionRunning = Transition && Transition.running;
             if (TransitionRunning && Transition.disposed.has(o))
               ;
-            if (TransitionRunning && !o.tState || !TransitionRunning && !o.state) {
+            if (TransitionRunning ? !o.tState : !o.state) {
               if (o.pure)
                 Updates.push(o);
               else
@@ -138,9 +164,7 @@
               if (o.observers)
                 markDownstream(o);
             }
-            if (TransitionRunning)
-              ;
-            else
+            if (!TransitionRunning)
               o.state = STALE;
           }
           if (Updates.length > 1e6) {
@@ -176,7 +200,8 @@
           node.owned = null;
         }
       }
-      handleError(err);
+      node.updatedAt = time + 1;
+      return handleError(err);
     }
     if (!node.updatedAt || node.updatedAt <= time) {
       if (node.updatedAt != null && "observers" in node) {
@@ -213,23 +238,22 @@
     return c;
   }
   function runTop(node) {
-    const runningTransition = Transition;
-    if (node.state === 0 || runningTransition)
+    if (node.state === 0)
       return;
-    if (node.state === PENDING || runningTransition)
+    if (node.state === PENDING)
       return lookUpstream(node);
     if (node.suspense && untrack(node.suspense.inFallback))
       return node.suspense.effects.push(node);
     const ancestors = [node];
     while ((node = node.owner) && (!node.updatedAt || node.updatedAt < ExecCount)) {
-      if (node.state || runningTransition)
+      if (node.state)
         ancestors.push(node);
     }
     for (let i = ancestors.length - 1; i >= 0; i--) {
       node = ancestors[i];
-      if (node.state === STALE || runningTransition) {
+      if (node.state === STALE) {
         updateComputation(node);
-      } else if (node.state === PENDING || runningTransition) {
+      } else if (node.state === PENDING) {
         const updates = Updates;
         Updates = null;
         runUpdates(() => lookUpstream(node, ancestors[0]), false);
@@ -275,25 +299,36 @@
     for (let i = 0; i < queue.length; i++)
       runTop(queue[i]);
   }
+  function runUserEffects(queue) {
+    let i, userLength = 0;
+    for (i = 0; i < queue.length; i++) {
+      const e = queue[i];
+      if (!e.user)
+        runTop(e);
+      else
+        queue[userLength++] = e;
+    }
+    for (i = 0; i < userLength; i++)
+      runTop(queue[i]);
+  }
   function lookUpstream(node, ignore) {
-    const runningTransition = Transition;
     node.state = 0;
     for (let i = 0; i < node.sources.length; i += 1) {
       const source = node.sources[i];
       if (source.sources) {
-        if (source.state === STALE || runningTransition) {
-          if (source !== ignore)
+        const state = source.state;
+        if (state === STALE) {
+          if (source !== ignore && (!source.updatedAt || source.updatedAt < ExecCount))
             runTop(source);
-        } else if (source.state === PENDING || runningTransition)
+        } else if (state === PENDING)
           lookUpstream(source, ignore);
       }
     }
   }
   function markDownstream(node) {
-    const runningTransition = Transition;
     for (let i = 0; i < node.observers.length; i += 1) {
       const o = node.observers[i];
-      if (!o.state || runningTransition) {
+      if (!o.state) {
         o.state = PENDING;
         if (o.pure)
           Updates.push(o);
@@ -319,25 +354,19 @@
       }
     }
     if (node.owned) {
-      for (i = 0; i < node.owned.length; i++)
+      for (i = node.owned.length - 1; i >= 0; i--)
         cleanNode(node.owned[i]);
       node.owned = null;
     }
     if (node.cleanups) {
-      for (i = 0; i < node.cleanups.length; i++)
+      for (i = node.cleanups.length - 1; i >= 0; i--)
         node.cleanups[i]();
       node.cleanups = null;
     }
     node.state = 0;
     node.context = null;
   }
-  function castError(err) {
-    if (err instanceof Error || typeof err === "string")
-      return err;
-    return new Error("Unknown error");
-  }
   function handleError(err) {
-    err = castError(err);
     throw err;
   }
   function createComponent(Comp, props) {
@@ -410,13 +439,16 @@
       element.textContent = "";
     };
   }
-  function template(html, check, isSVG) {
-    const t = document.createElement("template");
-    t.innerHTML = html;
-    let node = t.content.firstChild;
-    if (isSVG)
-      node = node.firstChild;
-    return node;
+  function template(html, isCE, isSVG) {
+    let node;
+    const create = () => {
+      const t = document.createElement("template");
+      t.innerHTML = html;
+      return isSVG ? t.content.firstChild.firstChild : t.content.firstChild;
+    };
+    const fn = isCE ? () => (node || (node = create())).cloneNode(true) : () => untrack(() => document.importNode(node || (node = create()), true));
+    fn.cloneNode = fn;
+    return fn;
   }
   function insert(parent, accessor, marker, initial) {
     if (marker !== void 0 && !initial)
@@ -426,8 +458,6 @@
     createRenderEffect((current) => insertExpression(parent, accessor(), current, marker), initial);
   }
   function insertExpression(parent, value, current, marker, unwrapArray) {
-    if (sharedConfig.context && !current)
-      current = [...parent.childNodes];
     while (typeof current === "function")
       current = current();
     if (value === current)
@@ -435,8 +465,6 @@
     const t = typeof value, multi = marker !== void 0;
     parent = multi && current[0] && current[0].parentNode || parent;
     if (t === "string" || t === "number") {
-      if (sharedConfig.context)
-        return current;
       if (t === "number")
         value = value.toString();
       if (multi) {
@@ -453,8 +481,6 @@
           current = parent.textContent = value;
       }
     } else if (value == null || t === "boolean") {
-      if (sharedConfig.context)
-        return current;
       current = cleanChildren(parent, current, marker);
     } else if (t === "function") {
       createRenderEffect(() => {
@@ -471,14 +497,6 @@
         createRenderEffect(() => current = insertExpression(parent, array, current, marker, true));
         return () => current;
       }
-      if (sharedConfig.context) {
-        if (!array.length)
-          return current;
-        for (let i = 0; i < array.length; i++) {
-          if (array[i].parentNode)
-            return current = array;
-        }
-      }
       if (array.length === 0) {
         current = cleanChildren(parent, current, marker);
         if (multi)
@@ -493,9 +511,7 @@
         appendNodes(parent, array);
       }
       current = array;
-    } else if (value instanceof Node) {
-      if (sharedConfig.context && value.parentNode)
-        return current = multi ? [value] : value;
+    } else if (value.nodeType) {
       if (Array.isArray(current)) {
         if (multi)
           return current = cleanChildren(parent, current, marker, value);
@@ -506,20 +522,20 @@
         parent.replaceChild(value, parent.firstChild);
       current = value;
     } else
-      ;
+      console.warn(`Unrecognized value. Skipped inserting`, value);
     return current;
   }
   function normalizeIncomingArray(normalized, array, current, unwrap) {
     let dynamic = false;
     for (let i = 0, len = array.length; i < len; i++) {
-      let item = array[i], prev = current && current[i];
-      if (item instanceof Node) {
-        normalized.push(item);
-      } else if (item == null || item === true || item === false)
+      let item = array[i], prev = current && current[i], t;
+      if (item == null || item === true || item === false)
         ;
-      else if (Array.isArray(item)) {
+      else if ((t = typeof item) === "object" && item.nodeType) {
+        normalized.push(item);
+      } else if (Array.isArray(item)) {
         dynamic = normalizeIncomingArray(normalized, item, prev) || dynamic;
-      } else if (typeof item === "function") {
+      } else if (t === "function") {
         if (unwrap) {
           while (typeof item === "function")
             item = item();
@@ -530,9 +546,9 @@
         }
       } else {
         const value = String(item);
-        if (prev && prev.nodeType === 3 && prev.data === value) {
+        if (prev && prev.nodeType === 3 && prev.data === value)
           normalized.push(prev);
-        } else
+        else
           normalized.push(document.createTextNode(value));
       }
     }
@@ -570,57 +586,52 @@
   function Portal(props) {
     const {
       useShadow
-    } = props, marker = document.createTextNode(""), mount = props.mount || document.body;
-    function renderPortal() {
-      if (sharedConfig.context) {
-        const [s, set] = createSignal(false);
-        queueMicrotask(() => set(true));
-        return () => s() && props.children;
-      } else
-        return () => props.children;
-    }
-    if (mount instanceof HTMLHeadElement) {
-      const [clean, setClean] = createSignal(false);
-      const cleanup = () => setClean(true);
-      createRoot((dispose) => insert(mount, () => !clean() ? renderPortal()() : dispose(), null));
-      onCleanup(() => {
-        if (sharedConfig.context)
-          queueMicrotask(cleanup);
-        else
-          cleanup();
-      });
-    } else {
-      const container = createElement(props.isSVG ? "g" : "div", props.isSVG), renderRoot = useShadow && container.attachShadow ? container.attachShadow({
-        mode: "open"
-      }) : container;
-      Object.defineProperty(container, "_$host", {
-        get() {
-          return marker.parentNode;
-        },
-        configurable: true
-      });
-      insert(renderRoot, renderPortal());
-      mount.appendChild(container);
-      props.ref && props.ref(container);
-      onCleanup(() => mount.removeChild(container));
-    }
+    } = props, marker = document.createTextNode(""), mount = () => props.mount || document.body, owner = getOwner();
+    let content;
+    let hydrating = !!sharedConfig.context;
+    createEffect(() => {
+      content || (content = runWithOwner(owner, () => props.children));
+      const el = mount();
+      if (el instanceof HTMLHeadElement) {
+        const [clean, setClean] = createSignal(false);
+        const cleanup = () => setClean(true);
+        createRoot((dispose) => insert(el, () => !clean() ? content : dispose(), null));
+        onCleanup(cleanup);
+      } else {
+        const container = createElement(props.isSVG ? "g" : "div", props.isSVG), renderRoot = useShadow && container.attachShadow ? container.attachShadow({
+          mode: "open"
+        }) : container;
+        Object.defineProperty(container, "_$host", {
+          get() {
+            return marker.parentNode;
+          },
+          configurable: true
+        });
+        insert(renderRoot, content);
+        el.appendChild(container);
+        props.ref && props.ref(container);
+        onCleanup(() => el.removeChild(container));
+      }
+    }, void 0, {
+      render: !hydrating
+    });
     return marker;
   }
   const unocssText = "";
-  const _tmpl$$1 = /* @__PURE__ */ template(`<div class="flex App"><div class="text-5xl fw100 animate-bounce-alt animate-count-infinite animate-duration-1s">monkey</div><div> 456 </div></div>`);
+  const _tmpl$$1 = /* @__PURE__ */ template(`<div class="flex App"><div class="text-5xl fw100 animate-bounce-alt animate-count-infinite animate-duration-1s">monkey</div><div> 456 `);
   function App() {
-    return _tmpl$$1.cloneNode(true);
+    return _tmpl$$1();
   }
-  const text = "div {\n  color: blue;\n}\n";
+  const text = "div{color:#00f}\n";
   const style = document.createElement("style");
   style.textContent = text;
-  const style2Text = ".App {\n  background: red;\n}";
-  const _tmpl$ = /* @__PURE__ */ template(`<style></style>`);
+  const style2Text = ".App{background:red}\n";
+  const _tmpl$ = /* @__PURE__ */ template(`<style>`);
   render(() => createComponent(Portal, {
     useShadow: true,
     get children() {
       return [style, (() => {
-        const _el$ = _tmpl$.cloneNode(true);
+        const _el$ = _tmpl$();
         insert(_el$, unocssText, null);
         insert(_el$, style2Text, null);
         return _el$;

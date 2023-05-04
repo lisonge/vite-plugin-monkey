@@ -14,12 +14,6 @@
 (function () {
   'use strict';
 
-  var __defProp = Object.defineProperty;
-  var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-  var __publicField = (obj, key, value) => {
-    __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
-    return value;
-  };
   var _GM_xmlhttpRequest = /* @__PURE__ */ (() => typeof GM_xmlhttpRequest != "undefined" ? GM_xmlhttpRequest : void 0)();
   var _monkeyWindow = /* @__PURE__ */ (() => window)();
   var delay = async (n = 0) => new Promise((res) => {
@@ -183,7 +177,7 @@
       (_a2 = request.signal) == null ? void 0 : _a2.addEventListener("abort", abortXhr);
     });
   };
-  var querySelector = async (root, selectors, timeout) => {
+  async function querySelector(root, selectors, timeout) {
     const node = root.querySelector(selectors);
     if (node) {
       return node;
@@ -214,7 +208,7 @@
         }, timeout);
       }
     });
-  };
+  }
   var produceChain = (originalFetch, interceptors, request, index = 0) => {
     return {
       request,
@@ -222,9 +216,13 @@
         while (index < interceptors.length) {
           const target = interceptors[index];
           if (target) {
-            return target(
-              produceChain(originalFetch, interceptors, req, index + 1)
+            const chain = produceChain(
+              originalFetch,
+              interceptors,
+              req,
+              index + 1
             );
+            return await target(chain);
           }
           index++;
         }
@@ -232,52 +230,34 @@
       }
     };
   };
-  var InterceptorManager = class {
-    constructor() {
-      __publicField(this, "interceptors", []);
-      __publicField(this, "cache", /* @__PURE__ */ new WeakMap());
-      __publicField(this, "use", (interceptor) => {
-        this.interceptors.push(interceptor);
-        return this.interceptors.length - 1;
-      });
-      __publicField(this, "eject", (id) => {
-        this.interceptors[id] = null;
-      });
-      __publicField(this, "clear", () => {
-        for (let i = 0; i < this.interceptors.length; i++) {
-          this.interceptors[i] = null;
+  var buildFetchInterceptorManager = (originalFetch) => {
+    const interceptors = [];
+    const fakeFetch = async (input, init) => {
+      return produceChain(
+        originalFetch,
+        [...interceptors],
+        new Request(input, init)
+      ).proceed();
+    };
+    return {
+      fetch: fakeFetch,
+      use: (interceptor) => {
+        interceptors.push(interceptor);
+        return interceptors.length - 1;
+      },
+      eject: (id) => {
+        interceptors[id] = null;
+      },
+      clear: () => {
+        for (let i = 0; i < interceptors.length; i++) {
+          interceptors[i] = null;
         }
-      });
-      __publicField(this, "hook", (target, originalFetch = target.fetch) => {
-        const oldFakeFetch = this.cache.get(target);
-        if (oldFakeFetch) {
-          return target.fetch == oldFakeFetch;
-        }
-        const fakeFetch = async (input, init) => {
-          return produceChain(
-            originalFetch,
-            this.interceptors,
-            new Request(input, init)
-          ).proceed();
-        };
-        this.cache.set(target, target.fetch);
-        target.fetch = fakeFetch;
-        return target.fetch == fakeFetch;
-      });
-      __publicField(this, "unhook", (target) => {
-        const oldFakeFetch = this.cache.get(target);
-        this.cache.delete(target);
-        if (!oldFakeFetch) {
-          return true;
-        }
-        target.fetch = oldFakeFetch;
-        return target.fetch == oldFakeFetch;
-      });
-    }
+      }
+    };
   };
   var UnsafeWindowInterceptorManager = /* @__PURE__ */ lazy(() => {
-    const t = new InterceptorManager();
-    t.hook(_monkeyWindow.unsafeWindow ?? window);
+    const t = buildFetchInterceptorManager(_monkeyWindow.unsafeWindow.fetch);
+    _monkeyWindow.unsafeWindow.fetch = t.fetch;
     return t;
   });
   (async () => {
@@ -311,7 +291,7 @@
     UnsafeWindowInterceptorManager.use(async ({ proceed, request }) => {
       const url = new URL(request.url);
       console.log(`hook: ${request.url}`);
-      url.searchParams.set(`k`, new Date().getTime().toString());
+      url.searchParams.set(`k`, (/* @__PURE__ */ new Date()).getTime().toString());
       return proceed(new Request(url, request));
     });
     await fetch(location.href);

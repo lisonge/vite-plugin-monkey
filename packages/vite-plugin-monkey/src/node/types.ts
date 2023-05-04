@@ -93,7 +93,6 @@ export type FinalMonkeyOption = {
     fileName: string;
     metaFileName?: (fileName: string) => string;
     autoGrant: boolean;
-    minifyCss: boolean;
     externalGlobals: [string, IArray<string | Mod2UrlFn>][];
     externalResource: Record<
       string,
@@ -246,8 +245,9 @@ export type MonkeyOption = {
     autoGrant?: boolean;
 
     /**
-     * if you want minify all, just set viteConfig.build.minify=true
-     * @default true
+     * @deprecated use [viteConfig.build.cssMinify](https://vitejs.dev/config/build-options.html#build-cssminify) in vite>=4.2.0
+     *
+     * now minifyCss will not work
      */
     minifyCss?: boolean;
 

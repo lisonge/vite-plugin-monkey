@@ -9,11 +9,19 @@ import type {
   PkgOptions,
 } from './types';
 import { projectPkg } from './_util';
+import { logger } from './_logger';
 
 export const resolvedOption = (
   pluginOption: MonkeyOption,
 ): FinalMonkeyOption => {
   const build = pluginOption.build ?? {};
+
+  if (build.minifyCss !== undefined) {
+    logger.warn(
+      `monkeyConfig.build.minifyCss is deprecated, use viteConfig.build.cssMinify in vite>=4.2.0`,
+      { time: false },
+    );
+  }
 
   const { externalResource = {} } = build;
   const externalResource2: Record<
@@ -269,7 +277,6 @@ export const resolvedOption = (
       fileName,
       metaFileName,
       autoGrant: build.autoGrant ?? true,
-      minifyCss: build.minifyCss ?? true,
       externalGlobals: externalGlobals,
       externalResource: externalResource2,
     },
@@ -282,5 +289,6 @@ export const resolvedOption = (
     requirePkgList: [],
     systemjs: build.systemjs ?? jsdelivr()[1],
   };
+
   return config;
 };

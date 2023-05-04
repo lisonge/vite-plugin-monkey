@@ -54,6 +54,7 @@ export default (pluginOption: MonkeyOption): PluginOption => {
           assetsDir: './',
           cssCodeSplit: false,
           minify: userConfig.build?.minify ?? false,
+          cssMinify: userConfig.build?.cssMinify ?? true,
           rollupOptions: {
             // serve pre-bundling need
             input: finalPluginOption.entry,

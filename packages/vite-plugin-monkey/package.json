@@ -67,12 +67,12 @@
     "acorn-walk": "^8.2.0",
     "cross-spawn": "^7.0.3",
     "detect-port": "^1.5.1",
-    "htmlparser2": "^8.0.1",
+    "htmlparser2": "^8.0.2",
     "magic-string": "^0.30.0",
     "mrmime": "^1.0.1",
     "open": "^8.4.1",
     "picocolors": "^1.0.0",
-    "systemjs": "^6.14.0"
+    "systemjs": "^6.14.1"
   },
   "devDependencies": {
     "@types/cross-spawn": "6.0.2",
@@ -81,7 +81,11 @@
   "peerDependencies": {
     "vite": ">=3.0.0"
   },
-  "peerDependenciesMeta": {},
+  "peerDependenciesMeta": {
+    "vite": {
+      "optional": true
+    }
+  },
   "engines": {
     "pnpm": ">=6",
     "node": "^14.18 || >= 16"

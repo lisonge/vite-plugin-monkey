@@ -18,7 +18,7 @@ A vite plugin server and build your.user.js for userscript engine like [Tampermo
 - external module inject to userscript @resource
 - use GM_api by ESM import with type hints
 - intelligently collect GM_api that is used and automatically configure userscript @grant comment
-- support `top level await` and `dynamic import` in single
+- support `top level await` and `dynamic import` in single file
 - when vite preview, auto open browser install dist.user.js
 - full typescript support and vite feature
 

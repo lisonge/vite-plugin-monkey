@@ -10,11 +10,11 @@
   },
   "devDependencies": {
     "typescript": "^5.0.4",
-    "vite": "^4.2.2",
-    "vite-plugin-monkey": "^3.1.4",
+    "vite": "^4.3.5",
+    "vite-plugin-monkey": "^3.2.0",
     "vite-plugin-solid": "^2.7.0"
   },
   "dependencies": {
-    "solid-js": "^1.7.3"
+    "solid-js": "^1.7.5"
   }
 }

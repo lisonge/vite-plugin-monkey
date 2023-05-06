@@ -424,7 +424,7 @@
         appendNodes(parent, array);
       }
       current = array;
-    } else if (value instanceof Node) {
+    } else if (value.nodeType) {
       if (Array.isArray(current)) {
         if (multi)
           return current = cleanChildren(parent, current, marker, value);
@@ -441,14 +441,14 @@
   function normalizeIncomingArray(normalized, array, current, unwrap) {
     let dynamic = false;
     for (let i = 0, len = array.length; i < len; i++) {
-      let item = array[i], prev = current && current[i];
-      if (item instanceof Node) {
-        normalized.push(item);
-      } else if (item == null || item === true || item === false)
+      let item = array[i], prev = current && current[i], t;
+      if (item == null || item === true || item === false)
         ;
-      else if (Array.isArray(item)) {
+      else if ((t = typeof item) === "object" && item.nodeType) {
+        normalized.push(item);
+      } else if (Array.isArray(item)) {
         dynamic = normalizeIncomingArray(normalized, item, prev) || dynamic;
-      } else if (typeof item === "function") {
+      } else if (t === "function") {
         if (unwrap) {
           while (typeof item === "function")
             item = item();
@@ -459,10 +459,9 @@
         }
       } else {
         const value = String(item);
-        if (prev && prev.nodeType === 3) {
-          prev.data = value;
+        if (prev && prev.nodeType === 3 && prev.data === value)
           normalized.push(prev);
-        } else
+        else
           normalized.push(document.createTextNode(value));
       }
     }

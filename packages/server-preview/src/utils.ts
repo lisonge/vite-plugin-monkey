@@ -1,5 +1,5 @@
-import { createSignal, createEffect } from 'solid-js';
-import produce from 'immer';
+import { produce } from 'immer';
+import { createSignal } from 'solid-js';
 
 export const delay = async (n = 0) => {
   await new Promise<void>((res) => {

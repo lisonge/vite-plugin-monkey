@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 3.2.0
+
+- feat: deprecated minifyCss to use vite:cssMinify [e12eb1ac](https://github.com/lisonge/vite-plugin-monkey/commit/567c5744239dcbc0287cb5d742fbb513e12eb1ac)
+- perf: monkey window isolation by import.meta.url [c5240e6a](https://github.com/lisonge/vite-plugin-monkey/commit/12aa0bc102db6a21561f248a2c4d5d4cc5240e6a)
+- fix: reopen should not depend on entry [85ad0fdd](https://github.com/lisonge/vite-plugin-monkey/commit/bc6eaf73f89fb1108fb9f5ec9c282baf85ad0fdd)
+- fix: generic type for GM_addValueChangeListener [b2024bbe](https://github.com/lisonge/vite-plugin-monkey/commit/28881bad96523f6a9294905c964cdf66b2024bbe)
+
 ## 3.1.4
 
 - fix: notification highlight types [21a95648](https://github.com/lisonge/vite-plugin-monkey/commit/9369c74a1a7bcc02b023b0364318422d21a95648)

@@ -11,7 +11,7 @@
 // @grant      GM_xmlhttpRequest
 // ==/UserScript==
 
-(function () {
+(async function () {
   'use strict';
 
   var _GM = /* @__PURE__ */ (() => typeof GM != "undefined" ? GM : void 0)();
@@ -71,13 +71,13 @@
         responseType: "blob",
         async onload(e) {
           await delay();
-          const resp = new Response(e.response ?? e.responseText, {
+          const resp2 = new Response(e.response ?? e.responseText, {
             status: e.status,
             statusText: e.statusText,
             headers: parseHeaders(e.responseHeaders)
           });
-          Object.defineProperty(resp, "url", { value: e.finalUrl });
-          resolve(resp);
+          Object.defineProperty(resp2, "url", { value: e.finalUrl });
+          resolve(resp2);
         },
         async onerror() {
           await delay();
@@ -104,24 +104,22 @@
       (_a = request.signal) == null ? void 0 : _a.addEventListener("abort", abortXhr);
     });
   };
-  (async () => {
-    console.time("x");
-    const resp = await GM_fetch(
-      `https://i.pximg.net/img-original/img/2017/05/16/00/20/10/62921231_p0.png`,
-      {
-        headers: {
-          referer: "https://www.pixiv.net/"
-        }
+  console.time("x");
+  const resp = (await GM_fetch(
+    `https://i.pximg.net/img-original/img/2017/05/16/00/20/10/62921231_p0.png`,
+    {
+      headers: {
+        referer: "https://www.pixiv.net/"
       }
-    );
-    console.log(resp);
-    console.timeLog("x");
-    const imgBlob = await resp.blob();
-    console.log(imgBlob.size);
-    const imgUrl = URL.createObjectURL(imgBlob);
-    const img = new Image();
-    img.src = imgUrl;
-    document.body.append(img);
-  })();
+    }
+  ));
+  console.log(resp);
+  console.timeLog("x");
+  const imgBlob = (await resp.blob());
+  console.log(imgBlob.size);
+  const imgUrl = URL.createObjectURL(imgBlob);
+  const img = new Image();
+  img.src = imgUrl;
+  document.body.append(img);
 
 })();

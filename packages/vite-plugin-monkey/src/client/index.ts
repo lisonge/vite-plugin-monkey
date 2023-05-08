@@ -161,7 +161,7 @@ export const GM_saveTab = /* @__PURE__ */ (() => monkeyWindow.GM_saveTab)();
 export const GM_getTabs = /* @__PURE__ */ (() => monkeyWindow.GM_getTabs)();
 
 /**
- * @see https://www.tampermonkey.net/documentation.php#api:GM_getResourceURL
+ * @see https://www.tampermonkey.net/documentation.php#api:GM_getValue
  * @see https://violentmonkey.github.io/api/gm/#gm_getvalue
  */
 export const GM_getValue = /* @__PURE__ */ (() => monkeyWindow.GM_getValue)();

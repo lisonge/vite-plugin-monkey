@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 3.2.1
+
+- fix: error docs link of GM_getValue [4095ad32](https://github.com/lisonge/vite-plugin-monkey/commit/521b45d42da00b805e6326075fa41d514095ad32)
+- fix: type error of GM_webRequest [07951290](https://github.com/lisonge/vite-plugin-monkey/commit/143c6b5a11dff445a740b54c0c32639e07951290)
+
 ## 3.2.0
 
 - feat: deprecated minifyCss to use vite:cssMinify [e12eb1ac](https://github.com/lisonge/vite-plugin-monkey/commit/567c5744239dcbc0287cb5d742fbb513e12eb1ac)

@@ -170,4 +170,5 @@ export const GM_getValue = /* @__PURE__ */ (() => monkeyWindow.GM_getValue)();
  * @see https://www.tampermonkey.net/documentation.php#api:GM_webRequest
  * @available tampermonkey
  */
-export const GM_webRequest = () => monkeyWindow.GM_webRequest;
+export const GM_webRequest = /* @__PURE__ */ (() =>
+  monkeyWindow.GM_webRequest)();

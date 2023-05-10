@@ -33,25 +33,27 @@ export const perviewPlugin = (finalOption: FinalMonkeyOption): PluginOption => {
       server.middlewares.use(async (req, res, next) => {
         if (['/', '/index.html'].includes((req.url ?? '').split('?')[0])) {
           const distDirPath = path.join(process.cwd(), viteConfig.build.outDir);
+          const fileNames: string[] = [];
           for await (const pathname of walk(distDirPath)) {
             if (pathname.endsWith('.user.js')) {
               const fileName = normalizePath(
                 path.relative(distDirPath, pathname),
               );
-              Object.entries({
-                'content-type': 'text/html; charset=utf-8',
-              }).forEach(([k, v]) => {
-                res.setHeader(k, String(v));
-              });
-              res.end(
-                `<script type="module" data-source="vite-plugin-monkey">${fn2string(
-                  redirectFn,
-                  '/' + fileName,
-                )}</script>`,
-              );
-              return;
+              fileNames.push(fileName);
             }
           }
+
+          const scripts = fileNames.map(
+            (fileName) =>
+              `<script type="module" data-source="vite-plugin-monkey">${fn2string(
+                redirectFn,
+                '/' + fileName,
+              )}</script>`,
+          );
+
+          res.setHeader('content-type', 'text/html; charset=utf-8');
+          res.end(scripts.join(''));
+          return;
         }
         next();
       });

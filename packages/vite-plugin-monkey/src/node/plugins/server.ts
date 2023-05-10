@@ -9,13 +9,12 @@ import type { FinalMonkeyOption } from '../types';
 import { finalMonkeyOptionToComment } from '../userscript';
 import { lazy } from '../_lazy';
 import { logger } from '../_logger';
-import { existFile, isFirstBoot, toValidURL } from '../_util';
+import { cyrb53hash, existFile, isFirstBoot, toValidURL } from '../_util';
 
 export const installUserPath = '/__vite-plugin-monkey.install.user.js';
 const gmApiPath = '/__vite-plugin-monkey.gm.api.js';
 const entryPath = '/__vite-plugin-monkey.entry.js';
 const pullPath = '/__vite-plugin-monkey.pull.js';
-const cacheUserPath = 'node_modules/.vite/__vite-plugin-monkey.cache.user.js';
 
 export const serverPlugin = (finalOption: FinalMonkeyOption): PluginOption => {
   let viteConfig: ResolvedConfig;
@@ -68,7 +67,6 @@ export const serverPlugin = (finalOption: FinalMonkeyOption): PluginOption => {
       const { server } = viteConfig;
       server.host = serverConfig.host;
       server.port = serverConfig.port;
-      // server.origin = serverConfig.origin;
       const baseConfig = {
         host: serverConfig.host,
         protocol: serverConfig.isHttps ? 'wss' : 'ws',
@@ -201,18 +199,21 @@ export const serverPlugin = (finalOption: FinalMonkeyOption): PluginOption => {
       });
 
       if (finalOption.server.open) {
+        const cacheUserPath = `node_modules/.vite/__vite-plugin-monkey.cache.${cyrb53hash(
+          viteConfig.configFile,
+        )}.user.js`;
         let cacheComment = '';
         if (await existFile(cacheUserPath)) {
           cacheComment = (await fs.readFile(cacheUserPath)).toString('utf-8');
         } else {
-          await fs.mkdir(path.dirname(cacheUserPath)).catch();
+          await fs.mkdir(path.dirname(cacheUserPath)).catch(() => {});
         }
         const newComment = await finalMonkeyOptionToComment(finalOption);
         if (!isFirstBoot() && cacheComment != newComment) {
           openBrowser(serverConfig.installUrl, true, logger);
           logger.info('reopen, config comment has changed', { time: true });
         }
-        await fs.writeFile(cacheUserPath, newComment).catch();
+        await fs.writeFile(cacheUserPath, newComment).catch(() => {});
       }
     },
   };

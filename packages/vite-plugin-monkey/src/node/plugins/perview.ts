@@ -35,7 +35,10 @@ export const perviewPlugin = (finalOption: FinalMonkeyOption): PluginOption => {
           const distDirPath = path.join(process.cwd(), viteConfig.build.outDir);
           const fileNames: string[] = [];
           for await (const pathname of walk(distDirPath)) {
-            if (pathname.endsWith('.user.js')) {
+            if (
+              pathname.endsWith('.user.js') &&
+              pathname.includes(finalOption.build.fileName)
+            ) {
               const fileName = normalizePath(
                 path.relative(distDirPath, pathname),
               );

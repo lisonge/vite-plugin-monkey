@@ -334,8 +334,8 @@ export type XhrRequest<TContext = object> = {
   onload?: RequestEventListener<TResponse<TContext>>;
 };
 
-export type MonkeyWindow = Window & {
-  unsafeWindow: Window;
+export type MonkeyWindow = typeof window & {
+  unsafeWindow: typeof window;
 
   /**
    * @see https://www.tampermonkey.net/documentation.php#meta:grant

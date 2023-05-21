@@ -54,6 +54,7 @@ export const GM_fetch = async (
       data,
       binary,
       responseType: 'blob',
+      timeout: 5000,
       async onload(e) {
         await delay();
         const resp = new Response(e.response ?? e.responseText, {

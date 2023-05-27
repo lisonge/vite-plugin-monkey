@@ -36,7 +36,7 @@ export const GM_fetch = async (
   if (request.signal?.aborted) {
     throw new DOMException('Aborted', 'AbortError');
   }
-  const data = await request.text();
+  const data = await request.blob();
   let binary = true;
   const headers: Record<string, string> = {};
   // can not get [`referer`,`user-agent`,`others`]

@@ -43,6 +43,8 @@ export const finalBundlePlugin = (
         (e) => e.dynamicImports.length > 0,
       );
 
+      const usedModules = new Set<string>();
+
       const buildResult = (await build({
         logLevel: 'error',
         configFile: false,
@@ -76,7 +78,7 @@ export const finalBundlePlugin = (
                   id.endsWith(chunk.fileName),
                 ) ?? [];
               if (chunk && chunk.type == 'chunk' && k) {
-                delete rawBundle[k];
+                usedModules.add(k);
                 if (!finalOption.hasDynamicImport) {
                   const ch = transformTlaToIdentifier(this, chunk);
                   if (ch) return ch;
@@ -117,6 +119,10 @@ export const finalBundlePlugin = (
           },
         },
       })) as RollupOutput[];
+
+      usedModules.forEach((k) => {
+        delete rawBundle[k];
+      });
 
       const finalBundle = Object.assign({}, rawBundle, buildResult[0].output);
       let finalJsCode = ``;

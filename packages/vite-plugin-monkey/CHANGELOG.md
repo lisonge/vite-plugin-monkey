@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 3.2.2
+
+- fix: error reopen when multiple vite config file [f981e2be](https://github.com/lisonge/vite-plugin-monkey/commit/5f2ed698ddf6f123f4595a367bf236b5f981e2be)
+- fix: vite preview install multiple scripts [8b65b48d](https://github.com/lisonge/vite-plugin-monkey/commit/37fb38f76d10d3f45dfb6ba4d89ae44e8b65b48d)
+- fix: window type error [6eeca4e2](https://github.com/lisonge/vite-plugin-monkey/commit/72fcf7e0ec4b92f70131896aa797d5f86eeca4e2)
+- fix: add gm xhr data type [d046f627](https://github.com/lisonge/vite-plugin-monkey/commit/15b148d33e98b7d13832491269210db0d046f627)
+- fix: dynamic import not resolve module ([#86](https://github.com/lisonge/vite-plugin-monkey/issues/86)) [329303e5](https://github.com/lisonge/vite-plugin-monkey/commit/49e92f33ebc170c968c6e2e7df585d2c329303e5)
+
 ## 3.2.1
 
 - fix: error docs link of GM_getValue [4095ad32](https://github.com/lisonge/vite-plugin-monkey/commit/521b45d42da00b805e6326075fa41d514095ad32)

@@ -248,7 +248,7 @@ type TResponse<TContext> = ResponseBase & {
 };
 type ProgressResponse<TContext> = TResponse<TContext> & ProgressResponseBase;
 export type XhrRequest<TContext = object> = {
-  method?: 'GET' | 'HEAD' | 'POST';
+  method?: string;
   /** Destination URL */
   url: string;
   /**
@@ -256,11 +256,15 @@ export type XhrRequest<TContext = object> = {
    * by Safari and Android browsers)
    */
   headers?: Record<string, string>;
-  /**
-   * @tampermonkey string
-   * @violentmonkey string | FormData | Blob
-   */
-  data?: string | FormData | Blob;
+
+  data?:
+    | string
+    | ArrayBuffer
+    | Blob
+    | DataView
+    | FormData
+    | ReadableStream
+    | URLSearchParams;
 
   /**
    * @available tampermonkey

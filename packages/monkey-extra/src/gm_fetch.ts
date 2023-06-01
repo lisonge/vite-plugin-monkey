@@ -1,4 +1,4 @@
-import { GM_xmlhttpRequest } from 'vite-plugin-monkey/dist/client';
+import { GM_xmlhttpRequest, XhrRequest } from 'vite-plugin-monkey/dist/client';
 import { delay, parseHeaders } from './util';
 
 // https://github.com/github/fetch/blob/master/fetch.js
@@ -31,6 +31,7 @@ const fixUrl = (url = '') => {
 export const GM_fetch = async (
   input: RequestInfo | URL,
   init: RequestInit = {},
+  xhrDetails: Partial<XhrRequest> = {},
 ): Promise<Response> => {
   const request = new Request(input, init);
   if (request.signal?.aborted) {
@@ -48,7 +49,8 @@ export const GM_fetch = async (
   });
   return new Promise<Response>((resolve, reject) => {
     const handle = GM_xmlhttpRequest({
-      method: request.method.toUpperCase() as 'GET' | 'POST' | 'HEAD',
+      ...xhrDetails,
+      method: request.method.toUpperCase(),
       url: fixUrl(request.url),
       headers,
       data,

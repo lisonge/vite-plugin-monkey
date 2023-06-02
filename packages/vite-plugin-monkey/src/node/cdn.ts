@@ -208,3 +208,20 @@ export const bdstatic = (
     },
   ];
 };
+
+/**
+ * `https://registry.npmmirror.com/${name}/${version}/files/${pathname}`
+ * @param exportVarName cdn-exportVarName or resourceName
+ */
+export const npmmirror = (
+  exportVarName = '',
+  pathname = '',
+): [string, Mod2UrlFn2] => {
+  return [
+    exportVarName,
+    (version, name, _importName = '', resolveName = '') => {
+      const p = pathname || resolveName;
+      return `https://registry.npmmirror.com/${name}/${version}/files/${p}`;
+    },
+  ];
+};

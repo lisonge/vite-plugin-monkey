@@ -8,7 +8,7 @@ import type { Mod2UrlFn2 } from './types';
  */
 export const jsdelivr = (
   exportVarName = '',
-  pathname?: string,
+  pathname = '',
 ): [string, Mod2UrlFn2] => {
   return [
     exportVarName,
@@ -221,7 +221,11 @@ export const npmmirror = (
     exportVarName,
     (version, name, _importName = '', resolveName = '') => {
       const p = pathname || resolveName;
-      return `https://registry.npmmirror.com/${name}/${version}/files/${p}`;
+      if (p) {
+        return `https://registry.npmmirror.com/${name}/${version}/files/${p}`;
+      } else {
+        return `https://registry.npmmirror.com/${name}/${version}/files`;
+      }
     },
   ];
 };

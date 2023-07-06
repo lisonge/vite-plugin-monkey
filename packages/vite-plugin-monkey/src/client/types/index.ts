@@ -105,12 +105,18 @@ export type OpenInTabDetails = {
 };
 
 type OpenInTabFn = {
-  (url: string, details?: OpenInTabDetails): {
+  (
+    url: string,
+    details?: OpenInTabDetails,
+  ): {
     onclose?: () => void;
     closed: boolean;
     close: () => void;
   };
-  (url: string, openInBackground?: boolean): {
+  (
+    url: string,
+    openInBackground?: boolean,
+  ): {
     onclose?: () => void;
     closed: boolean;
     close: () => void;
@@ -551,6 +557,7 @@ export type MonkeyWindow = typeof window & {
   GM_registerMenuCommand: <T extends MouseEvent | KeyboardEvent>(
     caption: string,
     onClick: (event: T) => void,
+    accessKey?: string,
   ) => string;
 
   /**

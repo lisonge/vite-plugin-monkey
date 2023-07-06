@@ -536,7 +536,7 @@ export type MonkeyWindow = typeof window & {
    * @see https://www.tampermonkey.net/documentation.php#GM_log
    * @available tampermonkey
    */
-  GM_log: (message: unknown) => void;
+  GM_log: (...data: any[]) => void;
 
   /**
    * @see https://www.tampermonkey.net/documentation.php#GM_notification

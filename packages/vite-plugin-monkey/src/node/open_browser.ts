@@ -2,6 +2,7 @@ import spawn from 'cross-spawn';
 import { execSync } from 'node:child_process';
 import path from 'node:path';
 import open from 'open';
+import type { Options } from 'open';
 import colors from 'picocolors';
 import type { Logger } from './_logger';
 import { compatResolve } from './_util';
@@ -83,7 +84,7 @@ function startBrowserProcess(browser: string | undefined, url: string) {
   // Fallback to open
   // (It will always open new tab)
   try {
-    const options: open.Options = browser ? { app: { name: browser } } : {};
+    const options: Options = browser ? { app: { name: browser } } : {};
     open(url, options).catch(() => {}); // Prevent `unhandledRejection` error.
     return true;
   } catch (err) {

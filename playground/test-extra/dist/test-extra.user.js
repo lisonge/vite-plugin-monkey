@@ -118,13 +118,13 @@
       return url;
     }
   };
-  var GM_fetch = async (input, init = {}) => {
+  var GM_fetch = async (input, init = {}, xhrDetails = {}) => {
     var _a;
     const request = new Request(input, init);
     if ((_a = request.signal) == null ? void 0 : _a.aborted) {
       throw new DOMException("Aborted", "AbortError");
     }
-    const data = await request.text();
+    const data = await request.blob();
     let binary = true;
     const headers = {};
     request.headers.forEach((value, key) => {
@@ -136,12 +136,14 @@
     return new Promise((resolve, reject) => {
       var _a2;
       const handle = _GM_xmlhttpRequest({
+        ...xhrDetails,
         method: request.method.toUpperCase(),
         url: fixUrl(request.url),
         headers,
         data,
         binary,
         responseType: "blob",
+        timeout: 5e3,
         async onload(e) {
           await delay();
           const resp = new Response(e.response ?? e.responseText, {
@@ -240,7 +242,8 @@
       ).proceed();
     };
     return {
-      fetch: fakeFetch,
+      originalFetch,
+      fakeFetch,
       use: (interceptor) => {
         interceptors.push(interceptor);
         return interceptors.length - 1;
@@ -257,7 +260,7 @@
   };
   var UnsafeWindowInterceptorManager = /* @__PURE__ */ lazy(() => {
     const t = buildFetchInterceptorManager(_monkeyWindow.unsafeWindow.fetch);
-    _monkeyWindow.unsafeWindow.fetch = t.fetch;
+    _monkeyWindow.unsafeWindow.fetch = t.fakeFetch;
     return t;
   });
   (async () => {

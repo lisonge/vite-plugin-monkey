@@ -42,9 +42,6 @@ export default defineConfig(async ({ command, mode }) => ({
         externalResource: {
           'element-plus/dist/index.css': cdn.jsdelivr(),
         },
-        sourcemap: {
-          offset: 146,
-        },
       },
     }),
   ],

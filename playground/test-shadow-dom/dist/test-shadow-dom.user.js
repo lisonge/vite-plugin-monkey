@@ -78,6 +78,15 @@
       c.user = true;
     Effects ? Effects.push(c) : updateComputation(c);
   }
+  function createMemo(fn, value, options) {
+    options = options ? Object.assign({}, signalOptions, options) : signalOptions;
+    const c = createComputation(fn, value, true, 0);
+    c.observers = null;
+    c.observerSlots = null;
+    c.comparator = options.equals || void 0;
+    updateComputation(c);
+    return readSignal.bind(c);
+  }
   function untrack(fn) {
     if (Listener === null)
       return fn();
@@ -366,8 +375,16 @@
     node.state = 0;
     node.context = null;
   }
-  function handleError(err) {
-    throw err;
+  function castError(err) {
+    if (err instanceof Error)
+      return err;
+    return new Error(typeof err === "string" ? err : "Unknown error", {
+      cause: err
+    });
+  }
+  function handleError(err, owner = Owner) {
+    const error = castError(err);
+    throw error;
   }
   function createComponent(Comp, props) {
     return untrack(() => Comp(props || {}));
@@ -446,7 +463,7 @@
       t.innerHTML = html;
       return isSVG ? t.content.firstChild.firstChild : t.content.firstChild;
     };
-    const fn = isCE ? () => (node || (node = create())).cloneNode(true) : () => untrack(() => document.importNode(node || (node = create()), true));
+    const fn = isCE ? () => untrack(() => document.importNode(node || (node = create()), true)) : () => (node || (node = create())).cloneNode(true);
     fn.cloneNode = fn;
     return fn;
   }
@@ -590,12 +607,12 @@
     let content;
     let hydrating = !!sharedConfig.context;
     createEffect(() => {
-      content || (content = runWithOwner(owner, () => props.children));
+      content || (content = runWithOwner(owner, () => createMemo(() => props.children)));
       const el = mount();
       if (el instanceof HTMLHeadElement) {
         const [clean, setClean] = createSignal(false);
         const cleanup = () => setClean(true);
-        createRoot((dispose) => insert(el, () => !clean() ? content : dispose(), null));
+        createRoot((dispose) => insert(el, () => !clean() ? content() : dispose(), null));
         onCleanup(cleanup);
       } else {
         const container = createElement(props.isSVG ? "g" : "div", props.isSVG), renderRoot = useShadow && container.attachShadow ? container.attachShadow({

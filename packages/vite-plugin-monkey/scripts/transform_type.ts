@@ -49,7 +49,7 @@ ts.forEachChild(source, (node) => {
   }
 });
 
-const clientDtsCode = format(`
+const clientDtsCode = await format(`
 /**
  * the alias of \`vite-plugin-monkey/dist/client\`
  */
@@ -116,7 +116,7 @@ ts.forEachChild(source, (node) => {
   }
 });
 
-const globalDtsCode = format(`
+const globalDtsCode = await format(`
 export {};
 
 ${topNodeList.map((n) => nodeToString(n)).join('\n')}

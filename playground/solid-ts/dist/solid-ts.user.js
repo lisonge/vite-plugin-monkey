@@ -317,8 +317,16 @@
     node.state = 0;
     node.context = null;
   }
-  function handleError(err) {
-    throw err;
+  function castError(err) {
+    if (err instanceof Error)
+      return err;
+    return new Error(typeof err === "string" ? err : "Unknown error", {
+      cause: err
+    });
+  }
+  function handleError(err, owner = Owner) {
+    const error = castError(err);
+    throw error;
   }
   function createComponent(Comp, props) {
     return untrack(() => Comp(props || {}));
@@ -398,7 +406,7 @@
       t.innerHTML = html;
       return isSVG ? t.content.firstChild.firstChild : t.content.firstChild;
     };
-    const fn = isCE ? () => (node || (node = create())).cloneNode(true) : () => untrack(() => document.importNode(node || (node = create()), true));
+    const fn = isCE ? () => untrack(() => document.importNode(node || (node = create()), true)) : () => (node || (node = create())).cloneNode(true);
     fn.cloneNode = fn;
     return fn;
   }

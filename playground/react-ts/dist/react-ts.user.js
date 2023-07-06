@@ -11,8 +11,8 @@
 // @require    https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js
 // @resource   base64-img/test/img/car.svg      https://cdn.jsdelivr.net/npm/base64-img@1.0.4/test/img/car.svg
 // @resource   base64-img/test/img/car.svg?url  https://cdn.jsdelivr.net/npm/base64-img@1.0.4/test/img/car.svg
-// @resource   element-plus/dist/index.css      https://cdn.jsdelivr.net/npm/element-plus@2.3.4/dist/index.css
-// @resource   element-plus/dist/index.css?url  https://cdn.jsdelivr.net/npm/element-plus@2.3.4/dist/index.css
+// @resource   element-plus/dist/index.css      https://cdn.jsdelivr.net/npm/element-plus@2.3.7/dist/index.css
+// @resource   element-plus/dist/index.css?url  https://cdn.jsdelivr.net/npm/element-plus@2.3.7/dist/index.css
 // @grant      GM_getResourceText
 // @grant      GM_getResourceURL
 // ==/UserScript==

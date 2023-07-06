@@ -7,9 +7,9 @@
 // @icon         https://vitejs.dev/logo.svg
 // @match        https://i.songe.li/*
 // @require      https://cdn.jsdelivr.net/npm/md5@2.3.0/dist/md5.min.js
-// @require      https://cdn.jsdelivr.net/npm/vue@3.2.47/dist/vue.global.prod.js
+// @require      https://cdn.jsdelivr.net/npm/vue@3.3.4/dist/vue.global.prod.js
 // @require      data:application/javascript,window.Vue%3DVue%3B
-// @require      https://cdn.jsdelivr.net/npm/element-plus@2.3.4/dist/index.full.min.js
+// @require      https://cdn.jsdelivr.net/npm/element-plus@2.3.7/dist/index.full.min.js
 // @require      https://cdn.jsdelivr.net/npm/systemjs@6.14.1/dist/system.min.js
 // @require      https://cdn.jsdelivr.net/npm/systemjs@6.14.1/dist/extras/named-register.min.js
 // @require      data:application/javascript,%3B(typeof%20System!%3D'undefined')%26%26(System%3Dnew%20System.constructor())%3B

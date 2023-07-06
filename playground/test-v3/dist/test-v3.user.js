@@ -4,7 +4,7 @@
 // @version           0.0.0
 // @author            monkey
 // @match             https://lisonge.com/*
-// @require           https://cdn.jsdelivr.net/npm/vue@3.2.47/dist/vue.global.prod.js
+// @require           https://cdn.jsdelivr.net/npm/vue@3.3.4/dist/vue.global.prod.js
 // @resource          resource1  https://github.com/1
 // @resource          resource2  https://github.com/2
 // @resource          resource3  https://github.com/3

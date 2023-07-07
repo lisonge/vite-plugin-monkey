@@ -312,6 +312,7 @@ there is the following cdn to use, full detail see [cdn.ts](/packages/vite-plugi
 - [staticfile](https://staticfile.org/)
 - [cdnjs](https://cdnjs.com/libraries)
 - [zhimg](https://unpkg.zhimg.com/)
+- [npmmirror](https://registry.npmmirror.com/)
 
 if you want use other cdn, you can see [external-scripts](https://greasyfork.org/help/external-scripts)
 

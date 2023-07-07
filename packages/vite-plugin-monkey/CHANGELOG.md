@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 3.3.0
+
+- feat: add cdn npmmirror [e971ea0a](https://github.com/lisonge/vite-plugin-monkey/commit/133f6cc393c3785b28a0391c927ea0bae971ea0a)
+- fix: type GM_registerMenuCommand accessKey [6567c2b2](https://github.com/lisonge/vite-plugin-monkey/commit/b06cf61fd86ffa31387cd520c0cf08a46567c2b2)
+- fix: type GM_log hint [ad5c73d9](https://github.com/lisonge/vite-plugin-monkey/commit/8bd42e45b23d0c1beacd8e2c91cee697ad5c73d9)
+- chore: update deps
+
 ## 3.2.2
 
 - fix: error reopen when multiple vite config file [f981e2be](https://github.com/lisonge/vite-plugin-monkey/commit/5f2ed698ddf6f123f4595a367bf236b5f981e2be)

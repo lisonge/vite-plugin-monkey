@@ -308,6 +308,7 @@ export default defineConfig({
 - [staticfile](https://staticfile.org/)
 - [cdnjs](https://cdnjs.com/libraries)
 - [zhimg](https://unpkg.zhimg.com/)
+- [npmmirror](https://registry.npmmirror.com/)
 
 如果你想使用其他 cdn，请查看 [external-scripts](https://greasyfork.org/zh-CN/help/external-scripts)
 

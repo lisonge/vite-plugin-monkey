@@ -9,11 +9,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "vue": "^3.2.47"
+    "vue": "^3.3.4"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^4.2.1",
-    "vite": "^4.3.5",
-    "vite-plugin-monkey": "^3.2.0"
+    "@vitejs/plugin-vue": "^4.2.3",
+    "vite": "^4.4.2",
+    "vite-plugin-monkey": "^3.3.0"
   }
 }

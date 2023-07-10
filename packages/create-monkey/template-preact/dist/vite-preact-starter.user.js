@@ -5,7 +5,7 @@
 // @author     monkey
 // @icon       https://vitejs.dev/logo.svg
 // @match      https://www.google.com/
-// @require    https://cdn.jsdelivr.net/npm/preact@10.13.2/dist/preact.min.js
+// @require    https://cdn.jsdelivr.net/npm/preact@10.16.0/dist/preact.min.js
 // ==/UserScript==
 
 (e=>{const o=document.createElement("style");o.dataset.source="vite-plugin-monkey",o.textContent=e,document.head.append(o)})(" #app{max-width:1280px;margin:0 auto;padding:2rem;text-align:center}.logo{height:6em;padding:1.5em}.logo:hover{filter:drop-shadow(0 0 2em #646cffaa)}.logo.preact:hover{filter:drop-shadow(0 0 2em #673ab8aa)}.card{padding:2em}.read-the-docs{color:#888}:root{font-family:Inter,Avenir,Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;font-weight:400;color-scheme:light dark;color:#ffffffde;background-color:#242424;font-synthesis:none;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;-webkit-text-size-adjust:100%}a{font-weight:500;color:#646cff;text-decoration:inherit}a:hover{color:#535bf2}body{margin:0;display:flex;place-items:center;min-width:320px;min-height:100vh}h1{font-size:3.2em;line-height:1.1}button{border-radius:8px;border:1px solid transparent;padding:.6em 1.2em;font-size:1em;font-weight:500;font-family:inherit;background-color:#1a1a1a;cursor:pointer;transition:border-color .25s}button:hover{border-color:#646cff}button:focus,button:focus-visible{outline:4px auto -webkit-focus-ring-color}@media (prefers-color-scheme: light){:root{color:#213547;background-color:#fff}a:hover{color:#747bff}button{background-color:#f9f9f9}} ");
@@ -74,7 +74,7 @@
     var i2 = (r = n.__c).__H;
     i2 && (u === r ? (i2.__h = [], r.__h = [], i2.__.forEach(function(n2) {
       n2.__N && (n2.__ = n2.__N), n2.__V = c, n2.__N = n2.i = void 0;
-    })) : (i2.__h.forEach(k), i2.__h.forEach(w), i2.__h = [])), u = r;
+    })) : (i2.__h.forEach(k), i2.__h.forEach(w), i2.__h = [], t = 0)), u = r;
   }, preact.options.diffed = function(t2) {
     v && v(t2);
     var o2 = t2.__c;

@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.3.1
+
+- fix: cjs can not require open module [#95](https://github.com/lisonge/vite-plugin-monkey/issues/95) [78fbc325](https://github.com/lisonge/vite-plugin-monkey/commit/009dc14ab46d1ebcdabe3a42a0c84e3d78fbc325)
+
 ## 3.3.0
 
 - feat: add cdn npmmirror [e971ea0a](https://github.com/lisonge/vite-plugin-monkey/commit/133f6cc393c3785b28a0391c927ea0bae971ea0a)

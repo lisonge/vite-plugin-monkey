@@ -1,7 +1,6 @@
 import spawn from 'cross-spawn';
 import { execSync } from 'node:child_process';
 import path from 'node:path';
-import open from 'open';
 import type { Options } from 'open';
 import colors from 'picocolors';
 import type { Logger } from './_logger';
@@ -85,7 +84,10 @@ function startBrowserProcess(browser: string | undefined, url: string) {
   // (It will always open new tab)
   try {
     const options: Options = browser ? { app: { name: browser } } : {};
-    open(url, options).catch(() => {}); // Prevent `unhandledRejection` error.
+    // open is esm only, cjs need
+    import('open').then(({ default: open }) => {
+      open(url, options).catch(() => {}); // Prevent `unhandledRejection` error.
+    });
     return true;
   } catch (err) {
     return false;

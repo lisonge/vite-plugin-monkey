@@ -421,27 +421,9 @@ preact/react/svelte/vanilla/vue/solid 的例子, 请直接看 [create-monkey](/p
 
 在 `vite serve` 模式下, 代码入口被作为 script 添加到目标环境 document.head, 代码需要在两个源之间正常工作
 
-#### 对于 http header csp
+但是浏览器会根据 CSP 策略阻止这个 script 的执行
 
-你可以使用 [Tampermonkey](https://www.tampermonkey.net/) 然后打开插件配置 `extension://iikmkjmpaadaobahmlepeloendndfphd/options.html#nav=settings`
-
-在 `安全`, 设置 `如果站点有内容安全策略（CSP）则向其策略:` 为 `全部移除（可能不安全）`
-
-具体情况请看 [issues/1](https://github.com/lisonge/vite-plugin-monkey/issues/1)
-
-如果你使用 `Violentmonkey`/`Greasemonkey`, 你能通过以下方式解决
-
-- chrome - [Disable Content-Security-Policy](https://chrome.google.com/webstore/detail/disable-content-security/ieelmcmcagommplceebfedjlakkhpden/)
-- edge - [Disable Content-Security-Policy](https://microsoftedge.microsoft.com/addons/detail/disable-contentsecurity/ecmfamimnofkleckfamjbphegacljmbp?hl=zh-CN)
-- firefox - 在 `about:config` 菜单配置中，禁用 `security.csp.enable`
-
-#### for html csp
-
-- 利用 <https://wproxy.org/whistle/> 中间人攻击修改 html
-
-- 如果 csp 允许 `*.xx.com` 这类域名, 你可以设置 `viteConfig.server.host=localhost.xx.com` 然后添加本地 dns `127.0.0.1 localhost.xx.com` 到你的 hosts 文件, 如果你需要伪装 https ca, 你可以使用 [mkcert](https://github.com/FiloSottile/mkcert)
-
-- 通过 chrome-remote-interface [issues/1#issuecomment-1236060681](https://github.com/lisonge/vite-plugin-monkey/issues/1#issuecomment-1236060681)
+安装扩展 [Disable-CSP](https://github.com/lisonge/Disable-CSP) 即可禁用 CSP
 
 ### 通过 @require 加载的 IIFE 和 UMD 混用的问题
 

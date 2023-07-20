@@ -425,27 +425,9 @@ please ensure that the order of the plugin is **the last one**
 
 in `vite serve` mode, the code entry is added as script to target host document.head, code need work between two origins
 
-#### For http header csp
+but the browser will prevent the execution of this script according to the CSP strategy
 
-you can use [Tampermonkey](https://www.tampermonkey.net/) then open `extension://iikmkjmpaadaobahmlepeloendndfphd/options.html#nav=settings`
-
-at `Security`, set `Modify existing content security policy (CSP) headers` to `Remove entirely (possibly unsecure)`
-
-full detail see [issues/1](https://github.com/lisonge/vite-plugin-monkey/issues/1)
-
-and if you use `Violentmonkey`/`Greasemonkey`, you can solve it in the following ways
-
-- chrome - [Disable Content-Security-Policy](https://chrome.google.com/webstore/detail/disable-content-security/ieelmcmcagommplceebfedjlakkhpden/)
-- edge - [Disable Content-Security-Policy](https://microsoftedge.microsoft.com/addons/detail/disable-contentsecurity/ecmfamimnofkleckfamjbphegacljmbp?hl=zh-CN)
-- firefox - disable `security.csp.enable` in the `about:config` menu
-
-#### For html csp
-
-- MITM modify html by <https://wproxy.org/whistle/>
-
-- if csp allow `*.xx.com`, you can set `viteConfig.server.host=localhost.xx.com` and add `127.0.0.1 localhost.xx.com` to your hosts file, if your need fake https ca, you can use [mkcert](https://github.com/FiloSottile/mkcert)
-
-- by chrome-remote-interface [issues/1#issuecomment-1236060681](https://github.com/lisonge/vite-plugin-monkey/issues/1#issuecomment-1236060681)
+now just use browser extension [Disable-CSP](https://github.com/lisonge/Disable-CSP)
 
 ### Mixed IIFE and UMD at @require
 

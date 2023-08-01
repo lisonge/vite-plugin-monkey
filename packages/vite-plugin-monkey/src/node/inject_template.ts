@@ -5,6 +5,30 @@ export const fn2string = <T extends (...args: any[]) => any>(
   return `;(${fn})(...${JSON.stringify(args, undefined, 2)});`;
 };
 
+const htmlText = /* html */ `
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="https://vitejs.dev/logo.svg" />
+    <title>Vite</title>
+  </head>
+  <script type="module" data-source="vite-plugin-monkey">
+  __CODE__
+  </script>
+</html>
+`.trimStart();
+
+export const fcToHtml = <T extends (...args: any[]) => any>(
+  fn: T,
+  ...args: Parameters<T>
+) => {
+  return htmlText.replace(
+    `__CODE__`,
+    `;(${fn})(...${JSON.stringify(args, void 0, 2)});`,
+  );
+};
+
 export const serverInjectFn = ({ entrySrc = `` }) => {
   // @ts-ignore
   window.GM; // must exist, see https://github.com/Tampermonkey/tampermonkey/issues/1567
@@ -54,7 +78,7 @@ export const mountGmApiFn = (meta: ImportMeta) => {
   );
 };
 
-export const redirectFn = async (url: string) => {
+export const virtualHtmlTemplate = async (url: string) => {
   const delay = async (n = 0) => {
     await new Promise<void>((res) => {
       setTimeout(res, n);
@@ -69,58 +93,93 @@ export const redirectFn = async (url: string) => {
     window.close();
     return;
   }
+  // if in iframe, like codesandbox
   const style = document.createElement('style');
-  document.body.append(style);
+  document.head.append(style);
   style.innerText = /* css */ `
-.App {
-  margin-top: 20vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.App > a {
-  font-size: 32px;
-  text-align: center;
-}
-.App > .copy {
-  margin-top: 20px;
-  padding: 4px;
-  font-size: 15px;
-  border: 2px solid;
-  cursor: pointer;
-  user-select: none;
-}
-.App > .copied {
-  opacity: 0;
-  margin-top: 10px;
-  font-size: 12px;
-  padding: 8px;
-  border-radius: 5px;
-  background-color: black;
-  color: white;
-}
-.App > .copy:active + .copied {
-  opacity: 1;
-}
-.App > .copy:not(:active) + .copied {
-  transition: opacity 750ms;
-}
+  .App {
+    margin-top: 10vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .App > .title {
+    padding: 4px;
+    font-size: 15px;
+  }
+  .App > a {
+    font-size: 32px;
+    text-align: center;
+  }
 `.trim();
-  const div = document.createElement('div');
-  document.body.append(div);
-  div.innerHTML = /* html */ `
-<div class="App">
-  <a target="_blank"></a>
-  <div class="copy">COPY</div>
-  <div class="copied">Copied!</div>
-</div>
+  document.body.innerHTML = /* html */ `
+  <div class="App">
+    <div class="title"> please click the link below to install userscipt </div>
+    <a target="_blank"></a>
+  </div>
   `.trim();
   await delay();
-  const a = div.querySelector('a')!;
+  const a = document.querySelector('a')!;
   a.href = location.href;
   a.text = location.href;
-  const copy = document.querySelector<HTMLElement>('.copy')!;
-  copy.addEventListener('click', async () => {
-    await navigator.clipboard.writeText(u.href);
-  });
+};
+
+export const previewTemplate = async (urls: string[]) => {
+  const delay = async (n = 0) => {
+    await new Promise<void>((res) => {
+      setTimeout(res, n);
+    });
+  };
+  await delay();
+  const style = document.createElement('style');
+  document.head.append(style);
+  style.innerText = /* css */ `
+  .App {
+    margin-top: 10vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .App > .title {
+    padding: 4px;
+    font-size: 15px;
+  }
+  .App > a {
+    font-size: 32px;
+    text-align: center;
+  }
+`.trim();
+  if (window == window.parent && urls.length == 1) {
+    const u = new URL(urls[0], location.origin);
+    location.href = u.href;
+    await delay(500);
+    window.close();
+    return;
+  } else if (urls.length == 0) {
+    document.body.innerHTML = /* html */ `
+    <div class="App">
+      <div class="title"> There is no script to install </div>
+    </div>
+    `.trim();
+    return;
+  } else {
+    document.body.innerHTML = /* html */ `
+    <div class="App">
+      <div class="title"> please click the link below to install userscipt </div>
+    </div>
+    `.trim();
+    await delay();
+    const div = document.querySelector<HTMLElement>(`.App`)!;
+    urls.forEach((u) => {
+      const a = document.createElement('a');
+      if (window != window.parent) {
+        a.target = '_blank';
+      }
+      a.href = u;
+      a.textContent = new URL(u, location.origin).href;
+      div.append(a);
+    });
+  }
 };

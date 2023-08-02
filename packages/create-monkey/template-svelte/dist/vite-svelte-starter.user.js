@@ -35,16 +35,6 @@
   function safe_not_equal(a, b) {
     return a != a ? b == b : a !== b || a && typeof a === "object" || typeof a === "function";
   }
-  let src_url_equal_anchor;
-  function src_url_equal(element_src, url) {
-    if (element_src === url)
-      return true;
-    if (!src_url_equal_anchor) {
-      src_url_equal_anchor = document.createElement("a");
-    }
-    src_url_equal_anchor.href = url;
-    return element_src === src_url_equal_anchor.href;
-  }
   function is_empty(obj) {
     return Object.keys(obj).length === 0;
   }
@@ -405,13 +395,6 @@
   function create_fragment(ctx) {
     let main;
     let div0;
-    let a0;
-    let img0;
-    let img0_src_value;
-    let t0;
-    let a1;
-    let img1;
-    let img1_src_value;
     let t1;
     let h1;
     let t3;
@@ -427,11 +410,7 @@
       c() {
         main = element("main");
         div0 = element("div");
-        a0 = element("a");
-        img0 = element("img");
-        t0 = space();
-        a1 = element("a");
-        img1 = element("img");
+        div0.innerHTML = `<a href="https://vitejs.dev" target="_blank" rel="noreferrer"><img src="${viteLogo}" class="logo svelte-c9fbf7" alt="Vite Logo"/></a> <a href="https://svelte.dev" target="_blank" rel="noreferrer"><img src="${svelteLogo}" class="logo svelte svelte-c9fbf7" alt="Svelte Logo"/></a>`;
         t1 = space();
         h1 = element("h1");
         h1.textContent = "Vite + Svelte";
@@ -444,31 +423,12 @@
         t8 = space();
         p1 = element("p");
         p1.textContent = "Click on the Vite and Svelte logos to learn more";
-        if (!src_url_equal(img0.src, img0_src_value = viteLogo))
-          attr(img0, "src", img0_src_value);
-        attr(img0, "class", "logo svelte-c9fbf7");
-        attr(img0, "alt", "Vite Logo");
-        attr(a0, "href", "https://vitejs.dev");
-        attr(a0, "target", "_blank");
-        attr(a0, "rel", "noreferrer");
-        if (!src_url_equal(img1.src, img1_src_value = svelteLogo))
-          attr(img1, "src", img1_src_value);
-        attr(img1, "class", "logo svelte svelte-c9fbf7");
-        attr(img1, "alt", "Svelte Logo");
-        attr(a1, "href", "https://svelte.dev");
-        attr(a1, "target", "_blank");
-        attr(a1, "rel", "noreferrer");
         attr(div1, "class", "card");
         attr(p1, "class", "read-the-docs svelte-c9fbf7");
       },
       m(target, anchor) {
         insert(target, main, anchor);
         append(main, div0);
-        append(div0, a0);
-        append(a0, img0);
-        append(div0, t0);
-        append(div0, a1);
-        append(a1, img1);
         append(main, t1);
         append(main, h1);
         append(main, t3);

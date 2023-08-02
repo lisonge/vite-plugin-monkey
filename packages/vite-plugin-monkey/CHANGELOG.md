@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 3.4.0
+
+- feat: gm type enhancement [#96](https://github.com/lisonge/vite-plugin-monkey/issues/96) [fd2b4f92](https://github.com/lisonge/vite-plugin-monkey/commit/a9eb3acba3cb7d2bf83548e99f36ad2dfd2b4f92)
+  - all export type now startWith Gm
+  - GmXhrRequest responseType generic type
+  - GmXhrRequest add redirect property
+  - GM_getTabs/GM_getTab generic type
+- perf: serve/preview html [b3680a37](https://github.com/lisonge/vite-plugin-monkey/commit/deeafb9659795850185198c49e782247b3680a37)
+- feat: add type for gm_xhr stream property [09aed1d1](https://github.com/lisonge/vite-plugin-monkey/commit/7e8542d011c3bf665602bc7e75406c5609aed1d1)
+
 ## 3.3.1
 
 - fix: cjs can not require open module [#95](https://github.com/lisonge/vite-plugin-monkey/issues/95) [78fbc325](https://github.com/lisonge/vite-plugin-monkey/commit/009dc14ab46d1ebcdabe3a42a0c84e3d78fbc325)

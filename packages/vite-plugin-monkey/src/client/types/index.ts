@@ -339,6 +339,17 @@ export type GmXhrRequest<TContext, TResponseType extends GmResponseType> = {
   onload?: GmRequestEventListener<GmResponseEvent<TContext, TResponseType>>;
 };
 
+type GmXhr = {
+  <TContext, TResponseType extends GmResponseType = 'text'>(
+    details: GmXhrRequest<TContext, TResponseType>,
+  ): GmAbortHandle;
+
+  /**
+   * @see [tampermonkey#1278](https://github.com/Tampermonkey/tampermonkey/issues/1278#issuecomment-884363078)
+   */
+  RESPONSE_TYPE_STREAM?: 'stream';
+};
+
 export type MonkeyWindow = typeof window & {
   unsafeWindow: typeof window;
 
@@ -589,9 +600,7 @@ export type MonkeyWindow = typeof window & {
    * @see https://www.tampermonkey.net/documentation.php#GM_xmlhttpRequest
    * @see https://violentmonkey.github.io/api/gm/#gm_xmlhttprequest
    */
-  GM_xmlhttpRequest: <TContext, TResponseType extends GmResponseType = 'text'>(
-    details: GmXhrRequest<TContext, TResponseType>,
-  ) => GmAbortHandle;
+  GM_xmlhttpRequest: GmXhr;
 
   /**
    * @see https://www.tampermonkey.net/documentation.php#GM_download

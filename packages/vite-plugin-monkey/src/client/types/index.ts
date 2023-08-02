@@ -217,11 +217,15 @@ type GmAbortHandle<TReturn = void> = {
 type GmResponseEventBase<TResponseType extends GmResponseType> = {
   responseHeaders: string;
   /**
-   * Unsent = 0,
-   * Opened = 1,
-   * HeadersReceived = 2,
-   * Loading = 3,
-   * Done = 4
+   * 0 = XMLHttpRequest.UNSENT
+   *
+   * 1 = XMLHttpRequest.OPENED
+   *
+   * 2 = XMLHttpRequest.HEADERS_RECEIVED
+   *
+   * 3 = XMLHttpRequest.HEADERS_RECEIVED
+   *
+   * 4 = XMLHttpRequest.DONE
    */
   readyState: 0 | 1 | 2 | 3 | 4;
   response: GmResponseTypeMap[TResponseType];
@@ -345,6 +349,7 @@ type GmXhr = {
   ): GmAbortHandle;
 
   /**
+   * @available tampermonkey
    * @see [tampermonkey#1278](https://github.com/Tampermonkey/tampermonkey/issues/1278#issuecomment-884363078)
    */
   RESPONSE_TYPE_STREAM?: 'stream';

@@ -204,14 +204,6 @@ importers:
         specifier: 2.4.2
         version: 2.4.2
 
-  packages/monkey-extra:
-    devDependencies:
-      vite-plugin-monkey:
-        specifier: workspace:*
-        version: link:../vite-plugin-monkey
-
-  packages/server-preview: {}
-
   packages/vite-plugin-monkey:
     dependencies:
       acorn-walk:
@@ -302,15 +294,6 @@ importers:
 
   playground/solid-ts:
     dependencies:
-      vite-plugin-monkey:
-        specifier: workspace:*
-        version: link:../../packages/vite-plugin-monkey
-
-  playground/test-extra:
-    dependencies:
-      monkey-extra:
-        specifier: workspace:*
-        version: link:../../packages/monkey-extra
       vite-plugin-monkey:
         specifier: workspace:*
         version: link:../../packages/vite-plugin-monkey

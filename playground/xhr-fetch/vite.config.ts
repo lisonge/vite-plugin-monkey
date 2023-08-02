@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite';
-import monkey, { util } from 'vite-plugin-monkey';
+import monkey, { util } from './node_modules/vite-plugin-monkey/src/node/index';
 import AutoImport from 'unplugin-auto-import/vite';
 
 export default defineConfig({

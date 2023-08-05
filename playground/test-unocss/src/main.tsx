@@ -1,16 +1,17 @@
-import 'uno.css';
-import React from 'react';
-import ReactDOM from 'react-dom/client';
+import { render, Portal } from 'solid-js/web';
+import style from 'unocss?style';
 import App from './App';
 
-ReactDOM.createRoot(
+render(
+  () => (
+    <Portal useShadow>
+      <App />
+      {style}
+    </Portal>
+  ),
   (() => {
-    const app = document.createElement('div');
-    document.body.append(app);
-    return app;
+    const div = document.createElement('div');
+    document.body.append(div);
+    return div;
   })(),
-).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
 );

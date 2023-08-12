@@ -1,5 +1,5 @@
 {
-  "name": "test-sourcemap",
+  "name": "test-top-level-await",
   "private": true,
   "version": "0.0.0",
   "type": "module",

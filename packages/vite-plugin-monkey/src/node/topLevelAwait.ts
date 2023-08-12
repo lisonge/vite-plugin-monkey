@@ -1,7 +1,12 @@
 import type { Node as AcornNode } from 'acorn';
 import * as acornWalk from 'acorn-walk';
 import MagicString from 'magic-string';
-import type { OutputAsset, OutputChunk, PluginContext } from 'rollup';
+import type {
+  OutputAsset,
+  OutputBundle,
+  OutputChunk,
+  PluginContext,
+} from 'rollup';
 
 type CallAcornNode = AcornNode & {
   callee: AcornNode & { name: string };
@@ -9,11 +14,28 @@ type CallAcornNode = AcornNode & {
 };
 
 const awaitOffset = `await`.length;
-const tlaIdentifier = `__TOP_LEVEL_AWAIT__`;
+const initTlaIdentifier = `_TLA_`;
+
+export const findSafeTlaIdentifier = (rawBundle: OutputBundle) => {
+  const codes: string[] = [];
+  for (const chunk of Object.values(rawBundle)) {
+    if (chunk.type == 'chunk') {
+      codes.push(chunk.code);
+    }
+  }
+  let x = 0;
+  let identifier = initTlaIdentifier;
+  while (codes.some((code) => code.includes(identifier))) {
+    x++;
+    identifier = initTlaIdentifier + x.toString(36);
+  }
+  return identifier;
+};
 
 export const transformTlaToIdentifier = (
   context: PluginContext,
   chunk: OutputAsset | OutputChunk,
+  identifier: string,
 ) => {
   if (chunk.type == 'chunk') {
     const code = chunk.code;
@@ -47,11 +69,11 @@ export const transformTlaToIdentifier = (
         ms.appendRight(node.end, `)`);
 
         // await (xxx) -> __topLevelAwait__ (xxx)
-        ms.update(node.start, node.start + awaitOffset, tlaIdentifier);
+        ms.update(node.start, node.start + awaitOffset, identifier);
       });
       tlaForOfNodes.forEach((node) => {
         // for await(const x of xxx){} -> __topLevelAwait__ ((async()=>{ /*start*/for await(const x of xxx){}/*end*/  })());
-        ms.appendLeft(node.start, `${tlaIdentifier}((async()=>{`);
+        ms.appendLeft(node.start, `${identifier}((async()=>{`);
         ms.appendRight(node.end, `})());`);
       });
       return {
@@ -65,9 +87,10 @@ export const transformTlaToIdentifier = (
 export const transformIdentifierToTla = (
   context: PluginContext,
   chunk: OutputAsset | OutputChunk,
+  identifier: string,
 ) => {
   if (chunk.type == 'chunk') {
-    if (!chunk.code.includes(tlaIdentifier)) {
+    if (!chunk.code.includes(identifier)) {
       return;
     }
 
@@ -76,9 +99,7 @@ export const transformIdentifierToTla = (
     >((p, key) => {
       if (key in p) return p;
       p[key] = (node, state, callback) => {
-        if (
-          chunk.code.substring(node.start, node.end).includes(tlaIdentifier)
-        ) {
+        if (chunk.code.substring(node.start, node.end).includes(identifier)) {
           return acornWalk.base[key](node, state, callback);
         }
       };
@@ -95,7 +116,7 @@ export const transformIdentifierToTla = (
           // top level await
           if (
             node.callee?.type === `Identifier` &&
-            node.callee?.name === tlaIdentifier
+            node.callee?.name === identifier
           ) {
             tlaCallNodes.push(node);
           }
@@ -107,9 +128,7 @@ export const transformIdentifierToTla = (
           if (topFnNodes.length == 0) {
             topFnNodes.push(node);
           }
-          if (
-            chunk.code.substring(node.start, node.end).includes(tlaIdentifier)
-          ) {
+          if (chunk.code.substring(node.start, node.end).includes(identifier)) {
             return acornWalk.base.Function(node, state, callback);
           }
         },
@@ -119,9 +138,8 @@ export const transformIdentifierToTla = (
       const ms = new MagicString(chunk.code, {});
       tlaCallNodes.forEach((node) => {
         const callee = node.callee;
-        const [argument] = node.arguments as AcornNode[];
-        ms.update(callee.start, callee.end, '');
-        ms.update(callee.end, argument.start, `(await\x20`);
+        // __topLevelAwait__ (xxx) -> await (xxx)
+        ms.update(callee.start, callee.end, 'await');
       });
       topFnNodes.forEach((node) => {
         ms.appendLeft(node.start, `async\x20`);

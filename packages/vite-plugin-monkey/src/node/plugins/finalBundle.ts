@@ -2,12 +2,14 @@ import type { OutputChunk, RollupOutput } from 'rollup';
 import { build, PluginOption } from 'vite';
 import { getSystemjsRequireUrls, systemjsTexts } from '../systemjs';
 import {
+  findSafeTlaIdentifier,
   transformIdentifierToTla,
   transformTlaToIdentifier,
 } from '../topLevelAwait';
 import type { FinalMonkeyOption } from '../types';
 import { finalMonkeyOptionToComment } from '../userscript';
 import { moduleExportExpressionWrapper } from '../_util';
+import { lazyValue } from '../_lazy';
 
 const __entry_name = `__monkey.entry.js`;
 
@@ -45,6 +47,8 @@ export const finalBundlePlugin = (
 
       const usedModules = new Set<string>();
 
+      const tlaIdentifier = lazyValue(() => findSafeTlaIdentifier(rawBundle));
+
       const buildResult = (await build({
         logLevel: 'error',
         configFile: false,
@@ -80,7 +84,11 @@ export const finalBundlePlugin = (
               if (chunk && chunk.type == 'chunk' && k) {
                 usedModules.add(k);
                 if (!finalOption.hasDynamicImport) {
-                  const ch = transformTlaToIdentifier(this, chunk);
+                  const ch = transformTlaToIdentifier(
+                    this,
+                    chunk,
+                    tlaIdentifier.value,
+                  );
                   if (ch) return ch;
                 }
                 return {
@@ -94,7 +102,7 @@ export const finalBundlePlugin = (
                 return;
               }
               Object.entries(iifeBundle).forEach(([k, chunk]) => {
-                transformIdentifierToTla(this, chunk);
+                transformIdentifierToTla(this, chunk, tlaIdentifier.value);
               });
             },
           },

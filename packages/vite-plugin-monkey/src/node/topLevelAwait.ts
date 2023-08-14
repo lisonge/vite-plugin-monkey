@@ -32,6 +32,21 @@ export const findSafeTlaIdentifier = (rawBundle: OutputBundle) => {
   return identifier;
 };
 
+const startWith = (
+  text: string,
+  searchString: string,
+  position = 0,
+  ignoreString: string,
+) => {
+  for (let i = position; i < text.length; i++) {
+    if (ignoreString.includes(text[i])) {
+      continue;
+    }
+    return text.startsWith(searchString, i);
+  }
+  return false;
+};
+
 export const transformTlaToIdentifier = (
   context: PluginContext,
   chunk: OutputAsset | OutputChunk,
@@ -64,16 +79,20 @@ export const transformTlaToIdentifier = (
     if (tlaNodes.length > 0 || tlaForOfNodes.length > 0) {
       const ms = new MagicString(code);
       tlaNodes.forEach((node) => {
-        // await xxx -> await (xxx)
-        ms.appendLeft(node.start + awaitOffset, `(`);
-        ms.appendRight(node.end, `)`);
+        if (
+          !startWith(chunk.code, '(', node.start + awaitOffset, '\x20\t\r\n')
+        ) {
+          // await xxx -> await (xxx)
+          ms.appendLeft(node.start + awaitOffset, `(`);
+          ms.appendRight(node.end, `)`);
+        }
 
         // await (xxx) -> __topLevelAwait__ (xxx)
         ms.update(node.start, node.start + awaitOffset, identifier);
       });
       tlaForOfNodes.forEach((node) => {
-        // for await(const x of xxx){} -> __topLevelAwait__ ((async()=>{ /*start*/for await(const x of xxx){}/*end*/  })());
-        ms.appendLeft(node.start, `${identifier}((async()=>{`);
+        // for await(const x of xxx){} -> __topLevelAwait_FOR ((async()=>{ /*start*/for await(const x of xxx){}/*end*/  })());
+        ms.appendLeft(node.start, `${identifier + `FOR`}((async()=>{`);
         ms.appendRight(node.end, `})());`);
       });
       return {
@@ -107,18 +126,22 @@ export const transformIdentifierToTla = (
     }, {});
     const ast = context.parse(chunk.code);
     const tlaCallNodes: CallAcornNode[] = [];
+    const forTlaCallNodes: CallAcornNode[] = [];
     const topFnNodes: AcornNode[] = [];
     acornWalk.simple(
       ast,
       {
         // @ts-ignore
         CallExpression(node: CallAcornNode) {
-          // top level await
-          if (
-            node.callee?.type === `Identifier` &&
-            node.callee?.name === identifier
-          ) {
-            tlaCallNodes.push(node);
+          const { name, type } = node.callee ?? {};
+          if (type === `Identifier`) {
+            if (name === identifier) {
+              // top level await
+              tlaCallNodes.push(node);
+            } else if (name === identifier + `FOR`) {
+              // top level for await
+              forTlaCallNodes.push(node);
+            }
           }
         },
       },
@@ -140,6 +163,14 @@ export const transformIdentifierToTla = (
         const callee = node.callee;
         // __topLevelAwait__ (xxx) -> await (xxx)
         ms.update(callee.start, callee.end, 'await');
+      });
+      forTlaCallNodes.forEach((node) => {
+        // __topLevelAwait_FOR ((async()=>{ /*start*/for await(const x of xxx){}/*end*/  })()); -> for await(const x of xxx){}
+        // @ts-ignore
+        const forOfNode = node.arguments?.[0]?.callee?.body
+          ?.body?.[0] as AcornNode;
+        ms.update(node.start, forOfNode.start, '');
+        ms.update(forOfNode.end, node.end, '');
       });
       topFnNodes.forEach((node) => {
         ms.appendLeft(node.start, `async\x20`);

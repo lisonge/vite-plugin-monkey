@@ -9,9 +9,10 @@
 (async function () {
   'use strict';
 
-  console.log(await( (window == null ? void 0 : window.fetch(`/`))));
-  await((async()=>{for await (const v of [Promise.resolve(1), Promise.resolve(2)]) {
+  console.log(await (window == null ? void 0 : window.fetch(`/`)));
+  for await (const v of [Promise.resolve(1), Promise.resolve(2)]) {
     console.log(v);
-  }})());
+  };
+  console.log((+await( fetch(`/`)) || await( fetch(`/`))) && await( fetch(`/`)));
 
 })();

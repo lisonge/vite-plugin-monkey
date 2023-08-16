@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 3.4.1
+
+- fix: Invalid URL when get monkeyWindow [e5a7c908](https://github.com/lisonge/vite-plugin-monkey/commit/c0b558595362d8bae3934b97773f9ab3e5a7c908)
+- fix: top level await + optional chaining (?.) will build product syntax error [#101](https://github.com/lisonge/vite-plugin-monkey/issues/101) [d06d1d63](https://github.com/lisonge/vite-plugin-monkey/commit/3d564d24c983a63f27ed23ac1b28db0bd06d1d63)
+- perf: top level for await remove wrapper function [54669bc3](https://github.com/lisonge/vite-plugin-monkey/commit/8f25e7d8eaae7c3b6f1905f4557d051654669bc3)
+
 ## 3.4.0
 
 - feat: gm type enhancement [#96](https://github.com/lisonge/vite-plugin-monkey/issues/96) [fd2b4f92](https://github.com/lisonge/vite-plugin-monkey/commit/a9eb3acba3cb7d2bf83548e99f36ad2dfd2b4f92)

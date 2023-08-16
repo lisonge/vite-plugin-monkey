@@ -304,7 +304,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/vite-plugin-monkey
 
-  playground/test-sourcemap:
+  playground/test-top-level-await:
     dependencies:
       vite-plugin-monkey:
         specifier: workspace:*

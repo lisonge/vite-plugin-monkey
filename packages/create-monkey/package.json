@@ -38,9 +38,9 @@
   },
   "homepage": "https://github.com/lisonge/vite-plugin-monkey#readme",
   "dependencies": {
-    "kolorist": "1.6.0",
-    "minimist": "1.2.7",
-    "prompts": "2.4.2"
+    "kolorist": "^1.8.0",
+    "minimist": "^1.2.8",
+    "prompts": "^2.4.2"
   },
   "volta": {
     "extends": "../../package.json"

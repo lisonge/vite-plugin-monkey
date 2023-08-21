@@ -1,12 +1,10 @@
-import { PluginOption, ResolvedConfig, transformWithEsbuild } from 'vite';
-import type { FinalMonkeyOption } from '../types';
 import fs from 'node:fs/promises';
+import type { Plugin, ResolvedConfig } from 'vite';
+import type { FinalMonkeyOption } from '../types';
 
 // https://github.com/vitejs/vite/blob/42e0d6af67743841bd38ed504cb8cbaaafb6313f/packages/vite/src/node/plugins/asset.ts#L327
 
-export const inlinesAssetPlugin = (
-  finalOption: FinalMonkeyOption,
-): PluginOption => {
+export const inlinesAssetPlugin = (finalOption: FinalMonkeyOption): Plugin => {
   let viteConfig: ResolvedConfig;
   return {
     name: 'monkey:inlinesAsset',

@@ -1,4 +1,4 @@
-import { PluginOption, transformWithEsbuild } from 'vite';
+import { Plugin, transformWithEsbuild } from 'vite';
 import type { FinalMonkeyOption } from '../types';
 
 const GM_getResourceText = (name: string) => document.title;
@@ -32,7 +32,7 @@ const moduleSourceCode = [
 
 export const externalLoaderPlugin = (
   finalOption: FinalMonkeyOption,
-): PluginOption => {
+): Plugin => {
   return {
     name: 'monkey:externalLoader',
     enforce: 'pre',

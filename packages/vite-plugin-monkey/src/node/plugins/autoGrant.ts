@@ -1,13 +1,11 @@
-import type { PluginOption } from 'vite';
+import type { Plugin } from 'vite';
 import { normalizePath } from 'vite';
 import type { FinalMonkeyOption } from '../types';
 import { GM_keywords } from '../_util';
 
 const GM_keyword_set = Array.from(new Set(GM_keywords));
 
-export const autoGrantPlugin = (
-  finalOption: FinalMonkeyOption,
-): PluginOption => {
+export const autoGrantPlugin = (finalOption: FinalMonkeyOption): Plugin => {
   const collectGrantMap = new Map<string, string[]>();
   return {
     name: 'monkey:autoGrant',

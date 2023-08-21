@@ -1,5 +1,5 @@
 import type { OutputChunk, RollupOutput } from 'rollup';
-import { build, PluginOption } from 'vite';
+import { build, Plugin } from 'vite';
 import { getSystemjsRequireUrls, systemjsTexts } from '../systemjs';
 import {
   findSafeTlaIdentifier,
@@ -18,9 +18,7 @@ const polyfillId = '\0vite/legacy-polyfills';
 
 const systemJsImportMapPrefix = `user`;
 
-export const finalBundlePlugin = (
-  finalOption: FinalMonkeyOption,
-): PluginOption => {
+export const finalBundlePlugin = (finalOption: FinalMonkeyOption): Plugin => {
   return {
     name: 'monkey:finalBundle',
     apply: 'build',

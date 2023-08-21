@@ -1,4 +1,4 @@
-import type { PluginOption } from 'vite';
+import type { Plugin } from 'vite';
 import { resolvedOption } from './option';
 import monkeyPluginList from './plugins';
 import type { MonkeyOption } from './types';
@@ -21,10 +21,10 @@ export type {
   MonkeyOption,
 };
 
-export default (pluginOption: MonkeyOption): PluginOption => {
+export default (pluginOption: MonkeyOption): Plugin[] => {
   const finalPluginOption = resolvedOption(pluginOption);
 
-  const monkeyPlugin: PluginOption = {
+  const monkeyPlugin: Plugin = {
     name: 'monkey:entry',
     async config(userConfig, { command }) {
       const isServe = command == 'serve';

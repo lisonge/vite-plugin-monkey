@@ -1,4 +1,4 @@
-import { normalizePath, PluginOption } from 'vite';
+import { normalizePath, Plugin } from 'vite';
 import type { FinalMonkeyOption } from '../types';
 import { getModuleRealInfo } from '../_util';
 
@@ -6,7 +6,7 @@ import { getModuleRealInfo } from '../_util';
 
 export const externalGlobalsPlugin = (
   finalOption: FinalMonkeyOption,
-): PluginOption => {
+): Plugin => {
   const { globalsPkg2VarName, requirePkgList } = finalOption;
   return {
     name: 'monkey:externalGlobals',

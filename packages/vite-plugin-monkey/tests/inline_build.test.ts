@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { RollupOutput } from 'rollup';
-import { build, PluginOption } from 'vite';
+import { build, Plugin } from 'vite';
 
 const cacheEntryDirFp = path.join(process.cwd(), `./node_modules/.vite/`);
 const cacheEntryFp = path.join(
@@ -21,7 +21,7 @@ if (
 
 await fs.writeFile(cacheEntryFp, `import './xxx'`, 'utf-8');
 
-const mock: PluginOption = {
+const mock: Plugin = {
   name: 'mokey:mock',
   enforce: 'pre',
   resolveId(source, importer, options) {

@@ -1,11 +1,9 @@
-import { PluginOption, ResolvedConfig } from 'vite';
+import { Plugin, ResolvedConfig } from 'vite';
 import { miniCode } from '../_util';
 import { cssInjectFn, fn2string } from '../inject_template';
 import type { FinalMonkeyOption } from '../types';
 
-export const collectCssPlugin = (
-  finalOption: FinalMonkeyOption,
-): PluginOption => {
+export const collectCssPlugin = (finalOption: FinalMonkeyOption): Plugin => {
   let viteConfig: ResolvedConfig;
 
   return {

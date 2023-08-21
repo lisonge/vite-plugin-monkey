@@ -2,7 +2,7 @@ import detectPort from 'detect-port';
 import { DomUtils, ElementType, parseDocument } from 'htmlparser2';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { normalizePath, PluginOption, ResolvedConfig } from 'vite';
+import { normalizePath, Plugin, ResolvedConfig } from 'vite';
 import { fn2string, mountGmApiFn, serverInjectFn } from '../inject_template';
 import { openBrowser } from '../open_browser';
 import type { FinalMonkeyOption } from '../types';
@@ -16,7 +16,7 @@ const gmApiPath = '/__vite-plugin-monkey.gm.api.js';
 const entryPath = '/__vite-plugin-monkey.entry.js';
 const pullPath = '/__vite-plugin-monkey.pull.js';
 
-export const serverPlugin = (finalOption: FinalMonkeyOption): PluginOption => {
+export const serverPlugin = (finalOption: FinalMonkeyOption): Plugin => {
   let viteConfig: ResolvedConfig;
   const serverConfig = lazy(() => {
     let availablePort = 5173;

@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.4.2
+
+- fix: condition forTlaCallNodes [7fe231ca](https://github.com/lisonge/vite-plugin-monkey/commit/a95d6ed3489a3f3d9b0d5cc7a4be64ab7fe231ca)
+
 ## 3.4.1
 
 - fix: Invalid URL when get monkeyWindow [e5a7c908](https://github.com/lisonge/vite-plugin-monkey/commit/c0b558595362d8bae3934b97773f9ab3e5a7c908)

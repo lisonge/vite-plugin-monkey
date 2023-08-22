@@ -157,7 +157,7 @@ export const transformIdentifierToTla = (
         },
       },
     );
-    if (tlaCallNodes.length > 0 || topFnNodes.length > 0) {
+    if (tlaCallNodes.length > 0 || forTlaCallNodes.length > 0) {
       const ms = new MagicString(chunk.code, {});
       tlaCallNodes.forEach((node) => {
         const callee = node.callee;

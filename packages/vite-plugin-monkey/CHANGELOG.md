@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 3.5.0
+
+- feat: cssSideEffects [#104](https://github.com/lisonge/vite-plugin-monkey/issues/104), [2b3444c0](https://github.com/lisonge/vite-plugin-monkey/commit/2ba64c679c425311ab4943b37da1854d2b3444c0)
+- feat: userscript format generate [#103](https://github.com/lisonge/vite-plugin-monkey/issues/103), [309b75e2](https://github.com/lisonge/vite-plugin-monkey/commit/98f323975ce766ff897a4de017946172309b75e2)
+
 ## 3.4.2
 
 - fix: condition forTlaCallNodes [7fe231ca](https://github.com/lisonge/vite-plugin-monkey/commit/a95d6ed3489a3f3d9b0d5cc7a4be64ab7fe231ca)

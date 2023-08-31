@@ -1,27 +1,28 @@
 import { Plugin, transformWithEsbuild } from 'vite';
 import type { FinalMonkeyOption } from '../types';
 
-const GM_getResourceText = (name: string) => document.title;
-const GM_getResourceURL = (name: string, isBlobUrl?: boolean) => document.title;
-
 const cssLoader = (resourceName: string) => {
+  // @ts-ignore
   const css = GM_getResourceText(resourceName);
-  const style = document.createElement('style');
-  style.innerText = css;
-  document.head.append(style);
+  // @ts-ignore
+  GM_addStyle(css);
   return css;
 };
 
 const jsonLoader = (resourceName: string): unknown =>
+  // @ts-ignore
   JSON.parse(GM_getResourceText(resourceName));
 
 const urlLoader = (resourceName: string, mediaType: string) =>
+  // @ts-ignore
   GM_getResourceURL(resourceName, false).replace(
     /^data:application;base64,/,
     `data:${mediaType};base64,`,
   );
 
-const rawLoader = (resourceName: string) => GM_getResourceText(resourceName);
+const rawLoader = (resourceName: string) =>
+  // @ts-ignore
+  GM_getResourceText(resourceName);
 
 const moduleSourceCode = [
   `export const cssLoader = ${cssLoader}`,

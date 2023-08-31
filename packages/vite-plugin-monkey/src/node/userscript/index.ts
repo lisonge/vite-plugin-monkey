@@ -185,13 +185,15 @@ export type FinalUserScript = {
   $extra: [string, ...string[]][];
 } & GreasyforkUserScript;
 
-export const finalMonkeyOptionToComment = async ({
-  userscript,
-  format = { align: 2 },
-  collectGrantSet,
-  collectRequireUrls,
-  collectResource,
-}: FinalMonkeyOption): Promise<string> => {
+export const finalMonkeyOptionToComment = async (
+  {
+    userscript,
+    format = { align: 2 },
+    collectRequireUrls,
+    collectResource,
+  }: FinalMonkeyOption,
+  collectGrantSet: Set<string>,
+): Promise<string> => {
   let attrList: [string, ...string[]][] = [];
   const {
     name,
@@ -327,6 +329,7 @@ export const finalMonkeyOptionToComment = async ({
   } else {
     new Set([...Array.from(collectGrantSet.values()).flat(), ...grant]).forEach(
       (s) => {
+        if (!s.trim()) return;
         attrList.push(['grant', s]);
       },
     );

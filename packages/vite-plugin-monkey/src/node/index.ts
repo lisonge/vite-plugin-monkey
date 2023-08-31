@@ -26,6 +26,7 @@ export default (pluginOption: MonkeyOption): Plugin[] => {
 
   const monkeyPlugin: Plugin = {
     name: 'monkey:entry',
+    enforce: 'post',
     async config(userConfig, { command }) {
       const isServe = command == 'serve';
 

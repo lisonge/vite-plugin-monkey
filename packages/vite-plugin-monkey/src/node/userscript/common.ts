@@ -41,7 +41,7 @@ export type Format = {
  *     'supportURL',
  *     'https://github.com/lisonge/vite-plugin-monkey/issues'
  *   ],
- *   [ 'match', 'https://i.songe.li/' ],
+ *   [ 'match', 'https://songe.li/' ],
  *   [ 'require', 'https://cdn.jsdelivr.net/npm/blueimp-md5@2.19.0' ],
  *   [
  *     'require',

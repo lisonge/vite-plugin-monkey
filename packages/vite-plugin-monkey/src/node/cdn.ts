@@ -1,4 +1,4 @@
-import type { Mod2UrlFn2 } from './types';
+import type { ModuleToUrlFc } from './types';
 
 /**
  * `https://cdn.jsdelivr.net/npm/${name}@${version}/${pathname}`
@@ -9,7 +9,7 @@ import type { Mod2UrlFn2 } from './types';
 export const jsdelivr = (
   exportVarName = '',
   pathname = '',
-): [string, Mod2UrlFn2] => {
+): [string, ModuleToUrlFc] => {
   return [
     exportVarName,
     (version, name, _importName = '', resolveName = '') => {
@@ -32,7 +32,7 @@ export const jsdelivr = (
 export const jsdelivrFastly = (
   exportVarName = '',
   pathname = '',
-): [string, Mod2UrlFn2] => {
+): [string, ModuleToUrlFc] => {
   return [
     exportVarName,
     (version, name, _importName = '', resolveName = '') => {
@@ -54,7 +54,7 @@ export const jsdelivrFastly = (
 export const unpkg = (
   exportVarName = '',
   pathname = '',
-): [string, Mod2UrlFn2] => {
+): [string, ModuleToUrlFc] => {
   return [
     exportVarName,
     (version, name, _importName = '', resolveName = '') => {
@@ -76,7 +76,7 @@ export const unpkg = (
 export const bytecdntp = (
   exportVarName = '',
   pathname = '',
-): [string, Mod2UrlFn2] => {
+): [string, ModuleToUrlFc] => {
   return [
     exportVarName,
     (version, name, _importName = '', resolveName = '') => {
@@ -94,7 +94,7 @@ export const bytecdntp = (
 export const bootcdn = (
   exportVarName = '',
   pathname = '',
-): [string, Mod2UrlFn2] => {
+): [string, ModuleToUrlFc] => {
   return [
     exportVarName,
     (version, name, _importName = '', resolveName = '') => {
@@ -112,7 +112,7 @@ export const bootcdn = (
 export const baomitu = (
   exportVarName = '',
   pathname = '',
-): [string, Mod2UrlFn2] => {
+): [string, ModuleToUrlFc] => {
   return [
     exportVarName,
     (version, name, _importName = '', resolveName = '') => {
@@ -130,7 +130,7 @@ export const baomitu = (
 export const staticfile = (
   exportVarName = '',
   pathname = '',
-): [string, Mod2UrlFn2] => {
+): [string, ModuleToUrlFc] => {
   return [
     exportVarName,
     (version, name, _importName = '', resolveName = '') => {
@@ -147,7 +147,7 @@ export const staticfile = (
 export const cdnjs = (
   exportVarName = '',
   pathname = '',
-): [string, Mod2UrlFn2] => {
+): [string, ModuleToUrlFc] => {
   return [
     exportVarName,
     (version, name, _importName = '', resolveName = '') => {
@@ -165,7 +165,7 @@ export const cdnjs = (
 export const zhimg = (
   exportVarName = '',
   pathname = '',
-): [string, Mod2UrlFn2] => {
+): [string, ModuleToUrlFc] => {
   return [
     exportVarName,
     (version, name, _importName = '', resolveName = '') => {
@@ -182,7 +182,7 @@ export const zhimg = (
 export const elemecdn = (
   exportVarName = '',
   pathname = '',
-): [string, Mod2UrlFn2] => {
+): [string, ModuleToUrlFc] => {
   return [
     exportVarName,
     (version, name, _importName = '', resolveName = '') => {
@@ -199,7 +199,7 @@ export const elemecdn = (
 export const bdstatic = (
   exportVarName = '',
   pathname = '',
-): [string, Mod2UrlFn2] => {
+): [string, ModuleToUrlFc] => {
   return [
     exportVarName,
     (version, name, _importName = '', resolveName = '') => {
@@ -216,7 +216,7 @@ export const bdstatic = (
 export const npmmirror = (
   exportVarName = '',
   pathname = '',
-): [string, Mod2UrlFn2] => {
+): [string, ModuleToUrlFc] => {
   return [
     exportVarName,
     (version, name, _importName = '', resolveName = '') => {

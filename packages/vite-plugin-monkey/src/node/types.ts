@@ -1,4 +1,5 @@
 import type { FinalUserScript, Format, MonkeyUserScript } from './userscript';
+import { AlignFunc } from './userscript/common';
 
 export type IPromise<T> = T | Promise<T>;
 
@@ -81,7 +82,13 @@ export type ExternalResource = Record<
 
 export type FinalMonkeyOption = {
   entry: string;
-  format?: Format;
+  format: {
+    align: number | boolean | AlignFunc;
+    generate: (uOptions: {
+      userscript: string;
+      mode: `serve` | `build` | `meta`;
+    }) => IPromise<string>;
+  };
   userscript: FinalUserScript;
   clientAlias: string;
   server: {

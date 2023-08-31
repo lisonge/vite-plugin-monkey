@@ -122,7 +122,11 @@ export const serverPlugin = (finalOption: FinalMonkeyOption): Plugin => {
             const u = new URL(entryPath, origin);
             res.end(
               [
-                await finalMonkeyOptionToComment(finalOption),
+                await finalMonkeyOptionToComment(
+                  finalOption,
+                  new Set(),
+                  'serve',
+                ),
                 fn2string(serverInjectFn, {
                   entrySrc: u.href,
                 }),
@@ -208,7 +212,11 @@ export const serverPlugin = (finalOption: FinalMonkeyOption): Plugin => {
         } else {
           await fs.mkdir(path.dirname(cacheUserPath)).catch(() => {});
         }
-        const newComment = await finalMonkeyOptionToComment(finalOption);
+        const newComment = await finalMonkeyOptionToComment(
+          finalOption,
+          new Set(),
+          'serve',
+        );
         if (!isFirstBoot() && cacheComment != newComment) {
           openBrowser(serverConfig.installUrl, true, logger);
           logger.info('reopen, config comment has changed', { time: true });

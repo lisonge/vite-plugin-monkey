@@ -284,7 +284,10 @@ export const resolvedOption = (
     },
     clientAlias: pluginOption.clientAlias ?? '$',
     entry: pluginOption.entry,
-    format: pluginOption.format,
+    format: {
+      align: pluginOption.format?.align ?? 2,
+      generate: pluginOption.format?.generate ?? ((o) => o.userscript),
+    },
     server: {
       mountGmApi: server.mountGmApi ?? false,
       open:

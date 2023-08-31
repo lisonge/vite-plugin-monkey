@@ -188,11 +188,12 @@ export type FinalUserScript = {
 export const finalMonkeyOptionToComment = async (
   {
     userscript,
-    format = { align: 2 },
+    format,
     collectRequireUrls,
     collectResource,
   }: FinalMonkeyOption,
   collectGrantSet: Set<string>,
+  mode: `serve` | `build` | `meta`,
 ): Promise<string> => {
   let attrList: [string, ...string[]][] = [];
   const {
@@ -385,7 +386,7 @@ export const finalMonkeyOptionToComment = async (
     attrList = await align(attrList);
   }
 
-  return [
+  const uString = [
     '==UserScript==',
     ...attrList.map(
       (attr) =>
@@ -401,6 +402,8 @@ export const finalMonkeyOptionToComment = async (
   ]
     .map((s) => '//\x20' + s)
     .join('\n');
+
+  return format.generate({ userscript: uString, mode });
 };
 
 const stringSort = (a: [string, ...string[]], b: [string, ...string[]]) => {

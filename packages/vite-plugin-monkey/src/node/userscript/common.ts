@@ -9,6 +9,16 @@ export type Format = {
    * @default 2, true
    */
   align?: number | boolean | AlignFunc;
+
+  /**
+   * custom generate userscript comment
+   *
+   * if you want add other comments after userscript or modify userscript
+   */
+  generate?: (uOptions: {
+    userscript: string;
+    mode: `serve` | `build` | `meta`;
+  }) => IPromise<string>;
 };
 
 /**

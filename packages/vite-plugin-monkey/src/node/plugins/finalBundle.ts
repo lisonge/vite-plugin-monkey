@@ -222,6 +222,7 @@ export const finalBundlePlugin = (finalOption: FinalMonkeyOption): Plugin => {
       const comment = await finalMonkeyOptionToComment(
         finalOption,
         collectGrantSet,
+        'build',
       );
 
       const mergedCode = [comment, injectCssCode, finalJsCode]
@@ -243,7 +244,11 @@ export const finalBundlePlugin = (finalOption: FinalMonkeyOption): Plugin => {
         this.emitFile({
           type: 'asset',
           fileName: finalOption.build.metaFileName(),
-          source: comment,
+          source: await finalMonkeyOptionToComment(
+            finalOption,
+            collectGrantSet,
+            'meta',
+          ),
         });
       }
     },

@@ -4,7 +4,7 @@
 // @version    0.0.0
 // @author     monkey
 // @icon       https://vitejs.dev/logo.svg
-// @match      https://i.songe.li/*
+// @match      https://songe.li/*
 // @require    https://cdn.jsdelivr.net/npm/@violentmonkey/dom@2.1.4/dist/index.js
 // @connect    httpbin.org
 // @connect    i.pximg.net

@@ -4,7 +4,7 @@
 // @version    0.0.0
 // @author     monkey
 // @icon       https://vitejs.dev/logo.svg
-// @match      https://i.songe.li/*
+// @match      https://songe.li/*
 // @connect    httpbin.org
 // @connect    i.pximg.net
 // @grant      GM.xmlHttpRequest
@@ -105,7 +105,7 @@
     });
   };
   console.time("x");
-  const resp = (await GM_fetch(
+  const resp = await( GM_fetch(
     `https://i.pximg.net/img-original/img/2017/05/16/00/20/10/62921231_p0.png`,
     {
       headers: {
@@ -115,7 +115,7 @@
   ));
   console.log(resp);
   console.timeLog("x");
-  const imgBlob = (await resp.blob());
+  const imgBlob = await( resp.blob());
   console.log(imgBlob.size);
   const imgUrl = URL.createObjectURL(imgBlob);
   const img = new Image();

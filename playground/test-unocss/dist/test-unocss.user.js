@@ -37,11 +37,11 @@
   let Effects = null;
   let ExecCount = 0;
   function createRoot(fn, detachedOwner) {
-    const listener = Listener, owner = Owner, unowned = fn.length === 0, root = unowned ? UNOWNED : {
+    const listener = Listener, owner = Owner, unowned = fn.length === 0, current = detachedOwner === void 0 ? owner : detachedOwner, root = unowned ? UNOWNED : {
       owned: null,
       cleanups: null,
-      context: null,
-      owner: detachedOwner === void 0 ? owner : detachedOwner
+      context: current ? current.context : null,
+      owner: current
     }, updateFn = unowned ? fn : () => fn(() => untrack(() => cleanNode(root)));
     Owner = root;
     Listener = null;
@@ -232,7 +232,7 @@
       cleanups: null,
       value: init,
       owner: Owner,
-      context: null,
+      context: Owner ? Owner.context : null,
       pure
     };
     if (Owner === null)
@@ -374,7 +374,6 @@
       node.cleanups = null;
     }
     node.state = 0;
-    node.context = null;
   }
   function castError(err) {
     if (err instanceof Error)

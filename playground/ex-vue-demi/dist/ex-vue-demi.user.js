@@ -5,13 +5,14 @@
 // @author       monkey
 // @description  default_description
 // @icon         https://vitejs.dev/logo.svg
-// @match        https://i.songe.li/
+// @match        https://songe.li/
 // @require      https://cdn.jsdelivr.net/npm/vue@3.3.4/dist/vue.global.prod.js
 // @require      https://cdn.jsdelivr.net/npm/vue-demi@latest/lib/index.iife.js
 // @require      data:application/javascript,window.Vue%3DVue%3B
-// @require      https://cdn.jsdelivr.net/npm/pinia@2.1.4/dist/pinia.iife.prod.js
-// @require      https://cdn.jsdelivr.net/npm/element-plus@2.3.7/dist/index.full.min.js
-// @resource     element-plus/dist/index.css  https://cdn.jsdelivr.net/npm/element-plus@2.3.7/dist/index.css
+// @require      https://cdn.jsdelivr.net/npm/pinia@2.1.6/dist/pinia.iife.prod.js
+// @require      https://cdn.jsdelivr.net/npm/element-plus@2.3.9/dist/index.full.min.js
+// @resource     element-plus/dist/index.css  https://cdn.jsdelivr.net/npm/element-plus@2.3.9/dist/index.css
+// @grant        GM_addStyle
 // @grant        GM_getResourceText
 // ==/UserScript==
 
@@ -19,8 +20,8 @@
   'use strict';
 
   const cssLoader = (e) => {
-    const t = GM_getResourceText(e), o = document.createElement("style");
-    return o.innerText = t, document.head.append(o), t;
+    const t = GM_getResourceText(e);
+    return GM_addStyle(t), t;
   };
   cssLoader("element-plus/dist/index.css");
   const useMainStore = pinia$1.defineStore("main", {

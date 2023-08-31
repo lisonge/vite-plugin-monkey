@@ -6,3 +6,5 @@ dist
 *.local
 *.log
 /docs/.vitepress/cache
+
+vite.config.{ts,js}.timestamp-*.mjs

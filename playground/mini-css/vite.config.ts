@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite';
-import monkey from 'vite-plugin-monkey';
+import monkey from './node_modules/vite-plugin-monkey/src/node';
 
 export default defineConfig({
   plugins: [
@@ -8,7 +8,10 @@ export default defineConfig({
       userscript: {
         icon: 'https://vitejs.dev/logo.svg',
         namespace: 'npm/vite-plugin-monkey',
-        match: ['https://i.songe.li/*'],
+        match: ['https://songe.li/*'],
+      },
+      build: {
+        // cssSideEffects: (css) => `GM_addStyle(${JSON.stringify(css)});`,
       },
     }),
   ],

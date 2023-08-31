@@ -12,7 +12,7 @@ export default defineConfig({
       userscript: {
         icon: 'https://vitejs.dev/logo.svg',
         namespace: 'npm/vite-plugin-monkey',
-        match: ['https://i.songe.li/*'],
+        match: ['https://songe.li/*'],
         connect: [`httpbin.org`, `i.pximg.net`],
       },
     }),

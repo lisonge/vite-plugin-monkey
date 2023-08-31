@@ -22,7 +22,7 @@ export default defineConfig(async ({ command, mode }) => ({
           ja: '説明z',
           'zh-CN': '描述',
         },
-        match: ['https://i.songe.li/'],
+        match: ['https://songe.li/'],
         include: [/^https:\/\/i\.songe\.li\/.*/],
       },
       build: {

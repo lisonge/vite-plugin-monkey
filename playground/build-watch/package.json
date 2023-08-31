@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "serve": "vite",
-    "build": "vite build",
+    "build": "vite build --watch",
     "preview": "vite preview"
   },
   "dependencies": {

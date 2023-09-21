@@ -305,6 +305,27 @@ export type MonkeyOption = {
 };
 ```
 
+## 排除依赖的CDN工具
+
+```ts
+import { defineConfig } from 'vite';
+import monkey, { cdn } from 'vite-plugin-monkey';
+export default defineConfig({
+  plugins: [
+    monkey({
+      build: {
+        externalGlobals: {
+          react: cdn.jsdelivr('React', 'umd/react.production.min.js'),
+        },
+        externalResource: {
+          'element-plus/dist/index.css': cdn.jsdelivr(),
+        },
+      },
+    }),
+  ],
+});
+```
+
 有以下 cdn 可使用，详情见 [cdn.ts](/packages/vite-plugin-monkey/src/node/cdn.ts)
 
 - [jsdelivr](https://www.jsdelivr.com/)
@@ -318,6 +339,16 @@ export type MonkeyOption = {
 - [npmmirror](https://registry.npmmirror.com/)
 
 如果你想使用其他 cdn，请查看 [external-scripts](https://greasyfork.org/zh-CN/help/external-scripts)
+
+## 压缩混淆
+
+由于 greasyfork 的 [代码规则](https://greasyfork.org/zh-CN/help/code-rules)
+
+> 提交到 Greasy Fork 的代码不得混淆或最小化
+
+因此插件将 [viteConfig.build.minify](https://cn.vitejs.dev/config/build-options.html#build-minify) 的默认值更改为 `false`
+
+如果你想启用压缩混淆, 只需要手动设置 `viteConfig.build.minify=true`
 
 ## GM_api 用法
 

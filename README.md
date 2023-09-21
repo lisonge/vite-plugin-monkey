@@ -346,6 +346,16 @@ there is the following cdn to use, full detail see [cdn.ts](/packages/vite-plugi
 
 if you want use other cdn, you can see [external-scripts](https://greasyfork.org/help/external-scripts)
 
+## Minify
+
+because of the [code-rules](https://greasyfork.org/en/help/code-rules) of greasyfork
+
+> Code posted to Greasy Fork must not be obfuscated or minified
+
+so plugin will change the default value of [viteConfig.build.minify](https://cn.vitejs.dev/config/build-options.html#build-minify) to `false`
+
+if you want to enable minify, just set `viteConfig.build.minify=true`
+
 ## GM_api usage
 
 ### ESM usage

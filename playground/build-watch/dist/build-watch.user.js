@@ -5,7 +5,7 @@
 // @author     monkey
 // @icon       https://vitejs.dev/logo.svg
 // @match      https://www.google.com/
-// @resource   element-plus/dist/index.css  https://cdn.jsdelivr.net/npm/element-plus@2.3.9/dist/index.css
+// @resource   element-plus/dist/index.css  https://cdn.jsdelivr.net/npm/element-plus@2.4.4/dist/index.css
 // @grant      GM_addStyle
 // @grant      GM_deleteValue
 // @grant      GM_getResourceText

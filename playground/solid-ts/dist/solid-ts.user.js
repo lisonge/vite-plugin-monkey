@@ -146,14 +146,17 @@
     if (!node.fn)
       return;
     cleanNode(node);
-    const owner = Owner, listener = Listener, time = ExecCount;
-    Listener = Owner = node;
-    runComputation(node, node.value, time);
-    Listener = listener;
-    Owner = owner;
+    const time = ExecCount;
+    runComputation(
+      node,
+      node.value,
+      time
+    );
   }
   function runComputation(node, value, time) {
     let nextValue;
+    const owner = Owner, listener = Listener;
+    Listener = Owner = node;
     try {
       nextValue = node.fn(value);
     } catch (err) {
@@ -166,6 +169,9 @@
       }
       node.updatedAt = time + 1;
       return handleError(err);
+    } finally {
+      Listener = listener;
+      Owner = owner;
     }
     if (!node.updatedAt || node.updatedAt <= time) {
       if (node.updatedAt != null && "observers" in node) {
@@ -537,7 +543,7 @@
         parent.replaceChild(value, parent.firstChild);
       current = value;
     } else
-      console.warn(`Unrecognized value. Skipped inserting`, value);
+      ;
     return current;
   }
   function normalizeIncomingArray(normalized, array, current, unwrap) {
@@ -554,7 +560,11 @@
         if (unwrap) {
           while (typeof item === "function")
             item = item();
-          dynamic = normalizeIncomingArray(normalized, Array.isArray(item) ? item : [item], Array.isArray(prev) ? prev : [prev]) || dynamic;
+          dynamic = normalizeIncomingArray(
+            normalized,
+            Array.isArray(item) ? item : [item],
+            Array.isArray(prev) ? prev : [prev]
+          ) || dynamic;
         } else {
           normalized.push(item);
           dynamic = true;
@@ -605,7 +615,7 @@
     header,
     link
   };
-  const _tmpl$ = /* @__PURE__ */ template(`<div><header><div></div><p>Edit <code>src/App.tsx,</code> and save to reload.</p><a href="https://github.com/solidjs/solid" target="_blank" rel="noopener noreferrer">Learn Solid`);
+  const _tmpl$ = /* @__PURE__ */ template(`<div><header><div></div><p>Edit <code>src/App.tsx,</code> and save to reload.</p><a href=https://github.com/solidjs/solid target=_blank rel="noopener noreferrer">Learn Solid`);
   const delay = async (n = 0) => {
     return new Promise((res) => {
       setTimeout(res, n);

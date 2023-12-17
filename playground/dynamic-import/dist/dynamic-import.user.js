@@ -7,9 +7,9 @@
 // @icon         https://vitejs.dev/logo.svg
 // @match        https://songe.li/*
 // @require      https://cdn.jsdelivr.net/npm/md5@2.3.0/dist/md5.min.js
-// @require      https://cdn.jsdelivr.net/npm/vue@3.3.4/dist/vue.global.prod.js
+// @require      https://cdn.jsdelivr.net/npm/vue@3.3.12/dist/vue.global.prod.js
 // @require      data:application/javascript,%3Bwindow.Vue%3DVue%3B
-// @require      https://cdn.jsdelivr.net/npm/element-plus@2.3.9/dist/index.full.min.js
+// @require      https://cdn.jsdelivr.net/npm/element-plus@2.4.4/dist/index.full.min.js
 // @require      https://cdn.jsdelivr.net/npm/systemjs@6.14.2/dist/system.min.js
 // @require      https://cdn.jsdelivr.net/npm/systemjs@6.14.2/dist/extras/named-register.min.js
 // @require      data:application/javascript,%3B(typeof%20System!%3D'undefined')%26%26(System%3Dnew%20System.constructor())%3B
@@ -37,43 +37,44 @@ System.register("./__entry.js", [], (function (exports, module) {
       };
       const seen = {};
       const __vitePreload = function preload(baseModule, deps, importerUrl) {
-        if (!deps || deps.length === 0) {
-          return baseModule();
-        }
-        const links = document.getElementsByTagName("link");
-        return Promise.all(deps.map((dep) => {
-          dep = assetsURL(dep);
-          if (dep in seen)
-            return;
-          seen[dep] = true;
-          const isCss = dep.endsWith(".css");
-          const cssSelector = isCss ? '[rel="stylesheet"]' : "";
-          const isBaseRelative = !!importerUrl;
-          if (isBaseRelative) {
-            for (let i = links.length - 1; i >= 0; i--) {
-              const link2 = links[i];
-              if (link2.href === dep && (!isCss || link2.rel === "stylesheet")) {
-                return;
+        let promise = Promise.resolve();
+        if (deps && deps.length > 0) {
+          const links = document.getElementsByTagName("link");
+          promise = Promise.all(deps.map((dep) => {
+            dep = assetsURL(dep);
+            if (dep in seen)
+              return;
+            seen[dep] = true;
+            const isCss = dep.endsWith(".css");
+            const cssSelector = isCss ? '[rel="stylesheet"]' : "";
+            const isBaseRelative = !!importerUrl;
+            if (isBaseRelative) {
+              for (let i = links.length - 1; i >= 0; i--) {
+                const link2 = links[i];
+                if (link2.href === dep && (!isCss || link2.rel === "stylesheet")) {
+                  return;
+                }
               }
+            } else if (document.querySelector(`link[href="${dep}"]${cssSelector}`)) {
+              return;
             }
-          } else if (document.querySelector(`link[href="${dep}"]${cssSelector}`)) {
-            return;
-          }
-          const link = document.createElement("link");
-          link.rel = isCss ? "stylesheet" : scriptRel;
-          if (!isCss) {
-            link.as = "script";
-            link.crossOrigin = "";
-          }
-          link.href = dep;
-          document.head.appendChild(link);
-          if (isCss) {
-            return new Promise((res, rej) => {
-              link.addEventListener("load", res);
-              link.addEventListener("error", () => rej(new Error(`Unable to preload CSS for ${dep}`)));
-            });
-          }
-        })).then(() => baseModule()).catch((err) => {
+            const link = document.createElement("link");
+            link.rel = isCss ? "stylesheet" : scriptRel;
+            if (!isCss) {
+              link.as = "script";
+              link.crossOrigin = "";
+            }
+            link.href = dep;
+            document.head.appendChild(link);
+            if (isCss) {
+              return new Promise((res, rej) => {
+                link.addEventListener("load", res);
+                link.addEventListener("error", () => rej(new Error(`Unable to preload CSS for ${dep}`)));
+              });
+            }
+          }));
+        }
+        return promise.then(() => baseModule()).catch((err) => {
           const e = new Event("vite:preloadError", { cancelable: true });
           e.payload = err;
           window.dispatchEvent(e);
@@ -83,7 +84,7 @@ System.register("./__entry.js", [], (function (exports, module) {
         });
       };
       if (location.href.includes("animate.css=on")) {
-        __vitePreload(() => module.import('./_monkey-resource-import_animate-95e7d958-fe1ec2e4.js'), void 0 );
+        __vitePreload(() => module.import('./_monkey-resource-import_animate-OkL_ty_c-2fh6USFs.js'), void 0 );
         document.querySelectorAll("div").forEach((div) => {
           div.classList.add("animate__shakeX");
           div.classList.add("animate__animated");
@@ -109,7 +110,7 @@ System.register("./__entry.js", [], (function (exports, module) {
   };
 }));
 
-System.register("./_monkey-resource-import_animate-95e7d958-fe1ec2e4.js", [], (function (exports, module) {
+System.register("./_monkey-resource-import_animate-OkL_ty_c-2fh6USFs.js", [], (function (exports, module) {
   'use strict';
   return {
     execute: (function () {
@@ -124,4 +125,9 @@ System.register("./_monkey-resource-import_animate-95e7d958-fe1ec2e4.js", [], (f
   };
 }));
 
-System.import("./__entry.js", "./");
+System.import("./__entry.js", "./");function __vite__mapDeps(indexes) {
+  if (!__vite__mapDeps.viteFileDeps) {
+    __vite__mapDeps.viteFileDeps = []
+  }
+  return indexes.map((i) => __vite__mapDeps.viteFileDeps[i])
+}

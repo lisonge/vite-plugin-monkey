@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.5.1
+
+- perf: support host 0.0.0.0 [#116](https://github.com/lisonge/vite-plugin-monkey/issues/116)
+
 ## 3.5.0
 
 - feat: cssSideEffects [#104](https://github.com/lisonge/vite-plugin-monkey/issues/104), [2b3444c0](https://github.com/lisonge/vite-plugin-monkey/commit/2ba64c679c425311ab4943b37da1854d2b3444c0)

@@ -22,12 +22,7 @@ export default defineConfig(async ({ command, mode }) => ({
               .concat(
                 cdn.jsdelivr('', 'lib/index.iife.js')[1]('latest', 'vue-demi'),
               )
-              .concat(
-                await util.fn2dataUrl(() => {
-                  // @ts-ignore
-                  window.Vue = Vue; // work with element-plus
-                }),
-              ),
+              .concat(util.dataUrl(';window.Vue=Vue;')),
           ],
           ['pinia', cdn.jsdelivr('Pinia', 'dist/pinia.iife.prod.js')],
           [

@@ -114,6 +114,7 @@ export type MonkeyOption = {
    * declare module other_alias {
    *   export * from 'vite-plugin-monkey/dist/client';
    * }
+   * //If you use vue and vue macros, you must change clientAlias to a different value, because the default value of $ of clientAlias conflicts with the $ of vue macros
    */
   clientAlias?: string;
   server?: {
@@ -367,6 +368,7 @@ we can use GM_api by esm module
 import { GM_cookie, unsafeWindow, monkeyWindow, GM_addElement } from '$';
 // $ is the default alias of vite-plugin-monkey/dist/client
 // if you want use 'others', set monkeyConfig.clientAlias='others'
+// If you use vue and vue macros, you must change clientAlias to a different value, because the default value of $ of clientAlias conflicts with the $ of vue macros
 
 // whatever it is serve or build mode, monkeyWindow is always the window of [UserScript Scope]
 console.log(monkeyWindow);

@@ -9,6 +9,16 @@ export type Format = {
    * @default 2, true
    */
   align?: number | boolean | AlignFunc;
+
+  /**
+   * custom generate userscript comment
+   *
+   * if you want add other comments after userscript or modify userscript
+   */
+  generate?: (uOptions: {
+    userscript: string;
+    mode: `serve` | `build` | `meta`;
+  }) => IPromise<string>;
 };
 
 /**
@@ -41,7 +51,7 @@ export type Format = {
  *     'supportURL',
  *     'https://github.com/lisonge/vite-plugin-monkey/issues'
  *   ],
- *   [ 'match', 'https://i.songe.li/' ],
+ *   [ 'match', 'https://songe.li/' ],
  *   [ 'require', 'https://cdn.jsdelivr.net/npm/blueimp-md5@2.19.0' ],
  *   [
  *     'require',

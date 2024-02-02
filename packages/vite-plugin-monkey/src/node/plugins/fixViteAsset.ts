@@ -1,4 +1,4 @@
-import { PluginOption, ResolvedConfig } from 'vite';
+import { Plugin, ResolvedConfig } from 'vite';
 import type { FinalMonkeyOption } from '../types';
 
 // should use import.meta['url'], becase vite will replace import.meta.url to self.location
@@ -15,9 +15,7 @@ export default ((()=>{
 
 // TODO the relative path of the *.vue file template does not work
 
-export const fixViteAssetPlugin = (
-  finalOption: FinalMonkeyOption,
-): PluginOption => {
+export const fixViteAssetPlugin = (finalOption: FinalMonkeyOption): Plugin => {
   let viteConfig: ResolvedConfig;
   return {
     name: 'monkey:fixViteAsset',

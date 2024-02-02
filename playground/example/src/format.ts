@@ -1,5 +1,5 @@
 import prettier from 'prettier';
-import parserBabel from 'prettier/parser-babel';
+import parserBabel from 'prettier/plugins/babel';
 import type { BuiltInParserName, Plugin } from 'prettier';
 
 // console.log(prettier.getSupportInfo().languages);
@@ -18,7 +18,7 @@ Object.assign(lang2parser, {
   java: 'java',
 });
 
-export const formatCode = (code: string, lang: string) => {
+export const formatCode = async (code: string, lang: string) => {
   if (lang2parser[lang]) {
     try {
       return prettier.format(code, {

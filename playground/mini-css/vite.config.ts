@@ -1,14 +1,23 @@
 import { defineConfig } from 'vite';
-import monkey from 'vite-plugin-monkey';
+import monkey from './node_modules/vite-plugin-monkey/src/node';
 
 export default defineConfig({
   plugins: [
     monkey({
       entry: 'src/main.ts',
+      format: {
+        generate(uOptions) {
+          return uOptions.userscript + `\n// hello`;
+        },
+      },
       userscript: {
         icon: 'https://vitejs.dev/logo.svg',
         namespace: 'npm/vite-plugin-monkey',
-        match: ['https://i.songe.li/*'],
+        match: ['https://songe.li/*'],
+      },
+      build: {
+        metaFileName: true,
+        // cssSideEffects: (css) => `GM_addStyle(${JSON.stringify(css)});`,
       },
     }),
   ],

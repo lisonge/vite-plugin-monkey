@@ -1,6 +1,7 @@
 {
   "name": "dynamic-import",
   "version": "1.0.0",
+  "type": "module",
   "private": true,
   "scripts": {
     "serve": "vite",
@@ -9,13 +10,6 @@
   },
   "dependencies": {
     "vite-plugin-monkey": "workspace:*"
-  },
-  "pnpm": {
-    "peerDependencyRules": {
-      "ignoreMissing": [
-        "vite"
-      ]
-    }
   },
   "volta": {
     "extends": "../../package.json"

@@ -69,7 +69,7 @@ type CookieResult = {
   delete: (error: unknown) => Promise<void>;
 };
 
-export type CookieFn = {
+export type GmCookieFc = {
   list: (
     details: CookieDetails['list'],
     callback?: CookieCallBack['list'],

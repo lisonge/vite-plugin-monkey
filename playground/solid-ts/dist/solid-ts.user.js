@@ -5,9 +5,10 @@
 // @author     monkey
 // @icon       https://vitejs.dev/logo.svg
 // @match      https://www.google.com/
+// @grant      GM_addStyle
 // ==/UserScript==
 
-(o=>{const e=document.createElement("style");e.dataset.source="vite-plugin-monkey",e.textContent=o,document.head.append(e)})(" body{margin:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;display:flex}code{font-family:source-code-pro,Menlo,Monaco,Consolas,Courier New,monospace}._App_9g4xh_1{text-align:center}._logo_9g4xh_5{animation:_logo-spin_9g4xh_1 infinite 20s linear;height:40vmin;pointer-events:none}._header_9g4xh_11{background-color:#282c34;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:calc(10px + 2vmin);color:#fff}._link_9g4xh_22{color:#b318f0}@keyframes _logo-spin_9g4xh_1{0%{transform:rotate(0)}to{transform:rotate(360deg)}} ");
+(e=>{if(typeof GM_addStyle=="function"){GM_addStyle(e);return}const o=document.createElement("style");o.textContent=e,document.head.append(o)})(" body{margin:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;display:flex}code{font-family:source-code-pro,Menlo,Monaco,Consolas,Courier New,monospace}._App_9g4xh_1{text-align:center}._logo_9g4xh_5{animation:_logo-spin_9g4xh_1 infinite 20s linear;height:40vmin;pointer-events:none}._header_9g4xh_11{background-color:#282c34;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:calc(10px + 2vmin);color:#fff}._link_9g4xh_22{color:#b318f0}@keyframes _logo-spin_9g4xh_1{0%{transform:rotate(0)}to{transform:rotate(360deg)}} ");
 
 (function () {
   'use strict';
@@ -32,11 +33,11 @@
   let Effects = null;
   let ExecCount = 0;
   function createRoot(fn, detachedOwner) {
-    const listener = Listener, owner = Owner, unowned = fn.length === 0, root = unowned ? UNOWNED : {
+    const listener = Listener, owner = Owner, unowned = fn.length === 0, current = detachedOwner === void 0 ? owner : detachedOwner, root = unowned ? UNOWNED : {
       owned: null,
       cleanups: null,
-      context: null,
-      owner: detachedOwner === void 0 ? owner : detachedOwner
+      context: current ? current.context : null,
+      owner: current
     }, updateFn = unowned ? fn : () => fn(() => untrack(() => cleanNode(root)));
     Owner = root;
     Listener = null;
@@ -145,14 +146,17 @@
     if (!node.fn)
       return;
     cleanNode(node);
-    const owner = Owner, listener = Listener, time = ExecCount;
-    Listener = Owner = node;
-    runComputation(node, node.value, time);
-    Listener = listener;
-    Owner = owner;
+    const time = ExecCount;
+    runComputation(
+      node,
+      node.value,
+      time
+    );
   }
   function runComputation(node, value, time) {
     let nextValue;
+    const owner = Owner, listener = Listener;
+    Listener = Owner = node;
     try {
       nextValue = node.fn(value);
     } catch (err) {
@@ -165,6 +169,9 @@
       }
       node.updatedAt = time + 1;
       return handleError(err);
+    } finally {
+      Listener = listener;
+      Owner = owner;
     }
     if (!node.updatedAt || node.updatedAt <= time) {
       if (node.updatedAt != null && "observers" in node) {
@@ -185,7 +192,7 @@
       cleanups: null,
       value: init,
       owner: Owner,
-      context: null,
+      context: Owner ? Owner.context : null,
       pure
     };
     if (Owner === null)
@@ -315,10 +322,17 @@
       node.cleanups = null;
     }
     node.state = 0;
-    node.context = null;
   }
-  function handleError(err) {
-    throw err;
+  function castError(err) {
+    if (err instanceof Error)
+      return err;
+    return new Error(typeof err === "string" ? err : "Unknown error", {
+      cause: err
+    });
+  }
+  function handleError(err, owner = Owner) {
+    const error = castError(err);
+    throw error;
   }
   function createComponent(Comp, props) {
     return untrack(() => Comp(props || {}));
@@ -398,7 +412,7 @@
       t.innerHTML = html;
       return isSVG ? t.content.firstChild.firstChild : t.content.firstChild;
     };
-    const fn = isCE ? () => (node || (node = create())).cloneNode(true) : () => untrack(() => document.importNode(node || (node = create()), true));
+    const fn = isCE ? () => untrack(() => document.importNode(node || (node = create()), true)) : () => (node || (node = create())).cloneNode(true);
     fn.cloneNode = fn;
     return fn;
   }
@@ -529,7 +543,7 @@
         parent.replaceChild(value, parent.firstChild);
       current = value;
     } else
-      console.warn(`Unrecognized value. Skipped inserting`, value);
+      ;
     return current;
   }
   function normalizeIncomingArray(normalized, array, current, unwrap) {
@@ -546,7 +560,11 @@
         if (unwrap) {
           while (typeof item === "function")
             item = item();
-          dynamic = normalizeIncomingArray(normalized, Array.isArray(item) ? item : [item], Array.isArray(prev) ? prev : [prev]) || dynamic;
+          dynamic = normalizeIncomingArray(
+            normalized,
+            Array.isArray(item) ? item : [item],
+            Array.isArray(prev) ? prev : [prev]
+          ) || dynamic;
         } else {
           normalized.push(item);
           dynamic = true;
@@ -597,7 +615,7 @@
     header,
     link
   };
-  const _tmpl$ = /* @__PURE__ */ template(`<div><header><div></div><p>Edit <code>src/App.tsx,</code> and save to reload.</p><a href="https://github.com/solidjs/solid" target="_blank" rel="noopener noreferrer">Learn Solid`);
+  const _tmpl$ = /* @__PURE__ */ template(`<div><header><div></div><p>Edit <code>src/App.tsx,</code> and save to reload.</p><a href=https://github.com/solidjs/solid target=_blank rel="noopener noreferrer">Learn Solid`);
   const delay = async (n = 0) => {
     return new Promise((res) => {
       setTimeout(res, n);

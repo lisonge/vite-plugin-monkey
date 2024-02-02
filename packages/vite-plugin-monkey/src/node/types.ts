@@ -1,4 +1,5 @@
 import type { FinalUserScript, Format, MonkeyUserScript } from './userscript';
+import { AlignFunc } from './userscript/common';
 
 export type IPromise<T> = T | Promise<T>;
 
@@ -44,7 +45,7 @@ export type Mod2UrlFn = (
   importName: string,
 ) => IPromise<string>;
 
-export type Mod2UrlFn2 = (
+export type ModuleToUrlFc = (
   version: string,
   name: string,
   importName?: string,
@@ -81,7 +82,13 @@ export type ExternalResource = Record<
 
 export type FinalMonkeyOption = {
   entry: string;
-  format?: Format;
+  format: {
+    align: number | boolean | AlignFunc;
+    generate: (uOptions: {
+      userscript: string;
+      mode: `serve` | `build` | `meta`;
+    }) => IPromise<string>;
+  };
   userscript: FinalUserScript;
   clientAlias: string;
   server: {
@@ -91,7 +98,7 @@ export type FinalMonkeyOption = {
   };
   build: {
     fileName: string;
-    metaFileName?: (fileName: string) => string;
+    metaFileName?: () => string;
     autoGrant: boolean;
     externalGlobals: [string, IArray<string | Mod2UrlFn>][];
     externalResource: Record<
@@ -105,13 +112,11 @@ export type FinalMonkeyOption = {
     >;
   };
   collectRequireUrls: string[];
-  collectGrantSet: Set<string>;
   collectResource: Record<string, string>;
-  hasDynamicImport: boolean;
-  injectCssCode: string;
   globalsPkg2VarName: Record<string, string>;
   requirePkgList: { moduleName: string; url: string }[];
-  systemjs: 'inline' | Mod2UrlFn2;
+  systemjs: 'inline' | ModuleToUrlFc;
+  cssSideEffects: (css: string) => Promise<string>;
 };
 
 export type MonkeyOption = {
@@ -293,6 +298,36 @@ export type MonkeyOption = {
      * @default
      * cdn.jsdelivr()[1]
      */
-    systemjs?: 'inline' | Mod2UrlFn2;
+    systemjs?: 'inline' | ModuleToUrlFc;
+
+    /**
+     * @default
+     * const defaultFc = () => {
+     *   return (e: string) => {
+     *     if (typeof GM_addStyle == 'function') {
+     *       GM_addStyle(e);
+     *       return;
+     *     }
+     *     const o = document.createElement('style');
+     *     o.textContent = e;
+     *     document.head.append(o);
+     *   };
+     * };
+     * @example
+     * const defaultFc1 = () => {
+     *   return (e: string) => {
+     *     const o = document.createElement('style');
+     *     o.textContent = e;
+     *     document.head.append(o);
+     *   };
+     * };
+     * const defaultFc2 = (css:string)=>{
+     *   const t = JSON.stringify(css)
+     *   return `(e=>{const o=document.createElement("style");o.textContent=e,document.head.append(o)})(${t})`
+     * }
+     */
+    cssSideEffects?: (
+      css: string,
+    ) => IPromise<string | ((css: string) => void)>;
   };
 };

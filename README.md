@@ -272,7 +272,37 @@ export type MonkeyOption = {
      * @default
      * cdn.jsdelivr()[1]
      */
-    systemjs?: 'inline' | Mod2UrlFn2;
+    systemjs?: 'inline' | ModuleToUrlFc;
+
+    /**
+     * @default
+     * const defaultFc = () => {
+     *   return (e: string) => {
+     *     if (typeof GM_addStyle == 'function') {
+     *       GM_addStyle(e);
+     *       return;
+     *     }
+     *     const o = document.createElement('style');
+     *     o.textContent = e;
+     *     document.head.append(o);
+     *   };
+     * };
+     * @example
+     * const defaultFc1 = () => {
+     *   return (e: string) => {
+     *     const o = document.createElement('style');
+     *     o.textContent = e;
+     *     document.head.append(o);
+     *   };
+     * };
+     * const defaultFc2 = (css:string)=>{
+     *   const t = JSON.stringify(css)
+     *   return `(e=>{const o=document.createElement("style");o.textContent=e,document.head.append(o)})(${t})`
+     * }
+     */
+    cssSideEffects?: (
+      css: string,
+    ) => IPromise<string | ((css: string) => void)>;
   };
 };
 ```
@@ -312,8 +342,19 @@ there is the following cdn to use, full detail see [cdn.ts](/packages/vite-plugi
 - [staticfile](https://staticfile.org/)
 - [cdnjs](https://cdnjs.com/libraries)
 - [zhimg](https://unpkg.zhimg.com/)
+- [npmmirror](https://registry.npmmirror.com/)
 
 if you want use other cdn, you can see [external-scripts](https://greasyfork.org/help/external-scripts)
+
+## Minify
+
+because of the [code-rules](https://greasyfork.org/en/help/code-rules) of greasyfork
+
+> Code posted to Greasy Fork must not be obfuscated or minified
+
+so plugin will change the default value of [viteConfig.build.minify](https://cn.vitejs.dev/config/build-options.html#build-minify) to `false`
+
+if you want to enable minify, just set `viteConfig.build.minify=true`
 
 ## GM_api usage
 
@@ -424,27 +465,9 @@ please ensure that the order of the plugin is **the last one**
 
 in `vite serve` mode, the code entry is added as script to target host document.head, code need work between two origins
 
-#### For http header csp
+but the browser will prevent the execution of this script according to the CSP strategy
 
-you can use [Tampermonkey](https://www.tampermonkey.net/) then open `extension://iikmkjmpaadaobahmlepeloendndfphd/options.html#nav=settings`
-
-at `Security`, set `Modify existing content security policy (CSP) headers` to `Remove entirely (possibly unsecure)`
-
-full detail see [issues/1](https://github.com/lisonge/vite-plugin-monkey/issues/1)
-
-and if you use `Violentmonkey`/`Greasemonkey`, you can solve it in the following ways
-
-- chrome - [Disable Content-Security-Policy](https://chrome.google.com/webstore/detail/disable-content-security/ieelmcmcagommplceebfedjlakkhpden/)
-- edge - [Disable Content-Security-Policy](https://microsoftedge.microsoft.com/addons/detail/disable-contentsecurity/ecmfamimnofkleckfamjbphegacljmbp?hl=zh-CN)
-- firefox - disable `security.csp.enable` in the `about:config` menu
-
-#### For html csp
-
-- MITM modify html by <https://wproxy.org/whistle/>
-
-- if csp allow `*.xx.com`, you can set `viteConfig.server.host=localhost.xx.com` and add `127.0.0.1 localhost.xx.com` to your hosts file, if your need fake https ca, you can use [mkcert](https://github.com/FiloSottile/mkcert)
-
-- by chrome-remote-interface [issues/1#issuecomment-1236060681](https://github.com/lisonge/vite-plugin-monkey/issues/1#issuecomment-1236060681)
+now just use browser extension [Disable-CSP](https://github.com/lisonge/Disable-CSP)
 
 ### Mixed IIFE and UMD at @require
 
@@ -466,12 +489,9 @@ export default defineConfig(async ({ command, mode }) => ({
       // ...
       build: {
         externalGlobals: {
-          vue: cdn.jsdelivr('Vue', 'dist/vue.global.prod.js').concat(
-            await util.fn2dataUrl(() => {
-              // @ts-ignore
-              window.Vue = Vue; // work with element-plus
-            }),
-          ),
+          vue: cdn
+            .jsdelivr('Vue', 'dist/vue.global.prod.js')
+            .concat(util.dataUrl(';window.Vue=Vue;')),
           'element-plus': cdn.jsdelivr('ElementPlus', 'dist/index.full.min.js'),
         },
       },
@@ -501,6 +521,77 @@ export default defineConfig({
     }),
   ],
 });
+```
+
+## How to Properly Build a Library Using GM_api
+
+If you want to encapsulate GM_api to build a library for others to use
+
+The previous practice generally involved accessing GM_api as a global variable directly in the library code and then referencing and loading it in userscript through `@require`.
+
+However, this approach does not allow us to manage this dependency through npm or other package managers, and it is not compatible with the usage of ESM GM_api in vite-plugin-monkey.
+
+Now, you only need to import GM_api normally from `vite-plugin-monkey/dist/client` in your library code. Modify your build config and exclude `vite-plugin-monkey/dist/client`.
+
+This way, you can build a library that can be used in vite-plugin-monkey. Users of this library only need to install it via npm and use it normally with `import`.
+
+Of course, if you directly bundle `vite-plugin-monkey/dist/client` into the build artifact, the library can also be referenced directly through `@require`.
+
+However, to make the build artifact more concise, it is recommended that you redirect `vite-plugin-monkey/dist/client` to `vite-plugin-monkey/dist/native` during the build.
+
+Below is an example using tsup to simultaneously package ESM and IIFE formats. ESM is provided to vite-plugin-monkey users, and IIFE is provided to users who want to reference it through `@require`.
+
+Additionally, the IIFE format can also be used as a configuration for vite-plugin-monkey's externalGlobals to reduce the size of the build artifact.
+
+```ts
+// /src/index.ts
+import { GM_setValue } from 'vite-plugin-monkey/dist/client';
+
+export const setValue = (name: string, value: unknown) => {
+  console.log('you invoke setValue', name, value);
+  GM_setValue(name, value);
+};
+```
+
+```ts
+// tsup.config.ts
+import { defineConfig } from 'tsup';
+
+const outExtension = (ctx: { format: 'esm' | 'cjs' | 'iife' }) => ({
+  js: { esm: '.mjs', cjs: '.cjs', iife: '.iife.js' }[ctx.format],
+});
+
+export default defineConfig([
+  {
+    // for vite import
+    entry: ['src/index.ts'],
+    outDir: 'dist',
+    sourcemap: true,
+    platform: 'browser',
+    outExtension,
+    dts: true,
+    format: ['esm'],
+    external: ['vite-plugin-monkey/dist/client'],
+  },
+  {
+    // for userscript @require
+    entry: ['src/index.ts'],
+    outDir: 'dist',
+    sourcemap: true,
+    platform: 'browser',
+    outExtension,
+    dts: false,
+    format: ['iife'],
+    minify: true,
+    globalName: `GmExtra`,
+    target: 'es2015',
+    esbuildOptions: (options) => {
+      options.alias = {
+        'vite-plugin-monkey/dist/client': 'vite-plugin-monkey/dist/native',
+      };
+    },
+  },
+]);
 ```
 
 ## Contribution

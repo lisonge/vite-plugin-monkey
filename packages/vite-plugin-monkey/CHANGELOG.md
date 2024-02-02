@@ -1,5 +1,45 @@
 # CHANGELOG
 
+## 3.5.1
+
+- perf: support host 0.0.0.0 [#116](https://github.com/lisonge/vite-plugin-monkey/issues/116)
+
+## 3.5.0
+
+- feat: cssSideEffects [#104](https://github.com/lisonge/vite-plugin-monkey/issues/104), [2b3444c0](https://github.com/lisonge/vite-plugin-monkey/commit/2ba64c679c425311ab4943b37da1854d2b3444c0)
+- feat: userscript format generate [#103](https://github.com/lisonge/vite-plugin-monkey/issues/103), [309b75e2](https://github.com/lisonge/vite-plugin-monkey/commit/98f323975ce766ff897a4de017946172309b75e2)
+
+## 3.4.2
+
+- fix: condition forTlaCallNodes [7fe231ca](https://github.com/lisonge/vite-plugin-monkey/commit/a95d6ed3489a3f3d9b0d5cc7a4be64ab7fe231ca)
+
+## 3.4.1
+
+- fix: Invalid URL when get monkeyWindow [e5a7c908](https://github.com/lisonge/vite-plugin-monkey/commit/c0b558595362d8bae3934b97773f9ab3e5a7c908)
+- fix: top level await + optional chaining (?.) will build product syntax error [#101](https://github.com/lisonge/vite-plugin-monkey/issues/101) [d06d1d63](https://github.com/lisonge/vite-plugin-monkey/commit/3d564d24c983a63f27ed23ac1b28db0bd06d1d63)
+- perf: top level for await remove wrapper function [54669bc3](https://github.com/lisonge/vite-plugin-monkey/commit/8f25e7d8eaae7c3b6f1905f4557d051654669bc3)
+
+## 3.4.0
+
+- feat: gm type enhancement [#96](https://github.com/lisonge/vite-plugin-monkey/issues/96) [fd2b4f92](https://github.com/lisonge/vite-plugin-monkey/commit/a9eb3acba3cb7d2bf83548e99f36ad2dfd2b4f92)
+  - all export type now startWith Gm
+  - GmXhrRequest responseType generic type
+  - GmXhrRequest add redirect property
+  - GM_getTabs/GM_getTab generic type
+- perf: serve/preview html [b3680a37](https://github.com/lisonge/vite-plugin-monkey/commit/deeafb9659795850185198c49e782247b3680a37)
+- feat: add type for gm_xhr stream property [09aed1d1](https://github.com/lisonge/vite-plugin-monkey/commit/7e8542d011c3bf665602bc7e75406c5609aed1d1)
+
+## 3.3.1
+
+- fix: cjs can not require open module [#95](https://github.com/lisonge/vite-plugin-monkey/issues/95) [78fbc325](https://github.com/lisonge/vite-plugin-monkey/commit/009dc14ab46d1ebcdabe3a42a0c84e3d78fbc325)
+
+## 3.3.0
+
+- feat: add cdn npmmirror [e971ea0a](https://github.com/lisonge/vite-plugin-monkey/commit/133f6cc393c3785b28a0391c927ea0bae971ea0a)
+- fix: type GM_registerMenuCommand accessKey [6567c2b2](https://github.com/lisonge/vite-plugin-monkey/commit/b06cf61fd86ffa31387cd520c0cf08a46567c2b2)
+- fix: type GM_log hint [ad5c73d9](https://github.com/lisonge/vite-plugin-monkey/commit/8bd42e45b23d0c1beacd8e2c91cee697ad5c73d9)
+- chore: update deps
+
 ## 3.2.2
 
 - fix: error reopen when multiple vite config file [f981e2be](https://github.com/lisonge/vite-plugin-monkey/commit/5f2ed698ddf6f123f4595a367bf236b5f981e2be)

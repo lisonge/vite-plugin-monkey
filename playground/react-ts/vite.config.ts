@@ -13,7 +13,7 @@ export default defineConfig({
         match: [
           'https://www.google.com/',
           'https://github.com/*',
-          'https://i.songe.li/*',
+          'https://songe.li/*',
         ],
       },
       build: {

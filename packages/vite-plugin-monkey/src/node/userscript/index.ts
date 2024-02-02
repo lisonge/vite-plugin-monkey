@@ -185,13 +185,16 @@ export type FinalUserScript = {
   $extra: [string, ...string[]][];
 } & GreasyforkUserScript;
 
-export const finalMonkeyOptionToComment = async ({
-  userscript,
-  format = { align: 2 },
-  collectGrantSet,
-  collectRequireUrls,
-  collectResource,
-}: FinalMonkeyOption): Promise<string> => {
+export const finalMonkeyOptionToComment = async (
+  {
+    userscript,
+    format,
+    collectRequireUrls,
+    collectResource,
+  }: FinalMonkeyOption,
+  collectGrantSet: Set<string>,
+  mode: `serve` | `build` | `meta`,
+): Promise<string> => {
   let attrList: [string, ...string[]][] = [];
   const {
     name,
@@ -327,6 +330,7 @@ export const finalMonkeyOptionToComment = async ({
   } else {
     new Set([...Array.from(collectGrantSet.values()).flat(), ...grant]).forEach(
       (s) => {
+        if (!s.trim()) return;
         attrList.push(['grant', s]);
       },
     );
@@ -382,7 +386,7 @@ export const finalMonkeyOptionToComment = async ({
     attrList = await align(attrList);
   }
 
-  return [
+  const uString = [
     '==UserScript==',
     ...attrList.map(
       (attr) =>
@@ -398,6 +402,8 @@ export const finalMonkeyOptionToComment = async ({
   ]
     .map((s) => '//\x20' + s)
     .join('\n');
+
+  return format.generate({ userscript: uString, mode });
 };
 
 const stringSort = (a: [string, ...string[]], b: [string, ...string[]]) => {

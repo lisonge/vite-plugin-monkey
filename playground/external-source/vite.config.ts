@@ -8,7 +8,7 @@ export default defineConfig(async ({ command, mode }) => ({
       userscript: {
         namespace: 'https://github.com/lisonge',
         icon: 'https://vitejs.dev/logo.svg',
-        match: 'https://i.songe.li/',
+        match: 'https://songe.li/',
         description: 'default_description',
       },
       build: {

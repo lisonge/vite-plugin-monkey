@@ -5,17 +5,18 @@
 // @author       monkey
 // @description  default_description
 // @icon         https://vitejs.dev/logo.svg
-// @match        https://i.songe.li/
-// @require      https://cdn.jsdelivr.net/npm/vue@3.2.47/dist/vue.global.prod.js
+// @match        https://songe.li/
+// @require      https://cdn.jsdelivr.net/npm/vue@3.3.12/dist/vue.global.prod.js
 // @require      data:application/javascript,window.Vue%3DVue%3B
-// @require      https://cdn.jsdelivr.net/npm/element-plus@2.3.4/dist/index.full.min.js
+// @require      https://cdn.jsdelivr.net/npm/element-plus@2.4.4/dist/index.full.min.js
 // @resource     animate.css                      https://cdn.bootcdn.net/ajax/libs/animate.css/4.1.1/animate.css
 // @resource     base64-img/test/img/car.svg      https://unpkg.com/base64-img@1.0.4/test/img/car.svg
 // @resource     base64-img/test/img/car.svg?raw  https://cdn.jsdelivr.net/npm/base64-img@1.0.4/test/img/car.svg
 // @resource     base64-img/test/img/car.svg?url  https://cdn.jsdelivr.net/npm/base64-img@1.0.4/test/img/car.svg
-// @resource     element-plus/dist/index.css      https://cdn.jsdelivr.net/npm/element-plus@2.3.4/dist/index.css
-// @resource     element-plus/dist/index.css?raw  https://cdn.jsdelivr.net/npm/element-plus@2.3.4/dist/index.css
-// @resource     element-plus/package.json        https://npm.elemecdn.com/element-plus@2.3.4/package.json
+// @resource     element-plus/dist/index.css      https://cdn.jsdelivr.net/npm/element-plus@2.4.4/dist/index.css
+// @resource     element-plus/dist/index.css?raw  https://cdn.jsdelivr.net/npm/element-plus@2.4.4/dist/index.css
+// @resource     element-plus/package.json        https://npm.elemecdn.com/element-plus@2.4.4/package.json
+// @grant        GM_addStyle
 // @grant        GM_getResourceText
 // @grant        GM_getResourceURL
 // @grant        unsafeWindow
@@ -44,8 +45,8 @@
   const Vue__namespace = /*#__PURE__*/_interopNamespaceDefault(Vue);
 
   const cssLoader = (e) => {
-    const t = GM_getResourceText(e), o = document.createElement("style");
-    return o.innerText = t, document.head.append(o), t;
+    const t = GM_getResourceText(e);
+    return GM_addStyle(t), t;
   }, jsonLoader = (e) => JSON.parse(GM_getResourceText(e)), urlLoader = (e, t) => GM_getResourceURL(e, false).replace(/^data:application;base64,/, `data:${t};base64,`), rawLoader = (e) => GM_getResourceText(e);
   cssLoader("element-plus/dist/index.css");
   const ElementPlusPkg = jsonLoader("element-plus/package.json");

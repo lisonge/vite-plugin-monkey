@@ -1,9 +1,12 @@
+import * as acornWalk from 'acorn-walk';
 import { readFileSync } from 'node:fs';
 import fs from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
+import type { OutputBundle, PluginContext } from 'rollup';
 import { normalizePath, transformWithEsbuild } from 'vite';
 import { logger } from './_logger';
+import { FinalMonkeyOption } from './types';
 
 export const delay = async (n = 0) => {
   await new Promise<void>((res) => {
@@ -291,4 +294,95 @@ export const cyrb53hash = (str = ``, seed = 0) => {
   return (4294967296 * (2097151 & h2) + (h1 >>> 0))
     .toString(36)
     .substring(0, 8);
+};
+
+export async function* walk(dirPath: string) {
+  const pathnames = (await fs.readdir(dirPath)).map((s) =>
+    path.join(dirPath, s),
+  );
+  while (pathnames.length > 0) {
+    const pathname = pathnames.pop()!;
+    const state = await fs.lstat(pathname);
+    if (state.isFile()) {
+      yield pathname;
+    } else if (state.isDirectory()) {
+      pathnames.push(
+        ...(await fs.readdir(pathname)).map((s) => path.join(pathname, s)),
+      );
+    }
+  }
+}
+
+export const collectGrant = (
+  context: PluginContext,
+  bundleOrCode: OutputBundle | string | string[],
+): Set<string> => {
+  const codes: string[] = [];
+  if (typeof bundleOrCode == 'string') {
+    codes.push(bundleOrCode);
+  } else if (Array.isArray(bundleOrCode)) {
+    codes.push(...bundleOrCode);
+  } else {
+    Object.values(bundleOrCode).forEach((chunk) => {
+      if (chunk.type == 'chunk') {
+        codes.push(chunk.code);
+      }
+    });
+  }
+  const unusedMembers = new Set(GM_keywords.filter((s) => s.includes(`.`)));
+  const unusedIdentifiers = new Set(
+    GM_keywords.filter((s) => !s.includes(`.`)),
+  );
+  const usedGm = new Set<string>();
+  for (const code of codes) {
+    if (!code.trim()) continue;
+    const ast = context.parse(code);
+    acornWalk.simple(
+      ast,
+      {
+        MemberExpression(node: any) {
+          if (unusedMembers.size == 0) return;
+          const memberName = node.object?.name + '.' + node.property?.name;
+          for (const unusedName of unusedMembers.values()) {
+            if (memberName.endsWith(unusedName)) {
+              usedGm.add(unusedName);
+              unusedMembers.delete(unusedName);
+              break;
+            }
+          }
+        },
+        Identifier(node: any) {
+          if (unusedIdentifiers.size == 0) return;
+          const identifier = node.name;
+          if (unusedIdentifiers.has(identifier)) {
+            usedGm.add(identifier);
+            unusedIdentifiers.delete(identifier);
+          }
+        },
+      },
+      { ...acornWalk.base },
+    );
+    if (unusedMembers.size == 0 && unusedIdentifiers.size == 0) {
+      break;
+    }
+  }
+  return usedGm;
+};
+
+export const getInjectCssCode = async (
+  finalOption: FinalMonkeyOption,
+  rawBundle: OutputBundle,
+) => {
+  const cssTexts: string[] = [];
+  Object.entries(rawBundle).forEach(([k, v]) => {
+    if (v.type == 'asset' && k.endsWith('.css')) {
+      cssTexts.push(v.source.toString());
+      delete rawBundle[k];
+    }
+  });
+  const css = cssTexts.join('').trim();
+  if (css) {
+    // use \x20 to compat unocss, see https://github.com/lisonge/vite-plugin-monkey/issues/45
+    return await finalOption.cssSideEffects(`\x20` + css + `\x20`);
+  }
 };

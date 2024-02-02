@@ -1,4 +1,4 @@
-import { normalizePath, PluginOption, ResolvedConfig } from 'vite';
+import { normalizePath, Plugin, ResolvedConfig } from 'vite';
 import type { FinalMonkeyOption, PkgOptions } from '../types';
 import { getModuleRealInfo, miniCode } from '../_util';
 import { lookup, mimes } from 'mrmime';
@@ -8,7 +8,7 @@ const resourceImportPrefix = '\0monkey-resource-import:';
 
 export const externalResourcePlugin = (
   finalOption: FinalMonkeyOption,
-): PluginOption => {
+): Plugin => {
   const resourceRecord: Record<
     string,
     { resourceName: string; resourceUrl: string }

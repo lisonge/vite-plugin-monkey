@@ -5,9 +5,10 @@
 // @author     monkey
 // @icon       https://vitejs.dev/logo.svg
 // @match      https://www.google.com/
+// @grant      GM_addStyle
 // ==/UserScript==
 
-(o=>{const e=document.createElement("style");e.dataset.source="vite-plugin-monkey",e.textContent=o,document.head.append(e)})(" body{margin:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;display:flex}code{font-family:source-code-pro,Menlo,Monaco,Consolas,Courier New,monospace}._App_9g4xh_1{text-align:center}._logo_9g4xh_5{animation:_logo-spin_9g4xh_1 infinite 20s linear;height:40vmin;pointer-events:none}._header_9g4xh_11{background-color:#282c34;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:calc(10px + 2vmin);color:#fff}._link_9g4xh_22{color:#b318f0}@keyframes _logo-spin_9g4xh_1{0%{transform:rotate(0)}to{transform:rotate(360deg)}} ");
+(e=>{if(typeof GM_addStyle=="function"){GM_addStyle(e);return}const o=document.createElement("style");o.textContent=e,document.head.append(o)})(" body{margin:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;display:flex}code{font-family:source-code-pro,Menlo,Monaco,Consolas,Courier New,monospace}._App_9g4xh_1{text-align:center}._logo_9g4xh_5{animation:_logo-spin_9g4xh_1 infinite 20s linear;height:40vmin;pointer-events:none}._header_9g4xh_11{background-color:#282c34;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:calc(10px + 2vmin);color:#fff}._link_9g4xh_22{color:#b318f0}@keyframes _logo-spin_9g4xh_1{0%{transform:rotate(0)}to{transform:rotate(360deg)}} ");
 
 (function () {
   'use strict';
@@ -23,16 +24,17 @@
   };
   var Owner = null;
   let Transition = null;
+  let ExternalSourceConfig = null;
   let Listener = null;
   let Updates = null;
   let Effects = null;
   let ExecCount = 0;
   function createRoot(fn, detachedOwner) {
-    const listener = Listener, owner = Owner, unowned = fn.length === 0, root = unowned ? UNOWNED : {
+    const listener = Listener, owner = Owner, unowned = fn.length === 0, current = detachedOwner === void 0 ? owner : detachedOwner, root = unowned ? UNOWNED : {
       owned: null,
       cleanups: null,
-      context: null,
-      owner: detachedOwner === void 0 ? owner : detachedOwner
+      context: current ? current.context : null,
+      owner: current
     }, updateFn = unowned ? fn : () => fn(() => untrack(() => cleanNode(root)));
     Owner = root;
     Listener = null;
@@ -53,6 +55,8 @@
     const listener = Listener;
     Listener = null;
     try {
+      if (ExternalSourceConfig)
+        ;
       return fn();
     } finally {
       Listener = listener;
@@ -95,14 +99,13 @@
     if (!node.fn)
       return;
     cleanNode(node);
-    const owner = Owner, listener = Listener, time = ExecCount;
-    Listener = Owner = node;
+    const time = ExecCount;
     runComputation(node, node.value, time);
-    Listener = listener;
-    Owner = owner;
   }
   function runComputation(node, value, time) {
     let nextValue;
+    const owner = Owner, listener = Listener;
+    Listener = Owner = node;
     try {
       nextValue = node.fn(value);
     } catch (err) {
@@ -115,6 +118,9 @@
       }
       node.updatedAt = time + 1;
       return handleError(err);
+    } finally {
+      Listener = listener;
+      Owner = owner;
     }
     if (!node.updatedAt || node.updatedAt <= time) {
       if (node.updatedAt != null && "observers" in node) {
@@ -135,7 +141,7 @@
       cleanups: null,
       value: init,
       owner: Owner,
-      context: null,
+      context: Owner ? Owner.context : null,
       pure
     };
     if (Owner === null)
@@ -243,13 +249,13 @@
     let i;
     if (node.sources) {
       while (node.sources.length) {
-        const source = node.sources.pop(), index2 = node.sourceSlots.pop(), obs = source.observers;
+        const source = node.sources.pop(), index = node.sourceSlots.pop(), obs = source.observers;
         if (obs && obs.length) {
           const n = obs.pop(), s = source.observerSlots.pop();
-          if (index2 < obs.length) {
-            n.sourceSlots[s] = index2;
-            obs[index2] = n;
-            source.observerSlots[index2] = s;
+          if (index < obs.length) {
+            n.sourceSlots[s] = index;
+            obs[index] = n;
+            source.observerSlots[index] = s;
           }
         }
       }
@@ -265,10 +271,17 @@
       node.cleanups = null;
     }
     node.state = 0;
-    node.context = null;
   }
-  function handleError(err) {
-    throw err;
+  function castError(err) {
+    if (err instanceof Error)
+      return err;
+    return new Error(typeof err === "string" ? err : "Unknown error", {
+      cause: err
+    });
+  }
+  function handleError(err, owner = Owner) {
+    const error = castError(err);
+    throw error;
   }
   function createComponent(Comp, props) {
     return untrack(() => Comp(props || {}));
@@ -307,18 +320,18 @@
           while (i < bEnd)
             map.set(b[i], i++);
         }
-        const index2 = map.get(a[aStart]);
-        if (index2 != null) {
-          if (bStart < index2 && index2 < bEnd) {
+        const index = map.get(a[aStart]);
+        if (index != null) {
+          if (bStart < index && index < bEnd) {
             let i = aStart, sequence = 1, t;
             while (++i < aEnd && i < bEnd) {
-              if ((t = map.get(a[i])) == null || t !== index2 + sequence)
+              if ((t = map.get(a[i])) == null || t !== index + sequence)
                 break;
               sequence++;
             }
-            if (sequence > index2 - bStart) {
+            if (sequence > index - bStart) {
               const node = a[aStart];
-              while (bStart < index2)
+              while (bStart < index)
                 parentNode.insertBefore(b[bStart++], node);
             } else
               parentNode.replaceChild(b[bStart++], a[aStart++]);
@@ -347,7 +360,7 @@
       t.innerHTML = html;
       return isSVG ? t.content.firstChild.firstChild : t.content.firstChild;
     };
-    const fn = isCE ? () => (node || (node = create())).cloneNode(true) : () => untrack(() => document.importNode(node || (node = create()), true));
+    const fn = isCE ? () => untrack(() => document.importNode(node || (node = create()), true)) : () => (node || (node = create())).cloneNode(true);
     fn.cloneNode = fn;
     return fn;
   }
@@ -383,7 +396,7 @@
       if (multi) {
         let node = current[0];
         if (node && node.nodeType === 3) {
-          node.data = value;
+          node.data !== value && (node.data = value);
         } else
           node = document.createTextNode(value);
         current = cleanChildren(parent, current, marker, node);
@@ -435,7 +448,7 @@
         parent.replaceChild(value, parent.firstChild);
       current = value;
     } else
-      console.warn(`Unrecognized value. Skipped inserting`, value);
+      ;
     return current;
   }
   function normalizeIncomingArray(normalized, array, current, unwrap) {
@@ -492,7 +505,7 @@
       parent.insertBefore(node, marker);
     return [node];
   }
-  const logo$1 = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNjYgMTU1LjMiPjxwYXRoIGQ9Ik0xNjMgMzVTMTEwLTQgNjkgNWwtMyAxYy02IDItMTEgNS0xNCA5bC0yIDMtMTUgMjYgMjYgNWMxMSA3IDI1IDEwIDM4IDdsNDYgOSAxOC0zMHoiIGZpbGw9IiM3NmIzZTEiLz48bGluZWFyR3JhZGllbnQgaWQ9ImEiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiB4MT0iMjcuNSIgeTE9IjMiIHgyPSIxNTIiIHkyPSI2My41Ij48c3RvcCBvZmZzZXQ9Ii4xIiBzdG9wLWNvbG9yPSIjNzZiM2UxIi8+PHN0b3Agb2Zmc2V0PSIuMyIgc3RvcC1jb2xvcj0iI2RjZjJmZCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzc2YjNlMSIvPjwvbGluZWFyR3JhZGllbnQ+PHBhdGggZD0iTTE2MyAzNVMxMTAtNCA2OSA1bC0zIDFjLTYgMi0xMSA1LTE0IDlsLTIgMy0xNSAyNiAyNiA1YzExIDcgMjUgMTAgMzggN2w0NiA5IDE4LTMweiIgb3BhY2l0eT0iLjMiIGZpbGw9InVybCgjYSkiLz48cGF0aCBkPSJNNTIgMzVsLTQgMWMtMTcgNS0yMiAyMS0xMyAzNSAxMCAxMyAzMSAyMCA0OCAxNWw2Mi0yMVM5MiAyNiA1MiAzNXoiIGZpbGw9IiM1MThhYzgiLz48bGluZWFyR3JhZGllbnQgaWQ9ImIiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiB4MT0iOTUuOCIgeTE9IjMyLjYiIHgyPSI3NCIgeTI9IjEwNS4yIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM3NmIzZTEiLz48c3RvcCBvZmZzZXQ9Ii41IiBzdG9wLWNvbG9yPSIjNDM3N2JiIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWYzYjc3Ii8+PC9saW5lYXJHcmFkaWVudD48cGF0aCBkPSJNNTIgMzVsLTQgMWMtMTcgNS0yMiAyMS0xMyAzNSAxMCAxMyAzMSAyMCA0OCAxNWw2Mi0yMVM5MiAyNiA1MiAzNXoiIG9wYWNpdHk9Ii4zIiBmaWxsPSJ1cmwoI2IpIi8+PGxpbmVhckdyYWRpZW50IGlkPSJjIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjE4LjQiIHkxPSI2NC4yIiB4Mj0iMTQ0LjMiIHkyPSIxNDkuOCI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjMzE1YWE5Ii8+PHN0b3Agb2Zmc2V0PSIuNSIgc3RvcC1jb2xvcj0iIzUxOGFjOCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzMxNWFhOSIvPjwvbGluZWFyR3JhZGllbnQ+PHBhdGggZD0iTTEzNCA4MGE0NSA0NSAwIDAwLTQ4LTE1TDI0IDg1IDQgMTIwbDExMiAxOSAyMC0zNmM0LTcgMy0xNS0yLTIzeiIgZmlsbD0idXJsKCNjKSIvPjxsaW5lYXJHcmFkaWVudCBpZD0iZCIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIHgxPSI3NS4yIiB5MT0iNzQuNSIgeDI9IjI0LjQiIHkyPSIyNjAuOCI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjNDM3N2JiIi8+PHN0b3Agb2Zmc2V0PSIuNSIgc3RvcC1jb2xvcj0iIzFhMzM2YiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzFhMzM2YiIvPjwvbGluZWFyR3JhZGllbnQ+PHBhdGggZD0iTTExNCAxMTVhNDUgNDUgMCAwMC00OC0xNUw0IDEyMHM1MyA0MCA5NCAzMGwzLTFjMTctNSAyMy0yMSAxMy0zNHoiIGZpbGw9InVybCgjZCkiLz48L3N2Zz4=";
+  const logo$1 = "data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20166%20155.3'%3e%3cpath%20d='M163%2035S110-4%2069%205l-3%201c-6%202-11%205-14%209l-2%203-15%2026%2026%205c11%207%2025%2010%2038%207l46%209%2018-30z'%20fill='%2376b3e1'/%3e%3clinearGradient%20id='a'%20gradientUnits='userSpaceOnUse'%20x1='27.5'%20y1='3'%20x2='152'%20y2='63.5'%3e%3cstop%20offset='.1'%20stop-color='%2376b3e1'/%3e%3cstop%20offset='.3'%20stop-color='%23dcf2fd'/%3e%3cstop%20offset='1'%20stop-color='%2376b3e1'/%3e%3c/linearGradient%3e%3cpath%20d='M163%2035S110-4%2069%205l-3%201c-6%202-11%205-14%209l-2%203-15%2026%2026%205c11%207%2025%2010%2038%207l46%209%2018-30z'%20opacity='.3'%20fill='url(%23a)'/%3e%3cpath%20d='M52%2035l-4%201c-17%205-22%2021-13%2035%2010%2013%2031%2020%2048%2015l62-21S92%2026%2052%2035z'%20fill='%23518ac8'/%3e%3clinearGradient%20id='b'%20gradientUnits='userSpaceOnUse'%20x1='95.8'%20y1='32.6'%20x2='74'%20y2='105.2'%3e%3cstop%20offset='0'%20stop-color='%2376b3e1'/%3e%3cstop%20offset='.5'%20stop-color='%234377bb'/%3e%3cstop%20offset='1'%20stop-color='%231f3b77'/%3e%3c/linearGradient%3e%3cpath%20d='M52%2035l-4%201c-17%205-22%2021-13%2035%2010%2013%2031%2020%2048%2015l62-21S92%2026%2052%2035z'%20opacity='.3'%20fill='url(%23b)'/%3e%3clinearGradient%20id='c'%20gradientUnits='userSpaceOnUse'%20x1='18.4'%20y1='64.2'%20x2='144.3'%20y2='149.8'%3e%3cstop%20offset='0'%20stop-color='%23315aa9'/%3e%3cstop%20offset='.5'%20stop-color='%23518ac8'/%3e%3cstop%20offset='1'%20stop-color='%23315aa9'/%3e%3c/linearGradient%3e%3cpath%20d='M134%2080a45%2045%200%2000-48-15L24%2085%204%20120l112%2019%2020-36c4-7%203-15-2-23z'%20fill='url(%23c)'/%3e%3clinearGradient%20id='d'%20gradientUnits='userSpaceOnUse'%20x1='75.2'%20y1='74.5'%20x2='24.4'%20y2='260.8'%3e%3cstop%20offset='0'%20stop-color='%234377bb'/%3e%3cstop%20offset='.5'%20stop-color='%231a336b'/%3e%3cstop%20offset='1'%20stop-color='%231a336b'/%3e%3c/linearGradient%3e%3cpath%20d='M114%20115a45%2045%200%2000-48-15L4%20120s53%2040%2094%2030l3-1c17-5%2023-21%2013-34z'%20fill='url(%23d)'/%3e%3c/svg%3e";
   const App$1 = "_App_9g4xh_1";
   const logo = "_logo_9g4xh_5";
   const header = "_header_9g4xh_11";
@@ -504,23 +517,23 @@
     header,
     link
   };
-  const _tmpl$ = /* @__PURE__ */ template(`<div><header><img alt="logo"><p>Edit <code>src/App.jsx</code> and save to reload.</p><a href="https://github.com/solidjs/solid" target="_blank" rel="noopener noreferrer">Learn Solid`);
+  var _tmpl$ = /* @__PURE__ */ template(`<div><header><img alt=logo><p>Edit <code>src/App.jsx</code> and save to reload.</p><a href=https://github.com/solidjs/solid target=_blank rel="noopener noreferrer">Learn Solid`);
   function App() {
     return (() => {
-      const _el$ = _tmpl$(), _el$2 = _el$.firstChild, _el$3 = _el$2.firstChild, _el$4 = _el$3.nextSibling, _el$5 = _el$4.nextSibling;
+      var _el$ = _tmpl$(), _el$2 = _el$.firstChild, _el$3 = _el$2.firstChild, _el$4 = _el$3.nextSibling, _el$5 = _el$4.nextSibling;
       setAttribute(_el$3, "src", logo$1);
       createRenderEffect((_p$) => {
-        const _v$ = styles.App, _v$2 = styles.header, _v$3 = styles.logo, _v$4 = styles.link;
-        _v$ !== _p$._v$ && className(_el$, _p$._v$ = _v$);
-        _v$2 !== _p$._v$2 && className(_el$2, _p$._v$2 = _v$2);
-        _v$3 !== _p$._v$3 && className(_el$3, _p$._v$3 = _v$3);
-        _v$4 !== _p$._v$4 && className(_el$5, _p$._v$4 = _v$4);
+        var _v$ = styles.App, _v$2 = styles.header, _v$3 = styles.logo, _v$4 = styles.link;
+        _v$ !== _p$.e && className(_el$, _p$.e = _v$);
+        _v$2 !== _p$.t && className(_el$2, _p$.t = _v$2);
+        _v$3 !== _p$.a && className(_el$3, _p$.a = _v$3);
+        _v$4 !== _p$.o && className(_el$5, _p$.o = _v$4);
         return _p$;
       }, {
-        _v$: void 0,
-        _v$2: void 0,
-        _v$3: void 0,
-        _v$4: void 0
+        e: void 0,
+        t: void 0,
+        a: void 0,
+        o: void 0
       });
       return _el$;
     })();

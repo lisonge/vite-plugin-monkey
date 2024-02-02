@@ -5,15 +5,16 @@
 // @author       monkey
 // @description  default_description
 // @icon         https://vitejs.dev/logo.svg
-// @match        https://i.songe.li/*
+// @match        https://songe.li/*
 // @require      https://cdn.jsdelivr.net/npm/md5@2.3.0/dist/md5.min.js
-// @require      https://cdn.jsdelivr.net/npm/vue@3.2.47/dist/vue.global.prod.js
-// @require      data:application/javascript,window.Vue%3DVue%3B
-// @require      https://cdn.jsdelivr.net/npm/element-plus@2.3.4/dist/index.full.min.js
-// @require      https://cdn.jsdelivr.net/npm/systemjs@6.14.1/dist/system.min.js
-// @require      https://cdn.jsdelivr.net/npm/systemjs@6.14.1/dist/extras/named-register.min.js
+// @require      https://cdn.jsdelivr.net/npm/vue@3.3.12/dist/vue.global.prod.js
+// @require      data:application/javascript,%3Bwindow.Vue%3DVue%3B
+// @require      https://cdn.jsdelivr.net/npm/element-plus@2.4.4/dist/index.full.min.js
+// @require      https://cdn.jsdelivr.net/npm/systemjs@6.14.2/dist/system.min.js
+// @require      https://cdn.jsdelivr.net/npm/systemjs@6.14.2/dist/extras/named-register.min.js
 // @require      data:application/javascript,%3B(typeof%20System!%3D'undefined')%26%26(System%3Dnew%20System.constructor())%3B
 // @resource     animate.css  https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.css
+// @grant        GM_addStyle
 // @grant        GM_getResourceText
 // ==/UserScript==
 
@@ -27,8 +28,63 @@ System.register("./__entry.js", [], (function (exports, module) {
   return {
     execute: (function () {
 
+      const scriptRel = function detectScriptRel() {
+        const relList = typeof document !== "undefined" && document.createElement("link").relList;
+        return relList && relList.supports && relList.supports("modulepreload") ? "modulepreload" : "preload";
+      }();
+      const assetsURL = function(dep) {
+        return "/" + dep;
+      };
+      const seen = {};
+      const __vitePreload = function preload(baseModule, deps, importerUrl) {
+        let promise = Promise.resolve();
+        if (deps && deps.length > 0) {
+          const links = document.getElementsByTagName("link");
+          promise = Promise.all(deps.map((dep) => {
+            dep = assetsURL(dep);
+            if (dep in seen)
+              return;
+            seen[dep] = true;
+            const isCss = dep.endsWith(".css");
+            const cssSelector = isCss ? '[rel="stylesheet"]' : "";
+            const isBaseRelative = !!importerUrl;
+            if (isBaseRelative) {
+              for (let i = links.length - 1; i >= 0; i--) {
+                const link2 = links[i];
+                if (link2.href === dep && (!isCss || link2.rel === "stylesheet")) {
+                  return;
+                }
+              }
+            } else if (document.querySelector(`link[href="${dep}"]${cssSelector}`)) {
+              return;
+            }
+            const link = document.createElement("link");
+            link.rel = isCss ? "stylesheet" : scriptRel;
+            if (!isCss) {
+              link.as = "script";
+              link.crossOrigin = "";
+            }
+            link.href = dep;
+            document.head.appendChild(link);
+            if (isCss) {
+              return new Promise((res, rej) => {
+                link.addEventListener("load", res);
+                link.addEventListener("error", () => rej(new Error(`Unable to preload CSS for ${dep}`)));
+              });
+            }
+          }));
+        }
+        return promise.then(() => baseModule()).catch((err) => {
+          const e = new Event("vite:preloadError", { cancelable: true });
+          e.payload = err;
+          window.dispatchEvent(e);
+          if (!e.defaultPrevented) {
+            throw err;
+          }
+        });
+      };
       if (location.href.includes("animate.css=on")) {
-        module.import('./_monkey-resource-import_animate-a2152b62-ea523879.js');
+        __vitePreload(() => module.import('./_monkey-resource-import_animate-OkL_ty_c-2fh6USFs.js'), void 0 );
         document.querySelectorAll("div").forEach((div) => {
           div.classList.add("animate__shakeX");
           div.classList.add("animate__animated");
@@ -37,12 +93,12 @@ System.register("./__entry.js", [], (function (exports, module) {
       }
       (async () => {
         if (location.href.includes("md5=on")) {
-          const md5 = (await module.import('md5')).default;
+          const md5 = (await __vitePreload(() => module.import('md5'), void 0 )).default;
           console.log(`md5('xx')=${md5("xx")}`);
           console.log("dynamic import md5");
         }
-        const Vue = await module.import('vue');
-        const ElementPlus = await module.import('element-plus');
+        const Vue = await __vitePreload(() => module.import('vue'), void 0 );
+        const ElementPlus = await __vitePreload(() => module.import('element-plus'), void 0 );
         console.log({
           Vue,
           ElementPlus,
@@ -54,19 +110,24 @@ System.register("./__entry.js", [], (function (exports, module) {
   };
 }));
 
-System.register("./_monkey-resource-import_animate-a2152b62-ea523879.js", [], (function (exports, module) {
+System.register("./_monkey-resource-import_animate-OkL_ty_c-2fh6USFs.js", [], (function (exports, module) {
   'use strict';
   return {
     execute: (function () {
 
       const cssLoader = (e) => {
-        const t = GM_getResourceText(e), o = document.createElement("style");
-        return o.innerText = t, document.head.append(o), t;
+        const t = GM_getResourceText(e);
+        return GM_addStyle(t), t;
       };
-      cssLoader("animate.css");
+      const _monkeyResourceImport_animate = exports('default', cssLoader("animate.css"));
 
     })
   };
 }));
 
-System.import("./__entry.js", "./");
+System.import("./__entry.js", "./");function __vite__mapDeps(indexes) {
+  if (!__vite__mapDeps.viteFileDeps) {
+    __vite__mapDeps.viteFileDeps = []
+  }
+  return indexes.map((i) => __vite__mapDeps.viteFileDeps[i])
+}

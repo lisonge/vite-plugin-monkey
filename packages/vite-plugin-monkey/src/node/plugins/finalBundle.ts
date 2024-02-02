@@ -1,13 +1,19 @@
 import type { OutputChunk, RollupOutput } from 'rollup';
-import { build, PluginOption } from 'vite';
+import { Plugin, build } from 'vite';
+import { lazyValue } from '../_lazy';
+import {
+  collectGrant,
+  getInjectCssCode,
+  moduleExportExpressionWrapper,
+} from '../_util';
 import { getSystemjsRequireUrls, systemjsTexts } from '../systemjs';
 import {
+  findSafeTlaIdentifier,
   transformIdentifierToTla,
   transformTlaToIdentifier,
 } from '../topLevelAwait';
 import type { FinalMonkeyOption } from '../types';
 import { finalMonkeyOptionToComment } from '../userscript';
-import { moduleExportExpressionWrapper } from '../_util';
 
 const __entry_name = `__monkey.entry.js`;
 
@@ -16,34 +22,40 @@ const polyfillId = '\0vite/legacy-polyfills';
 
 const systemJsImportMapPrefix = `user`;
 
-export const finalBundlePlugin = (
-  finalOption: FinalMonkeyOption,
-): PluginOption => {
+export const finalBundlePlugin = (finalOption: FinalMonkeyOption): Plugin => {
   return {
     name: 'monkey:finalBundle',
     apply: 'build',
     enforce: 'post',
     async generateBundle(_, rawBundle) {
-      const entryChunks = (() => {
-        const polyfillChunks: OutputChunk[] = [];
-        const chunks: OutputChunk[] = [];
-        Object.values(rawBundle).forEach((chunk) => {
-          if (chunk.type == 'chunk' && chunk.isEntry) {
+      const entryChunks: OutputChunk[] = [];
+      const chunks: OutputChunk[] = [];
+      Object.values(rawBundle).forEach((chunk) => {
+        if (chunk.type == 'chunk') {
+          if (chunk.facadeModuleId != polyfillId) {
+            chunks.push(chunk);
+          }
+          if (chunk.isEntry) {
             if (chunk.facadeModuleId == polyfillId) {
-              polyfillChunks.push(chunk);
+              entryChunks.unshift(chunk);
             } else {
-              chunks.push(chunk);
+              entryChunks.push(chunk);
             }
           }
-        });
-        return polyfillChunks.concat(chunks);
-      })();
+        }
+      });
 
-      finalOption.hasDynamicImport = entryChunks.some(
+      const fristEntryChunk = entryChunks.find(
+        (s) => s.facadeModuleId != polyfillId,
+      );
+
+      const hasDynamicImport = entryChunks.some(
         (e) => e.dynamicImports.length > 0,
       );
 
       const usedModules = new Set<string>();
+
+      const tlaIdentifier = lazyValue(() => findSafeTlaIdentifier(rawBundle));
 
       const buildResult = (await build({
         logLevel: 'error',
@@ -79,8 +91,12 @@ export const finalBundlePlugin = (
                 ) ?? [];
               if (chunk && chunk.type == 'chunk' && k) {
                 usedModules.add(k);
-                if (!finalOption.hasDynamicImport) {
-                  const ch = transformTlaToIdentifier(this, chunk);
+                if (!hasDynamicImport) {
+                  const ch = transformTlaToIdentifier(
+                    this,
+                    chunk,
+                    tlaIdentifier.value,
+                  );
                   if (ch) return ch;
                 }
                 return {
@@ -90,11 +106,11 @@ export const finalBundlePlugin = (
               }
             },
             generateBundle(_, iifeBundle) {
-              if (finalOption.hasDynamicImport) {
+              if (hasDynamicImport) {
                 return;
               }
               Object.entries(iifeBundle).forEach(([k, chunk]) => {
-                transformIdentifierToTla(this, chunk);
+                transformIdentifierToTla(this, chunk, tlaIdentifier.value);
               });
             },
           },
@@ -113,23 +129,24 @@ export const finalBundlePlugin = (
           },
           lib: {
             entry: __entry_name,
-            formats: [finalOption.hasDynamicImport ? 'system' : 'iife'] as any,
-            name: finalOption.hasDynamicImport ? undefined : '__expose__',
+            formats: [hasDynamicImport ? 'system' : 'iife'] as any,
+            name: hasDynamicImport ? undefined : '__expose__',
             fileName: () => `__entry.js`,
           },
         },
       })) as RollupOutput[];
-
       usedModules.forEach((k) => {
-        delete rawBundle[k];
+        if (fristEntryChunk != rawBundle[k]) {
+          delete rawBundle[k];
+        }
       });
 
-      const finalBundle = Object.assign({}, rawBundle, buildResult[0].output);
+      const buildBundle = buildResult[0].output.flat();
       let finalJsCode = ``;
-      if (finalOption.hasDynamicImport) {
+      if (hasDynamicImport) {
         const systemJsModules: string[] = [];
         let entryName = '';
-        Object.entries(finalBundle).forEach(([k, chunk]) => {
+        Object.entries(buildBundle).forEach(([k, chunk]) => {
           if (chunk.type == 'chunk') {
             const name = JSON.stringify(`./` + chunk.fileName);
             systemJsModules.push(
@@ -173,87 +190,65 @@ export const finalBundlePlugin = (
           .filter((s) => s)
           .join('\n');
 
-        if (finalOption.hasDynamicImport) {
-          if (typeof finalOption.systemjs == 'function') {
-            finalOption.collectRequireUrls.push(
-              ...getSystemjsRequireUrls(finalOption.systemjs),
-            );
-          } else {
-            finalJsCode =
-              (await systemjsTexts.value).join('\n') + '\n' + finalJsCode;
-          }
+        if (typeof finalOption.systemjs == 'function') {
+          finalOption.collectRequireUrls.push(
+            ...getSystemjsRequireUrls(finalOption.systemjs),
+          );
+        } else {
+          finalJsCode =
+            (await systemjsTexts.value).join('\n') + '\n' + finalJsCode;
         }
       } else {
         // use iife
-        Object.entries(finalBundle).forEach(([k, chunk]) => {
+        Object.entries(buildBundle).forEach(([k, chunk]) => {
           if (chunk.type == 'chunk' && chunk.isEntry) {
             finalJsCode = chunk.code;
           }
         });
       }
 
-      const bannerCode = [
-        await finalMonkeyOptionToComment(finalOption),
-        finalOption.injectCssCode,
-      ]
+      const injectCssCode = await getInjectCssCode(finalOption, rawBundle);
+
+      let collectGrantSet: Set<string>;
+      if (finalOption.build.autoGrant) {
+        collectGrantSet = collectGrant(
+          this,
+          chunks.map((s) => s.code).concat(injectCssCode || ``),
+        );
+      } else {
+        collectGrantSet = new Set<string>();
+      }
+
+      const comment = await finalMonkeyOptionToComment(
+        finalOption,
+        collectGrantSet,
+        'build',
+      );
+
+      const mergedCode = [comment, injectCssCode, finalJsCode]
         .filter((s) => s)
-        .map((s) => s + `\n\n`)
-        .join(``);
-
-      // wrap, @require, @resouse will make map error. This requires developers to manually pass the extra offset in the outside
-      // The offset of different userscript engines is different
-      // let { offset, sourceRoot } = finalPluginOption.build.sourcemap;
-      // for (const char of bannerCode) {
-      //   if (char == '\n') {
-      //     offset++;
-      //   }
-      // }
-      // if (offset < 0) {
-      //   offset = 0;
-      // }
-      // const { map } = chunk;
-      // if (map) {
-      //   map.mappings = ';'.repeat(offset) + map.mappings;
-
-      //   let relativeFileList = map.sources
-      //     .map((filepath, i) => ({ filepath, i }))
-      //     .filter(({ filepath }) => !path.isAbsolute(filepath));
-      //   while (
-      //     relativeFileList.every(({ filepath }) => filepath.startsWith('../'))
-      //   ) {
-      //     relativeFileList.forEach((f) => {
-      //       f.filepath = f.filepath.substring(3);
-      //     });
-      //   }
-      //   let relativeMaxNum = 0;
-      //   relativeFileList.forEach(({ filepath }) => {
-      //     let n = 0;
-      //     while (filepath.substring(n * 3).startsWith('../')) {
-      //       n++;
-      //     }
-      //     if (relativeMaxNum < n) {
-      //       relativeMaxNum = n;
-      //     }
-      //   });
-      //   const prefix = '-/'.repeat(relativeMaxNum);
-      //   relativeFileList.forEach(({ filepath, i }) => {
-      //     map.sources[i] = prefix + filepath;
-      //   });
-      //   Reflect.set(map, 'sourceRoot', sourceRoot);
-      // }
-      finalJsCode = bannerCode + finalJsCode;
-      this.emitFile({
-        type: 'asset',
-        fileName: finalOption.build.fileName,
-        source: finalJsCode,
-      });
-
-      const { metaFileName, fileName } = finalOption.build;
-      if (metaFileName) {
+        .join(`\n\n`)
+        .trimEnd();
+      if (fristEntryChunk) {
+        fristEntryChunk.fileName = finalOption.build.fileName;
+        fristEntryChunk.code = mergedCode;
+      } else {
         this.emitFile({
           type: 'asset',
-          fileName: metaFileName(fileName),
-          source: await finalMonkeyOptionToComment(finalOption),
+          fileName: finalOption.build.fileName,
+          source: mergedCode,
+        });
+      }
+
+      if (finalOption.build.metaFileName) {
+        this.emitFile({
+          type: 'asset',
+          fileName: finalOption.build.metaFileName(),
+          source: await finalMonkeyOptionToComment(
+            finalOption,
+            collectGrantSet,
+            'meta',
+          ),
         });
       }
     },

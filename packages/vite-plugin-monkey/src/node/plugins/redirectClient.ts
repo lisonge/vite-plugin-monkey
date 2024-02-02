@@ -1,9 +1,9 @@
-import type { PluginOption } from 'vite';
+import type { Plugin } from 'vite';
 import type { FinalMonkeyOption } from '../types';
 
 export const redirectClientPlugin = (
   finalOption: FinalMonkeyOption,
-): PluginOption => {
+): Plugin => {
   return {
     name: 'monkey:redirectClient',
     enforce: 'pre',

@@ -1,4 +1,7 @@
+import { logger } from './_logger';
+import { miniCode, projectPkg } from './_util';
 import { jsdelivr } from './cdn';
+import { fn2string } from './inject_template';
 import type {
   FinalMonkeyOption,
   IArray,
@@ -8,8 +11,6 @@ import type {
   Pkg2UrlFn,
   PkgOptions,
 } from './types';
-import { projectPkg } from './_util';
-import { logger } from './_logger';
 
 export const resolvedOption = (
   pluginOption: MonkeyOption,
@@ -221,6 +222,24 @@ export const resolvedOption = (
     metaFileName = undefined;
   }
 
+  const metaFileFc = metaFileName;
+
+  const cssSideEffects =
+    build.cssSideEffects ||
+    (() => {
+      return (e: string) => {
+        // @ts-ignore
+        if (typeof GM_addStyle == 'function') {
+          // @ts-ignore
+          GM_addStyle(e);
+          return;
+        }
+        const o = document.createElement('style');
+        o.textContent = e;
+        document.head.append(o);
+      };
+    });
+
   const config: FinalMonkeyOption = {
     userscript: {
       name,
@@ -265,7 +284,10 @@ export const resolvedOption = (
     },
     clientAlias: pluginOption.clientAlias ?? '$',
     entry: pluginOption.entry,
-    format: pluginOption.format,
+    format: {
+      align: pluginOption.format?.align ?? 2,
+      generate: pluginOption.format?.generate ?? ((o) => o.userscript),
+    },
     server: {
       mountGmApi: server.mountGmApi ?? false,
       open:
@@ -275,19 +297,23 @@ export const resolvedOption = (
     },
     build: {
       fileName,
-      metaFileName,
+      metaFileName: metaFileFc ? () => metaFileFc(fileName) : undefined,
       autoGrant: build.autoGrant ?? true,
       externalGlobals: externalGlobals,
       externalResource: externalResource2,
     },
-    collectGrantSet: new Set(),
     collectRequireUrls: [],
     collectResource: {},
-    hasDynamicImport: false,
-    injectCssCode: ``,
     globalsPkg2VarName: {},
     requirePkgList: [],
     systemjs: build.systemjs ?? jsdelivr()[1],
+    cssSideEffects: async (css) => {
+      const codeOrFc = await cssSideEffects(css);
+      if (typeof codeOrFc == 'string') {
+        return codeOrFc;
+      }
+      return miniCode(fn2string(codeOrFc, css), 'js');
+    },
   };
 
   return config;

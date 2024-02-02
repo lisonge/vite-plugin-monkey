@@ -10,7 +10,7 @@ export default defineConfig(async ({ command, mode }) => ({
       userscript: {
         namespace: 'https://github.com/lisonge',
         icon: 'https://vitejs.dev/logo.svg',
-        match: 'https://i.songe.li/',
+        match: 'https://songe.li/',
         description: 'default_description',
       },
       build: {
@@ -22,12 +22,7 @@ export default defineConfig(async ({ command, mode }) => ({
               .concat(
                 cdn.jsdelivr('', 'lib/index.iife.js')[1]('latest', 'vue-demi'),
               )
-              .concat(
-                await util.fn2dataUrl(() => {
-                  // @ts-ignore
-                  window.Vue = Vue; // work with element-plus
-                }),
-              ),
+              .concat(util.dataUrl(';window.Vue=Vue;')),
           ],
           ['pinia', cdn.jsdelivr('Pinia', 'dist/pinia.iife.prod.js')],
           [

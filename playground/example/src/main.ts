@@ -73,5 +73,5 @@ Learn Solid
 </div>
 );
 };`;
-console.log(formatCode(tsxCode, 'tsx'));
+console.log(await formatCode(tsxCode, 'tsx'));
 //-------------------------

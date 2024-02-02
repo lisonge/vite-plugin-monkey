@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
-import monkey, { cdn } from 'vite-plugin-monkey';
+import fs from 'node:fs/promises';
+import monkey, { cdn } from './node_modules/vite-plugin-monkey/src/node/index';
 
 export default defineConfig(async ({ command, mode }) => ({
   plugins: [
@@ -21,7 +22,7 @@ export default defineConfig(async ({ command, mode }) => ({
           ja: '説明z',
           'zh-CN': '描述',
         },
-        match: ['https://i.songe.li/'],
+        match: ['https://songe.li/'],
         include: [/^https:\/\/i\.songe\.li\/.*/],
       },
       build: {
@@ -42,15 +43,17 @@ export default defineConfig(async ({ command, mode }) => ({
         externalResource: {
           'element-plus/dist/index.css': cdn.jsdelivr(),
         },
-        sourcemap: {
-          offset: 146,
-        },
       },
     }),
   ],
   build: {
     // if you want to minify xxx.user.js, set true
     // minify: true,
-    sourcemap: 'inline',
+  },
+  server: {
+    https: {
+      cert: await fs.readFile(`./127.0.0.1.pem`, 'utf-8'),
+      key: await fs.readFile(`./127.0.0.1-key.pem`, 'utf-8'),
+    },
   },
 }));

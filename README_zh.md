@@ -270,14 +270,42 @@ export type MonkeyOption = {
      * @default
      * cdn.jsdelivr()[1]
      */
-    systemjs?: 'inline' | Mod2UrlFn2;
+    systemjs?: 'inline' | ModuleToUrlFc;
+
+    /**
+     * @default
+     * const defaultFc = () => {
+     *   return (e: string) => {
+     *     if (typeof GM_addStyle == 'function') {
+     *       GM_addStyle(e);
+     *       return;
+     *     }
+     *     const o = document.createElement('style');
+     *     o.textContent = e;
+     *     document.head.append(o);
+     *   };
+     * };
+     * @example
+     * const defaultFc1 = () => {
+     *   return (e: string) => {
+     *     const o = document.createElement('style');
+     *     o.textContent = e;
+     *     document.head.append(o);
+     *   };
+     * };
+     * const defaultFc2 = (css:string)=>{
+     *   const t = JSON.stringify(css)
+     *   return `(e=>{const o=document.createElement("style");o.textContent=e,document.head.append(o)})(${t})`
+     * }
+     */
+    cssSideEffects?: (
+      css: string,
+    ) => IPromise<string | ((css: string) => void)>;
   };
 };
 ```
 
-</details>
-
-## 排除依赖的 CDN 工具
+## 排除依赖的CDN工具
 
 ```ts
 import { defineConfig } from 'vite';
@@ -308,8 +336,19 @@ export default defineConfig({
 - [staticfile](https://staticfile.org/)
 - [cdnjs](https://cdnjs.com/libraries)
 - [zhimg](https://unpkg.zhimg.com/)
+- [npmmirror](https://registry.npmmirror.com/)
 
 如果你想使用其他 cdn，请查看 [external-scripts](https://greasyfork.org/zh-CN/help/external-scripts)
+
+## 压缩混淆
+
+由于 greasyfork 的 [代码规则](https://greasyfork.org/zh-CN/help/code-rules)
+
+> 提交到 Greasy Fork 的代码不得混淆或最小化
+
+因此插件将 [viteConfig.build.minify](https://cn.vitejs.dev/config/build-options.html#build-minify) 的默认值更改为 `false`
+
+如果你想启用压缩混淆, 只需要手动设置 `viteConfig.build.minify=true`
 
 ## GM_api 用法
 
@@ -420,27 +459,9 @@ preact/react/svelte/vanilla/vue/solid 的例子, 请直接看 [create-monkey](/p
 
 在 `vite serve` 模式下, 代码入口被作为 script 添加到目标环境 document.head, 代码需要在两个源之间正常工作
 
-#### 对于 http header csp
+但是浏览器会根据 CSP 策略阻止这个 script 的执行
 
-你可以使用 [Tampermonkey](https://www.tampermonkey.net/) 然后打开插件配置 `extension://iikmkjmpaadaobahmlepeloendndfphd/options.html#nav=settings`
-
-在 `安全`, 设置 `如果站点有内容安全策略（CSP）则向其策略:` 为 `全部移除（可能不安全）`
-
-具体情况请看 [issues/1](https://github.com/lisonge/vite-plugin-monkey/issues/1)
-
-如果你使用 `Violentmonkey`/`Greasemonkey`, 你能通过以下方式解决
-
-- chrome - [Disable Content-Security-Policy](https://chrome.google.com/webstore/detail/disable-content-security/ieelmcmcagommplceebfedjlakkhpden/)
-- edge - [Disable Content-Security-Policy](https://microsoftedge.microsoft.com/addons/detail/disable-contentsecurity/ecmfamimnofkleckfamjbphegacljmbp?hl=zh-CN)
-- firefox - 在 `about:config` 菜单配置中，禁用 `security.csp.enable`
-
-#### for html csp
-
-- 利用 <https://wproxy.org/whistle/> 中间人攻击修改 html
-
-- 如果 csp 允许 `*.xx.com` 这类域名, 你可以设置 `viteConfig.server.host=localhost.xx.com` 然后添加本地 dns `127.0.0.1 localhost.xx.com` 到你的 hosts 文件, 如果你需要伪装 https ca, 你可以使用 [mkcert](https://github.com/FiloSottile/mkcert)
-
-- 通过 chrome-remote-interface [issues/1#issuecomment-1236060681](https://github.com/lisonge/vite-plugin-monkey/issues/1#issuecomment-1236060681)
+安装扩展 [Disable-CSP](https://github.com/lisonge/Disable-CSP) 即可禁用 CSP
 
 ### 通过 @require 加载的 IIFE 和 UMD 混用的问题
 
@@ -456,12 +477,9 @@ iife-cdn 使用 `var` 声明的变量在油猴脚本作用域下不会成为 win
 // 解决方案例子
 import { cdn, util } from 'vite-plugin-monkey';
 const buildConfig = {
-  vue: cdn.jsdelivr('Vue', 'dist/vue.global.prod.js').concat(
-    await util.fn2dataUrl(() => {
-      // @ts-ignore
-      window.Vue = Vue;
-    }),
-  ),
+  vue: cdn
+    .jsdelivr('Vue', 'dist/vue.global.prod.js')
+    .concat(util.dataUrl(';window.Vue=Vue;')),
   'element-plus': cdn.jsdelivr('ElementPlus', 'dist/index.full.min.js'),
 };
 ```
@@ -487,6 +505,77 @@ export default defineConfig({
     }),
   ],
 });
+```
+
+## 如何正确构建一个使用 GM_api 的库
+
+如果您想封装 GM_api 构建一个库后给其他人使用
+
+以前的做法一般是直接在库代码里将 GM_api 作为全局变量访问, 然后通过 `@require` 在脚本里引用加载
+
+但是这无法让我们通过 npm 等包管理器去管理这个依赖, 也不适配 vite-plugin-monkey 的 ESM GM_api 的用法
+
+现在您只需要在您的库代码里正常从 `vite-plugin-monkey/dist/client` 导入 GM_api, 然后在打包的时候将 `vite-plugin-monkey/dist/client` 作为排除依赖即可
+
+这样您就能构建一个正常在 vite-plugin-monkey 里使用的库, 用户使用这个库只需要使用 npm 安装后正常 `import` 使用即可
+
+当然如果您直接将 `vite-plugin-monkey/dist/client` 打包到构建产物中, 这个库也能直接通过 `@require` 引用
+
+但是为了使构建产物更加简洁, 建议您在构建的时候将 `vite-plugin-monkey/dist/client` 重定向到 `vite-plugin-monkey/dist/native`
+
+以下是一个使用 tsup 同时打包 ESM 和 IIFE 格式的例子, ESM 提供给 vite-plugin-monkey 用户, IIFE 提供给想通过 `@require` 引用的用户
+
+同时 IIFE 格式也能作为 vite-plugin-monkey 的 externalGlobals 的配置来减少构建产物的大小
+
+```ts
+// /src/index.ts
+import { GM_setValue } from 'vite-plugin-monkey/dist/client';
+
+export const setValue = (name: string, value: unknown) => {
+  console.log('you invoke setValue', name, value);
+  GM_setValue(name, value);
+};
+```
+
+```ts
+// tsup.config.ts
+import { defineConfig } from 'tsup';
+
+const outExtension = (ctx: { format: 'esm' | 'cjs' | 'iife' }) => ({
+  js: { esm: '.mjs', cjs: '.cjs', iife: '.iife.js' }[ctx.format],
+});
+
+export default defineConfig([
+  {
+    // for vite import
+    entry: ['src/index.ts'],
+    outDir: 'dist',
+    sourcemap: true,
+    platform: 'browser',
+    outExtension,
+    dts: true,
+    format: ['esm'],
+    external: ['vite-plugin-monkey/dist/client'],
+  },
+  {
+    // for userscript @require
+    entry: ['src/index.ts'],
+    outDir: 'dist',
+    sourcemap: true,
+    platform: 'browser',
+    outExtension,
+    dts: false,
+    format: ['iife'],
+    minify: true,
+    globalName: `GmExtra`,
+    target: 'es2015',
+    esbuildOptions: (options) => {
+      options.alias = {
+        'vite-plugin-monkey/dist/client': 'vite-plugin-monkey/dist/native',
+      };
+    },
+  },
+]);
 ```
 
 ## 贡献

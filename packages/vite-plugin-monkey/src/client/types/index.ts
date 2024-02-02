@@ -1,6 +1,6 @@
 import type { WebRequestRule } from '../../shared/types';
 import type {
-  CookieFn,
+  GmCookieFc,
   TamperInfo,
   TamperScriptMeta,
   WebRequestListener,
@@ -44,26 +44,11 @@ type CommonInfo = {
 /**
  * GM_info Type
  */
-export type ScriptInfo = CommonInfo & TamperInfo & ViolentInfo;
+export type GmScriptInfo = CommonInfo & TamperInfo & ViolentInfo;
 
-// type IfEquals<X, Y, A = X, B = never> = (<T>() => T extends X ? 1 : 2) extends <
-//   T,
-// >() => T extends Y ? 1 : 2
-//   ? A
-//   : B;
-
-// type WritableKeys<T> = {
-//   [P in keyof T]-?: IfEquals<
-//     { [Q in P]: T[P] },
-//     { -readonly [Q in P]: T[P] },
-//     P
-//   >;
-// }[keyof T];
-
-// type KV<T = unknown> = Partial<T>;
 type HTMLElementTagName = keyof HTMLElementTagNameMap;
 
-type AddElementFn = {
+type GmAddElementFc = {
   <K extends HTMLElementTagName>(
     tagName: K,
     attributes?: Partial<HTMLElementTagNameMap[K]>,
@@ -83,7 +68,7 @@ type AddElementFn = {
   ): HTMLElement;
 };
 
-export type OpenInTabDetails = {
+export type GmOpenInTabDetails = {
   active?: boolean;
   insert?: boolean;
   /**
@@ -104,20 +89,18 @@ export type OpenInTabDetails = {
   pinned?: boolean;
 };
 
-type OpenInTabFn = {
-  (url: string, details?: OpenInTabDetails): {
-    onclose?: () => void;
-    closed: boolean;
-    close: () => void;
-  };
-  (url: string, openInBackground?: boolean): {
-    onclose?: () => void;
-    closed: boolean;
-    close: () => void;
-  };
+type GmOpenHandle = {
+  onclose?: () => void;
+  closed: boolean;
+  close: () => void;
 };
 
-export type NotificationDetails = {
+type GmOpenInTabFc = {
+  (url: string, details?: GmOpenInTabDetails): GmOpenHandle;
+  (url: string, openInBackground?: boolean): GmOpenHandle;
+};
+
+export type GmNotificationDetails = {
   text: string;
   title?: string;
   image?: string;
@@ -140,23 +123,24 @@ export type NotificationDetails = {
 /**
  * @available violentmonkey
  */
-type NotificationControl = {
+type GmNotificationControl = {
   /**
    * @available violentmonkey
    */
   remove: () => Promise<void>;
 };
-type NotificationFn = {
+
+type GmNotificationFc = {
   (
     text: string,
     title?: string,
     image?: string,
     onclick?: () => void,
-  ): NotificationControl;
-  (details: NotificationDetails, ondone?: () => void): NotificationControl;
+  ): GmNotificationControl;
+  (details: GmNotificationDetails, ondone?: () => void): GmNotificationControl;
 };
 
-type DownloadErrorResponse = {
+type GmDownloadErrorEvent = {
   /**
    * Error reason
    * - `not_enabled` - the download feature isn't enabled by the user
@@ -175,15 +159,12 @@ type DownloadErrorResponse = {
     | 'not_permitted'
     | 'not_supported'
     | 'not_succeeded';
-  /** Detail about that error */
+
   details?: string;
 };
-type RequestEventListener<TResponse> = (
-  this: TResponse,
-  response: TResponse,
-) => void;
+type GmRequestEventListener<Event> = (this: Event, event: Event) => void;
 
-type ProgressResponseBase = {
+type GmProgressEventBase = {
   done: number;
   lengthComputable: boolean;
   loaded: number;
@@ -191,12 +172,15 @@ type ProgressResponseBase = {
   total: number;
   totalSize: number;
 };
-type DownloadProgressResponse = ProgressResponseBase & {
+
+type GmDownloadProgressEvent = GmProgressEventBase & {
   readonly finalUrl: string;
 };
 
-export type DownloadRequest = {
-  /** URL from where the data should be downloaded */
+export type GmDownloadRequest = {
+  /**
+   * URL from where the data should be downloaded
+   */
   url: string;
   /**
    * Filename - for security reasons the file extension needs to be
@@ -204,73 +188,95 @@ export type DownloadRequest = {
    */
   name: string;
   headers?: Record<string, string>;
-  /** Show 'Save As' dialog */
+  /**
+   * Show 'Save As' dialog
+   */
   saveAs?: boolean;
   timeout?: number;
-  /** Callback to be executed if this download ended up with an error */
-  onerror?: RequestEventListener<DownloadErrorResponse>;
-  /** Callback to be executed if this download finished */
+  onerror?: GmRequestEventListener<GmDownloadErrorEvent>;
   ontimeout?(): void;
-  /** Callback to be executed if this download finished */
   onload?(): void;
-  /** Callback to be executed if this download failed due to a timeout */
-  onprogress?: RequestEventListener<DownloadProgressResponse>;
+  onprogress?: GmRequestEventListener<GmDownloadProgressEvent>;
 };
 
-type AbortHandle<TReturn = void> = {
+type GmResponseTypeMap = {
+  text: string;
+  json: any;
+  arraybuffer: ArrayBuffer;
+  blob: Blob;
+  document: Document;
+  stream: ReadableStream<Uint8Array>;
+};
+
+type GmResponseType = keyof GmResponseTypeMap;
+
+type GmAbortHandle<TReturn = void> = {
   abort(): TReturn;
 };
 
-type ResponseBase = {
-  readonly responseHeaders: string;
+type GmResponseEventBase<TResponseType extends GmResponseType> = {
+  responseHeaders: string;
   /**
-   * Unsent = 0,
-   * Opened = 1,
-   * HeadersReceived = 2,
-   * Loading = 3,
-   * Done = 4
+   * 0 = XMLHttpRequest.UNSENT
+   *
+   * 1 = XMLHttpRequest.OPENED
+   *
+   * 2 = XMLHttpRequest.HEADERS_RECEIVED
+   *
+   * 3 = XMLHttpRequest.HEADERS_RECEIVED
+   *
+   * 4 = XMLHttpRequest.DONE
    */
-  readonly readyState: 0 | 1 | 2 | 3 | 4;
-  readonly response: any;
-  readonly responseText: string;
-  readonly responseXML: Document | null;
-  readonly status: number;
-  readonly statusText: string;
+  readyState: 0 | 1 | 2 | 3 | 4;
+  response: GmResponseTypeMap[TResponseType];
+  responseText: string;
+  responseXML: Document | null;
+  status: number;
+  statusText: string;
 };
 
-type ErrorResponse = ResponseBase & {
-  readonly error: string;
+type GmErrorEvent<TResponseType extends GmResponseType> =
+  GmResponseEventBase<TResponseType> & {
+    error: string;
+  };
+
+type GmResponseEvent<
+  TContext,
+  TResponseType extends GmResponseType,
+> = GmResponseEventBase<TResponseType> & {
+  finalUrl: string;
+  context: TContext;
 };
 
-type TResponse<TContext> = ResponseBase & {
-  readonly finalUrl: string;
-  readonly context: TContext;
-};
-type ProgressResponse<TContext> = TResponse<TContext> & ProgressResponseBase;
-export type XhrRequest<TContext = object> = {
+type ProgressResponse<
+  TContext,
+  TResponseType extends GmResponseType,
+> = GmResponseEvent<TContext, TResponseType> & GmProgressEventBase;
+
+export type GmXhrRequest<TContext, TResponseType extends GmResponseType> = {
   method?: string;
-  /** Destination URL */
   url: string;
-  /**
-   * i.e. user-agent, referer... (some special headers are not supported
-   * by Safari and Android browsers)
-   */
   headers?: Record<string, string>;
 
   data?:
     | string
+    | URLSearchParams
+    | FormData
     | ArrayBuffer
     | Blob
     | DataView
-    | FormData
-    | ReadableStream
-    | URLSearchParams;
+    | ReadableStream;
+
+  /**
+   * @available tampermonkey
+   */
+  redirect?: `follow` | `error` | `manual`;
 
   /**
    * @available tampermonkey
    */
   cookie?: string;
-  /** Send the data string in binary mode */
+
   binary?: boolean;
 
   /**
@@ -282,85 +288,96 @@ export type XhrRequest<TContext = object> = {
    * @available tampermonkey
    */
   revalidate?: boolean;
-  /** Timeout in ms */
+
   timeout?: number;
-  /** Property which will be added to the response object */
+
+  /**
+   * Property which will be added to the response event object
+   */
   context?: TContext;
 
   /**
-   * @tampermonkey arraybuffer, blob, json, stream
-   * @violentmonkey arraybuffer, blob, json, text, document
-   * @default 'text' // violentmonkey
+   * @tampermonkey  text, json, arraybuffer, blob, document, stream
+   * @violentmonkey text, json, arraybuffer, blob, document
+   * @default
+   * 'text'
    */
-  responseType?:
-    | 'arraybuffer'
-    | 'blob'
-    | 'json'
-    | 'stream'
-    | 'document'
-    | 'text';
-  /** MIME type for the request */
+  responseType?: TResponseType;
+
   overrideMimeType?: string;
-  /** Don't send cookies with the requests (please see the fetch notes) */
+
   anonymous?: boolean;
+
   /**
-   * (Beta) Use a fetch instead of a xhr request(at Chrome this causes
-   * `xhr.abort`, `details.timeout` and `xhr.onprogress` to not work and
-   * makes `xhr.onreadystatechange` receive only readyState 4 events)
    * @available tampermonkey
    */
   fetch?: boolean;
 
   user?: string;
+
   password?: string;
 
-  // Events
-
-  /** Callback to be executed if the request was aborted */
   onabort?: () => void;
-  /** Callback to be executed if the request ended up with an error */
-  onerror?: RequestEventListener<ErrorResponse>;
+
+  onerror?: GmRequestEventListener<GmErrorEvent<TResponseType>>;
 
   /**
    * @available violentmonkey
    */
-  onloadend?: RequestEventListener<TResponse<TContext>>;
+  onloadend?: GmRequestEventListener<GmResponseEvent<TContext, TResponseType>>;
 
-  /** Callback to be executed if the request started to load */
-  onloadstart?: RequestEventListener<TResponse<TContext>>;
-  /** Callback to be executed if the request made some progress */
-  onprogress?: RequestEventListener<ProgressResponse<TContext>>;
-  /** Callback to be executed if the request's ready state changed */
-  onreadystatechange?: RequestEventListener<TResponse<TContext>>;
-  /** Callback to be executed if the request failed due to a timeout */
+  onloadstart?: GmRequestEventListener<
+    GmResponseEvent<TContext, TResponseType>
+  >;
+
+  onprogress?: GmRequestEventListener<
+    ProgressResponse<TContext, TResponseType>
+  >;
+
+  onreadystatechange?: GmRequestEventListener<
+    GmResponseEvent<TContext, TResponseType>
+  >;
+
   ontimeout?: () => void;
-  /** Callback to be executed if the request was loaded */
-  onload?: RequestEventListener<TResponse<TContext>>;
+
+  onload?: GmRequestEventListener<GmResponseEvent<TContext, TResponseType>>;
+};
+
+type GmXhr = {
+  <TContext, TResponseType extends GmResponseType = 'text'>(
+    details: GmXhrRequest<TContext, TResponseType>,
+  ): GmAbortHandle;
+
+  /**
+   * @available tampermonkey
+   * @see [tampermonkey#1278](https://github.com/Tampermonkey/tampermonkey/issues/1278#issuecomment-884363078)
+   */
+  RESPONSE_TYPE_STREAM?: 'stream';
 };
 
 export type MonkeyWindow = typeof window & {
   unsafeWindow: typeof window;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#meta:grant
+   * @see https://www.tampermonkey.net/documentation.php#api:window.close
    * @see https://violentmonkey.github.io/api/metadata-block/#grant
    */
   close: () => void;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#meta:grant
+   * @see https://www.tampermonkey.net/documentation.php#api:window.focus
    * @see https://violentmonkey.github.io/api/metadata-block/#grant
    */
   focus: () => void;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#meta:grant
+   * @see https://www.tampermonkey.net/documentation.php#api:window.onurlchange
    * @available tampermonkey
    */
   onurlchange?: null;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#meta:grant
+   * @see https://www.tampermonkey.net/documentation.php#api:window.onurlchange
    * @available tampermonkey
    */
   addEventListener: (
@@ -369,7 +386,7 @@ export type MonkeyWindow = typeof window & {
   ) => void;
 
   /**
-   * @see https://www.tampermonkey.net/documentation.php#meta:grant
+   * @see https://www.tampermonkey.net/documentation.php#api:window.onurlchange
    * @available tampermonkey
    */
   removeEventListener: (
@@ -446,7 +463,7 @@ export type MonkeyWindow = typeof window & {
    * @see https://www.tampermonkey.net/documentation.php#GM_addElement
    * @see https://violentmonkey.github.io/api/gm/#gm_addelement
    */
-  GM_addElement: AddElementFn;
+  GM_addElement: GmAddElementFc;
 
   /**
    * @see https://www.tampermonkey.net/documentation.php#GM_addStyle
@@ -474,7 +491,7 @@ export type MonkeyWindow = typeof window & {
    * @see https://www.tampermonkey.net/documentation.php##api:GM_cookie.delete
    * @available tampermonkey
    */
-  GM_cookie: CookieFn;
+  GM_cookie: GmCookieFc;
 
   /**
    * @see https://www.tampermonkey.net/documentation.php#GM_deleteValue
@@ -504,21 +521,21 @@ export type MonkeyWindow = typeof window & {
    * @see https://www.tampermonkey.net/documentation.php#GM_getTab
    * @available tampermonkey
    */
-  GM_getTab: (callback: (obj: unknown) => void) => void;
+  GM_getTab: <T = any>(callback: (tab: T) => void) => void;
 
   /**
    * @see https://www.tampermonkey.net/documentation.php#GM_getTabs
    * @available tampermonkey
    */
-  GM_getTabs: (
-    callback: (tabsMap: { [tabId: number]: unknown }) => void,
+  GM_getTabs: <T = any>(
+    callback: (tabsMap: { [tabId: number]: T }) => void,
   ) => void;
 
   /**
    * @see https://www.tampermonkey.net/documentation.php#GM_info
    * @see https://violentmonkey.github.io/api/gm/#gm_info
    */
-  GM_info: ScriptInfo;
+  GM_info: GmScriptInfo;
 
   /**
    * @see https://www.tampermonkey.net/documentation.php#GM_listValues
@@ -530,19 +547,19 @@ export type MonkeyWindow = typeof window & {
    * @see https://www.tampermonkey.net/documentation.php#GM_log
    * @available tampermonkey
    */
-  GM_log: (message: unknown) => void;
+  GM_log: (...data: any[]) => void;
 
   /**
    * @see https://www.tampermonkey.net/documentation.php#GM_notification
    * @see https://violentmonkey.github.io/api/gm/#gm_notification
    */
-  GM_notification: NotificationFn;
+  GM_notification: GmNotificationFc;
 
   /**
    * @see https://www.tampermonkey.net/documentation.php#GM_openInTab
    * @see https://violentmonkey.github.io/api/gm/#gm_openintab
    */
-  GM_openInTab: OpenInTabFn;
+  GM_openInTab: GmOpenInTabFc;
 
   /**
    * @see https://www.tampermonkey.net/documentation.php#GM_registerMenuCommand
@@ -551,6 +568,7 @@ export type MonkeyWindow = typeof window & {
   GM_registerMenuCommand: <T extends MouseEvent | KeyboardEvent>(
     caption: string,
     onClick: (event: T) => void,
+    accessKey?: string,
   ) => string;
 
   /**
@@ -563,7 +581,7 @@ export type MonkeyWindow = typeof window & {
    * @see https://www.tampermonkey.net/documentation.php#GM_saveTab
    * @available tampermonkey
    */
-  GM_saveTab: (tab: object) => void;
+  GM_saveTab: (tab: unknown) => void;
 
   /**
    * @see https://www.tampermonkey.net/documentation.php#GM_setClipboard
@@ -587,15 +605,15 @@ export type MonkeyWindow = typeof window & {
    * @see https://www.tampermonkey.net/documentation.php#GM_xmlhttpRequest
    * @see https://violentmonkey.github.io/api/gm/#gm_xmlhttprequest
    */
-  GM_xmlhttpRequest: <TContext>(details: XhrRequest<TContext>) => AbortHandle;
+  GM_xmlhttpRequest: GmXhr;
 
   /**
    * @see https://www.tampermonkey.net/documentation.php#GM_download
    * @see https://violentmonkey.github.io/api/gm/#gm_download
    */
   GM_download: {
-    (options: DownloadRequest): AbortHandle<boolean>;
-    (url: string, name?: string): AbortHandle<boolean>;
+    (options: GmDownloadRequest): GmAbortHandle<boolean>;
+    (url: string, name?: string): GmAbortHandle<boolean>;
   };
 
   /**

@@ -1,9 +1,7 @@
-import { PluginOption, transformWithEsbuild } from 'vite';
+import type { Plugin } from 'vite';
 import type { FinalMonkeyOption } from '../types';
 
-export const fixViteClientPlugin = (
-  finalOption: FinalMonkeyOption,
-): PluginOption => {
+export const fixViteClientPlugin = (finalOption: FinalMonkeyOption): Plugin => {
   return {
     name: 'monkey:fixViteClient',
     apply: 'serve',

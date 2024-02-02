@@ -1,6 +1,6 @@
 import module from 'node:module';
 import type systemjsPkgT from 'systemjs/package.json';
-import { Mod2UrlFn2 } from './types';
+import { ModuleToUrlFc } from './types';
 import fs from 'node:fs/promises';
 import { lazyValue } from './_lazy';
 import { dataUrl } from './util';
@@ -37,7 +37,7 @@ export const systemjsTexts = lazyValue(() => {
   );
 });
 
-export const getSystemjsRequireUrls = (fn: Mod2UrlFn2) => {
+export const getSystemjsRequireUrls = (fn: ModuleToUrlFc) => {
   return systemjsSubPaths
     .map((p) => {
       return fn(systemjsPkg.version, systemjsPkg.name, p, p);

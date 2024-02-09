@@ -106,7 +106,7 @@ export const virtualHtmlTemplate = async (url: string) => {
   a {
     color: blue;
     text-decoration: none;
-    font-size: 1.2em;
+    font-size: 1.5em;
   }
   a:hover {
     text-decoration: underline;
@@ -144,7 +144,7 @@ export const previewTemplate = async (urls: string[]) => {
   table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 1.2em;
+    font-size: 1.5em;
   }
   th, td {
     border: 1px solid black;

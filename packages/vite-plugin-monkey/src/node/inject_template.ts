@@ -101,7 +101,7 @@ export const virtualHtmlTemplate = async (url: string) => {
     margin: 25px;
   }
   p {
-	  font-size: 1.5em;
+    font-size: 1.5em;
   }
   a {
     color: blue;
@@ -139,7 +139,7 @@ export const previewTemplate = async (urls: string[]) => {
     margin: 25px;
   }
   p {
-	  font-size: 1.5em;
+    font-size: 1.5em;
   }
   table {
     width: 100%;

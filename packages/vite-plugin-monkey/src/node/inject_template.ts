@@ -79,11 +79,7 @@ export const mountGmApiFn = (meta: ImportMeta) => {
 };
 
 export const virtualHtmlTemplate = async (url: string) => {
-  const delay = async (n = 0) => {
-    await new Promise<void>((res) => {
-      setTimeout(res, n);
-    });
-  };
+  const delay = (n = 0) => new Promise<void>((res) => setTimeout(res, n));
   await delay();
   const u = new URL(url, location.origin);
   u.searchParams.set('origin', u.origin);
@@ -97,26 +93,30 @@ export const virtualHtmlTemplate = async (url: string) => {
   const style = document.createElement('style');
   document.head.append(style);
   style.innerText = /* css */ `
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+  }
   .App {
-    margin-top: 10vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
+    margin: 25px;
   }
-  .App > .title {
-    padding: 4px;
-    font-size: 15px;
+  p {
+	  font-size: 1.5em;
   }
-  .App > a {
-    font-size: 32px;
-    text-align: center;
+  a {
+    color: blue;
+    text-decoration: none;
+    font-size: 1.2em;
+  }
+  a:hover {
+    text-decoration: underline;
   }
 `.trim();
   document.body.innerHTML = /* html */ `
   <div class="App">
-    <div class="title"> please click the link below to install userscipt </div>
-    <a target="_blank"></a>
+    <h1>PREVIEW PAGE</h1>
+    <p>Click the links below to install userscripts:</p>
+    <a target="_blank"></a></th>
   </div>
   `.trim();
   await delay();
@@ -126,29 +126,40 @@ export const virtualHtmlTemplate = async (url: string) => {
 };
 
 export const previewTemplate = async (urls: string[]) => {
-  const delay = async (n = 0) => {
-    await new Promise<void>((res) => {
-      setTimeout(res, n);
-    });
-  };
+  const delay = (n = 0) => new Promise<void>((res) => setTimeout(res, n));
   await delay();
   const style = document.createElement('style');
   document.head.append(style);
   style.innerText = /* css */ `
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+  }
   .App {
-    margin-top: 10vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
+    margin: 25px;
   }
-  .App > .title {
-    padding: 4px;
-    font-size: 15px;
+  p {
+	  font-size: 1.5em;
   }
-  .App > a {
-    font-size: 32px;
-    text-align: center;
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1.2em;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: left;
+  }
+  th {
+    background-color: #f2f2f2;
+  }
+  a {
+    color: blue;
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
   }
 `.trim();
   if (window == window.parent && urls.length == 1) {
@@ -160,26 +171,40 @@ export const previewTemplate = async (urls: string[]) => {
   } else if (urls.length == 0) {
     document.body.innerHTML = /* html */ `
     <div class="App">
-      <div class="title"> There is no script to install </div>
+      <h1> There is no script to install </h1>
     </div>
     `.trim();
     return;
   } else {
     document.body.innerHTML = /* html */ `
     <div class="App">
-      <div class="title"> please click the link below to install userscipt </div>
+      <h1>PREVIEW PAGE</h1>
+      <p>Click the links below to install userscripts:</p>
+      <table>
+        <tr>
+          <th>No.</th>
+          <th>Install Link</th>
+        </tr>
+      </table>
     </div>
     `.trim();
     await delay();
-    const div = document.querySelector<HTMLElement>(`.App`)!;
-    urls.forEach((u) => {
+    const table = document.querySelector<HTMLElement>(`table`)!;
+    urls.sort().forEach((u, index) => {
+      const tr = document.createElement('tr');
+      const td1 = document.createElement('td');
+      const td2 = document.createElement('td');
       const a = document.createElement('a');
+      td1.innerText = `${index + 1}`;
       if (window != window.parent) {
         a.target = '_blank';
       }
       a.href = u;
       a.textContent = new URL(u, location.origin).href;
-      div.append(a);
+      td2.append(a);
+      tr.append(td1);
+      tr.append(td2);
+      table.append(tr);
     });
   }
 };

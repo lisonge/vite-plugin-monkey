@@ -34,7 +34,7 @@ pnpm create monkey
 
 then you can choose the following template
 
-| JavaScript                                                     | TypeSript                                                            |
+| JavaScript                                                     | TypeScript                                                            |
 | -------------------------------------------------------------- | -------------------------------------------------------------------- |
 | [empty](/packages/create-monkey/template-empty) (only js)      | [empty-ts](/packages/create-monkey/template-empty-ts) (only ts)      |
 | [vanilla](/packages/create-monkey/template-vanilla) (js + css) | [vanilla-ts](/packages/create-monkey/template-vanilla-ts) (ts + css) |

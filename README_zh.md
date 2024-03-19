@@ -9,18 +9,18 @@
 
 一个 vite 插件，用来辅助开发 [Tampermonkey](https://www.tampermonkey.net/), [Violentmonkey](https://violentmonkey.github.io/), [Greasemonkey](https://www.greasespot.net/), [ScriptCat](https://docs.scriptcat.org/) 等脚本引擎 的脚本
 
-## feature
+## 主要特性
 
-- 支持 Tampermonkey, Violentmonkey, Greasemonkey, ScriptCat 等脚本引擎的辅助开发
+- 支持 Tampermonkey、Violentmonkey、Greasemonkey、ScriptCat 等脚本引擎的辅助开发
 - 打包自动注入脚本配置头部注释
-- 当 第一次启动 或 脚本配置注释改变时 自动在默认浏览器打开脚本安装
-- 利用 @require 配置库的 cdn 的方案, 减少构建脚本大小
-- 利用 @resource 配置外部资源 cdn 的方案, 额外减少构建脚本大小
-- 通过 ESM 导入的方式使用 GM_api, 附带类型提示
-- 智能收集使用到的 GM_api, 自动配置 @grant 注释
+- 当第一次启动或脚本配置注释改变时自动在默认浏览器打开脚本安装
+- 利用 @require 配置库的 CDN 的方案，减少构建脚本大小
+- 利用 @resource 配置外部资源 CDN 的方案，额外减少构建脚本大小
+- 通过 ESM 导入的方式使用 GM_api，附带类型提示
+- 智能收集使用到的 GM_api，自动配置 @grant 注释
 - 支持 `top level await` 和单文件下的 `dynamic import`
 - 预览模式下自动打开浏览器安装构建好的脚本
-- 完全的 Typescript 和 Vite 的开发体验，比如模块热替换,秒启动
+- 完全的 Typescript 和 Vite 的开发体验，比如模块热替换，秒启动
 
 ## 快速开始
 
@@ -34,7 +34,7 @@ pnpm create monkey
 
 然后你能从以下模板选择
 
-| JavaScript                                                     | TypeSript                                                            |
+| JavaScript                                                     | TypeScript                                                            |
 | -------------------------------------------------------------- | -------------------------------------------------------------------- |
 | [empty](/packages/create-monkey/template-empty) (only js)      | [empty-ts](/packages/create-monkey/template-empty-ts) (only ts)      |
 | [vanilla](/packages/create-monkey/template-vanilla) (js + css) | [vanilla-ts](/packages/create-monkey/template-vanilla-ts) (ts + css) |
@@ -305,7 +305,7 @@ export type MonkeyOption = {
 };
 ```
 
-## 排除依赖的CDN工具
+## 排除依赖的 CDN 工具
 
 ```ts
 import { defineConfig } from 'vite';
@@ -326,7 +326,7 @@ export default defineConfig({
 });
 ```
 
-有以下 cdn 可使用，详情见 [cdn.ts](/packages/vite-plugin-monkey/src/node/cdn.ts)
+有以下 CDN 可使用，详情见 [cdn.ts](/packages/vite-plugin-monkey/src/node/cdn.ts)
 
 - [jsdelivr](https://www.jsdelivr.com/)
 - [unpkg](https://unpkg.com/)
@@ -338,7 +338,7 @@ export default defineConfig({
 - [zhimg](https://unpkg.zhimg.com/)
 - [npmmirror](https://registry.npmmirror.com/)
 
-如果你想使用其他 cdn，请查看 [external-scripts](https://greasyfork.org/zh-CN/help/external-scripts)
+如果你想使用其他 CDN，请查看 [external-scripts](https://greasyfork.org/zh-CN/help/external-scripts)
 
 ## 压缩混淆
 
@@ -348,7 +348,7 @@ export default defineConfig({
 
 因此插件将 [viteConfig.build.minify](https://cn.vitejs.dev/config/build-options.html#build-minify) 的默认值更改为 `false`
 
-如果你想启用压缩混淆, 只需要手动设置 `viteConfig.build.minify=true`
+如果你想启用压缩混淆，只需要手动设置 `viteConfig.build.minify=true`
 
 ## GM_api 用法
 
@@ -405,7 +405,7 @@ export default defineConfig({
 });
 ```
 
-GM_api 将会变成宿主域的全局变量, 可以在任意作用域访问
+GM_api 将会变成宿主域的全局变量，可以在任意作用域访问
 
 ```ts
 // main.ts
@@ -443,9 +443,9 @@ console.log({ GM_cookie, unsafeWindow, monkeyWindow, GM_addElement });
 
 ## 例子
 
-测试例子, 请直接看 [/playground](/playground)
+测试例子，请直接看 [/playground](/playground)
 
-preact/react/svelte/vanilla/vue/solid 的例子, 请直接看 [create-monkey](/packages/create-monkey)
+preact/react/svelte/vanilla/vue/solid 的例子，请直接看 [create-monkey](/packages/create-monkey)
 
 ## 注意
 
@@ -457,7 +457,7 @@ preact/react/svelte/vanilla/vue/solid 的例子, 请直接看 [create-monkey](/p
 
 ### [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)
 
-在 `vite serve` 模式下, 代码入口被作为 script 添加到目标环境 document.head, 代码需要在两个源之间正常工作
+在 `vite serve` 模式下，代码入口被作为 script 添加到目标环境 document.head，代码需要在两个源之间正常工作
 
 但是浏览器会根据 CSP 策略阻止这个 script 的执行
 
@@ -467,11 +467,11 @@ preact/react/svelte/vanilla/vue/solid 的例子, 请直接看 [create-monkey](/p
 
 iife-cdn 使用 `var` 声明的变量在油猴脚本作用域下不会成为 window 的属性
 
-因此如果一个 umd 库依赖了一个 iife 库, 例如 `element-plus` 依赖 `vue`, `element-plus` cdn 在这种情况下无法正常运行
+因此如果一个 umd 库依赖了一个 iife 库， 例如 `element-plus` 依赖 `vue`，`element-plus` cdn 在这种情况下无法正常运行
 
 详情见 [issues/5](https://github.com/lisonge/vite-plugin-monkey/issues/5) 或 [greasyfork#1084](https://github.com/JasonBarnabe/greasyfork/issues/1084)
 
-解决方法是 在 iife-cdn 后面追加一个 dataUrl 脚本, 把 iife 声明的变量作为 window 的属性
+解决方法是 在 iife-cdn 后面追加一个 `dataUrl` 脚本，把 iife 声明的变量作为 `window` 的属性
 
 ```js
 // 解决方案例子
@@ -486,7 +486,7 @@ const buildConfig = {
 
 ### Polyfill
 
-与 vite legacy 一起使用时, 需要设置 `renderLegacyChunks=false`
+与 vite legacy 一起使用时，需要设置 `renderLegacyChunks=false`
 
 ```ts
 // vite.config.ts
@@ -511,21 +511,21 @@ export default defineConfig({
 
 如果您想封装 GM_api 构建一个库后给其他人使用
 
-以前的做法一般是直接在库代码里将 GM_api 作为全局变量访问, 然后通过 `@require` 在脚本里引用加载
+以前的做法一般是直接在库代码里将 GM_api 作为全局变量访问，然后通过 `@require` 在脚本里引用加载
 
-但是这无法让我们通过 npm 等包管理器去管理这个依赖, 也不适配 vite-plugin-monkey 的 ESM GM_api 的用法
+但是这无法让我们通过 npm 等包管理器去管理这个依赖，也不适配 vite-plugin-monkey 的 ESM GM_api 的用法
 
-现在您只需要在您的库代码里正常从 `vite-plugin-monkey/dist/client` 导入 GM_api, 然后在打包的时候将 `vite-plugin-monkey/dist/client` 作为排除依赖即可
+现在您只需要在您的库代码里正常从 `vite-plugin-monkey/dist/client` 导入 GM_api，然后在打包的时候将 `vite-plugin-monkey/dist/client` 作为排除依赖即可
 
-这样您就能构建一个正常在 vite-plugin-monkey 里使用的库, 用户使用这个库只需要使用 npm 安装后正常 `import` 使用即可
+这样您就能构建一个正常在 vite-plugin-monkey 里使用的库，用户使用这个库只需要使用 npm 安装后正常 `import` 使用即可
 
-当然如果您直接将 `vite-plugin-monkey/dist/client` 打包到构建产物中, 这个库也能直接通过 `@require` 引用
+当然如果您直接将 `vite-plugin-monkey/dist/client` 打包到构建产物中，这个库也能直接通过 `@require` 引用
 
-但是为了使构建产物更加简洁, 建议您在构建的时候将 `vite-plugin-monkey/dist/client` 重定向到 `vite-plugin-monkey/dist/native`
+但是为了使构建产物更加简洁，建议您在构建的时候将 `vite-plugin-monkey/dist/client` 重定向到 `vite-plugin-monkey/dist/native`
 
-以下是一个使用 tsup 同时打包 ESM 和 IIFE 格式的例子, ESM 提供给 vite-plugin-monkey 用户, IIFE 提供给想通过 `@require` 引用的用户
+以下是一个使用 tsup 同时打包 ESM 和 IIFE 格式的例子，ESM 提供给 vite-plugin-monkey 用户，IIFE 提供给想通过 `@require` 引用的用户
 
-同时 IIFE 格式也能作为 vite-plugin-monkey 的 externalGlobals 的配置来减少构建产物的大小
+同时 IIFE 格式也能作为 vite-plugin-monkey 的 `externalGlobals` 的配置来减少构建产物的大小
 
 ```ts
 // /src/index.ts

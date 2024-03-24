@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 3.5.2
+
+- fix: can not get gm_api when use mountGmApi [8f0e1bd](https://github.com/lisonge/vite-plugin-monkey/commit/ea700c60d895532229f9174111b5c31158f0e1bd)
+- docs: update docs [7d0fade](https://github.com/lisonge/vite-plugin-monkey/commit/5ed4afdfb4712f437c218c5a7c0ca1ebe7d0fade)
+- perf: preview page [#132](https://github.com/lisonge/vite-plugin-monkey/pull/132)
+
 ## 3.5.1
 
 - perf: support host 0.0.0.0 [#116](https://github.com/lisonge/vite-plugin-monkey/issues/116)

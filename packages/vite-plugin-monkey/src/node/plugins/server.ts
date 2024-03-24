@@ -7,6 +7,7 @@ import { cyrb53hash, existFile, isFirstBoot, toValidURL } from '../_util';
 import { fn2string, mountGmApiFn, serverInjectFn } from '../inject_template';
 import { openBrowser } from '../open_browser';
 import type { FinalMonkeyOption } from '../types';
+import { GmApiNames, preset } from '../unimport';
 import { finalMonkeyOptionToComment } from '../userscript';
 
 export const installUserPath = '/__vite-plugin-monkey.install.user.js';
@@ -102,11 +103,10 @@ export const serverPlugin = (finalOption: FinalMonkeyOption): Plugin => {
             );
 
             const doc = parseDocument(htmlText);
-            type Element = ReturnType<typeof DomUtils.findAll> extends Array<
-              infer T
-            >
-              ? T
-              : never;
+            type Element =
+              ReturnType<typeof DomUtils.findAll> extends Array<infer T>
+                ? T
+                : never;
             const scriptList = DomUtils.getElementsByTagType(
               ElementType.Script,
               doc,
@@ -149,7 +149,9 @@ export const serverPlugin = (finalOption: FinalMonkeyOption): Plugin => {
             );
           } else if (reqUrl.startsWith(gmApiPath)) {
             if (finalOption.server.mountGmApi) {
-              res.end(`;(${mountGmApiFn})(import.meta);`);
+              res.end(
+                `;(${mountGmApiFn})(import.meta, ${JSON.stringify(GmApiNames)});`,
+              );
             } else {
               res.end('');
             }

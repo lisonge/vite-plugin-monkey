@@ -52,7 +52,7 @@ export const cssInjectFn = (css: string) => {
   document.head.append(style);
 };
 
-export const mountGmApiFn = (meta: ImportMeta) => {
+export const mountGmApiFn = (meta: ImportMeta, apiNames: string[] = []) => {
   const key = `__monkeyWindow-` + new URL(meta.url).origin;
   // @ts-ignore
   const monkeyWindow: Window = document[key];
@@ -65,16 +65,18 @@ export const mountGmApiFn = (meta: ImportMeta) => {
   window.unsafeWindow = window;
   console.log(`[vite-plugin-monkey] mount unsafeWindow to unsafeWindow`);
 
-  const mountedApiList: string[] = [];
-  Object.entries(monkeyWindow)
-    .filter(([k]) => k.startsWith('GM'))
-    .forEach(([k, fn]) => {
+  let mountedApiSize = 0;
+  apiNames.forEach((apiName) => {
+    // @ts-ignore
+    const fn = monkeyWindow[apiName];
+    if (fn) {
       // @ts-ignore
-      window[k] = fn;
-      mountedApiList.push(k);
-    });
+      window[apiName] = monkeyWindow[apiName];
+      mountedApiSize++;
+    }
+  });
   console.log(
-    `[vite-plugin-monkey] mount ${mountedApiList.length} GM_api to unsafeWindow`,
+    `[vite-plugin-monkey] mount ${mountedApiSize}/${apiNames.length} GM_api to unsafeWindow`,
   );
 };
 

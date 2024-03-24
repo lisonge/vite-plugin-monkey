@@ -1,5 +1,6 @@
 import type { InlinePreset } from 'unimport';
 import { transformWithEsbuild } from 'vite';
+import { preset } from './unimport';
 
 /**
  * transform function and parameter to iife code then mini code then transform code to data url string
@@ -70,35 +71,4 @@ export function dataUrl(p0: any, ...args: any[]): string | Promise<string> {
  *
  * Note, there is not comment in unimport.d.ts/auto-imports.d.ts file
  */
-export const unimportPreset: InlinePreset = {
-  from: 'vite-plugin-monkey/dist/client',
-  imports: [
-    'GM',
-    'GM_addElement',
-    'GM_addStyle',
-    'GM_addValueChangeListener',
-    'GM_cookie',
-    'GM_deleteValue',
-    'GM_download',
-    'GM_getResourceText',
-    'GM_getResourceURL',
-    'GM_getTab',
-    'GM_getTabs',
-    'GM_getValue',
-    'GM_info',
-    'GM_listValues',
-    'GM_log',
-    'GM_notification',
-    'GM_openInTab',
-    'GM_registerMenuCommand',
-    'GM_removeValueChangeListener',
-    'GM_saveTab',
-    'GM_setClipboard',
-    'GM_setValue',
-    'GM_unregisterMenuCommand',
-    'GM_xmlhttpRequest',
-    'GM_webRequest',
-    'unsafeWindow',
-    'monkeyWindow',
-  ],
-};
+export const unimportPreset: InlinePreset = preset;

@@ -28,6 +28,7 @@
   };
   var Owner = null;
   let Transition = null;
+  let ExternalSourceConfig = null;
   let Listener = null;
   let Updates = null;
   let Effects = null;
@@ -74,6 +75,8 @@
     const listener = Listener;
     Listener = null;
     try {
+      if (ExternalSourceConfig)
+        ;
       return fn();
     } finally {
       Listener = listener;
@@ -491,7 +494,7 @@
       if (multi) {
         let node = current[0];
         if (node && node.nodeType === 3) {
-          node.data = value;
+          node.data !== value && (node.data = value);
         } else
           node = document.createTextNode(value);
         current = cleanChildren(parent, current, marker, node);
@@ -549,7 +552,7 @@
   function normalizeIncomingArray(normalized, array, current, unwrap) {
     let dynamic = false;
     for (let i = 0, len = array.length; i < len; i++) {
-      let item = array[i], prev = current && current[i], t;
+      let item = array[i], prev = current && current[normalized.length], t;
       if (item == null || item === true || item === false)
         ;
       else if ((t = typeof item) === "object" && item.nodeType) {

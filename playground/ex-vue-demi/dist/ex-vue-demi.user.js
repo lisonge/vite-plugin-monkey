@@ -6,12 +6,12 @@
 // @description  default_description
 // @icon         https://vitejs.dev/logo.svg
 // @match        https://songe.li/
-// @require      https://cdn.jsdelivr.net/npm/vue@3.3.12/dist/vue.global.prod.js
+// @require      https://cdn.jsdelivr.net/npm/vue@3.4.21/dist/vue.global.prod.js
 // @require      https://cdn.jsdelivr.net/npm/vue-demi@latest/lib/index.iife.js
-// @require      data:application/javascript,window.Vue%3DVue%3B
+// @require      data:application/javascript,%3Bwindow.Vue%3DVue%3B
 // @require      https://cdn.jsdelivr.net/npm/pinia@2.1.7/dist/pinia.iife.prod.js
-// @require      https://cdn.jsdelivr.net/npm/element-plus@2.4.4/dist/index.full.min.js
-// @resource     element-plus/dist/index.css  https://cdn.jsdelivr.net/npm/element-plus@2.4.4/dist/index.css
+// @require      https://cdn.jsdelivr.net/npm/element-plus@2.6.2/dist/index.full.min.js
+// @resource     element-plus/dist/index.css  https://cdn.jsdelivr.net/npm/element-plus@2.6.2/dist/index.css
 // @grant        GM_addStyle
 // @grant        GM_getResourceText
 // ==/UserScript==

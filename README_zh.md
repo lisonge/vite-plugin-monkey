@@ -112,6 +112,7 @@ export type MonkeyOption = {
    * declare module other_alias {
    *   export * from 'vite-plugin-monkey/dist/client';
    * }
+   * // 如果你使用了vue，并且使用了vue macros，你必须把 clientAlias 修改成其他值，因为clientAlias的默认值 $ 会和vue macros的 $ 冲突
    */
   clientAlias?: string;
   server?: {
@@ -361,6 +362,7 @@ export default defineConfig({
 import { GM_cookie, unsafeWindow, monkeyWindow, GM_addElement } from '$';
 // $ is the default alias of vite-plugin-monkey/dist/client
 // if you want use 'others', set monkeyConfig.clientAlias='others'
+// 如果你使用了vue，并且使用了vue macros，你必须把   clientAlias 修改成其他值，因为clientAlias的默认值 $ 会和vue macros的 $ 冲突
 
 // whatever it is serve or build mode, monkeyWindow is always the window of [UserScript Scope]
 console.log(monkeyWindow);

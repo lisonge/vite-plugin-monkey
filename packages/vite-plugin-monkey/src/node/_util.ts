@@ -137,7 +137,7 @@ export const projectPkg = (() => {
 })();
 
 export const compatResolve = (id: string) => {
-  return resolve(id, pathToFileURL(process.cwd()).href);
+  return resolve(id, pathToFileURL(process.cwd() + '/any.js').href);
 };
 
 export const existFile = async (path: string) => {

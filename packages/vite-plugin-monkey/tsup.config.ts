@@ -11,7 +11,7 @@ export default defineConfig([
     clean: true,
     dts: true,
     outDir: 'dist/node',
-    format: ['cjs', 'esm'],
+    format: ['esm'],
     target: 'node14',
     shims: true,
     outExtension,

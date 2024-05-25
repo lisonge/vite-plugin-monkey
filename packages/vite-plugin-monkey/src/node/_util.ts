@@ -1,12 +1,13 @@
 import * as acornWalk from 'acorn-walk';
 import { readFileSync } from 'node:fs';
 import fs from 'node:fs/promises';
-import { createRequire } from 'node:module';
 import path from 'node:path';
 import type { OutputBundle, PluginContext } from 'rollup';
 import { normalizePath, transformWithEsbuild } from 'vite';
 import { logger } from './_logger';
 import { FinalMonkeyOption } from './types';
+import { resolve } from 'import-meta-resolve';
+import { pathToFileURL } from 'node:url';
 
 export const delay = async (n = 0) => {
   await new Promise<void>((res) => {
@@ -135,15 +136,9 @@ export const projectPkg = (() => {
   return target;
 })();
 
-export const compatResolve = (() => {
-  // see https://github.com/formkit/formkit/blob/c77a28c40bfecb8dbd4dca22f12e980abcaf55d9/packages/vue/package.json#L15
-  // `@formkit/vue/package.json` -> `@formkit/vue/dist/package.json`  will error
-  // I try solve it by resolvePackageJsonFromPath
-  const compatRequire = createRequire(process.cwd() + '/any_filename.js');
-  return (id: string) => {
-    return compatRequire.resolve(id);
-  };
-})();
+export const compatResolve = (id: string) => {
+  return resolve(id, pathToFileURL(process.cwd()).href);
+};
 
 export const existFile = async (path: string) => {
   try {

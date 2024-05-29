@@ -49,5 +49,4 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
-          body: |
-            Please refer to [CHANGELOG.md](https://github.com/lisonge/vite-plugin-monkey/blob/${{ github.ref_name }}/packages/${{ steps.tag.outputs.pkgName }}/CHANGELOG.md) for details.
+          body_path: ./packages/${{ steps.tag.outputs.pkgName }}/CHANGELOG.md

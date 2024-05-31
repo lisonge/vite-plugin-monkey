@@ -171,15 +171,8 @@
       outroing.add(block);
       outros.c.push(() => {
         outroing.delete(block);
-        if (callback) {
-          if (detach2)
-            block.d(1);
-          callback();
-        }
       });
       block.o(local);
-    } else if (callback) {
-      callback();
     }
   }
   function create_component(block) {

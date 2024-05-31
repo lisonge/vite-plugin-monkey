@@ -100,7 +100,11 @@
       return;
     cleanNode(node);
     const time = ExecCount;
-    runComputation(node, node.value, time);
+    runComputation(
+      node,
+      node.value,
+      time
+    );
   }
   function runComputation(node, value, time) {
     let nextValue;
@@ -358,17 +362,14 @@
     const create = () => {
       const t = document.createElement("template");
       t.innerHTML = html;
-      return isSVG ? t.content.firstChild.firstChild : t.content.firstChild;
+      return t.content.firstChild;
     };
-    const fn = isCE ? () => untrack(() => document.importNode(node || (node = create()), true)) : () => (node || (node = create())).cloneNode(true);
+    const fn = () => (node || (node = create())).cloneNode(true);
     fn.cloneNode = fn;
     return fn;
   }
   function setAttribute(node, name, value) {
-    if (value == null)
-      node.removeAttribute(name);
-    else
-      node.setAttribute(name, value);
+    node.setAttribute(name, value);
   }
   function className(node, value) {
     if (value == null)
@@ -454,7 +455,7 @@
   function normalizeIncomingArray(normalized, array, current, unwrap) {
     let dynamic = false;
     for (let i = 0, len = array.length; i < len; i++) {
-      let item = array[i], prev = current && current[i], t;
+      let item = array[i], prev = current && current[normalized.length], t;
       if (item == null || item === true || item === false)
         ;
       else if ((t = typeof item) === "object" && item.nodeType) {
@@ -465,7 +466,11 @@
         if (unwrap) {
           while (typeof item === "function")
             item = item();
-          dynamic = normalizeIncomingArray(normalized, Array.isArray(item) ? item : [item], Array.isArray(prev) ? prev : [prev]) || dynamic;
+          dynamic = normalizeIncomingArray(
+            normalized,
+            Array.isArray(item) ? item : [item],
+            Array.isArray(prev) ? prev : [prev]
+          ) || dynamic;
         } else {
           normalized.push(item);
           dynamic = true;

@@ -1,3 +1,5 @@
-# CHANGELOG
+# v1.37.0
 
-CHANGELOG
+## Features
+
+- update template dependency

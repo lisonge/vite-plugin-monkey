@@ -87,19 +87,21 @@ export const bytecdntp = (
 };
 
 /**
- * `https://cdn.bootcdn.net/ajax/libs/${name}/${version}/${pathname}`
- * @param exportVarName cdn-exportVarName or resourceName
- * @see https://www.bootcdn.cn/all/
+ * `https://cdn.jsdelivr.net/npm/${name}@${version}/${pathname}`
+ * @deprecated bootcdn will return virus-infected code. Please stop using it and switch to other sources
  */
 export const bootcdn = (
   exportVarName = '',
   pathname = '',
 ): [string, ModuleToUrlFc] => {
+  console.warn(
+    'bootcdn will return virus-infected code. Please stop using it and switch to other sources. now it will return jsdelivr url.',
+  );
   return [
     exportVarName,
     (version, name, _importName = '', resolveName = '') => {
       const p = pathname || resolveName;
-      return `https://cdn.bootcdn.net/ajax/libs/${name}/${version}/${p}`;
+      return `https://fastly.jsdelivr.net/npm/${name}@${version}/${p}`;
     },
   ];
 };

@@ -172,7 +172,7 @@ export const zhimg = (
     exportVarName,
     (version, name, _importName = '', resolveName = '') => {
       const p = pathname || resolveName;
-      return `https://unpkg.zhimg.com/${name}/${version}/${p}`;
+      return `https://unpkg.zhimg.com/${name}@${version}/${p}`;
     },
   ];
 };

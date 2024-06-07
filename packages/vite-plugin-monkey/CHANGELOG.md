@@ -1,5 +1,5 @@
-# v4.0.1
+# v4.0.2
 
 ## Bug Fixes
 
-- fix: invalid import.meta.url when build (#163)
+- fix: zhimg cdn use the url like unpkg (#160)

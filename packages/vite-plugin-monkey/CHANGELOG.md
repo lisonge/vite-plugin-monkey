@@ -1,5 +1,5 @@
-# v4.0.2
+# v4.0.3
 
 ## Bug Fixes
 
-- fix: zhimg cdn use the url like unpkg (#160)
+- fix: not auto add GM_webRequest grant (#155)

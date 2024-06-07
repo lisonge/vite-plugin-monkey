@@ -8,6 +8,7 @@ import { logger } from './_logger';
 import { FinalMonkeyOption } from './types';
 import { resolve } from 'import-meta-resolve';
 import { pathToFileURL } from 'node:url';
+import { GmApiNames } from './unimport';
 
 export const delay = async (n = 0) => {
   await new Promise<void>((res) => {
@@ -42,29 +43,7 @@ export const GM_keywords = [
   'GM.setValue',
   'GM.xmlHttpRequest',
   'GM.cookie',
-  'GM_addElement',
-  'GM_addStyle',
-  'GM_addValueChangeListener',
-  'GM_cookie',
-  'GM_deleteValue',
-  'GM_download',
-  'GM_getResourceText',
-  'GM_getResourceURL',
-  'GM_getTab',
-  'GM_getTabs',
-  'GM_getValue',
-  'GM_info',
-  'GM_listValues',
-  'GM_log',
-  'GM_notification',
-  'GM_openInTab',
-  'GM_registerMenuCommand',
-  'GM_removeValueChangeListener',
-  'GM_saveTab',
-  'GM_setClipboard',
-  'GM_setValue',
-  'GM_unregisterMenuCommand',
-  'GM_xmlhttpRequest',
+  ...GmApiNames.filter((s) => s.startsWith('GM_')),
   'unsafeWindow',
   'window.close',
   'window.focus',

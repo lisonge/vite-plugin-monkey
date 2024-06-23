@@ -31,6 +31,11 @@ export const perviewPlugin = (finalOption: FinalMonkeyOption): Plugin => {
           return;
         }
         next();
+        if (finalOption.server.closePreviewAutomatically) {
+          setTimeout(() => {
+            server.close();
+          }, 3000);
+        }
       });
     },
   };

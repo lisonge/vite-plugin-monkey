@@ -95,6 +95,7 @@ export type FinalMonkeyOption = {
     open: boolean;
     prefix: (name: string) => string;
     mountGmApi: boolean;
+    closePreviewAutomatically: boolean;
   };
   build: {
     fileName: string;
@@ -157,6 +158,12 @@ export type MonkeyOption = {
      * @default 'server:'
      */
     prefix?: string | ((name: string) => string) | false;
+
+    /**
+     * close the preview server automatically after 3000ms
+     * @default false
+     */
+    closePreviewAutomatically?: boolean;
 
     /**
      * mount GM_api to unsafeWindow, not recommend it, you should use GM_api by ESM import, or use [unplugin-auto-import](https://github.com/antfu/unplugin-auto-import)

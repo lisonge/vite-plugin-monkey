@@ -294,6 +294,7 @@ export const resolvedOption = (
         server.open ??
         (process.platform == 'win32' || process.platform == 'darwin'),
       prefix: prefix2,
+      closePreviewAutomatically: server.closePreviewAutomatically ?? false,
     },
     build: {
       fileName,

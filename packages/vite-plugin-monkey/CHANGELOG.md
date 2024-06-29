@@ -1,5 +1,5 @@
-# v4.0.3
+# v4.0.4
 
 ## Bug Fixes
 
-- fix: not auto add GM_webRequest grant (#155)
+- fix: remove staticfile cdn because it return virus-infected code (#171)

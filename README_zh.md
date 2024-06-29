@@ -34,7 +34,7 @@ pnpm create monkey
 
 然后你能从以下模板选择
 
-| JavaScript                                                     | TypeScript                                                            |
+| JavaScript                                                     | TypeScript                                                           |
 | -------------------------------------------------------------- | -------------------------------------------------------------------- |
 | [empty](/packages/create-monkey/template-empty) (only js)      | [empty-ts](/packages/create-monkey/template-empty-ts) (only ts)      |
 | [vanilla](/packages/create-monkey/template-vanilla) (js + css) | [vanilla-ts](/packages/create-monkey/template-vanilla-ts) (ts + css) |
@@ -331,9 +331,7 @@ export default defineConfig({
 - [jsdelivr](https://www.jsdelivr.com/)
 - [unpkg](https://unpkg.com/)
 - [bytecdntp](https://cdn.bytedance.com/)
-- [bootcdn](https://www.bootcdn.cn/all/)
 - [baomitu](https://cdn.baomitu.com/)
-- [staticfile](https://staticfile.org/)
 - [cdnjs](https://cdnjs.com/libraries)
 - [zhimg](https://unpkg.zhimg.com/)
 - [npmmirror](https://registry.npmmirror.com/)

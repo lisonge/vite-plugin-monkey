@@ -87,7 +87,7 @@ export const bytecdntp = (
 };
 
 /**
- * `https://cdn.jsdelivr.net/npm/${name}@${version}/${pathname}`
+ * `https://fastly.jsdelivr.net/npm/${name}@${version}/${pathname}`
  * @deprecated bootcdn will return virus-infected code. Please stop using it and switch to other sources
  */
 export const bootcdn = (
@@ -125,19 +125,21 @@ export const baomitu = (
 };
 
 /**
- * `https://cdn.staticfile.org/${name}/${version}/${pathname}`
- * @param exportVarName cdn-exportVarName or resourceName
- * @see https://staticfile.org/
+ * `https://fastly.jsdelivr.net/npm/${name}@${version}/${pathname}`
+ * @deprecated staticfile will return virus-infected code. Please stop using it and switch to other sources
  */
 export const staticfile = (
   exportVarName = '',
   pathname = '',
 ): [string, ModuleToUrlFc] => {
+  console.warn(
+    'staticfile will return virus-infected code. Please stop using it and switch to other sources. now it will return jsdelivr url.',
+  );
   return [
     exportVarName,
     (version, name, _importName = '', resolveName = '') => {
       const p = pathname || resolveName;
-      return `https://cdn.staticfile.org/${name}/${version}/${p}`;
+      return `https://fastly.jsdelivr.net/npm/${name}@${version}/${p}`;
     },
   ];
 };

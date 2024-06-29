@@ -34,7 +34,7 @@ pnpm create monkey
 
 then you can choose the following template
 
-| JavaScript                                                     | TypeScript                                                            |
+| JavaScript                                                     | TypeScript                                                           |
 | -------------------------------------------------------------- | -------------------------------------------------------------------- |
 | [empty](/packages/create-monkey/template-empty) (only js)      | [empty-ts](/packages/create-monkey/template-empty-ts) (only ts)      |
 | [vanilla](/packages/create-monkey/template-vanilla) (js + css) | [vanilla-ts](/packages/create-monkey/template-vanilla-ts) (ts + css) |
@@ -337,9 +337,7 @@ there is the following cdn to use, full detail see [cdn.ts](/packages/vite-plugi
 - [jsdelivr](https://www.jsdelivr.com/)
 - [unpkg](https://unpkg.com/)
 - [bytecdntp](https://cdn.bytedance.com/)
-- [bootcdn](https://www.bootcdn.cn/all/)
 - [baomitu](https://cdn.baomitu.com/)
-- [staticfile](https://staticfile.org/)
 - [cdnjs](https://cdnjs.com/libraries)
 - [zhimg](https://unpkg.zhimg.com/)
 - [npmmirror](https://registry.npmmirror.com/)

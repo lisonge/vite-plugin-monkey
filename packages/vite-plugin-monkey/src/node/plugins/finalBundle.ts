@@ -1,4 +1,4 @@
-import type { OutputChunk, RollupOutput } from 'rollup';
+import type { OutputChunk, RollupOutput, OutputAsset } from 'rollup';
 import { Plugin, build } from 'vite';
 import { lazyValue } from '../_lazy';
 import {
@@ -57,91 +57,100 @@ export const finalBundlePlugin = (finalOption: FinalMonkeyOption): Plugin => {
 
       const tlaIdentifier = lazyValue(() => findSafeTlaIdentifier(rawBundle));
 
-      const buildResult = (await build({
-        logLevel: 'error',
-        configFile: false,
-        esbuild: false,
-        plugins: [
-          {
-            name: 'mokey:mock',
-            enforce: 'pre',
-            resolveId(source, importer, options) {
-              if (!importer && options.isEntry) {
-                return '\0' + source;
-              }
-              const chunk = Object.values(rawBundle).find(
-                (chunk) =>
-                  chunk.type == 'chunk' && source.endsWith(chunk.fileName),
-              ) as OutputChunk | undefined;
-              if (chunk) {
-                return '\0' + source;
-              }
-            },
-            async load(id) {
-              if (!id.startsWith('\0')) return;
-
-              if (id.endsWith(__entry_name)) {
-                return entryChunks
-                  .map((a) => `import ${JSON.stringify(`./${a.fileName}`)};`)
-                  .join('\n');
-              }
-              const [k, chunk] =
-                Object.entries(rawBundle).find(([k, chunk]) =>
-                  id.endsWith(chunk.fileName),
-                ) ?? [];
-              if (chunk && chunk.type == 'chunk' && k) {
-                usedModules.add(k);
-                if (!hasDynamicImport) {
-                  const ch = transformTlaToIdentifier(
-                    this,
-                    chunk,
-                    tlaIdentifier.value,
-                  );
-                  if (ch) return ch;
+      const bgScript =
+        finalOption.userscript.background || finalOption.userscript.crontab;
+      let buildBundle: (OutputChunk | OutputAsset)[];
+      if (bgScript) {
+        buildBundle = [fristEntryChunk!];
+      } else {
+        const buildResult = (await build({
+          logLevel: 'error',
+          configFile: false,
+          esbuild: false,
+          plugins: [
+            {
+              name: 'mokey:mock',
+              enforce: 'pre',
+              resolveId(source, importer, options) {
+                if (!importer && options.isEntry) {
+                  return '\0' + source;
                 }
-                return {
-                  code: chunk.code,
-                  map: chunk.map,
-                };
-              }
-            },
-            generateBundle(_, iifeBundle) {
-              if (hasDynamicImport) {
-                return;
-              }
-              Object.entries(iifeBundle).forEach(([k, chunk]) => {
-                transformIdentifierToTla(this, chunk, tlaIdentifier.value);
-              });
-            },
-          },
-        ],
-        build: {
-          write: false,
-          minify: false,
-          target: 'esnext',
-          rollupOptions: {
-            external(source) {
-              return source in finalOption.globalsPkg2VarName;
-            },
-            output: {
-              globals: finalOption.globalsPkg2VarName,
-            },
-          },
-          lib: {
-            entry: __entry_name,
-            formats: [hasDynamicImport ? 'system' : 'iife'] as any,
-            name: hasDynamicImport ? undefined : '__expose__',
-            fileName: () => `__entry.js`,
-          },
-        },
-      })) as RollupOutput[];
-      usedModules.forEach((k) => {
-        if (fristEntryChunk != rawBundle[k]) {
-          delete rawBundle[k];
-        }
-      });
+                const chunk = Object.values(rawBundle).find(
+                  (chunk) =>
+                    chunk.type == 'chunk' && source.endsWith(chunk.fileName),
+                ) as OutputChunk | undefined;
+                if (chunk) {
+                  return '\0' + source;
+                }
+              },
+              async load(id) {
+                if (!id.startsWith('\0')) return;
 
-      const buildBundle = buildResult[0].output.flat();
+                if (id.endsWith(__entry_name)) {
+                  return entryChunks
+                    .map((a) => `import ${JSON.stringify(`./${a.fileName}`)};`)
+                    .join('\n');
+                }
+                const [k, chunk] =
+                  Object.entries(rawBundle).find(([k, chunk]) =>
+                    id.endsWith(chunk.fileName),
+                  ) ?? [];
+                if (chunk && chunk.type == 'chunk' && k) {
+                  usedModules.add(k);
+                  if (!hasDynamicImport) {
+                    const ch = transformTlaToIdentifier(
+                      this,
+                      chunk,
+                      tlaIdentifier.value,
+                    );
+                    if (ch) return ch;
+                  }
+                  return {
+                    code: chunk.code,
+                    map: chunk.map,
+                  };
+                }
+              },
+              generateBundle(_, iifeBundle) {
+                if (hasDynamicImport) {
+                  return;
+                }
+                Object.entries(iifeBundle).forEach(([k, chunk]) => {
+                  transformIdentifierToTla(this, chunk, tlaIdentifier.value);
+                });
+              },
+            },
+          ],
+          build: {
+            write: false,
+            minify: false,
+            target: 'esnext',
+            rollupOptions: {
+              external(source) {
+                return source in finalOption.globalsPkg2VarName;
+              },
+              output: {
+                globals: finalOption.globalsPkg2VarName,
+              },
+            },
+            lib: {
+              entry: __entry_name,
+              formats: bgScript
+                ? undefined
+                : ([hasDynamicImport ? 'system' : 'iife'] as any),
+              name: hasDynamicImport ? undefined : '__expose__',
+              fileName: () => `__entry.js`,
+            },
+          },
+        })) as RollupOutput[];
+        usedModules.forEach((k) => {
+          if (fristEntryChunk != rawBundle[k]) {
+            delete rawBundle[k];
+          }
+        });
+        buildBundle = buildResult[0].output.flat();
+      }
+
       let finalJsCode = ``;
       if (hasDynamicImport) {
         const systemJsModules: string[] = [];
@@ -224,6 +233,10 @@ export const finalBundlePlugin = (finalOption: FinalMonkeyOption): Plugin => {
         collectGrantSet,
         'build',
       );
+
+      if (bgScript) {
+        finalJsCode += `\nreturn window.monkey;`;
+      }
 
       const mergedCode = [comment, injectCssCode, finalJsCode]
         .filter((s) => s)

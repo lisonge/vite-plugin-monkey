@@ -6,6 +6,7 @@ import type {
   GreaseRunAt,
 } from './greasemonkey';
 import { GreaseGrantValueList } from './greasemonkey';
+import { ScriptcatUserScript } from './scriptcat';
 import type {
   AntifeatureType,
   TamperGrant,
@@ -24,6 +25,7 @@ export type {
   GreasemonkeyUserScript,
   TampermonkeyUserScript,
   ViolentmonkeyUserScript,
+  ScriptcatUserScript,
   Format,
 };
 
@@ -144,6 +146,7 @@ export type MonkeyUserScript = GreasemonkeyUserScript &
   TampermonkeyUserScript &
   ViolentmonkeyUserScript &
   GreasyforkUserScript &
+  ScriptcatUserScript &
   MergemonkeyUserScript;
 
 export type FinalUserScript = {
@@ -183,6 +186,10 @@ export type FinalUserScript = {
   'run-at'?: GreaseRunAt | TamperRunAt | ViolentRunAt;
   grant: Set<string>;
   $extra: [string, ...string[]][];
+
+  // scriptcat backgroud script
+  background?: boolean;
+  crontab?: string;
 } & GreasyforkUserScript;
 
 export const finalMonkeyOptionToComment = async (
@@ -244,6 +251,9 @@ export const finalMonkeyOptionToComment = async (
     unwrap,
     webRequest,
     $extra,
+
+    background,
+    crontab,
   } = userscript;
   Object.entries({
     namespace,
@@ -351,6 +361,14 @@ export const finalMonkeyOptionToComment = async (
   attrList.push(...$extra);
 
   attrList = defaultSortFormat(attrList);
+
+  if (background) {
+    attrList.push(['background']);
+  }
+
+  if (crontab) {
+    attrList.push(['crontab', crontab]);
+  }
 
   let { align = 2 } = format;
 

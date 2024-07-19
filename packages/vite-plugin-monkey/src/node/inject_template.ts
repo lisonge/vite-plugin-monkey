@@ -38,26 +38,200 @@ export const serverInjectFn = ({ entrySrc = `` }) => {
   document[key] = window;
   console.log(`[vite-plugin-monkey] mount monkeyWindow to document`);
 
+  // GM api is undefined in Via|X browser
+  // Via|X browser GM Api is local variable
+  // so need register api in window
+  // @ts-ignore
+  if (typeof unsafeWindow !== 'undefined' && unsafeWindow == window) {
+    // @ts-ignore
+    if (window.GM == null && typeof GM === 'object') {
+      // @ts-ignore
+      window.GM = GM;
+    }
+    // @ts-ignore
+    if (typeof GM_addElement !== 'undefined' && window.GM_addElement == null) {
+      // @ts-ignore
+      window.GM_addElement = GM_addElement;
+    }
+    // @ts-ignore
+    if (typeof GM_addStyle !== 'undefined' && window.GM_addStyle == null) {
+      // @ts-ignore
+      window.GM_addStyle = GM_addStyle;
+    }
+    if (
+      // @ts-ignore
+      typeof GM_addValueChangeListener !== 'undefined' &&
+      // @ts-ignore
+      window.GM_addValueChangeListener == null
+    ) {
+      // @ts-ignore
+      window.GM_addValueChangeListener = GM_addValueChangeListener;
+    }
+    // @ts-ignore
+    if (typeof GM_cookie !== 'undefined' && window.GM_cookie == null) {
+      // @ts-ignore
+      window.GM_cookie = GM_cookie;
+    }
+    if (
+      // @ts-ignore
+      typeof GM_deleteValue !== 'undefined' &&
+      // @ts-ignore
+      window.GM_deleteValue == null
+    ) {
+      // @ts-ignore
+      window.GM_deleteValue = GM_deleteValue;
+    }
+    // @ts-ignore
+    if (typeof GM_download !== 'undefined' && window.GM_download == null) {
+      // @ts-ignore
+      window.GM_download = GM_download;
+    }
+    if (
+      // @ts-ignore
+      typeof GM_getResourceText !== 'undefined' &&
+      // @ts-ignore
+      window.GM_getResourceText == null
+    ) {
+      // @ts-ignore
+      window.GM_getResourceText = GM_getResourceText;
+    }
+    if (
+      // @ts-ignore
+      typeof GM_getResourceURL !== 'undefined' &&
+      // @ts-ignore
+      window.GM_getResourceURL == null
+    ) {
+      // @ts-ignore
+      window.GM_getResourceURL = GM_getResourceURL;
+    }
+    // @ts-ignore
+    if (typeof GM_getTab !== 'undefined' && window.GM_getTab == null) {
+      // @ts-ignore
+      window.GM_getTab = GM_getTab;
+    }
+    // @ts-ignore
+    if (typeof GM_getTabs !== 'undefined' && window.GM_getTabs == null) {
+      // @ts-ignore
+      window.GM_getTabs = GM_getTabs;
+    }
+    // @ts-ignore
+    if (typeof GM_getValue !== 'undefined' && window.GM_getValue == null) {
+      // @ts-ignore
+      window.GM_getValue = GM_getValue;
+    }
+    // @ts-ignore
+    if (typeof GM_info !== 'undefined' && window.GM_info == null) {
+      // @ts-ignore
+      window.GM_info = GM_info;
+    }
+    // @ts-ignore
+    if (typeof GM_listValues !== 'undefined' && window.GM_listValues == null) {
+      // @ts-ignore
+      window.GM_listValues = GM_listValues;
+    }
+    // @ts-ignore
+    if (typeof GM_log !== 'undefined' && window.GM_log == null) {
+      // @ts-ignore
+      window.GM_log = GM_log;
+    }
+    if (
+      // @ts-ignore
+      typeof GM_notification !== 'undefined' &&
+      // @ts-ignore
+      window.GM_notification == null
+    ) {
+      // @ts-ignore
+      window.GM_notification = GM_notification;
+    }
+    // @ts-ignore
+    if (typeof GM_openInTab !== 'undefined' && window.GM_openInTab == null) {
+      // @ts-ignore
+      window.GM_openInTab = GM_openInTab;
+    }
+    if (
+      // @ts-ignore
+      typeof GM_registerMenuCommand !== 'undefined' &&
+      // @ts-ignore
+      window.GM_registerMenuCommand == null
+    ) {
+      // @ts-ignore
+      window.GM_registerMenuCommand = GM_registerMenuCommand;
+    }
+    if (
+      // @ts-ignore
+      typeof GM_removeValueChangeListener !== 'undefined' &&
+      // @ts-ignore
+      window.GM_removeValueChangeListener == null
+    ) {
+      // @ts-ignore
+      window.GM_removeValueChangeListener = GM_removeValueChangeListener;
+    }
+    // @ts-ignore
+    if (typeof GM_saveTab !== 'undefined' && window.GM_saveTab == null) {
+      // @ts-ignore
+      window.GM_saveTab = GM_saveTab;
+    }
+    if (
+      // @ts-ignore
+      typeof GM_setClipboard !== 'undefined' &&
+      // @ts-ignore
+      window.GM_setClipboard == null
+    ) {
+      // @ts-ignore
+      window.GM_setClipboard = GM_setClipboard;
+    }
+    // @ts-ignore
+    if (typeof GM_setValue !== 'undefined' && window.GM_setValue == null) {
+      // @ts-ignore
+      window.GM_setValue = GM_setValue;
+    }
+    if (
+      // @ts-ignore
+      typeof GM_unregisterMenuCommand !== 'undefined' &&
+      // @ts-ignore
+      window.GM_unregisterMenuCommand == null
+    ) {
+      // @ts-ignore
+      window.GM_unregisterMenuCommand = GM_unregisterMenuCommand;
+    }
+    // @ts-ignore
+    if (typeof GM_webRequest !== 'undefined' && window.GM_webRequest == null) {
+      // @ts-ignore
+      window.GM_webRequest = GM_webRequest;
+    }
+    if (
+      // @ts-ignore
+      typeof GM_xmlhttpRequest !== 'undefined' &&
+      // @ts-ignore
+      window.GM_xmlhttpRequest == null
+    ) {
+      // @ts-ignore
+      window.GM_xmlhttpRequest = GM_xmlhttpRequest;
+    }
+  }
   const entryScript = document.createElement('script');
   entryScript.type = 'module';
   entryScript.src = entrySrc;
-  let mountPosition = "";
+  let mountPosition = '';
   if (document.head) {
-		if (document.head.firstChild) {
-		  document.head.insertBefore(entryScript, document.head.firstChild);
-      mountPosition = "document.head first";
-		} else {
-		  document.head.appendChild(entryScript);
-      mountPosition = "document.head last";
-		}
-	} else {
-		if (document.documentElement.firstChild) {
-		  document.documentElement.insertBefore(entryScript,document.documentElement.firstChild);
-      mountPosition = "document.documentElement first";
-		} else {
-		  document.documentElement.appendChild(entryScript);
-      mountPosition = "document.documentElement last";
-		}
+    if (document.head.firstChild) {
+      document.head.insertBefore(entryScript, document.head.firstChild);
+      mountPosition = 'document.head first';
+    } else {
+      document.head.appendChild(entryScript);
+      mountPosition = 'document.head last';
+    }
+  } else {
+    if (document.documentElement.firstChild) {
+      document.documentElement.insertBefore(
+        entryScript,
+        document.documentElement.firstChild,
+      );
+      mountPosition = 'document.documentElement first';
+    } else {
+      document.documentElement.appendChild(entryScript);
+      mountPosition = 'document.documentElement last';
+    }
   }
   console.log(`[vite-plugin-monkey] mount entry module to ` + mountPosition);
 };
@@ -73,7 +247,7 @@ export const cssInjectFn = (css: string) => {
   } else {
     document.documentElement.insertBefore(
       style,
-      document.documentElement.childNodes[0]
+      document.documentElement.childNodes[0],
     );
   }
 };

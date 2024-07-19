@@ -41,15 +41,41 @@ export const serverInjectFn = ({ entrySrc = `` }) => {
   const entryScript = document.createElement('script');
   entryScript.type = 'module';
   entryScript.src = entrySrc;
-  document.head.insertBefore(entryScript, document.head.firstChild);
-  console.log(`[vite-plugin-monkey] mount entry module to document.head`);
+  let mountPosition = "";
+  if (document.head) {
+		if (document.head.firstChild) {
+		  document.head.insertBefore(entryScript, document.head.firstChild);
+      mountPosition = "document.head first";
+		} else {
+		  document.head.appendChild(entryScript);
+      mountPosition = "document.head last";
+		}
+	} else {
+		if (document.documentElement.firstChild) {
+		  document.documentElement.insertBefore(entryScript,document.documentElement.firstChild);
+      mountPosition = "document.documentElement first";
+		} else {
+		  document.documentElement.appendChild(entryScript);
+      mountPosition = "document.documentElement last";
+		}
+  }
+  console.log(`[vite-plugin-monkey] mount entry module to ` + mountPosition);
 };
 
 export const cssInjectFn = (css: string) => {
   const style = document.createElement('style');
   style.dataset.source = 'vite-plugin-monkey';
   style.textContent = css;
-  document.head.append(style);
+  if (document.head) {
+    document.head.appendChild(style);
+  } else if (document.documentElement.childNodes.length === 0) {
+    document.documentElement.appendChild(style);
+  } else {
+    document.documentElement.insertBefore(
+      style,
+      document.documentElement.childNodes[0]
+    );
+  }
 };
 
 export const mountGmApiFn = (meta: ImportMeta, apiNames: string[] = []) => {

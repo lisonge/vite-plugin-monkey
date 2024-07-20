@@ -95,6 +95,7 @@ export type FinalMonkeyOption = {
     open: boolean;
     prefix: (name: string) => string;
     mountGmApi: boolean;
+    ssl: 'auto' | boolean;
   };
   build: {
     fileName: string;
@@ -167,6 +168,16 @@ export type MonkeyOption = {
      * /// <reference types="vite-plugin-monkey/global" />
      */
     mountGmApi?: boolean;
+    /**
+     * script entry url, some site need https to load script, you can use vite-plugin-mkcert plugn to enable https
+     * @default false
+     * @example
+     * // pnpm add vite-plugin-mkcert -D
+     * ssl: true    =>  https://localhost:5173/__vite-plugin-monkey.entry.js
+     * ssl: false   =>  http://localhost:5173/__vite-plugin-monkey.entry.js
+     * ssl: "auto"  =>  //localhost:5173/__vite-plugin-monkey.entry.js
+     */
+    ssl?: 'auto' | boolean;
   };
   build?: {
     /**

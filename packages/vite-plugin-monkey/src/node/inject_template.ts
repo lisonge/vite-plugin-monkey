@@ -29,6 +29,60 @@ export const fcToHtml = <T extends (...args: any[]) => any>(
   );
 };
 
+/**
+ * 根据meta信息生成处理@grant 注入到window
+ * 可修复GM_xxx is undefined
+ * @param metaData // ==UserScript== 信息
+ */
+export const serverInjectGMApiFn = (metaData: string) => {
+  let metaDataSplit = metaData.split('\n');
+  /** 每一项都是@grant的兼容处理函数字符串 */
+  let grantCompatibilityProcessing: string[] = [];
+  /** 是否已添加GM.的处理 */
+  let isAddGMList = false;
+  for (let index = 0; index < metaDataSplit.length; index++) {
+    let metaDataItem = metaDataSplit[index];
+    let metaGrantValueMatch = metaDataItem.match(
+      /[\s]*\/\/[\s]*@grant[\s]+([\S]+)/i,
+    );
+    if (metaGrantValueMatch) {
+      let metaGrantValue =
+        metaGrantValueMatch[metaGrantValueMatch.length - 1].trim();
+      if (metaGrantValue.startsWith('GM.') && !isAddGMList) {
+        isAddGMList = true;
+        grantCompatibilityProcessing.push(`        // @ts-ignore
+        if (window.GM == null && typeof GM === 'object') {
+          // @ts-ignore
+          window.GM = GM;
+        }`);
+      } else if (
+        metaGrantValue.startsWith('window.') ||
+        metaGrantValue === 'unsafeWindow'
+      ) {
+        // ↓不做处理
+        // window.close
+        // window.focus
+        // window.onurlchange
+        // unsafeWindow
+      } else {
+        grantCompatibilityProcessing.push(`        // @ts-ignore
+        if (typeof ${metaGrantValue} !== 'undefined' && window.${metaGrantValue} == null) {
+          // @ts-ignore
+          window.${metaGrantValue} = ${metaGrantValue};
+        }`);
+      }
+    }
+  }
+
+  return `
+  ;()=>{
+    if (typeof unsafeWindow !== 'undefined' && unsafeWindow == window) {
+${grantCompatibilityProcessing.join('\n')}
+    }
+  };
+  `;
+};
+
 export const serverInjectFn = ({ entrySrc = `` }) => {
   // @ts-ignore
   window.GM; // must exist, see https://github.com/Tampermonkey/tampermonkey/issues/1567
@@ -38,177 +92,6 @@ export const serverInjectFn = ({ entrySrc = `` }) => {
   document[key] = window;
   console.log(`[vite-plugin-monkey] mount monkeyWindow to document`);
 
-  // GM api is undefined in Via|X browser
-  // Via|X browser GM Api is local variable
-  // so need register api in window
-  // @ts-ignore
-  if (typeof unsafeWindow !== 'undefined' && unsafeWindow == window) {
-    // @ts-ignore
-    if (window.GM == null && typeof GM === 'object') {
-      // @ts-ignore
-      window.GM = GM;
-    }
-    // @ts-ignore
-    if (typeof GM_addElement !== 'undefined' && window.GM_addElement == null) {
-      // @ts-ignore
-      window.GM_addElement = GM_addElement;
-    }
-    // @ts-ignore
-    if (typeof GM_addStyle !== 'undefined' && window.GM_addStyle == null) {
-      // @ts-ignore
-      window.GM_addStyle = GM_addStyle;
-    }
-    if (
-      // @ts-ignore
-      typeof GM_addValueChangeListener !== 'undefined' &&
-      // @ts-ignore
-      window.GM_addValueChangeListener == null
-    ) {
-      // @ts-ignore
-      window.GM_addValueChangeListener = GM_addValueChangeListener;
-    }
-    // @ts-ignore
-    if (typeof GM_cookie !== 'undefined' && window.GM_cookie == null) {
-      // @ts-ignore
-      window.GM_cookie = GM_cookie;
-    }
-    if (
-      // @ts-ignore
-      typeof GM_deleteValue !== 'undefined' &&
-      // @ts-ignore
-      window.GM_deleteValue == null
-    ) {
-      // @ts-ignore
-      window.GM_deleteValue = GM_deleteValue;
-    }
-    // @ts-ignore
-    if (typeof GM_download !== 'undefined' && window.GM_download == null) {
-      // @ts-ignore
-      window.GM_download = GM_download;
-    }
-    if (
-      // @ts-ignore
-      typeof GM_getResourceText !== 'undefined' &&
-      // @ts-ignore
-      window.GM_getResourceText == null
-    ) {
-      // @ts-ignore
-      window.GM_getResourceText = GM_getResourceText;
-    }
-    if (
-      // @ts-ignore
-      typeof GM_getResourceURL !== 'undefined' &&
-      // @ts-ignore
-      window.GM_getResourceURL == null
-    ) {
-      // @ts-ignore
-      window.GM_getResourceURL = GM_getResourceURL;
-    }
-    // @ts-ignore
-    if (typeof GM_getTab !== 'undefined' && window.GM_getTab == null) {
-      // @ts-ignore
-      window.GM_getTab = GM_getTab;
-    }
-    // @ts-ignore
-    if (typeof GM_getTabs !== 'undefined' && window.GM_getTabs == null) {
-      // @ts-ignore
-      window.GM_getTabs = GM_getTabs;
-    }
-    // @ts-ignore
-    if (typeof GM_getValue !== 'undefined' && window.GM_getValue == null) {
-      // @ts-ignore
-      window.GM_getValue = GM_getValue;
-    }
-    // @ts-ignore
-    if (typeof GM_info !== 'undefined' && window.GM_info == null) {
-      // @ts-ignore
-      window.GM_info = GM_info;
-    }
-    // @ts-ignore
-    if (typeof GM_listValues !== 'undefined' && window.GM_listValues == null) {
-      // @ts-ignore
-      window.GM_listValues = GM_listValues;
-    }
-    // @ts-ignore
-    if (typeof GM_log !== 'undefined' && window.GM_log == null) {
-      // @ts-ignore
-      window.GM_log = GM_log;
-    }
-    if (
-      // @ts-ignore
-      typeof GM_notification !== 'undefined' &&
-      // @ts-ignore
-      window.GM_notification == null
-    ) {
-      // @ts-ignore
-      window.GM_notification = GM_notification;
-    }
-    // @ts-ignore
-    if (typeof GM_openInTab !== 'undefined' && window.GM_openInTab == null) {
-      // @ts-ignore
-      window.GM_openInTab = GM_openInTab;
-    }
-    if (
-      // @ts-ignore
-      typeof GM_registerMenuCommand !== 'undefined' &&
-      // @ts-ignore
-      window.GM_registerMenuCommand == null
-    ) {
-      // @ts-ignore
-      window.GM_registerMenuCommand = GM_registerMenuCommand;
-    }
-    if (
-      // @ts-ignore
-      typeof GM_removeValueChangeListener !== 'undefined' &&
-      // @ts-ignore
-      window.GM_removeValueChangeListener == null
-    ) {
-      // @ts-ignore
-      window.GM_removeValueChangeListener = GM_removeValueChangeListener;
-    }
-    // @ts-ignore
-    if (typeof GM_saveTab !== 'undefined' && window.GM_saveTab == null) {
-      // @ts-ignore
-      window.GM_saveTab = GM_saveTab;
-    }
-    if (
-      // @ts-ignore
-      typeof GM_setClipboard !== 'undefined' &&
-      // @ts-ignore
-      window.GM_setClipboard == null
-    ) {
-      // @ts-ignore
-      window.GM_setClipboard = GM_setClipboard;
-    }
-    // @ts-ignore
-    if (typeof GM_setValue !== 'undefined' && window.GM_setValue == null) {
-      // @ts-ignore
-      window.GM_setValue = GM_setValue;
-    }
-    if (
-      // @ts-ignore
-      typeof GM_unregisterMenuCommand !== 'undefined' &&
-      // @ts-ignore
-      window.GM_unregisterMenuCommand == null
-    ) {
-      // @ts-ignore
-      window.GM_unregisterMenuCommand = GM_unregisterMenuCommand;
-    }
-    // @ts-ignore
-    if (typeof GM_webRequest !== 'undefined' && window.GM_webRequest == null) {
-      // @ts-ignore
-      window.GM_webRequest = GM_webRequest;
-    }
-    if (
-      // @ts-ignore
-      typeof GM_xmlhttpRequest !== 'undefined' &&
-      // @ts-ignore
-      window.GM_xmlhttpRequest == null
-    ) {
-      // @ts-ignore
-      window.GM_xmlhttpRequest = GM_xmlhttpRequest;
-    }
-  }
   const entryScript = document.createElement('script');
   entryScript.type = 'module';
   entryScript.src = entrySrc;

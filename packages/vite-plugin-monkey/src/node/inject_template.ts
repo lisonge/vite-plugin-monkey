@@ -75,11 +75,11 @@ export const serverInjectGMApiFn = (metaData: string) => {
   }
 
   return `
-  ;()=>{
+  ;(()=>{
     if (typeof unsafeWindow !== 'undefined' && unsafeWindow == window) {
 ${grantCompatibilityProcessing.join('\n')}
     }
-  };
+})();
   `;
 };
 
@@ -148,18 +148,28 @@ export const mountGmApiFn = (meta: ImportMeta, apiNames: string[] = []) => {
   window.unsafeWindow = window;
   console.log(`[vite-plugin-monkey] mount unsafeWindow to unsafeWindow`);
 
-  let mountedApiSize = 0;
+  /** @type {string[]} */
+  let mountedApiNameList = [];
+  /** @type {string[]} */
+  // @ts-ignore
+  let unmountedApiNameList = [];
   apiNames.forEach((apiName) => {
     // @ts-ignore
     const fn = monkeyWindow[apiName];
     if (fn) {
       // @ts-ignore
       window[apiName] = monkeyWindow[apiName];
-      mountedApiSize++;
+      mountedApiNameList.push(apiName);
+    } else {
+      unmountedApiNameList.push(apiName);
     }
   });
   console.log(
-    `[vite-plugin-monkey] mount ${mountedApiSize}/${apiNames.length} GM_api to unsafeWindow`,
+    `[vite-plugin-monkey] mount ${mountedApiNameList.length}/${apiNames.length} GM_api to unsafeWindow`,
+  );
+  console.log(
+    // @ts-ignore
+    `[vite-plugin-monkey] unmount ${unmountedApiNameList.join('、')}`,
   );
 };
 

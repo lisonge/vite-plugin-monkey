@@ -51,7 +51,7 @@ export const serverInjectGMApiFn = (metaData: string) => {
       if (metaGrantValue.startsWith('GM.') && !isAddGMList) {
         isAddGMList = true;
         grantCompatibilityProcessing.push(`        // @ts-ignore
-        if (window.GM == null && typeof GM === 'object') {
+        if (window.GM == null && typeof GM === "object") {
           // @ts-ignore
           window.GM = GM;
         }`);
@@ -66,7 +66,7 @@ export const serverInjectGMApiFn = (metaData: string) => {
         // unsafeWindow
       } else {
         grantCompatibilityProcessing.push(`        // @ts-ignore
-        if (typeof ${metaGrantValue} !== 'undefined' && window.${metaGrantValue} == null) {
+        if (typeof ${metaGrantValue} !== "undefined" && ${metaGrantValue} != null && window.${metaGrantValue} == null) {
           // @ts-ignore
           window.${metaGrantValue} = ${metaGrantValue};
         }`);
@@ -76,7 +76,7 @@ export const serverInjectGMApiFn = (metaData: string) => {
 
   return `
   ;(()=>{
-    if (typeof unsafeWindow !== 'undefined' && unsafeWindow == window) {
+    if (typeof unsafeWindow !== "undefined" && unsafeWindow == window) {
 ${grantCompatibilityProcessing.join('\n')}
     }
 })();

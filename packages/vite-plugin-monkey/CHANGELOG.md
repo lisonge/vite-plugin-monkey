@@ -1,5 +1,5 @@
-# v4.0.5
+# v4.0.6
 
 ## Bug Fixes
 
-- fix: compat not defined in pkg/package.json but exist in pkg/subpath (#169)
+- fix: can not collect grant when minify (#166)

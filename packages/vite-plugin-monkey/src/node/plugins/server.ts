@@ -95,7 +95,7 @@ export const serverPlugin = (finalOption: FinalMonkeyOption): Plugin => {
             res.end(
               [
                 metadata,
-                serverInjectGMApiFn(metadata),
+                serverInjectGMApiFn(u.href, metadata),
                 fn2string(serverInjectFn, {
                   entrySrc: u.href,
                 }),

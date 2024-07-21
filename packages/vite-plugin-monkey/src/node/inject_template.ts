@@ -1,3 +1,5 @@
+import type { GmApi } from '../client/types';
+
 export const fn2string = <T extends (...args: any[]) => any>(
   fn: T,
   ...args: Parameters<T>
@@ -32,9 +34,12 @@ export const fcToHtml = <T extends (...args: any[]) => any>(
 /**
  * 根据meta信息生成处理@grant 注入到window
  * 可修复GM_xxx is undefined
+ * @package entrySrc 脚本入口地址
  * @param metaData // ==UserScript== 信息
  */
-export const serverInjectGMApiFn = (metaData: string) => {
+export const serverInjectGMApiFn = (entrySrc: string, metaData: string) => {
+  const api_key = `__monkeyApi-` + new URL(entrySrc).origin;
+
   let metaDataSplit = metaData.split('\n');
   /** 每一项都是@grant的兼容处理函数字符串 */
   let grantCompatibilityProcessing: string[] = [];
@@ -48,27 +53,29 @@ export const serverInjectGMApiFn = (metaData: string) => {
     if (metaGrantValueMatch) {
       let metaGrantValue =
         metaGrantValueMatch[metaGrantValueMatch.length - 1].trim();
-      if (metaGrantValue.startsWith('GM.') && !isAddGMList) {
+      if (metaGrantValue.startsWith('GM.')) {
+        // GM.addElement
+        // GM.addStyle
+        // ...
+        if (isAddGMList) {
+          continue;
+        }
         isAddGMList = true;
-        grantCompatibilityProcessing.push(`        // @ts-ignore
+        grantCompatibilityProcessing.push(`
         if (window.GM == null && typeof GM === "object") {
-          // @ts-ignore
-          window.GM = GM;
+          Reflect.set(GM_Api, "GM", GM);
+          GM_repair_count++;
         }`);
-      } else if (
-        metaGrantValue.startsWith('window.') ||
-        metaGrantValue === 'unsafeWindow'
-      ) {
+      } else if (metaGrantValue.startsWith('window.')) {
         // ↓不做处理
         // window.close
         // window.focus
         // window.onurlchange
-        // unsafeWindow
       } else {
-        grantCompatibilityProcessing.push(`        // @ts-ignore
+        grantCompatibilityProcessing.push(`
         if (typeof ${metaGrantValue} !== "undefined" && ${metaGrantValue} != null && window.${metaGrantValue} == null) {
-          // @ts-ignore
-          window.${metaGrantValue} = ${metaGrantValue};
+          Reflect.set(GM_Api, "${metaGrantValue}", ${metaGrantValue});
+          GM_repair_count++;
         }`);
       }
     }
@@ -76,8 +83,16 @@ export const serverInjectGMApiFn = (metaData: string) => {
 
   return `
   ;(()=>{
+    const GM_Api = {};
+    let GM_repair_count = 0;
     if (typeof unsafeWindow !== "undefined" && unsafeWindow == window) {
+      console.log("[vite-plugin-monkey] window == unsafeWindow repair GM api");
 ${grantCompatibilityProcessing.join('\n')}
+    }
+    Object.freeze(GM_Api);
+    document["${api_key}"] = GM_Api;
+    if(GM_repair_count > 0){
+      console.log("[vite-plugin-monkey] repair GM api count: " + GM_repair_count);
     }
 })();
   `;
@@ -137,15 +152,18 @@ export const cssInjectFn = (css: string) => {
 
 export const mountGmApiFn = (meta: ImportMeta, apiNames: string[] = []) => {
   const key = `__monkeyWindow-` + new URL(meta.url).origin;
+  const api_key = `__monkeyApi-` + new URL(meta.url).origin;
   // @ts-ignore
   const monkeyWindow: Window = document[key];
+  // @ts-ignore
+  const monkeyApi: Partial<GmApi> = document[api_key] ?? {};
   if (!monkeyWindow) {
     console.log(`[vite-plugin-monkey] not found monkeyWindow`);
     return;
   }
 
   // @ts-ignore
-  window.unsafeWindow = window;
+  window.unsafeWindow = monkeyApi?.unsafeWindow ?? window;
   console.log(`[vite-plugin-monkey] mount unsafeWindow to unsafeWindow`);
 
   /** @type {string[]} */
@@ -155,10 +173,10 @@ export const mountGmApiFn = (meta: ImportMeta, apiNames: string[] = []) => {
   let unmountedApiNameList = [];
   apiNames.forEach((apiName) => {
     // @ts-ignore
-    const fn = monkeyWindow[apiName];
+    const fn = monkeyApi?.[apiName] ?? monkeyWindow[apiName];
     if (fn) {
       // @ts-ignore
-      window[apiName] = monkeyWindow[apiName];
+      window[apiName] = fn;
       mountedApiNameList.push(apiName);
     } else {
       unmountedApiNameList.push(apiName);
@@ -167,10 +185,12 @@ export const mountGmApiFn = (meta: ImportMeta, apiNames: string[] = []) => {
   console.log(
     `[vite-plugin-monkey] mount ${mountedApiNameList.length}/${apiNames.length} GM_api to unsafeWindow`,
   );
-  console.log(
-    // @ts-ignore
-    `[vite-plugin-monkey] unmount ${unmountedApiNameList.join('、')}`,
-  );
+  if (unmountedApiNameList.length) {
+    console.log(
+      // @ts-ignore
+      `[vite-plugin-monkey] unmount ${unmountedApiNameList.join('、')}`,
+    );
+  }
 };
 
 export const virtualHtmlTemplate = async (url: string) => {

@@ -95,7 +95,7 @@ export type FinalMonkeyOption = {
     open: boolean;
     prefix: (name: string) => string;
     mountGmApi: boolean;
-    ssl: 'auto' | boolean;
+    entryUrlProtocol: 'http' | 'https' | 'auto' | 'origin';
   };
   build: {
     fileName: string;
@@ -169,15 +169,23 @@ export type MonkeyOption = {
      */
     mountGmApi?: boolean;
     /**
-     * script entry url, some site need https to load script, you can use vite-plugin-mkcert plugn to enable https
-     * @default false
+     * script entrySrc, some site need https to load script, you can use vite-plugin-mkcert plugn to enable https
+     * @default "origin"
      * @example
      * // pnpm add vite-plugin-mkcert -D
-     * ssl: true    =>  https://localhost:5173/__vite-plugin-monkey.entry.js
-     * ssl: false   =>  http://localhost:5173/__vite-plugin-monkey.entry.js
-     * ssl: "auto"  =>  //localhost:5173/__vite-plugin-monkey.entry.js
+     * // "entrySrc": "http://127.0.0.1:5173/__vite-plugin-monkey.entry.js"
+     * entryUrlProtocol: http    =>  http://127.0.0.1:5173/__vite-plugin-monkey.entry.js
+     * entryUrlProtocol: https   =>  https://127.0.0.1:5173/__vite-plugin-monkey.entry.js
+     * entryUrlProtocol: "auto"  =>  //localhost:5173/__vite-plugin-monkey.entry.js
+     * entryUrlProtocol: "origin"  =>  http://127.0.0.1:5173/__vite-plugin-monkey.entry.js
+     * @example
+     * // "entrySrc": "https://127.0.0.1:5173/__vite-plugin-monkey.entry.js"
+     * entryUrlProtocol: http    =>  http://127.0.0.1:5173/__vite-plugin-monkey.entry.js
+     * entryUrlProtocol: https   =>  https://127.0.0.1:5173/__vite-plugin-monkey.entry.js
+     * entryUrlProtocol: "auto"  =>  //localhost:5173/__vite-plugin-monkey.entry.js
+     * entryUrlProtocol: "origin"  =>  https://127.0.0.1:5173/__vite-plugin-monkey.entry.js
      */
-    ssl?: 'auto' | boolean;
+    entryUrlProtocol: 'http' | 'https' | 'auto' | 'origin';
   };
   build?: {
     /**

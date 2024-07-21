@@ -94,18 +94,19 @@ export const serverPlugin = (finalOption: FinalMonkeyOption): Plugin => {
             );
             // server entry url
             let entryUrl = u.href;
-            if (
-              typeof finalOption.server.ssl === 'string' &&
-              finalOption.server.ssl === 'auto'
-            ) {
-              entryUrl = u.href.replace(new RegExp('^' + u.protocol), '');
-            } else {
-              if (finalOption.server.ssl) {
-                u.protocol = 'https:';
-              } else {
+
+            if (typeof finalOption.server.entryUrlProtocol === 'string') {
+              if (finalOption.server.entryUrlProtocol === 'auto') {
+                entryUrl = u.href.replace(new RegExp('^' + u.protocol), '');
+              } else if (finalOption.server.entryUrlProtocol == 'http') {
                 u.protocol = 'http:';
+                entryUrl = u.href;
+              } else if (finalOption.server.entryUrlProtocol == 'https') {
+                u.protocol = 'https:';
+                entryUrl = u.href;
+              } else if (finalOption.server.entryUrlProtocol == 'origin') {
+                // pass
               }
-              entryUrl = u.href;
             }
             res.end(
               [

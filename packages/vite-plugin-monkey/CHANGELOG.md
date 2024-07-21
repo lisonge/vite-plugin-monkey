@@ -1,5 +1,5 @@
-# v4.0.4
+# v4.0.5
 
 ## Bug Fixes
 
-- fix: remove staticfile cdn because it return virus-infected code (#171)
+- fix: compat not defined in pkg/package.json but exist in pkg/subpath (#169)

@@ -1,15 +1,14 @@
 import * as acornWalk from 'acorn-walk';
+import { resolve } from 'import-meta-resolve';
 import { readFileSync } from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import type { OutputBundle, PluginContext } from 'rollup';
 import { normalizePath, transformWithEsbuild } from 'vite';
 import { logger } from './_logger';
 import { FinalMonkeyOption } from './types';
-import { resolve } from 'import-meta-resolve';
-import { pathToFileURL } from 'node:url';
 import { GmApiNames } from './unimport';
-import { c } from 'vite/dist/node/types.d-aGj9QkWt';
 
 export const delay = async (n = 0) => {
   await new Promise<void>((res) => {

@@ -9,6 +9,7 @@ import { FinalMonkeyOption } from './types';
 import { resolve } from 'import-meta-resolve';
 import { pathToFileURL } from 'node:url';
 import { GmApiNames } from './unimport';
+import { c } from 'vite/dist/node/types.d-aGj9QkWt';
 
 export const delay = async (n = 0) => {
   await new Promise<void>((res) => {
@@ -127,32 +128,51 @@ export const existFile = async (path: string) => {
   }
 };
 
-/**
- * unstable
- */
-const resolvePackageJsonFromPath = async (name: string) => {
+const resolveModuleFromPath = async (subpath: string) => {
   const p = normalizePath(process.cwd()).split('/');
   for (let i = p.length; i > 0; i--) {
-    const p2 = `${p.slice(0, i).join('/')}/node_modules/${name}/package.json`;
+    const p2 = `${p.slice(0, i).join('/')}/node_modules/${subpath}`;
     if (await existFile(p2)) {
       return p2;
     }
   }
 };
 
+const compatResolveModulePath = async (id: string): Promise<string> => {
+  try {
+    return compatResolve(id);
+  } catch (e) {
+    // not defined in pkg/package.json but exist in pkg/subpath
+    // https://github.com/lisonge/vite-plugin-monkey/issues/169
+    const r = await resolveModuleFromPath(id);
+    if (!r) {
+      throw e;
+    }
+    return r;
+  }
+};
+
+const isScopePkg = (name: string) => name.startsWith('@');
+
 export const getModuleRealInfo = async (importName: string) => {
-  const importName2 = normalizePath(importName.split('?')[0]);
-  const resolveName = normalizePath(compatResolve(importName2)).replace(
-    /.*\/node_modules\/[^/]+\//,
-    '',
-  );
+  const nameNoQuery = normalizePath(importName.split('?')[0]);
+  const resolveName = await (async () => {
+    const n = normalizePath(await compatResolveModulePath(nameNoQuery)).replace(
+      /.*\/node_modules\/[^/]+\//,
+      '',
+    );
+    if (isScopePkg(importName)) {
+      return n.split('/').slice(1).join('/');
+    }
+    return n;
+  })();
   let version: string | undefined = undefined;
-  const nameList = importName2.split('/');
-  let pkgName = importName2;
+  const nameList = nameNoQuery.split('/');
+  let pkgName = nameNoQuery;
   while (nameList.length > 0) {
     pkgName = nameList.join('/');
     const filePath = await (async () => {
-      const p = await resolvePackageJsonFromPath(pkgName);
+      const p = await resolveModuleFromPath(`${pkgName}/package.json`);
       if (p) {
         return p;
       }
@@ -174,9 +194,9 @@ export const getModuleRealInfo = async (importName: string) => {
   }
   if (version === undefined) {
     logger.warn(
-      `not found module ${importName2} version, use ${importName2}@latest`,
+      `not found module ${nameNoQuery} version, use ${nameNoQuery}@latest`,
     );
-    pkgName = importName2;
+    pkgName = nameNoQuery;
     version = 'latest';
   }
   return { version, name: pkgName, resolveName };

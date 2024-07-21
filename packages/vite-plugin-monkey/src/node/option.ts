@@ -209,6 +209,8 @@ export const resolvedOption = (
     compatible,
     sandbox,
     unwrap = false,
+    background,
+    crontab,
   } = pluginOption.userscript ?? {};
 
   const { fileName = projectPkg.name + '.user.js' } = build;
@@ -281,6 +283,8 @@ export const resolvedOption = (
       sandbox,
       unwrap,
       webRequest: webRequest.map((w) => JSON.stringify(w)),
+      background,
+      crontab,
     },
     clientAlias: pluginOption.clientAlias ?? '$',
     entry: pluginOption.entry,

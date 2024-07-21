@@ -1,4 +1,4 @@
-import type { Plugin } from 'vite';
+import type { Plugin, UserConfig } from 'vite';
 import { resolvedOption } from './option';
 import monkeyPluginList from './plugins';
 import type { MonkeyOption } from './types';
@@ -30,7 +30,7 @@ export default (pluginOption: MonkeyOption): Plugin[] => {
     async config(userConfig, { command }) {
       const isServe = command == 'serve';
 
-      return {
+      const ret: UserConfig = {
         resolve: {
           alias: {
             [finalPluginOption.clientAlias]: 'vite-plugin-monkey/dist/client',
@@ -56,16 +56,33 @@ export default (pluginOption: MonkeyOption): Plugin[] => {
           cssCodeSplit: false,
           minify: userConfig.build?.minify ?? false,
           cssMinify: userConfig.build?.cssMinify ?? true,
-          rollupOptions: {
-            // serve pre-bundling need
-            input: finalPluginOption.entry,
-          },
+
           sourcemap: false,
 
           // TODO
           // sourcemap: sourcemap,
         },
       };
+
+      // background or crontab script use lib
+      if (
+        finalPluginOption.userscript.background ||
+        finalPluginOption.userscript.crontab
+      ) {
+        ret.build!.lib = {
+          entry: finalPluginOption.entry,
+          name: 'monkey',
+          formats: ['umd'],
+          fileName: 'monkey.user.js',
+        };
+      } else {
+        ret.build!.rollupOptions = {
+          // serve pre-bundling need
+          input: finalPluginOption.entry,
+        };
+      }
+
+      return ret;
     },
   };
 

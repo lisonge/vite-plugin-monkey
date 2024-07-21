@@ -235,6 +235,12 @@ importers:
         specifier: ^6.0.6
         version: 6.0.6
 
+  playground/background-script:
+    dependencies:
+      vite-plugin-monkey:
+        specifier: workspace:*
+        version: link:../../packages/vite-plugin-monkey
+
   playground/build-watch:
     dependencies:
       vite-plugin-monkey:

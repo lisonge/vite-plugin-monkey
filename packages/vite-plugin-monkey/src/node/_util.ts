@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import type { OutputBundle, PluginContext } from 'rollup';
+import type { OutputBundle, PluginContext, OutputChunk } from 'rollup';
 import { normalizePath, transformWithEsbuild } from 'vite';
 import { logger } from './_logger';
 import { FinalMonkeyOption } from './types';
@@ -308,19 +308,26 @@ export async function* walk(dirPath: string) {
 
 export const collectGrant = (
   context: PluginContext,
-  bundleOrCode: OutputBundle | string | string[],
+  chunks: OutputChunk[],
+  injectCssCode: string | undefined,
+  minify: boolean,
 ): Set<string> => {
-  const codes: string[] = [];
-  if (typeof bundleOrCode == 'string') {
-    codes.push(bundleOrCode);
-  } else if (Array.isArray(bundleOrCode)) {
-    codes.push(...bundleOrCode);
-  } else {
-    Object.values(bundleOrCode).forEach((chunk) => {
-      if (chunk.type == 'chunk') {
-        codes.push(chunk.code);
-      }
-    });
+  const codes = new Set<string>();
+  if (injectCssCode) {
+    codes.add(injectCssCode);
+  }
+  for (const chunk of chunks) {
+    if (minify) {
+      // https://github.com/lisonge/vite-plugin-monkey/issues/166
+      const modules = Object.values(chunk.modules);
+      modules.forEach((m) => {
+        const code = m.code;
+        if (code) {
+          codes.add(code);
+        }
+      });
+    }
+    codes.add(chunk.code);
   }
   const unusedMembers = new Set(GM_keywords.filter((s) => s.includes(`.`)));
   const unusedIdentifiers = new Set(

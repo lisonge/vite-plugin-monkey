@@ -180,7 +180,7 @@ export const virtualHtmlTemplate = async (url: string) => {
   u.searchParams.set('origin', u.origin);
   if (window == window.parent) {
     location.href = u.href;
-    await delay(1000);
+    await delay(3500);
     window.close();
     return;
   }
@@ -260,7 +260,7 @@ export const previewTemplate = async (urls: string[]) => {
   if (window == window.parent && urls.length == 1) {
     const u = new URL(urls[0], location.origin);
     location.href = u.href;
-    await delay(1000);
+    await delay(3500);
     window.close();
     return;
   } else if (urls.length == 0) {

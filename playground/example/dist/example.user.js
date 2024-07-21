@@ -20,7 +20,8 @@
 // @match              https://songe.li/
 // @require            https://cdn.jsdelivr.net/npm/blueimp-md5@2.19.0
 // @require            https://cdn.jsdelivr.net/npm/prettier@3.2.5/standalone.js
-// @resource           element-plus/dist/index.css  https://cdn.jsdelivr.net/npm/element-plus@2.6.2/dist/index.css
+// @resource           @layui/layui-vue/lib/index.css  https://cdn.jsdelivr.net/npm/@layui/layui-vue@2.17.7/lib/index.css
+// @resource           element-plus/dist/index.css     https://cdn.jsdelivr.net/npm/element-plus@2.6.2/dist/index.css
 // @grant              GM_addElement
 // @grant              GM_addStyle
 // @grant              GM_cookie
@@ -38,6 +39,7 @@
     return GM_addStyle(t), t;
   };
   cssLoader("element-plus/dist/index.css");
+  cssLoader("@layui/layui-vue/lib/index.css");
   var _GM_addElement = /* @__PURE__ */ (() => typeof GM_addElement != "undefined" ? GM_addElement : void 0)();
   var _GM_cookie = /* @__PURE__ */ (() => typeof GM_cookie != "undefined" ? GM_cookie : void 0)();
   var _unsafeWindow = /* @__PURE__ */ (() => typeof unsafeWindow != "undefined" ? unsafeWindow : void 0)();

@@ -92,28 +92,12 @@ export const serverPlugin = (finalOption: FinalMonkeyOption): Plugin => {
               new Set(),
               'serve',
             );
-            // server entry url
-            let entryUrl = u.href;
-
-            if (typeof finalOption.server.entryUrlProtocol === 'string') {
-              if (finalOption.server.entryUrlProtocol === 'auto') {
-                entryUrl = u.href.replace(new RegExp('^' + u.protocol), '');
-              } else if (finalOption.server.entryUrlProtocol == 'http') {
-                u.protocol = 'http:';
-                entryUrl = u.href;
-              } else if (finalOption.server.entryUrlProtocol == 'https') {
-                u.protocol = 'https:';
-                entryUrl = u.href;
-              } else if (finalOption.server.entryUrlProtocol == 'origin') {
-                // pass
-              }
-            }
             res.end(
               [
                 metadata,
                 serverInjectGMApiFn(metadata),
                 fn2string(serverInjectFn, {
-                  entrySrc: entryUrl,
+                  entrySrc: u.href,
                 }),
                 '',
               ].join('\n\n'),

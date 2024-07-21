@@ -290,7 +290,6 @@ export const resolvedOption = (
     },
     server: {
       mountGmApi: server.mountGmApi ?? false,
-      ssl: server.ssl ?? false,
       open:
         server.open ??
         (process.platform == 'win32' || process.platform == 'darwin'),

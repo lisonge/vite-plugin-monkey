@@ -1,5 +1,5 @@
 import type { OutputChunk, RollupOutput } from 'rollup';
-import { Plugin, build } from 'vite';
+import { Plugin, ResolvedConfig, build } from 'vite';
 import { lazyValue } from '../_lazy';
 import {
   collectGrant,
@@ -23,10 +23,14 @@ const polyfillId = '\0vite/legacy-polyfills';
 const systemJsImportMapPrefix = `user`;
 
 export const finalBundlePlugin = (finalOption: FinalMonkeyOption): Plugin => {
+  let viteConfig: ResolvedConfig;
   return {
     name: 'monkey:finalBundle',
     apply: 'build',
     enforce: 'post',
+    async configResolved(resolvedConfig) {
+      viteConfig = resolvedConfig;
+    },
     async generateBundle(_, rawBundle) {
       const entryChunks: OutputChunk[] = [];
       const chunks: OutputChunk[] = [];
@@ -213,7 +217,9 @@ export const finalBundlePlugin = (finalOption: FinalMonkeyOption): Plugin => {
       if (finalOption.build.autoGrant) {
         collectGrantSet = collectGrant(
           this,
-          chunks.map((s) => s.code).concat(injectCssCode || ``),
+          chunks,
+          injectCssCode,
+          viteConfig.build.minify !== false,
         );
       } else {
         collectGrantSet = new Set<string>();

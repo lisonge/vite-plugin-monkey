@@ -1,5 +1,5 @@
-# v4.0.4
+# v4.0.6
 
 ## Bug Fixes
 
-- fix: remove staticfile cdn because it return virus-infected code (#171)
+- fix: can not collect grant when minify (#166)

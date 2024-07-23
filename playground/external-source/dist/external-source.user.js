@@ -9,7 +9,7 @@
 // @require      https://cdn.jsdelivr.net/npm/vue@3.4.21/dist/vue.global.prod.js
 // @require      data:application/javascript,window.Vue%3DVue%3B
 // @require      https://cdn.jsdelivr.net/npm/element-plus@2.6.2/dist/index.full.min.js
-// @resource     animate.css                      https://cdn.bootcdn.net/ajax/libs/animate.css/4.1.1/animate.css
+// @resource     animate.css                      https://fastly.jsdelivr.net/npm/animate.css@4.1.1/animate.css
 // @resource     base64-img/test/img/car.svg      https://unpkg.com/base64-img@1.0.4/test/img/car.svg
 // @resource     base64-img/test/img/car.svg?raw  https://cdn.jsdelivr.net/npm/base64-img@1.0.4/test/img/car.svg
 // @resource     base64-img/test/img/car.svg?url  https://cdn.jsdelivr.net/npm/base64-img@1.0.4/test/img/car.svg

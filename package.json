@@ -17,6 +17,7 @@
     "@commitlint/config-conventional": "^19.1.0",
     "@commitlint/types": "^19.0.3",
     "@gera2ld/jsx-dom": "^2.2.2",
+    "@layui/layui-vue": "2.17.7",
     "@types/blueimp-md5": "^2.18.2",
     "@types/cross-spawn": "^6.0.6",
     "@types/fs-extra": "^11.0.4",

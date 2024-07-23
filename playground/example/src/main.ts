@@ -4,6 +4,7 @@ import './style.css';
 import md5 from 'blueimp-md5';
 // import 'element-plus/dist/index.css';
 import 'element-plus/dist/index.css';
+import '@layui/layui-vue/lib/index.css';
 
 // console.log({ css });
 

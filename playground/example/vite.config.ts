@@ -42,6 +42,7 @@ export default defineConfig(async ({ command, mode }) => ({
         },
         externalResource: {
           'element-plus/dist/index.css': cdn.jsdelivr(),
+          '@layui/layui-vue/lib/index.css': cdn.jsdelivr(),
         },
       },
     }),

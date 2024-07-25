@@ -212,7 +212,7 @@ export const resolvedOption = (
   } = pluginOption.userscript ?? {};
 
   const { fileName = projectPkg.name + '.user.js' } = build;
-  let { metaFileName } = build;
+  let { metaFileName, metaLocalFileName } = build;
   if (typeof metaFileName == 'string') {
     const t = metaFileName;
     metaFileName = () => t;
@@ -222,7 +222,17 @@ export const resolvedOption = (
     metaFileName = undefined;
   }
 
+  if (typeof metaLocalFileName == 'string') {
+    const tt = metaLocalFileName;
+    metaLocalFileName = () => tt;
+  } else if (metaLocalFileName === true) {
+    metaLocalFileName = () =>
+      fileName.replace(/\.user\.js$/, '.meta.local.user.js');
+  } else if (metaLocalFileName === false) {
+    metaLocalFileName = undefined;
+  }
   const metaFileFc = metaFileName;
+  const metaLocalFileFc = metaLocalFileName;
 
   const cssSideEffects =
     build.cssSideEffects ||
@@ -306,6 +316,9 @@ export const resolvedOption = (
     build: {
       fileName,
       metaFileName: metaFileFc ? () => metaFileFc(fileName) : undefined,
+      metaLocalFileName: metaLocalFileFc
+        ? () => metaLocalFileFc(fileName)
+        : undefined,
       autoGrant: build.autoGrant ?? true,
       externalGlobals: externalGlobals,
       externalResource: externalResource2,

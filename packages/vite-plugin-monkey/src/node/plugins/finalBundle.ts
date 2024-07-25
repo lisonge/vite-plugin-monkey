@@ -14,6 +14,7 @@ import {
 } from '../topLevelAwait';
 import type { FinalMonkeyOption } from '../types';
 import { finalMonkeyOptionToComment } from '../userscript';
+import path from 'path';
 
 const __entry_name = `__monkey.entry.js`;
 
@@ -31,7 +32,10 @@ export const finalBundlePlugin = (finalOption: FinalMonkeyOption): Plugin => {
     async configResolved(resolvedConfig) {
       viteConfig = resolvedConfig;
     },
-    async generateBundle(_, rawBundle) {
+    async generateBundle(outputOptions, rawBundle) {
+      // 输出的目录
+      let outputPath =
+        outputOptions.dir || path.resolve(viteConfig.build.outDir);
       const entryChunks: OutputChunk[] = [];
       const chunks: OutputChunk[] = [];
       Object.values(rawBundle).forEach((chunk) => {
@@ -254,6 +258,20 @@ export const finalBundlePlugin = (finalOption: FinalMonkeyOption): Plugin => {
             finalOption,
             collectGrantSet,
             'meta',
+          ),
+        });
+      }
+
+      if (finalOption.build.metaLocalFileName) {
+        let filePath = path.join(outputPath!, finalOption.build.fileName);
+        this.emitFile({
+          type: 'asset',
+          fileName: finalOption.build.metaLocalFileName(),
+          source: await finalMonkeyOptionToComment(
+            finalOption,
+            collectGrantSet,
+            'meta-local',
+            filePath,
           ),
         });
       }

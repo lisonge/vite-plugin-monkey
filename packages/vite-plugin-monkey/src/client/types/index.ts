@@ -355,7 +355,7 @@ type GmXhr = {
   RESPONSE_TYPE_STREAM?: 'stream';
 };
 
-export type MonkeyWindow = typeof window & {
+export type GmApi = {
   unsafeWindow: typeof window;
 
   /**
@@ -624,3 +624,5 @@ export type MonkeyWindow = typeof window & {
     listener: WebRequestListener,
   ) => void;
 };
+
+export type MonkeyWindow = typeof window & GmApi;

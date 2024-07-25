@@ -234,9 +234,17 @@ export const resolvedOption = (
           GM_addStyle(e);
           return;
         }
-        const o = document.createElement('style');
-        o.textContent = e;
-        document.head.append(o);
+        function addStyle(cssText: string) {
+          let $style = document.createElement('style');
+          $style.innerHTML = cssText;
+          if (document.head) {
+            document.head.appendChild($style);
+          } else {
+            document.documentElement.appendChild($style);
+          }
+          return $style;
+        }
+        addStyle(e);
       };
     });
 

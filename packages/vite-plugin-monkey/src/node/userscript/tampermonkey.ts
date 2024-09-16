@@ -206,6 +206,11 @@ export interface TampermonkeyUserScript {
   connect?: IArray<string>;
 
   /**
+   * @see https://www.tampermonkey.net/documentation.php#meta:tag
+   */
+  tag?: string;
+
+  /**
    * @see https://www.tampermonkey.net/documentation.php#meta:sandbox
    */
   sandbox?: 'raw' | 'JavaScript' | 'DOM';

@@ -3,7 +3,7 @@ import type { IPromise } from '../types';
 /**
  * format userscript comment
  */
-export type Format = {
+export interface Format {
   /**
    * @description note font_width/font_family, suggest fixed-width font
    * @default 2, true
@@ -19,7 +19,7 @@ export type Format = {
     userscript: string;
     mode: `serve` | `build` | `meta`;
   }) => IPromise<string>;
-};
+}
 
 /**
  * @example
@@ -66,6 +66,6 @@ export type Format = {
  *   [ 'grant', 'unsafeWindow' ]
  * ]
  */
-export type AlignFunc = (
-  p0: [string, ...string[]][],
-) => IPromise<[string, ...string[]][]>;
+export interface AlignFunc {
+  (p0: [string, ...string[]][]): IPromise<[string, ...string[]][]>;
+}

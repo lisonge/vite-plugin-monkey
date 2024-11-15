@@ -1,5 +1,5 @@
-import { WebRequestRule } from '../../shared/types';
-import { IArray, LocaleType } from '../types';
+import type { GmWebRequestRule } from '../../client/types/webRequest';
+import type { IArray, LocaleType } from '../types';
 
 export type TamperRunAt =
   | 'document-start'
@@ -69,11 +69,11 @@ export const TamperGrantValueList: TamperGrant[] = [
   'GM_webRequest',
 ];
 
-export type AntifeatureType = {
+export interface AntifeatureType {
   tag?: string;
   type: 'ads' | 'tracking' | 'miner';
   description: string;
-};
+}
 
 /**
  * @see https://www.tampermonkey.net/documentation.php
@@ -228,7 +228,7 @@ export interface TampermonkeyUserScript {
   /**
    * @see https://www.tampermonkey.net/documentation.php#meta:webRequest
    */
-  webRequest?: IArray<WebRequestRule>;
+  webRequest?: IArray<GmWebRequestRule>;
 
   /**
    * @see https://www.tampermonkey.net/documentation.php#meta:unwrap

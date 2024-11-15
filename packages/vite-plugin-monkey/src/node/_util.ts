@@ -49,7 +49,7 @@ export const GM_keywords = [
   'window.focus',
   'window.onurlchange',
 ];
-type RawPackageJson = {
+interface RawPackageJson {
   name?: string;
   version?: string;
   description?: string;
@@ -58,8 +58,8 @@ type RawPackageJson = {
   homepage?: string;
   repository?: string | { url?: string };
   bugs?: string | { url?: string };
-};
-type PackageJson = {
+}
+interface PackageJson {
   name: string;
   version: string;
   description?: string;
@@ -68,7 +68,7 @@ type PackageJson = {
   homepage?: string;
   repository?: string;
   bugs?: string;
-};
+}
 
 export const projectPkg = (() => {
   let rawTarget: RawPackageJson = {};

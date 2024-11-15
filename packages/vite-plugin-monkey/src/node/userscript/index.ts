@@ -30,7 +30,7 @@ export type {
 /**
  * @see https://greasyfork.org/help/meta-keys
  */
-type GreasyforkUserScript = {
+interface GreasyforkUserScript {
   /**
    * @see https://greasyfork.org/help/meta-keys
    * @default package.json.license
@@ -56,9 +56,9 @@ type GreasyforkUserScript = {
    * @see https://greasyfork.org/help/meta-keys
    */
   incompatible?: string;
-};
+}
 
-type MergemonkeyUserScript = {
+interface MergemonkeyUserScript {
   /**
    * @default package.json.name??'monkey'
    * @default {...{'':package.json.name??'monkey'},...name} // if name is object
@@ -135,18 +135,19 @@ type MergemonkeyUserScript = {
    * // \@antifeature  miner     hello233
    */
   $extra?: [string, IArray<string>][] | Record<string, IArray<string>>;
-};
+}
 
 /**
  * UserScript, merge metadata from Greasemonkey, Tampermonkey, Violentmonkey, Greasyfork
  */
-export type MonkeyUserScript = GreasemonkeyUserScript &
-  TampermonkeyUserScript &
-  ViolentmonkeyUserScript &
-  GreasyforkUserScript &
-  MergemonkeyUserScript;
+export interface MonkeyUserScript
+  extends GreasemonkeyUserScript,
+    TampermonkeyUserScript,
+    ViolentmonkeyUserScript,
+    GreasyforkUserScript,
+    MergemonkeyUserScript {}
 
-export type FinalUserScript = {
+export interface FinalUserScript extends GreasyforkUserScript {
   name: LocaleType<string>;
   namespace: string;
   version: string;
@@ -183,7 +184,7 @@ export type FinalUserScript = {
   'run-at'?: GreaseRunAt | TamperRunAt | ViolentRunAt;
   grant: Set<string>;
   $extra: [string, ...string[]][];
-} & GreasyforkUserScript;
+}
 
 export const finalMonkeyOptionToComment = async (
   {

@@ -1,12 +1,12 @@
 import pc from 'picocolors';
 
 export type Message = string | number | null | undefined;
-type OutputOptions = {
+interface OutputOptions {
   /**
    * @default false
    */
   time?: boolean;
-};
+}
 
 const log = (tag: string, message: Message, options?: OutputOptions) => {
   console.log(

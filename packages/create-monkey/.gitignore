@@ -21,3 +21,4 @@ dist
 
 template-*/pnpm-lock.yaml
 template-*/package-lock.json
+template-*/bun.lockb

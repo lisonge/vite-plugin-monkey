@@ -1,7 +1,7 @@
 import type { GmAddElementType } from './addElement';
 import type { GmAddStyleType } from './addStyle';
 import type { GmAsyncCookieType } from './cookie';
-import type { GmDownloadType } from './download';
+import type { GmAsyncDownloadType } from './download';
 import type { GmAsyncGetResourceTextType } from './getResourceText';
 import type { GmAsyncGetResourceURLType } from './getResourceURL';
 import type { GmInfoType } from './info';
@@ -10,7 +10,8 @@ import type {
   GmRegisterMenuCommandType,
   GmUnregisterMenuCommandType,
 } from './menuCommand';
-import type { GmSetClipboardType } from './setClipboard';
+import type { GmAsyncNotificationType } from './notification';
+import type { GmAsyncSetClipboardType } from './setClipboard';
 import type {
   GmAsyncGetTabsType,
   GmAsyncGetTabType,
@@ -18,15 +19,15 @@ import type {
   GmOpenInTabType,
 } from './tab';
 import type {
-  GmAddValueChangeListenerType,
+  GmAsyncAddValueChangeListenerType,
   GmAsyncDeleteValuesType,
   GmAsyncDeleteValueType,
   GmAsyncGetValuesType,
   GmAsyncGetValueType,
   GmAsyncListValuesType,
+  GmAsyncRemoveValueChangeListenerType,
   GmAsyncSetValuesType,
   GmAsyncSetValueType,
-  GmRemoveValueChangeListenerType,
 } from './value';
 import type { GmAsyncXmlhttpRequestType } from './xmlhttpRequest';
 
@@ -37,14 +38,14 @@ export interface GmType {
   addStyle: GmAddStyleType;
   addElement: GmAddElementType;
   openInTab: GmOpenInTabType;
-  setClipboard: GmSetClipboardType;
-  addValueChangeListener: GmAddValueChangeListenerType;
-  removeValueChangeListener: GmRemoveValueChangeListenerType;
   registerMenuCommand: GmRegisterMenuCommandType;
   unregisterMenuCommand: GmUnregisterMenuCommandType;
-  download: GmDownloadType;
 
-  cookie: GmAsyncCookieType;
+  setClipboard: GmAsyncSetClipboardType;
+  addValueChangeListener: GmAsyncAddValueChangeListenerType;
+  removeValueChangeListener: GmAsyncRemoveValueChangeListenerType;
+  download: GmAsyncDownloadType;
+  notification: GmAsyncNotificationType;
   setValue: GmAsyncSetValueType;
   getValue: GmAsyncGetValueType;
   deleteValue: GmAsyncDeleteValueType;
@@ -53,9 +54,10 @@ export interface GmType {
   getValues: GmAsyncGetValuesType;
   deleteValues: GmAsyncDeleteValuesType;
   getResourceText: GmAsyncGetResourceTextType;
-  getResourceURL: GmAsyncGetResourceURLType;
+  getResourceUrl: GmAsyncGetResourceURLType;
   getTab: GmAsyncGetTabType;
   saveTab: GmAsyncSaveTab;
   getTabs: GmAsyncGetTabsType;
+  cookie: GmAsyncCookieType;
   xmlHttpRequest: GmAsyncXmlhttpRequestType;
 }

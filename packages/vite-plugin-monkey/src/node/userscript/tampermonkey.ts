@@ -208,7 +208,12 @@ export interface TampermonkeyUserScript {
   /**
    * @see https://www.tampermonkey.net/documentation.php#meta:tag
    */
-  tag?: string;
+  tag?: IArray<string>;
+
+  /**
+   * @see https://www.tampermonkey.net/documentation.php?locale=en#meta:run_in
+   */
+  'run-in'?: IArray<string>;
 
   /**
    * @see https://www.tampermonkey.net/documentation.php#meta:sandbox

@@ -50,4 +50,7 @@ export interface GmNotificationType {
     onclick?: () => void,
   ): GmNotificationControl | void;
 }
-export interface GmAsyncNotificationType {}
+export interface GmAsyncNotificationType {
+  (details: GmNotificationOptions): Promise<boolean>;
+  (text: string, title?: string, image?: string): Promise<boolean>;
+}

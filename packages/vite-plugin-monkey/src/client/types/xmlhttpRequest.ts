@@ -15,7 +15,7 @@ export interface GmResponseTypeMap {
 
 export type GmResponseType = keyof GmResponseTypeMap;
 
-export interface GmResponseEventBase<TResponseType extends GmResponseType> {
+export interface GmResponseEventBase<R extends GmResponseType> {
   responseHeaders: string;
   /**
    * 0 = XMLHttpRequest.UNSENT
@@ -29,34 +29,29 @@ export interface GmResponseEventBase<TResponseType extends GmResponseType> {
    * 4 = XMLHttpRequest.DONE
    */
   readyState: 0 | 1 | 2 | 3 | 4;
-  response: GmResponseTypeMap[TResponseType];
+  response: GmResponseTypeMap[R];
   responseText: string;
   responseXML: Document | null;
   status: number;
   statusText: string;
 }
 
-interface GmErrorEvent<TResponseType extends GmResponseType>
-  extends GmResponseEventBase<TResponseType> {
+interface GmErrorEvent<R extends GmResponseType>
+  extends GmResponseEventBase<R> {
   error: string;
 }
 
-interface GmResponseEvent<TResponseType extends GmResponseType, TContext>
-  extends GmResponseEventBase<TResponseType> {
+interface GmResponseEvent<R extends GmResponseType, C>
+  extends GmResponseEventBase<R> {
   finalUrl: string;
-  context: TContext;
+  context: C;
 }
 
-export interface GmProgressResponseEvent<
-  TResponseType extends GmResponseType,
-  TContext,
-> extends GmResponseEvent<TResponseType, TContext>,
+export interface GmProgressResponseEvent<R extends GmResponseType, C>
+  extends GmResponseEvent<R, C>,
     GmProgressEventBase {}
 
-export interface GmXmlhttpRequestOption<
-  TResponseType extends GmResponseType,
-  TContext,
-> {
+export interface GmXmlhttpRequestOption<R extends GmResponseType, C> {
   method?: string;
   url: string;
   headers?: Record<string, string>;
@@ -98,7 +93,7 @@ export interface GmXmlhttpRequestOption<
   /**
    * Property which will be added to the response event object
    */
-  context?: TContext;
+  context?: C;
 
   /**
    * @tampermonkey  text, json, arraybuffer, blob, document, stream
@@ -106,7 +101,7 @@ export interface GmXmlhttpRequestOption<
    * @default
    * 'text'
    */
-  responseType?: TResponseType;
+  responseType?: R;
 
   overrideMimeType?: string;
 
@@ -123,51 +118,45 @@ export interface GmXmlhttpRequestOption<
 
   onabort?: () => void;
 
-  onerror?: GmReponseEventListener<GmErrorEvent<TResponseType>>;
+  onerror?: GmReponseEventListener<GmErrorEvent<R>>;
 
   /**
    * @available violentmonkey
    */
-  onloadend?: GmReponseEventListener<GmResponseEvent<TResponseType, TContext>>;
+  onloadend?: GmReponseEventListener<GmResponseEvent<R, C>>;
 
-  onloadstart?: GmReponseEventListener<
-    GmResponseEvent<TResponseType, TContext>
-  >;
+  onloadstart?: GmReponseEventListener<GmResponseEvent<R, C>>;
 
-  onprogress?: GmReponseEventListener<
-    GmProgressResponseEvent<TResponseType, TContext>
-  >;
+  onprogress?: GmReponseEventListener<GmProgressResponseEvent<R, C>>;
 
-  onreadystatechange?: GmReponseEventListener<
-    GmResponseEvent<TResponseType, TContext>
-  >;
+  onreadystatechange?: GmReponseEventListener<GmResponseEvent<R, C>>;
 
   ontimeout?: () => void;
 
-  onload?: GmReponseEventListener<GmResponseEvent<TResponseType, TContext>>;
+  onload?: GmReponseEventListener<GmResponseEvent<R, C>>;
 }
 
-export interface GmXmlhttpRequestType {
-  <TResponseType extends GmResponseType = 'text', TContext = any>(
-    details: GmXmlhttpRequestOption<TResponseType, TContext>,
-  ): GmAbortHandle;
-
+export interface GmXmlhttpRequestExtType {
   /**
    * @see [tampermonkey#1278](https://github.com/Tampermonkey/tampermonkey/issues/1278#issuecomment-884363078)
    */
   RESPONSE_TYPE_STREAM?: 'stream';
 }
 
+export interface GmXmlhttpRequestType extends GmXmlhttpRequestExtType {
+  <R extends GmResponseType = 'text', C = any>(
+    details: GmXmlhttpRequestOption<R, C>,
+  ): GmAbortHandle;
+}
+
 export interface GmAsyncXmlhttpRequestReturnType<
-  TResponseType extends GmResponseType,
-  TContext,
+  R extends GmResponseType,
+  C = any,
 > extends GmAbortHandle,
-    Promise<GmResponseEvent<TResponseType, TContext>> {}
+    Promise<GmResponseEvent<R, C>> {}
 
-export interface GmAsyncXmlhttpRequestType {
-  <TResponseType extends GmResponseType = 'text', TContext = any>(
-    details: GmXmlhttpRequestOption<TResponseType, TContext>,
-  ): GmAsyncXmlhttpRequestReturnType<TResponseType, TContext>;
-
-  RESPONSE_TYPE_STREAM?: 'stream';
+export interface GmAsyncXmlhttpRequestType extends GmXmlhttpRequestExtType {
+  <R extends GmResponseType = 'text', C = any>(
+    details: GmXmlhttpRequestOption<R, C>,
+  ): GmAsyncXmlhttpRequestReturnType<R, C>;
 }

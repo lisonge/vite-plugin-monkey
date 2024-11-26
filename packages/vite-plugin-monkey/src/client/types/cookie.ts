@@ -58,7 +58,7 @@ export interface GmCookieType {
 }
 
 export interface GmAsyncCookieType {
-  list: (details: GmCookieListOptions) => Promise<GmCallbackCookie[]>;
-  set: (details: GmCookieSetOptions) => Promise<void>;
-  delete: (details: { name?: string; url?: string }) => Promise<void>;
+  list(details: GmCookieListOptions): Promise<GmCallbackCookie[]>;
+  set(details: GmCookieSetOptions): Promise<void>;
+  delete(details: { name?: string; url?: string }): Promise<void>;
 }

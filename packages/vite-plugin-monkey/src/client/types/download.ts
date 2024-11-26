@@ -46,6 +46,10 @@ export interface GmDownloadOptions {
    * Show 'Save As' dialog
    */
   saveAs?: boolean;
+  /**
+   * @see https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/downloads/FilenameConflictAction
+   */
+  conflictAction?: 'uniquify' | 'overwrite' | 'prompt';
   timeout?: number;
   onerror?: GmReponseEventListener<GmDownloadErrorEvent>;
   ontimeout?(): void;
@@ -56,4 +60,12 @@ export interface GmDownloadOptions {
 export interface GmDownloadType {
   (options: GmDownloadOptions): GmAbortHandle<boolean>;
   (url: string, name?: string): GmAbortHandle<boolean>;
+}
+export interface GmDownloadAsyncAbortHandle
+  extends Promise<void>,
+    GmAbortHandle<boolean> {}
+
+export interface GmAsyncDownloadType {
+  (options: GmDownloadOptions): GmDownloadAsyncAbortHandle;
+  (url: string, name?: string): GmDownloadAsyncAbortHandle;
 }

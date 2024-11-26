@@ -67,7 +67,21 @@ export interface GmAddValueChangeListenerType {
     ) => void,
   ): string;
 }
+export interface GmAsyncAddValueChangeListenerType {
+  <T = any>(
+    name: string,
+    callback: (
+      name: string,
+      oldValue?: T,
+      newValue?: T,
+      remote?: boolean,
+    ) => void,
+  ): Promise<string>;
+}
 
 export interface GmRemoveValueChangeListenerType {
   (listenerId: string): void;
+}
+export interface GmAsyncRemoveValueChangeListenerType {
+  (listenerId: string): Promise<void>;
 }

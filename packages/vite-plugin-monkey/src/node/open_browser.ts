@@ -67,7 +67,7 @@ function startBrowserProcess(browser: string | undefined, url: string) {
         stdio: 'ignore',
       });
       return true;
-    } catch (err) {
+    } catch {
       // Ignore errors
     }
   }
@@ -89,7 +89,7 @@ function startBrowserProcess(browser: string | undefined, url: string) {
       open(url, options).catch(() => {}); // Prevent `unhandledRejection` error.
     });
     return true;
-  } catch (err) {
+  } catch {
     return false;
   }
 }

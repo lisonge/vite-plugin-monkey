@@ -31,8 +31,8 @@ import { args, getPackageInfo, publishPackage, step } from './releaseUtils';
   const releaseTag = version.includes('beta')
     ? 'beta'
     : version.includes('alpha')
-    ? 'alpha'
-    : undefined;
+      ? 'alpha'
+      : undefined;
   await publishPackage(pkgDir, releaseTag);
 })().catch((err) => {
   console.error(err);

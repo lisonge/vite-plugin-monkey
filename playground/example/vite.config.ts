@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite';
 import fs from 'node:fs/promises';
-import monkey, { cdn } from './node_modules/vite-plugin-monkey/src/node/index';
+import monkey, { cdn } from 'vite-plugin-monkey';
 
 export default defineConfig(async ({ command, mode }) => ({
   plugins: [
@@ -28,7 +28,6 @@ export default defineConfig(async ({ command, mode }) => ({
       build: {
         metaFileName: true,
         externalGlobals: {
-          'blueimp-md5': cdn.jsdelivr('md5'),
           prettier: cdn.jsdelivr('prettier', 'standalone.js'),
           'prettier/parser-babel': [
             'prettierPlugins.babel',
@@ -42,7 +41,6 @@ export default defineConfig(async ({ command, mode }) => ({
         },
         externalResource: {
           'element-plus/dist/index.css': cdn.jsdelivr(),
-          '@layui/layui-vue/lib/index.css': cdn.jsdelivr(),
         },
       },
     }),

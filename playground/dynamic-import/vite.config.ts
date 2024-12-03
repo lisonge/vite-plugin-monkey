@@ -13,7 +13,6 @@ export default defineConfig(async ({ command, mode }) => ({
       },
       build: {
         externalGlobals: {
-          md5: cdn.jsdelivr('MD5', 'dist/md5.min.js'),
           vue: cdn
             .jsdelivr('Vue', 'dist/vue.global.prod.js')
             .concat(util.dataUrl(`;window.Vue=Vue;`)),

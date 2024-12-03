@@ -2,13 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
-import imgUrl from 'base64-img/test/img/car.svg';
-import imgUrl2 from 'base64-img/test/img/car.svg?url';
 import imgUrl3 from './assets/fluidicon.png';
-import 'element-plus/dist/index.css';
-import cssUrl from 'element-plus/dist/index.css?url';
 
-console.log({ imgUrl, imgUrl2, cssUrl, imgUrl3 });
+console.log({ imgUrl3 });
 
 ReactDOM.createRoot(
   (() => {

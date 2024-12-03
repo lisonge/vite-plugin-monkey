@@ -15,7 +15,7 @@ export default ((()=>{
 
 // TODO the relative path of the *.vue file template does not work
 
-export const fixViteAssetPlugin = (finalOption: FinalMonkeyOption): Plugin => {
+export const fixViteAssetPlugin = (_: FinalMonkeyOption): Plugin => {
   let viteConfig: ResolvedConfig;
   return {
     name: 'monkey:fixViteAsset',

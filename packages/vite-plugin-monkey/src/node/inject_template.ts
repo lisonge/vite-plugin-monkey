@@ -31,6 +31,7 @@ export const fcToHtml = <T extends (...args: any[]) => any>(
 
 export const serverInjectFn = ({ entrySrc = `` }) => {
   // @ts-ignore
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
   window.GM; // must exist, see https://github.com/Tampermonkey/tampermonkey/issues/1567
 
   const key = `__monkeyWindow-` + new URL(entrySrc).origin;

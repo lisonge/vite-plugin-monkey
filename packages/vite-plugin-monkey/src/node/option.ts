@@ -116,6 +116,7 @@ export const resolvedOption = (
     Object.entries(externalGlobals2).forEach((s) => externalGlobals.push(s));
   }
 
+  const { grant = [], $extra = [] } = pluginOption.userscript ?? {};
   let {
     name = {},
     description = {},
@@ -126,9 +127,7 @@ export const resolvedOption = (
     antifeature = [],
     require = [],
     connect = [],
-    grant = [],
     webRequest = [],
-    $extra = [],
   } = pluginOption.userscript ?? {};
   if (typeof name == 'string') {
     name = { '': name };

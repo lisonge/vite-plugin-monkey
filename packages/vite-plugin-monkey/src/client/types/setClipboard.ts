@@ -3,5 +3,5 @@ export interface GmSetClipboardType {
 }
 
 export interface GmAsyncSetClipboardType {
-  (data: string, type: string): Promise<void>;
+  (data: string, type: string): Promise<void> | void;
 }

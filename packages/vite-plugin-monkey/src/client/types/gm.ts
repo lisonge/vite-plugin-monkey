@@ -1,14 +1,14 @@
-import type { GmAddElementType } from './addElement';
-import type { GmAddStyleType } from './addStyle';
+import type { GmAsyncAddElementType } from './addElement';
+import type { GmAsyncAddStyleType } from './addStyle';
 import type { GmAsyncCookieType } from './cookie';
 import type { GmAsyncDownloadType } from './download';
 import type { GmAsyncGetResourceTextType } from './getResourceText';
 import type { GmAsyncGetResourceURLType } from './getResourceURL';
 import type { GmInfoType } from './info';
-import type { GmLogType } from './log';
+import type { GmAsyncLogType } from './log';
 import type {
-  GmRegisterMenuCommandType,
-  GmUnregisterMenuCommandType,
+  GmAsyncRegisterMenuCommandType,
+  GmAsnycUnregisterMenuCommandType,
 } from './menuCommand';
 import type { GmAsyncNotificationType } from './notification';
 import type { GmAsyncSetClipboardType } from './setClipboard';
@@ -16,7 +16,7 @@ import type {
   GmAsyncGetTabsType,
   GmAsyncGetTabType,
   GmAsyncSaveTab,
-  GmOpenInTabType,
+  GmAsyncOpenInTabType,
 } from './tab';
 import type {
   GmAsyncAddValueChangeListenerType,
@@ -34,13 +34,12 @@ import type { GmAsyncXmlhttpRequestType } from './xmlhttpRequest';
 export interface GmType {
   info: GmInfoType;
 
-  log: GmLogType;
-  addStyle: GmAddStyleType;
-  addElement: GmAddElementType;
-  openInTab: GmOpenInTabType;
-  registerMenuCommand: GmRegisterMenuCommandType;
-  unregisterMenuCommand: GmUnregisterMenuCommandType;
-
+  log: GmAsyncLogType;
+  addStyle: GmAsyncAddStyleType;
+  addElement: GmAsyncAddElementType;
+  openInTab: GmAsyncOpenInTabType;
+  registerMenuCommand: GmAsyncRegisterMenuCommandType;
+  unregisterMenuCommand: GmAsnycUnregisterMenuCommandType;
   setClipboard: GmAsyncSetClipboardType;
   addValueChangeListener: GmAsyncAddValueChangeListenerType;
   removeValueChangeListener: GmAsyncRemoveValueChangeListenerType;

@@ -29,6 +29,16 @@ export interface GmOpenInTabType {
   (url: string, details?: GmOpenInTabOptions): GmTabControl;
   (url: string, openInBackground?: boolean): GmTabControl;
 }
+export interface GmAsyncOpenInTabType {
+  (
+    url: string,
+    details?: GmOpenInTabOptions,
+  ): GmTabControl | Promise<GmTabControl>;
+  (
+    url: string,
+    openInBackground?: boolean,
+  ): GmTabControl | Promise<GmTabControl>;
+}
 
 export interface GmGetTabType {
   <T = any>(callback: (tab: T) => void): void;

@@ -11,9 +11,20 @@ export interface GmRegisterMenuCommandType {
     onClick: (event: T) => void,
     accessKey?: string,
     options?: GmMenuCommandOptions,
-  ): string;
+  ): string | number;
+}
+export interface GmAsyncRegisterMenuCommandType {
+  <T extends MouseEvent | KeyboardEvent>(
+    caption: string,
+    onClick: (event: T) => void,
+    accessKey?: string,
+    options?: GmMenuCommandOptions,
+  ): string | number | Promise<string | number>;
 }
 
 export interface GmUnregisterMenuCommandType {
-  (captionOrId: string): void;
+  (captionOrId: string | number): void;
+}
+export interface GmAsnycUnregisterMenuCommandType {
+  (captionOrId: string | number): void;
 }

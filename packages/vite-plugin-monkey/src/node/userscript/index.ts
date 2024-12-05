@@ -1,30 +1,20 @@
+import { grantNames, type GrantType } from '../gm_api';
 import type { FinalMonkeyOption, IArray, LocaleType } from '../types';
 import type { Format } from './common';
-import type {
-  GreaseGrant,
-  GreasemonkeyUserScript,
-  GreaseRunAt,
-} from './greasemonkey';
-import { GreaseGrantValueList } from './greasemonkey';
+import type { GreasemonkeyUserScript, GreaseRunAt } from './greasemonkey';
 import type {
   AntifeatureType,
-  TamperGrant,
   TampermonkeyUserScript,
   TamperRunAt,
 } from './tampermonkey';
-import { TamperGrantValueList } from './tampermonkey';
-import type {
-  ViolentGrant,
-  ViolentmonkeyUserScript,
-  ViolentRunAt,
-} from './violentmonkey';
-import { ViolentGrantValueList, ViolentInjectInto } from './violentmonkey';
+import type { ViolentmonkeyUserScript, ViolentRunAt } from './violentmonkey';
+import { ViolentInjectInto } from './violentmonkey';
 
 export type {
+  Format,
   GreasemonkeyUserScript,
   TampermonkeyUserScript,
   ViolentmonkeyUserScript,
-  Format,
 };
 
 /**
@@ -125,7 +115,7 @@ interface MergemonkeyUserScript {
    *
    * if set '\*', will add all GM_* to UserScript
    */
-  grant?: IArray<GreaseGrant | TamperGrant | ViolentGrant> | 'none' | '*';
+  grant?: IArray<GrantType> | 'none' | '*';
 
   /**
    * custom extra meta
@@ -321,11 +311,7 @@ export const finalMonkeyOptionToComment = async (
   if (grant.has('none')) {
     attrList.push(['grant', 'none']);
   } else if (grant.has('*')) {
-    new Set([
-      ...GreaseGrantValueList,
-      ...ViolentGrantValueList,
-      ...TamperGrantValueList,
-    ]).forEach((s) => {
+    grantNames.forEach((s) => {
       attrList.push(['grant', s]);
     });
   } else {

@@ -3,6 +3,7 @@ import type {
   GmProgressEventBase,
   GmReponseEventListener,
 } from './_share';
+import type { GmResponseEvent } from './xmlhttpRequest';
 
 export interface GmDownloadErrorEvent {
   /**
@@ -62,7 +63,7 @@ export interface GmDownloadType {
   (url: string, name?: string): GmAbortHandle<boolean>;
 }
 export interface GmDownloadAsyncAbortHandle
-  extends Promise<void>,
+  extends Promise<GmResponseEvent<'blob', undefined>>,
     GmAbortHandle<boolean> {}
 
 export interface GmAsyncDownloadType {

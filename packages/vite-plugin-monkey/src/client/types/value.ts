@@ -76,12 +76,12 @@ export interface GmAsyncAddValueChangeListenerType {
       newValue?: T,
       remote?: boolean,
     ) => void,
-  ): Promise<string>;
+  ): string | number | Promise<string | number>;
 }
 
 export interface GmRemoveValueChangeListenerType {
-  (listenerId: string): void;
+  (listenerId: string | number): void;
 }
 export interface GmAsyncRemoveValueChangeListenerType {
-  (listenerId: string): Promise<void>;
+  (listenerId: string | number): void;
 }

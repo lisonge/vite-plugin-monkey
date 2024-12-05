@@ -66,6 +66,7 @@ export const mountGmApiFn = (meta: ImportMeta, apiNames: string[] = []) => {
   window.unsafeWindow = window;
   console.log(`[vite-plugin-monkey] mount unsafeWindow to unsafeWindow`);
 
+  apiNames.push('GM');
   let mountedApiSize = 0;
   apiNames.forEach((apiName) => {
     // @ts-ignore
@@ -77,7 +78,7 @@ export const mountGmApiFn = (meta: ImportMeta, apiNames: string[] = []) => {
     }
   });
   console.log(
-    `[vite-plugin-monkey] mount ${mountedApiSize}/${apiNames.length} GM_api to unsafeWindow`,
+    `[vite-plugin-monkey] mount ${mountedApiSize}/${apiNames.length} GM api to unsafeWindow`,
   );
 };
 

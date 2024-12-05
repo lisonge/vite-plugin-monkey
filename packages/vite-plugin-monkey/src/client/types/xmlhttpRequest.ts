@@ -41,7 +41,7 @@ interface GmErrorEvent<R extends GmResponseType>
   error: string;
 }
 
-interface GmResponseEvent<R extends GmResponseType, C>
+export interface GmResponseEvent<R extends GmResponseType, C>
   extends GmResponseEventBase<R> {
   finalUrl: string;
   context: C;

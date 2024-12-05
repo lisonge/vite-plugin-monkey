@@ -51,6 +51,10 @@ export interface GmNotificationType {
   ): GmNotificationControl | void;
 }
 export interface GmAsyncNotificationType {
-  (details: GmNotificationOptions): Promise<boolean>;
-  (text: string, title?: string, image?: string): Promise<boolean>;
+  (details: GmNotificationOptions): Promise<boolean> | GmNotificationControl;
+  (
+    text: string,
+    title?: string,
+    image?: string,
+  ): Promise<boolean> | GmNotificationControl;
 }

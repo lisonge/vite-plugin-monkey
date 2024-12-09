@@ -84,7 +84,7 @@ ts.forEachChild(source, (node) => {
   }
 });
 ts.forEachChild(source, (node) => {
-  if (ts.isTypeAliasDeclaration(node)) {
+  if (ts.isInterfaceDeclaration(node) || ts.isTypeAliasDeclaration(node)) {
     const name = node.name.escapedText.toString();
     if (name != 'MonkeyWindow' && exportNameList.includes(name)) {
       globalNodeList.push(node);

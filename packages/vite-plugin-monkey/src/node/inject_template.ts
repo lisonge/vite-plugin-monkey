@@ -1,4 +1,4 @@
-import type { GmApi } from '../client/types';
+import type { GmContextType } from '../client/index';
 
 export const fn2string = <T extends (...args: any[]) => any>(
   fn: T,
@@ -180,7 +180,7 @@ export const mountGmApiFn = (meta: ImportMeta, apiNames: string[] = []) => {
   // @ts-ignore
   const monkeyWindow: Window = document[key];
   // @ts-ignore
-  const monkeyApi: Partial<GmApi> = document[api_key] ?? {};
+  const monkeyApi: Partial<GmContextType> = document[api_key] ?? {};
   if (!monkeyWindow) {
     console.log(`[vite-plugin-monkey] not found monkeyWindow`);
     return;

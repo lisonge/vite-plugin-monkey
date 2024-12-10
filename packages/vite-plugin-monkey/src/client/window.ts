@@ -1,4 +1,5 @@
 import type { MonkeyWindow } from './types/_context';
+import type { GmContextType } from '../client/index';
 
 const key =
   `__monkeyWindow-` +
@@ -20,8 +21,7 @@ const api_key =
     }
   })();
 
-// @ts-ignore
-export const monkeyWindow: MonkeyWindow = document[key] ?? window;
+export const monkeyWindow: MonkeyWindow = (document as any)[key] ?? window;
 
-// @ts-ignore
-export const monkeyApi: GmApi = document[api_key] ?? Object.freeze({});
+export const monkeyApi: GmContextType =
+  (document as any)[api_key] ?? Object.freeze({});

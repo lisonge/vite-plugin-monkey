@@ -7,16 +7,16 @@ import type { GmAsyncGetResourceURLType } from './getResourceURL';
 import type { GmInfoType } from './info';
 import type { GmAsyncLogType } from './log';
 import type {
-  GmAsyncRegisterMenuCommandType,
   GmAsnycUnregisterMenuCommandType,
+  GmAsyncRegisterMenuCommandType,
 } from './menuCommand';
 import type { GmAsyncNotificationType } from './notification';
 import type { GmAsyncSetClipboardType } from './setClipboard';
 import type {
   GmAsyncGetTabsType,
   GmAsyncGetTabType,
-  GmAsyncSaveTab,
   GmAsyncOpenInTabType,
+  GmAsyncSaveTab,
 } from './tab';
 import type {
   GmAsyncAddValueChangeListenerType,
@@ -29,34 +29,35 @@ import type {
   GmAsyncSetValuesType,
   GmAsyncSetValueType,
 } from './value';
+import type { GmAsyncWebRequestType } from './webRequest';
 import type { GmAsyncXmlhttpRequestType } from './xmlhttpRequest';
 
 export interface GmType {
   info: GmInfoType;
-
   log: GmAsyncLogType;
-  addStyle: GmAsyncAddStyleType;
-  addElement: GmAsyncAddElementType;
-  openInTab: GmAsyncOpenInTabType;
-  registerMenuCommand: GmAsyncRegisterMenuCommandType;
-  unregisterMenuCommand: GmAsnycUnregisterMenuCommandType;
-  setClipboard: GmAsyncSetClipboardType;
+  getValue: GmAsyncGetValueType;
+  getValues: GmAsyncGetValuesType;
+  setValue: GmAsyncSetValueType;
+  setValues: GmAsyncSetValuesType;
+  listValues: GmAsyncListValuesType;
+  deleteValue: GmAsyncDeleteValueType;
+  deleteValues: GmAsyncDeleteValuesType;
   addValueChangeListener: GmAsyncAddValueChangeListenerType;
   removeValueChangeListener: GmAsyncRemoveValueChangeListenerType;
-  download: GmAsyncDownloadType;
-  notification: GmAsyncNotificationType;
-  setValue: GmAsyncSetValueType;
-  getValue: GmAsyncGetValueType;
-  deleteValue: GmAsyncDeleteValueType;
-  listValues: GmAsyncListValuesType;
-  setValues: GmAsyncSetValuesType;
-  getValues: GmAsyncGetValuesType;
-  deleteValues: GmAsyncDeleteValuesType;
   getResourceText: GmAsyncGetResourceTextType;
   getResourceUrl: GmAsyncGetResourceURLType;
+  addElement: GmAsyncAddElementType;
+  addStyle: GmAsyncAddStyleType;
   getTab: GmAsyncGetTabType;
   saveTab: GmAsyncSaveTab;
   getTabs: GmAsyncGetTabsType;
-  cookie: GmAsyncCookieType;
+  openInTab: GmAsyncOpenInTabType;
+  registerMenuCommand: GmAsyncRegisterMenuCommandType;
+  unregisterMenuCommand: GmAsnycUnregisterMenuCommandType;
+  notification: GmAsyncNotificationType;
+  setClipboard: GmAsyncSetClipboardType;
   xmlHttpRequest: GmAsyncXmlhttpRequestType;
+  download: GmAsyncDownloadType;
+  cookie: GmAsyncCookieType;
+  webRequest: GmAsyncWebRequestType;
 }

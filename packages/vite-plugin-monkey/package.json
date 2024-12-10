@@ -15,10 +15,6 @@
       "import": "./dist/client/index.mjs",
       "types": "./dist/client/index.d.ts"
     },
-    "./dist/native": {
-      "import": "./dist/native/index.mjs",
-      "types": "./dist/native/index.d.ts"
-    },
     "./client": {
       "types": "./client.d.ts"
     },

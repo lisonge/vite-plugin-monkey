@@ -1,3 +1,8 @@
+import type { GmAbortHandle } from './_share';
+
+/**
+ * @see https://www.tampermonkey.net/documentation.php#api:GM_webRequest
+ */
 export interface GmWebRequestRule {
   selector:
     | string
@@ -7,7 +12,7 @@ export interface GmWebRequestRule {
         exclude?: string | string[];
       };
   action:
-    | 'cancel'
+    | string
     | {
         cancel?: boolean;
         redirect?:
@@ -20,10 +25,19 @@ export interface GmWebRequestRule {
       };
 }
 
+/**
+ * @see https://www.tampermonkey.net/documentation.php#api:GM_webRequest
+ */
 export interface GmWebRequestListener {
   (
-    info: 'cancel' | 'redirect',
-    message: 'ok' | 'error',
+    /**
+     * 'cancel' | 'redirect'
+     */
+    info: string,
+    /**
+     * 'ok' | 'error'
+     */
+    message: string,
     details: {
       rule: GmWebRequestRule;
       url: string;
@@ -34,5 +48,11 @@ export interface GmWebRequestListener {
 }
 
 export interface GmWebRequestType {
-  (rules: GmWebRequestRule[], listener: GmWebRequestListener): void;
+  (rules: GmWebRequestRule[], listener: GmWebRequestListener): GmAbortHandle;
+}
+export interface GmAsyncWebRequestType {
+  (
+    rules: GmWebRequestRule[],
+    listener: GmWebRequestListener,
+  ): Promise<GmAbortHandle>;
 }

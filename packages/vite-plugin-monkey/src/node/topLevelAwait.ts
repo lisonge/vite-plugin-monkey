@@ -1,4 +1,4 @@
-import type { Node as AcornNode } from 'acorn';
+import * as acorn from 'acorn';
 import * as acornWalk from 'acorn-walk';
 import MagicString from 'magic-string';
 import type {
@@ -8,10 +8,9 @@ import type {
   PluginContext,
 } from 'rollup';
 
-type CallAcornNode = AcornNode & {
-  callee: AcornNode & { name: string };
-  arguments: AcornNode[];
-};
+interface AwaitCallExpression extends acorn.CallExpression {
+  callee: acorn.Identifier;
+}
 
 const awaitOffset = `await`.length;
 const initTlaIdentifier = `_TLA_`;
@@ -47,6 +46,16 @@ const startWith = (
   return false;
 };
 
+const includes = (
+  str: string,
+  start: number,
+  end: number,
+  substr: string,
+): boolean => {
+  const i = str.indexOf(substr, start);
+  return i >= 0 && i + substr.length < end;
+};
+
 export const transformTlaToIdentifier = (
   context: PluginContext,
   chunk: OutputAsset | OutputChunk,
@@ -58,8 +67,8 @@ export const transformTlaToIdentifier = (
       return;
     }
     const ast = context.parse(code);
-    const tlaNodes: AcornNode[] = [];
-    const tlaForOfNodes: AcornNode[] = [];
+    const tlaNodes: acorn.AwaitExpression[] = [];
+    const tlaForOfNodes: acorn.ForOfStatement[] = [];
     acornWalk.simple(
       ast,
       {
@@ -67,8 +76,7 @@ export const transformTlaToIdentifier = (
           // top level await
           tlaNodes.push(node);
         },
-        // @ts-ignore
-        ForOfStatement(node: AcornNode & { await: boolean }) {
+        ForOfStatement(node) {
           if (node.await === true) {
             tlaForOfNodes.push(node);
           }
@@ -113,46 +121,38 @@ export const transformIdentifierToTla = (
       return;
     }
 
-    const base = Object.keys(acornWalk.base).reduce<
-      Record<string, acornWalk.RecursiveWalkerFn<any>>
-    >((p, key) => {
-      if (key in p) return p;
-      p[key] = (node, state, callback) => {
-        if (chunk.code.substring(node.start, node.end).includes(identifier)) {
-          return acornWalk.base[key](node, state, callback);
-        }
-      };
-      return p;
-    }, {});
+    const forIdentifier = identifier + `FOR`;
+
     const ast = context.parse(chunk.code);
-    const tlaCallNodes: CallAcornNode[] = [];
-    const forTlaCallNodes: CallAcornNode[] = [];
-    const topFnNodes: AcornNode[] = [];
+    const tlaCallNodes: AwaitCallExpression[] = [];
+    const forTlaCallNodes: AwaitCallExpression[] = [];
+    const topFnNodes: acorn.Function[] = [];
     acornWalk.simple(
       ast,
       {
-        // @ts-ignore
-        CallExpression(node: CallAcornNode) {
-          const { name, type } = node.callee ?? {};
-          if (type === `Identifier`) {
-            if (name === identifier) {
-              // top level await
-              tlaCallNodes.push(node);
-            } else if (name === identifier + `FOR`) {
-              // top level for await
-              forTlaCallNodes.push(node);
+        CallExpression(node) {
+          if ('name' in node.callee) {
+            const { name, type } = node.callee;
+            if (type === `Identifier`) {
+              if (name === identifier) {
+                // top level await
+                tlaCallNodes.push({ ...node, callee: node.callee });
+              } else if (name === forIdentifier) {
+                // top level for await
+                forTlaCallNodes.push({ ...node, callee: node.callee });
+              }
             }
           }
         },
       },
       {
-        ...base,
+        ...acornWalk.base,
         Function: (node, state, callback) => {
           if (topFnNodes.length == 0) {
             topFnNodes.push(node);
           }
-          if (chunk.code.substring(node.start, node.end).includes(identifier)) {
-            return acornWalk.base.Function(node, state, callback);
+          if (includes(chunk.code, node.start, node.end, identifier)) {
+            return acornWalk.base.Function?.(node, state, callback);
           }
         },
       },
@@ -168,7 +168,7 @@ export const transformIdentifierToTla = (
         // __topLevelAwait_FOR ((async()=>{ /*start*/for await(const x of xxx){}/*end*/  })()); -> for await(const x of xxx){}
         // @ts-ignore
         const forOfNode = node.arguments?.[0]?.callee?.body
-          ?.body?.[0] as AcornNode;
+          ?.body?.[0] as acorn.ForOfStatement;
         ms.update(node.start, forOfNode.start, '');
         ms.update(forOfNode.end, node.end, '');
       });
@@ -176,11 +176,6 @@ export const transformIdentifierToTla = (
         ms.appendLeft(node.start, `async\x20`);
       });
       chunk.code = ms.toString();
-      // TODO sourcemap
-      // https://github.com/keik/merge-source-map
-      if (chunk.map) {
-        chunk.map;
-      }
     }
   }
 };

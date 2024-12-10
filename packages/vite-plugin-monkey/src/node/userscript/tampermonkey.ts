@@ -1,5 +1,5 @@
-import { WebRequestRule } from '../../shared/types';
-import { IArray, LocaleType } from '../types';
+import type { GmWebRequestRule } from '../../client/types/webRequest';
+import type { IArray, LocaleType } from '../types';
 
 export type TamperRunAt =
   | 'document-start'
@@ -8,72 +8,11 @@ export type TamperRunAt =
   | 'document-idle'
   | 'context-menu';
 
-export type TamperGrant =
-  | 'unsafeWindow'
-  | 'window.close'
-  | 'window.focus'
-  | 'window.onurlchange'
-  | 'GM_addStyle'
-  | 'GM_addElement'
-  | 'GM_deleteValue'
-  | 'GM_listValues'
-  | 'GM_addValueChangeListener'
-  | 'GM_removeValueChangeListener'
-  | 'GM_setValue'
-  | 'GM_getValue'
-  | 'GM_log'
-  | 'GM_getResourceText'
-  | 'GM_getResourceURL'
-  | 'GM_registerMenuCommand'
-  | 'GM_unregisterMenuCommand'
-  | 'GM_openInTab'
-  | 'GM_xmlhttpRequest'
-  | 'GM_download'
-  | 'GM_getTab'
-  | 'GM_saveTab'
-  | 'GM_getTabs'
-  | 'GM_notification'
-  | 'GM_setClipboard'
-  | 'GM_info'
-  | 'GM_cookie'
-  | 'GM_webRequest';
-
-export const TamperGrantValueList: TamperGrant[] = [
-  'unsafeWindow',
-  'window.close',
-  'window.focus',
-  'window.onurlchange',
-  'GM_addStyle',
-  'GM_addElement',
-  'GM_deleteValue',
-  'GM_listValues',
-  'GM_addValueChangeListener',
-  'GM_removeValueChangeListener',
-  'GM_setValue',
-  'GM_getValue',
-  'GM_log',
-  'GM_getResourceText',
-  'GM_getResourceURL',
-  'GM_registerMenuCommand',
-  'GM_unregisterMenuCommand',
-  'GM_openInTab',
-  'GM_xmlhttpRequest',
-  'GM_download',
-  'GM_getTab',
-  'GM_saveTab',
-  'GM_getTabs',
-  'GM_notification',
-  'GM_setClipboard',
-  'GM_info',
-  'GM_cookie',
-  'GM_webRequest',
-];
-
-export type AntifeatureType = {
+export interface AntifeatureType {
   tag?: string;
   type: 'ads' | 'tracking' | 'miner';
   description: string;
-};
+}
 
 /**
  * @see https://www.tampermonkey.net/documentation.php
@@ -206,6 +145,16 @@ export interface TampermonkeyUserScript {
   connect?: IArray<string>;
 
   /**
+   * @see https://www.tampermonkey.net/documentation.php#meta:tag
+   */
+  tag?: IArray<string>;
+
+  /**
+   * @see https://www.tampermonkey.net/documentation.php?locale=en#meta:run_in
+   */
+  'run-in'?: IArray<string>;
+
+  /**
    * @see https://www.tampermonkey.net/documentation.php#meta:sandbox
    */
   sandbox?: 'raw' | 'JavaScript' | 'DOM';
@@ -223,7 +172,7 @@ export interface TampermonkeyUserScript {
   /**
    * @see https://www.tampermonkey.net/documentation.php#meta:webRequest
    */
-  webRequest?: IArray<WebRequestRule>;
+  webRequest?: IArray<GmWebRequestRule>;
 
   /**
    * @see https://www.tampermonkey.net/documentation.php#meta:unwrap

@@ -1,14 +1,8 @@
 import './style.css';
-// import pngUrl from './asset/test.png';
-// import svgUrl from './asset/favicon.svg';
-import md5 from 'blueimp-md5';
-// import 'element-plus/dist/index.css';
 import 'element-plus/dist/index.css';
-import '@layui/layui-vue/lib/index.css';
 
 // console.log({ css });
 
-console.log(`md5('114514')=${md5('114514')}`); //c4d038b4bed09fdb1471ef51ec3a32cd
 console.log('document.readyState', document.readyState); // interactive
 
 import {

@@ -1,7 +1,7 @@
 import type { Plugin } from 'vite';
 import type { FinalMonkeyOption } from '../types';
 
-export const fixViteClientPlugin = (finalOption: FinalMonkeyOption): Plugin => {
+export const fixViteClientPlugin = (_: FinalMonkeyOption): Plugin => {
   return {
     name: 'monkey:fixViteClient',
     apply: 'serve',

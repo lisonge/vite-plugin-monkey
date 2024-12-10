@@ -5,7 +5,7 @@ export type FormatMode = `serve` | `build` | `meta` | `meta-local`;
 /**
  * format userscript comment
  */
-export type Format = {
+export interface Format {
   /**
    * @description note font_width/font_family, suggest fixed-width font
    * @default 2, true
@@ -21,7 +21,7 @@ export type Format = {
     userscript: string;
     mode: FormatMode;
   }) => IPromise<string>;
-};
+}
 
 /**
  * @example
@@ -68,6 +68,6 @@ export type Format = {
  *   [ 'grant', 'unsafeWindow' ]
  * ]
  */
-export type AlignFunc = (
-  p0: [string, ...string[]][],
-) => IPromise<[string, ...string[]][]>;
+export interface AlignFunc {
+  (p0: [string, ...string[]][]): IPromise<[string, ...string[]][]>;
+}

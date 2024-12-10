@@ -94,7 +94,7 @@ export const finalBundlePlugin = (finalOption: FinalMonkeyOption): Plugin => {
                   .join('\n');
               }
               const [k, chunk] =
-                Object.entries(rawBundle).find(([k, chunk]) =>
+                Object.entries(rawBundle).find(([_, chunk]) =>
                   id.endsWith(chunk.fileName),
                 ) ?? [];
               if (chunk && chunk.type == 'chunk' && k) {
@@ -117,7 +117,7 @@ export const finalBundlePlugin = (finalOption: FinalMonkeyOption): Plugin => {
               if (hasDynamicImport) {
                 return;
               }
-              Object.entries(iifeBundle).forEach(([k, chunk]) => {
+              Object.entries(iifeBundle).forEach(([_, chunk]) => {
                 transformIdentifierToTla(this, chunk, tlaIdentifier.value);
               });
             },
@@ -154,7 +154,7 @@ export const finalBundlePlugin = (finalOption: FinalMonkeyOption): Plugin => {
       if (hasDynamicImport) {
         const systemJsModules: string[] = [];
         let entryName = '';
-        Object.entries(buildBundle).forEach(([k, chunk]) => {
+        Object.entries(buildBundle).forEach(([_, chunk]) => {
           if (chunk.type == 'chunk') {
             const name = JSON.stringify(`./` + chunk.fileName);
             systemJsModules.push(
@@ -208,7 +208,7 @@ export const finalBundlePlugin = (finalOption: FinalMonkeyOption): Plugin => {
         }
       } else {
         // use iife
-        Object.entries(buildBundle).forEach(([k, chunk]) => {
+        Object.entries(buildBundle).forEach(([_, chunk]) => {
           if (chunk.type == 'chunk' && chunk.isEntry) {
             finalJsCode = chunk.code;
           }

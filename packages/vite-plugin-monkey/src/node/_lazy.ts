@@ -7,7 +7,7 @@ const lazyValuePlaceholder = {};
  */
 export const lazy = <T extends object>(fn: () => T) => {
   let temp: T | undefined = undefined;
-  let o = {
+  const o = {
     get k() {
       if (temp === undefined) {
         temp = fn();

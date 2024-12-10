@@ -25,8 +25,6 @@ export default defineConfig({
           ),
         },
         externalResource: {
-          'base64-img/test/img/car.svg': cdn.jsdelivr(),
-          'base64-img/test/img/car.svg?url': cdn.jsdelivr(),
           'element-plus/dist/index.css': cdn.jsdelivr(),
           'element-plus/dist/index.css?url': cdn.jsdelivr(),
         },

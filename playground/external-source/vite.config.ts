@@ -23,11 +23,6 @@ export default defineConfig(async ({ command, mode }) => ({
         },
         externalResource: {
           'element-plus/dist/index.css': cdn.jsdelivr(),
-          'animate.css': cdn.bootcdn(),
-          'element-plus/package.json': cdn.elemecdn(),
-          'base64-img/test/img/car.svg': cdn.unpkg(),
-          'base64-img/test/img/car.svg?url': cdn.jsdelivr(),
-          'base64-img/test/img/car.svg?raw': cdn.jsdelivr(),
           'element-plus/dist/index.css?raw': cdn.jsdelivr(),
         },
       },

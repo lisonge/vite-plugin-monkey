@@ -1,4 +1,4 @@
-import type { GmApi, MonkeyWindow } from './types';
+import type { MonkeyWindow } from './types/_context';
 
 const key =
   `__monkeyWindow-` +

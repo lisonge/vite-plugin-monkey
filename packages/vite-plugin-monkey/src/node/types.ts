@@ -17,21 +17,23 @@ export type IArray<T = unknown> = T | T[];
  */
 export type LocaleType<T = unknown> = Record<string, T>;
 
-export type PkgOptions = {
+export interface PkgOptions {
   name: string;
   version: string;
   importName: string;
   resolveName: string;
   resourceUrl: string;
   resourceName: string;
-};
+}
 
-export type Pkg2UrlFn = (pkg: {
-  name: string;
-  version: string;
-  importName: string;
-  resolveName: string;
-}) => IPromise<string>;
+export interface Pkg2UrlFn {
+  (pkg: {
+    name: string;
+    version: string;
+    importName: string;
+    resolveName: string;
+  }): IPromise<string>;
+}
 
 /**
  * @param importName 'name/subname' in example
@@ -39,18 +41,18 @@ export type Pkg2UrlFn = (pkg: {
  * @example
  * const mod = await import('name/subname')
  */
-export type Mod2UrlFn = (
-  version: string,
-  name: string,
-  importName: string,
-) => IPromise<string>;
+export interface Mod2UrlFn {
+  (version: string, name: string, importName: string): IPromise<string>;
+}
 
-export type ModuleToUrlFc = (
-  version: string,
-  name: string,
-  importName?: string,
-  resolveName?: string,
-) => string;
+export interface ModuleToUrlFc {
+  (
+    version: string,
+    name: string,
+    importName?: string,
+    resolveName?: string,
+  ): string;
+}
 
 export type ExternalGlobals =
   | Record<string, IArray<string | Mod2UrlFn>>
@@ -80,7 +82,7 @@ export type ExternalResource = Record<
     >
 >;
 
-export type FinalMonkeyOption = {
+export interface FinalMonkeyOption {
   entry: string;
   format: {
     align: number | boolean | AlignFunc;
@@ -118,9 +120,9 @@ export type FinalMonkeyOption = {
   requirePkgList: { moduleName: string; url: string }[];
   systemjs: 'inline' | ModuleToUrlFc;
   cssSideEffects: (css: string) => Promise<string>;
-};
+}
 
-export type MonkeyOption = {
+export interface MonkeyOption {
   /**
    * userscript entry file path
    */
@@ -346,4 +348,4 @@ export type MonkeyOption = {
       css: string,
     ) => IPromise<string | ((css: string) => void)>;
   };
-};
+}

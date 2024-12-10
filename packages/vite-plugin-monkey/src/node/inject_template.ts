@@ -110,28 +110,51 @@ export const serverInjectFn = ({ entrySrc = `` }) => {
   const entryScript = document.createElement('script');
   entryScript.type = 'module';
   entryScript.src = entrySrc;
-  let mountPosition = '';
-  if (document.head) {
-    if (document.head.firstChild) {
-      document.head.insertBefore(entryScript, document.head.firstChild);
-      mountPosition = 'document.head first';
+
+  let injectFn = function () {
+    let mountPositionStr = '';
+    if (document.head) {
+      if (document.head.firstChild) {
+        document.head.insertBefore(entryScript, document.head.firstChild);
+        mountPositionStr = 'document.head first';
+      } else {
+        document.head.appendChild(entryScript);
+        mountPositionStr = 'document.head last';
+      }
     } else {
-      document.head.appendChild(entryScript);
-      mountPosition = 'document.head last';
+      if (document.documentElement) {
+        if (document.documentElement.firstChild) {
+          document.documentElement.insertBefore(
+            entryScript,
+            document.documentElement.firstChild,
+          );
+          mountPositionStr = 'document.documentElement first';
+        } else {
+          document.documentElement.appendChild(entryScript);
+          mountPositionStr = 'document.documentElement last';
+        }
+      } else {
+        // 部分情况下documentElement未加载出来
+      }
     }
+    return mountPositionStr == '' ? null : mountPositionStr;
+  };
+
+  let mountPosition = injectFn();
+  if (mountPosition == null) {
+    let intervalId = setInterval(() => {
+      let mountPosition = injectFn();
+      if (mountPosition != null) {
+        clearInterval(intervalId);
+        console.log(
+          `[vite-plugin-monkey] interval check mount entry module to ` +
+            mountPosition,
+        );
+      }
+    }, 5);
   } else {
-    if (document.documentElement.firstChild) {
-      document.documentElement.insertBefore(
-        entryScript,
-        document.documentElement.firstChild,
-      );
-      mountPosition = 'document.documentElement first';
-    } else {
-      document.documentElement.appendChild(entryScript);
-      mountPosition = 'document.documentElement last';
-    }
+    console.log(`[vite-plugin-monkey] mount entry module to ` + mountPosition);
   }
-  console.log(`[vite-plugin-monkey] mount entry module to ` + mountPosition);
 };
 
 export const cssInjectFn = (css: string) => {

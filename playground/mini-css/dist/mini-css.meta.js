@@ -6,5 +6,8 @@
 // @icon       https://vitejs.dev/logo.svg
 // @match      https://songe.li/*
 // @grant      GM_addStyle
+// @grant      GM_getValue
+// @grant      GM_registerMenuCommand
+// @grant      GM_webRequest
 // ==/UserScript==
 // hello

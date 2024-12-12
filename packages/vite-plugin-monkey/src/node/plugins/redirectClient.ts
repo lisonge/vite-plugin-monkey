@@ -2,6 +2,7 @@ import type { Plugin } from 'vite';
 import type { FinalMonkeyOption } from '../types';
 import { gmIdentifiers } from '../gm_api';
 
+// https://github.com/Tampermonkey/tampermonkey/issues/1567
 const clientSourceId = 'vite-plugin-monkey/dist/client';
 const clientId = '\0vite-plugin-monkey/dist/client';
 export const redirectClientPlugin = (_: FinalMonkeyOption): Plugin => {

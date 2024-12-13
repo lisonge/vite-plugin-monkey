@@ -9,9 +9,9 @@
 // @require      https://cdn.jsdelivr.net/npm/vue@3.5.13/dist/vue.global.prod.js
 // @require      https://cdn.jsdelivr.net/npm/vue-demi@latest/lib/index.iife.js
 // @require      data:application/javascript,%3Bwindow.Vue%3DVue%3B
-// @require      https://cdn.jsdelivr.net/npm/pinia@2.2.8/dist/pinia.iife.prod.js
-// @require      https://cdn.jsdelivr.net/npm/element-plus@2.9.0/dist/index.full.min.js
-// @resource     element-plus/dist/index.css  https://cdn.jsdelivr.net/npm/element-plus@2.9.0/dist/index.css
+// @require      https://cdn.jsdelivr.net/npm/pinia@2.3.0/dist/pinia.iife.prod.js
+// @require      https://cdn.jsdelivr.net/npm/element-plus@2.9.1/dist/index.full.min.js
+// @resource     element-plus/dist/index.css  https://cdn.jsdelivr.net/npm/element-plus@2.9.1/dist/index.css
 // @grant        GM_addStyle
 // @grant        GM_getResourceText
 // ==/UserScript==

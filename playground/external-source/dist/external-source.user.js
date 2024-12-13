@@ -8,9 +8,9 @@
 // @match        https://songe.li/
 // @require      https://cdn.jsdelivr.net/npm/vue@3.5.13/dist/vue.global.prod.js
 // @require      data:application/javascript,window.Vue%3DVue%3B
-// @require      https://cdn.jsdelivr.net/npm/element-plus@2.9.0/dist/index.full.min.js
-// @resource     element-plus/dist/index.css      https://cdn.jsdelivr.net/npm/element-plus@2.9.0/dist/index.css
-// @resource     element-plus/dist/index.css?raw  https://cdn.jsdelivr.net/npm/element-plus@2.9.0/dist/index.css
+// @require      https://cdn.jsdelivr.net/npm/element-plus@2.9.1/dist/index.full.min.js
+// @resource     element-plus/dist/index.css      https://cdn.jsdelivr.net/npm/element-plus@2.9.1/dist/index.css
+// @resource     element-plus/dist/index.css?raw  https://cdn.jsdelivr.net/npm/element-plus@2.9.1/dist/index.css
 // @grant        GM_addStyle
 // @grant        GM_getResourceText
 // @grant        unsafeWindow
@@ -44,7 +44,7 @@
   }, rawLoader = (e) => GM_getResourceText(e);
   cssLoader("element-plus/dist/index.css");
   const name = "element-plus";
-  const version = "2.9.0";
+  const version = "2.9.1";
   const description = "A Component Library for Vue 3";
   const keywords = ["element-plus", "element", "component library", "ui framework", "ui", "vue"];
   const homepage = "https://element-plus.org/";
@@ -65,7 +65,7 @@
   const devDependencies = { "@types/node": "*", "csstype": "^2.6.20", "vue": "^3.2.37", "vue-router": "^4.0.16" };
   const vetur = { "tags": "tags.json", "attributes": "attributes.json" };
   const browserslist = ["> 1%", "not ie 11", "not op_mini all"];
-  const gitHead = "7b7cd2322300b51f1a2105eb101c74178e011d00";
+  const gitHead = "4ea2be7966d9d8a430fe57edd4646062e7e26c87";
   const ElementPlusPkg = {
     name,
     version,

@@ -8,7 +8,6 @@ import { externalResourcePlugin } from './externalResource';
 import { finalBundlePlugin } from './finalBundle';
 import { perviewPlugin } from './perview';
 import { redirectClientPlugin } from './redirectClient';
-import { inlinesAssetPlugin } from './inlinesAsset';
 
 const monkeyPluginList = [
   // only serve
@@ -22,9 +21,6 @@ const monkeyPluginList = [
   externalLoaderPlugin,
   externalResourcePlugin,
   externalGlobalsPlugin,
-
-  // only build post
-  inlinesAssetPlugin,
 
   // only build, final build
   finalBundlePlugin,

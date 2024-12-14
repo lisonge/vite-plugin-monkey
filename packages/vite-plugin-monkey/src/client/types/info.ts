@@ -147,7 +147,7 @@ interface TamperScriptType {
   };
 }
 
-interface GmInfoScriptType extends TamperScriptType, ViolentScriptType {}
+export interface GmInfoScriptType extends TamperScriptType, ViolentScriptType {}
 
 /**
  * @see https://www.tampermonkey.net/documentation.php#api:GM_info

@@ -1,27 +1,10 @@
 {
   "name": "vite-plugin-monkey",
-  "version": "4.0.6",
+  "version": "5.0.0-beta.3",
   "description": "A vite plugin server and build your.user.js for userscript engine like Tampermonkey and Violentmonkey and Greasemonkey",
   "main": "dist/node/index.mjs",
   "types": "dist/node/index.d.ts",
   "type": "module",
-  "exports": {
-    "./package.json": "./package.json",
-    ".": {
-      "import": "./dist/node/index.mjs",
-      "types": "./dist/node/index.d.ts"
-    },
-    "./dist/client": {
-      "import": "./dist/client/index.mjs",
-      "types": "./dist/client/index.d.ts"
-    },
-    "./client": {
-      "types": "./client.d.ts"
-    },
-    "./global": {
-      "types": "./global.d.ts"
-    }
-  },
   "sideEffects": false,
   "files": [
     "dist",
@@ -63,7 +46,7 @@
     "cross-spawn": "^7.0.6",
     "htmlparser2": "^9.1.0",
     "import-meta-resolve": "^4.1.0",
-    "magic-string": "^0.30.14",
+    "magic-string": "^0.30.15",
     "mrmime": "^2.0.0",
     "open": "^10.1.0",
     "picocolors": "^1.1.1",
@@ -73,7 +56,7 @@
     "@types/cross-spawn": "^6.0.6"
   },
   "peerDependencies": {
-    "vite": "^5.0.0 || ^6.0.0"
+    "vite": "^5.4.11 || ^6.0.0"
   },
   "peerDependenciesMeta": {
     "vite": {

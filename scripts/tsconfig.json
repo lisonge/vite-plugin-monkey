@@ -2,9 +2,9 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "include": ["."],
   "compilerOptions": {
-    "module": "CommonJS",
+    "module": "ESNext",
     "target": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,

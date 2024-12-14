@@ -5,7 +5,7 @@ import { walk } from '../_util';
 import { fcToHtml, previewTemplate } from '../inject_template';
 import type { FinalMonkeyOption } from '../types';
 
-export const perviewPlugin = (finalOption: FinalMonkeyOption): Plugin => {
+export const perviewPlugin = (_: FinalMonkeyOption): Plugin => {
   let viteConfig: ResolvedConfig;
   return {
     name: 'monkey:perview',

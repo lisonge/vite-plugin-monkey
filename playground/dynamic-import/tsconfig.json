@@ -1,15 +1,4 @@
 {
-  "compilerOptions": {
-    "target": "ESNext",
-    "useDefineForClassFields": true,
-    "module": "ESNext",
-    "moduleResolution": "node",
-    "strict": true,
-    "jsx": "preserve",
-    "sourceMap": true,
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "lib": ["ESNext", "DOM"]
-  },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "vite.config.ts"]
+  "extends": "../../tsconfig.base.json",
+  "include": ["src", "vite.config.ts"]
 }

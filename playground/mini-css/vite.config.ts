@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite';
-import monkey from './node_modules/vite-plugin-monkey/src/node';
+import monkey from 'vite-plugin-monkey';
 
 export default defineConfig({
   plugins: [
@@ -14,6 +14,7 @@ export default defineConfig({
         icon: 'https://vitejs.dev/logo.svg',
         namespace: 'npm/vite-plugin-monkey',
         match: ['https://songe.li/*'],
+        tag: ['tag1', 'tag2'],
       },
       build: {
         metaFileName: true,

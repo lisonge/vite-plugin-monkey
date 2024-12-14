@@ -1,36 +1,26 @@
+import { grantNames, type GrantType } from '../gm_api';
 import type { FinalMonkeyOption, IArray, LocaleType } from '../types';
 import type { Format } from './common';
-import type {
-  GreaseGrant,
-  GreasemonkeyUserScript,
-  GreaseRunAt,
-} from './greasemonkey';
-import { GreaseGrantValueList } from './greasemonkey';
+import type { GreasemonkeyUserScript, GreaseRunAt } from './greasemonkey';
 import type {
   AntifeatureType,
-  TamperGrant,
   TampermonkeyUserScript,
   TamperRunAt,
 } from './tampermonkey';
-import { TamperGrantValueList } from './tampermonkey';
-import type {
-  ViolentGrant,
-  ViolentmonkeyUserScript,
-  ViolentRunAt,
-} from './violentmonkey';
-import { ViolentGrantValueList, ViolentInjectInto } from './violentmonkey';
+import type { ViolentmonkeyUserScript, ViolentRunAt } from './violentmonkey';
+import { ViolentInjectInto } from './violentmonkey';
 
 export type {
+  Format,
   GreasemonkeyUserScript,
   TampermonkeyUserScript,
   ViolentmonkeyUserScript,
-  Format,
 };
 
 /**
  * @see https://greasyfork.org/help/meta-keys
  */
-type GreasyforkUserScript = {
+interface GreasyforkUserScript {
   /**
    * @see https://greasyfork.org/help/meta-keys
    * @default package.json.license
@@ -56,9 +46,9 @@ type GreasyforkUserScript = {
    * @see https://greasyfork.org/help/meta-keys
    */
   incompatible?: string;
-};
+}
 
-type MergemonkeyUserScript = {
+interface MergemonkeyUserScript {
   /**
    * @default package.json.name??'monkey'
    * @default {...{'':package.json.name??'monkey'},...name} // if name is object
@@ -125,7 +115,7 @@ type MergemonkeyUserScript = {
    *
    * if set '\*', will add all GM_* to UserScript
    */
-  grant?: IArray<GreaseGrant | TamperGrant | ViolentGrant> | 'none' | '*';
+  grant?: IArray<GrantType> | 'none' | '*';
 
   /**
    * custom extra meta
@@ -135,18 +125,19 @@ type MergemonkeyUserScript = {
    * // \@antifeature  miner     hello233
    */
   $extra?: [string, IArray<string>][] | Record<string, IArray<string>>;
-};
+}
 
 /**
  * UserScript, merge metadata from Greasemonkey, Tampermonkey, Violentmonkey, Greasyfork
  */
-export type MonkeyUserScript = GreasemonkeyUserScript &
-  TampermonkeyUserScript &
-  ViolentmonkeyUserScript &
-  GreasyforkUserScript &
-  MergemonkeyUserScript;
+export interface MonkeyUserScript
+  extends GreasemonkeyUserScript,
+    TampermonkeyUserScript,
+    ViolentmonkeyUserScript,
+    GreasyforkUserScript,
+    MergemonkeyUserScript {}
 
-export type FinalUserScript = {
+export interface FinalUserScript extends GreasyforkUserScript {
   name: LocaleType<string>;
   namespace: string;
   version: string;
@@ -176,6 +167,7 @@ export type FinalUserScript = {
   supportURL?: string;
   connect: string[];
   sandbox?: string;
+  tag: string[];
   antifeature: AntifeatureType[];
 
   'exclude-match': string[];
@@ -183,7 +175,7 @@ export type FinalUserScript = {
   'run-at'?: GreaseRunAt | TamperRunAt | ViolentRunAt;
   grant: Set<string>;
   $extra: [string, ...string[]][];
-} & GreasyforkUserScript;
+}
 
 export const finalMonkeyOptionToComment = async (
   {
@@ -238,6 +230,7 @@ export const finalMonkeyOptionToComment = async (
 
     connect,
     sandbox,
+    tag,
     resource,
     grant,
     noframes,
@@ -312,6 +305,9 @@ export const finalMonkeyOptionToComment = async (
   connect.forEach((s) => {
     attrList.push(['connect', s]);
   });
+  tag.forEach((s) => {
+    attrList.push(['tag', s]);
+  });
 
   webRequest.forEach((s) => {
     attrList.push(['webRequest', s]);
@@ -320,11 +316,7 @@ export const finalMonkeyOptionToComment = async (
   if (grant.has('none')) {
     attrList.push(['grant', 'none']);
   } else if (grant.has('*')) {
-    new Set([
-      ...GreaseGrantValueList,
-      ...ViolentGrantValueList,
-      ...TamperGrantValueList,
-    ]).forEach((s) => {
+    grantNames.forEach((s) => {
       attrList.push(['grant', s]);
     });
   } else {
@@ -476,6 +468,7 @@ const defaultSortFormat = (p0: [string, ...string[]][]) => {
     filter(([k]) => k == 'resource').sort(stringSort),
 
     filter(([k]) => k == 'sandbox'),
+    filter(([k]) => k == 'tag'),
 
     filter(([k]) => k == 'connect'),
 

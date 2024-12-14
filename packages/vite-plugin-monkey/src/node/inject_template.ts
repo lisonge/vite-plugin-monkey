@@ -31,6 +31,7 @@ export const fcToHtml = <T extends (...args: any[]) => any>(
 
 export const serverInjectFn = ({ entrySrc = `` }) => {
   // @ts-ignore
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
   window.GM; // must exist, see https://github.com/Tampermonkey/tampermonkey/issues/1567
 
   const key = `__monkeyWindow-` + new URL(entrySrc).origin;
@@ -65,6 +66,7 @@ export const mountGmApiFn = (meta: ImportMeta, apiNames: string[] = []) => {
   window.unsafeWindow = window;
   console.log(`[vite-plugin-monkey] mount unsafeWindow to unsafeWindow`);
 
+  apiNames.push('GM');
   let mountedApiSize = 0;
   apiNames.forEach((apiName) => {
     // @ts-ignore
@@ -76,7 +78,7 @@ export const mountGmApiFn = (meta: ImportMeta, apiNames: string[] = []) => {
     }
   });
   console.log(
-    `[vite-plugin-monkey] mount ${mountedApiSize}/${apiNames.length} GM_api to unsafeWindow`,
+    `[vite-plugin-monkey] mount ${mountedApiSize}/${apiNames.length} GM api to unsafeWindow`,
   );
 };
 

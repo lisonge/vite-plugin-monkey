@@ -2,35 +2,6 @@ import { IArray, LocaleType } from '../types';
 
 export type GreaseRunAt = 'document-start' | 'document-end' | 'document-idle';
 
-export type GreaseGrant =
-  | 'GM.info'
-  | 'GM.deleteValue'
-  | 'GM.getValue'
-  | 'GM.listValues'
-  | 'GM.setValue'
-  | 'GM.getResourceUrl'
-  | 'GM.notification'
-  | 'GM.openInTab'
-  | 'GM.registerMenuCommand'
-  | 'GM.setClipboard'
-  | 'GM.xmlHttpRequest'
-  | 'unsafeWindow';
-
-export const GreaseGrantValueList: GreaseGrant[] = [
-  'GM.info',
-  'GM.deleteValue',
-  'GM.getValue',
-  'GM.listValues',
-  'GM.setValue',
-  'GM.getResourceUrl',
-  'GM.notification',
-  'GM.openInTab',
-  'GM.registerMenuCommand',
-  'GM.setClipboard',
-  'GM.xmlHttpRequest',
-  'unsafeWindow',
-];
-
 /**
  * @see https://wiki.greasespot.net/Metadata_Block
  */

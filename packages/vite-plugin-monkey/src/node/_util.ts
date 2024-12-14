@@ -8,7 +8,7 @@ import type { OutputBundle, PluginContext, OutputChunk } from 'rollup';
 import { normalizePath, transformWithEsbuild } from 'vite';
 import { logger } from './_logger';
 import { FinalMonkeyOption } from './types';
-import { GmApiNames } from './unimport';
+import { grantNames } from './gm_api';
 
 export const delay = async (n = 0) => {
   await new Promise<void>((res) => {
@@ -28,28 +28,7 @@ const get_vite_start_time = () => {
 
 export const isFirstBoot = (n = 1000) => get_vite_start_time() < n;
 
-export const GM_keywords = [
-  'GM.addElement',
-  'GM.addStyle',
-  'GM.deleteValue',
-  'GM.getResourceUrl',
-  'GM.getValue',
-  'GM.info',
-  'GM.listValues',
-  'GM.notification',
-  'GM.openInTab',
-  'GM.registerMenuCommand',
-  'GM.setClipboard',
-  'GM.setValue',
-  'GM.xmlHttpRequest',
-  'GM.cookie',
-  ...GmApiNames.filter((s) => s.startsWith('GM_')),
-  'unsafeWindow',
-  'window.close',
-  'window.focus',
-  'window.onurlchange',
-];
-type RawPackageJson = {
+interface RawPackageJson {
   name?: string;
   version?: string;
   description?: string;
@@ -58,8 +37,8 @@ type RawPackageJson = {
   homepage?: string;
   repository?: string | { url?: string };
   bugs?: string | { url?: string };
-};
-type PackageJson = {
+}
+interface PackageJson {
   name: string;
   version: string;
   description?: string;
@@ -68,7 +47,7 @@ type PackageJson = {
   homepage?: string;
   repository?: string;
   bugs?: string;
-};
+}
 
 export const projectPkg = (() => {
   let rawTarget: RawPackageJson = {};
@@ -329,10 +308,8 @@ export const collectGrant = (
     }
     codes.add(chunk.code);
   }
-  const unusedMembers = new Set(GM_keywords.filter((s) => s.includes(`.`)));
-  const unusedIdentifiers = new Set(
-    GM_keywords.filter((s) => !s.includes(`.`)),
-  );
+  const unusedMembers = new Set(grantNames.filter((s) => s.includes(`.`)));
+  const unusedIdentifiers = new Set(grantNames.filter((s) => !s.includes(`.`)));
   const usedGm = new Set<string>();
   for (const code of codes) {
     if (!code.trim()) continue;

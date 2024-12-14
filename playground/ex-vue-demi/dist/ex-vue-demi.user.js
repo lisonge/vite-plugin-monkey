@@ -6,12 +6,12 @@
 // @description  default_description
 // @icon         https://vitejs.dev/logo.svg
 // @match        https://songe.li/
-// @require      https://cdn.jsdelivr.net/npm/vue@3.4.21/dist/vue.global.prod.js
+// @require      https://cdn.jsdelivr.net/npm/vue@3.5.13/dist/vue.global.prod.js
 // @require      https://cdn.jsdelivr.net/npm/vue-demi@latest/lib/index.iife.js
 // @require      data:application/javascript,%3Bwindow.Vue%3DVue%3B
-// @require      https://cdn.jsdelivr.net/npm/pinia@2.1.7/dist/pinia.iife.prod.js
-// @require      https://cdn.jsdelivr.net/npm/element-plus@2.6.2/dist/index.full.min.js
-// @resource     element-plus/dist/index.css  https://cdn.jsdelivr.net/npm/element-plus@2.6.2/dist/index.css
+// @require      https://cdn.jsdelivr.net/npm/pinia@2.3.0/dist/pinia.iife.prod.js
+// @require      https://cdn.jsdelivr.net/npm/element-plus@2.9.1/dist/index.full.min.js
+// @resource     element-plus/dist/index.css  https://cdn.jsdelivr.net/npm/element-plus@2.9.1/dist/index.css
 // @grant        GM_addStyle
 // @grant        GM_getResourceText
 // ==/UserScript==
@@ -60,9 +60,9 @@
             type: "success",
             onClick: _cache[0] || (_cache[0] = ($event) => vue.unref(main).counter++)
           }, {
-            default: vue.withCtx(() => [
+            default: vue.withCtx(() => _cache[1] || (_cache[1] = [
               vue.createTextVNode("main.counter++")
-            ]),
+            ])),
             _: 1
           })
         ], 64);

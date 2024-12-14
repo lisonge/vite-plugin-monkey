@@ -19,8 +19,8 @@
     "template-*"
   ],
   "scripts": {
-    "build": "tsup",
-    "build:watch": "tsup --watch"
+    "prebuild": "tsc",
+    "build": "tsup"
   },
   "keywords": [
     "create",

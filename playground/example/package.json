@@ -14,7 +14,7 @@
   },
   "homepage": "https://github.com/lisonge/vite-plugin-monkey#readme",
   "scripts": {
-    "serve": "vite",
+    "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
   },

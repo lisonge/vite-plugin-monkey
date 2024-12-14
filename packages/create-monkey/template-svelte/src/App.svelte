@@ -6,7 +6,7 @@
 
 <main>
   <div>
-    <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
+    <a href="https://vite.dev" target="_blank" rel="noreferrer">
       <img src={viteLogo} class="logo" alt="Vite Logo" />
     </a>
     <a href="https://svelte.dev" target="_blank" rel="noreferrer">
@@ -33,6 +33,7 @@
     height: 6em;
     padding: 1.5em;
     will-change: filter;
+    transition: filter 300ms;
   }
   .logo:hover {
     filter: drop-shadow(0 0 2em #646cffaa);

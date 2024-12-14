@@ -7,7 +7,7 @@ import { cyrb53hash, existFile, isFirstBoot, toValidURL } from '../_util';
 import { fn2string, mountGmApiFn, serverInjectFn } from '../inject_template';
 import { openBrowser } from '../open_browser';
 import type { FinalMonkeyOption } from '../types';
-import { GmApiNames, preset } from '../unimport';
+import { gmIdentifiers } from '../gm_api';
 import { finalMonkeyOptionToComment } from '../userscript';
 
 export const installUserPath = '/__vite-plugin-monkey.install.user.js';
@@ -68,7 +68,8 @@ export const serverPlugin = (finalOption: FinalMonkeyOption): Plugin => {
           if (reqUrl.startsWith(installUserPath)) {
             let origin = toValidURL(usp.get(`origin`))?.origin;
             if (!origin) {
-              let { https, host, port } = viteConfig.server;
+              const { https, port } = viteConfig.server;
+              let { host } = viteConfig.server;
               if (host == '0.0.0.0') {
                 host = '127.0.0.1';
               }
@@ -150,7 +151,7 @@ export const serverPlugin = (finalOption: FinalMonkeyOption): Plugin => {
           } else if (reqUrl.startsWith(gmApiPath)) {
             if (finalOption.server.mountGmApi) {
               res.end(
-                `;(${mountGmApiFn})(import.meta, ${JSON.stringify(GmApiNames)});`,
+                `;(${mountGmApiFn})(import.meta, ${JSON.stringify(gmIdentifiers)});`,
               );
             } else {
               res.end('');

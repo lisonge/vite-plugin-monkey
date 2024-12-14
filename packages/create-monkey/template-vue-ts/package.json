@@ -15,7 +15,7 @@
     "@vitejs/plugin-vue": "^5.2.1",
     "typescript": "^5.7.2",
     "vite": "^6.0.3",
-    "vite-plugin-monkey": "5.0.0-beta.2",
+    "vite-plugin-monkey": "^5.0.0",
     "vue-tsc": "^2.1.10"
   }
 }

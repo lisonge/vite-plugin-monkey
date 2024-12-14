@@ -35,7 +35,7 @@ import { args, getPackageInfo, publishPackage, step } from './releaseUtils';
       : undefined;
   await publishPackage(pkgDir, releaseTag);
 
-  await fetch('https://registry-direct.npmmirror.com/vite-plugin-monkey/sync', {
+  await fetch(`https://registry-direct.npmmirror.com/${pkgName}/sync`, {
     method: 'PUT',
   });
 })().catch((err) => {

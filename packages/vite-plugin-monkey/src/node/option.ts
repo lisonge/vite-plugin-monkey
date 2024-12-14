@@ -207,6 +207,7 @@ export const resolvedOption = (
     contributionAmount,
     compatible,
     sandbox,
+    tag,
     unwrap = false,
   } = pluginOption.userscript ?? {};
 
@@ -278,6 +279,7 @@ export const resolvedOption = (
       $extra: extra,
       grant: grantSet,
       sandbox,
+      tag: tag ? (tag instanceof Array ? tag : [tag]) : [],
       unwrap,
       webRequest: webRequest.map((w) => JSON.stringify(w)),
     },

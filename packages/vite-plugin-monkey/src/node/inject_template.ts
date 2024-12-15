@@ -83,11 +83,18 @@ export const serverInjectGMApiFn = (entrySrc: string, metaData: string) => {
 
   return `
   ;(()=>{
-    const GM_Api = {};
+    let GM_Api = {};
     let GM_repair_count = 0;
     if (typeof unsafeWindow !== "undefined" && unsafeWindow == window) {
       console.log("[vite-plugin-monkey] window == unsafeWindow repair GM api");
 ${grantCompatibilityProcessing.join('\n')}
+    } else {
+      if(typeof unsafeWindow === "object" && unsafeWindow){
+        if (unsafeWindow.GM == null && typeof GM === "object") {
+          Reflect.set(GM_Api, "GM", GM);
+          GM_repair_count++;
+        }
+      }
     }
     Object.freeze(GM_Api);
     document["${api_key}"] = GM_Api;
@@ -195,6 +202,8 @@ export const mountGmApiFn = (meta: ImportMeta, apiNames: string[] = []) => {
   /** @type {string[]} */
   // @ts-ignore
   let unmountedApiNameList = [];
+  // extra import api
+  apiNames.push('GM', 'unsafeWindow');
   apiNames.forEach((apiName) => {
     // @ts-ignore
     const fn = monkeyApi?.[apiName] ?? monkeyWindow[apiName];

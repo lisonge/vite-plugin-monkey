@@ -14,6 +14,7 @@ export default defineConfig({
         icon: 'https://vitejs.dev/logo.svg',
         namespace: 'npm/vite-plugin-monkey',
         match: ['https://songe.li/*'],
+        tag: ['tag1', 'tag2'],
       },
       build: {
         metaFileName: true,

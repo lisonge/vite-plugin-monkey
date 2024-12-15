@@ -1,4 +1,4 @@
-import type { ExecaReturnValue, Options as ExecaOptions } from 'execa';
+import type { Options as ExecaOptions } from 'execa';
 import { execa } from 'execa';
 import minimist from 'minimist';
 import { existsSync } from 'node:fs';
@@ -29,7 +29,7 @@ export function getPackageInfo(pkgName: string): {
   pkgPath: string;
   currentVersion: string;
 } {
-  const pkgDir = path.resolve(__dirname, '../packages/' + pkgName);
+  const pkgDir = path.resolve(import.meta.dirname, '../packages/' + pkgName);
 
   if (!existsSync(pkgDir)) {
     throw new Error(`Package ${pkgName} not found`);
@@ -55,15 +55,15 @@ export function getPackageInfo(pkgName: string): {
 export async function run(
   bin: string,
   args: string[],
-  opts: ExecaOptions<string> = {},
-): Promise<ExecaReturnValue<string>> {
+  opts: ExecaOptions = {},
+) {
   return execa(bin, args, { stdio: 'inherit', ...opts });
 }
 
 export async function dryRun(
   bin: string,
   args: string[],
-  opts?: ExecaOptions<string>,
+  opts?: ExecaOptions,
 ): Promise<void> {
   return console.log(
     colors.blue(`[dryrun] ${bin} ${args.join(' ')}`),

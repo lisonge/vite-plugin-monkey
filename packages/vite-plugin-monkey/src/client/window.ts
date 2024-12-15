@@ -20,8 +20,8 @@ const api_key =
       return location.origin;
     }
   })();
+// @ts-ignore
+export const monkeyWindow: MonkeyWindow = document[key] ?? window;
 
-export const monkeyWindow: MonkeyWindow = (document as any)[key] ?? window;
-
-export const monkeyApi: GmContextType =
-  (document as any)[api_key] ?? Object.freeze({});
+// @ts-ignore
+export const monkeyApi: GmContextType = document[api_key] ?? Object.freeze({});

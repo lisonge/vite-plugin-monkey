@@ -1,5 +1,10 @@
-# v4.0.6
+# v5.0.0
 
-## Bug Fixes
+## Features
 
-- fix: can not collect grant when minify (#166)
+- add support for vite v6
+- add userscript meta tag
+
+## Breaking Changes
+
+- refactor TypeScript interfaces for GM api

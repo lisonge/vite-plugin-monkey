@@ -35,6 +35,7 @@
   const INERT = 1 << 13;
   const DESTROYED = 1 << 14;
   const EFFECT_RAN = 1 << 15;
+  const EFFECT_TRANSPARENT = 1 << 16;
   const HEAD_EFFECT = 1 << 19;
   const EFFECT_HAS_DERIVED = 1 << 20;
   function equals(value) {
@@ -306,10 +307,20 @@
     }
     return effect2;
   }
-  function effect_root(fn) {
+  function component_root(fn) {
     const effect2 = create_effect(ROOT_EFFECT, fn, true);
-    return () => {
-      destroy_effect(effect2);
+    return (options = {}) => {
+      return new Promise((fulfil) => {
+        if (options.outro) {
+          pause_effect(effect2, () => {
+            destroy_effect(effect2);
+            fulfil(void 0);
+          });
+        } else {
+          destroy_effect(effect2);
+          fulfil(void 0);
+        }
+      });
     };
   }
   function effect(fn) {
@@ -405,6 +416,43 @@
     if (parent !== null) {
       if (parent.first === effect2) parent.first = next;
       if (parent.last === effect2) parent.last = prev;
+    }
+  }
+  function pause_effect(effect2, callback) {
+    var transitions = [];
+    pause_children(effect2, transitions, true);
+    run_out_transitions(transitions, () => {
+      destroy_effect(effect2);
+      if (callback) callback();
+    });
+  }
+  function run_out_transitions(transitions, fn) {
+    var remaining = transitions.length;
+    if (remaining > 0) {
+      var check = () => --remaining || fn();
+      for (var transition of transitions) {
+        transition.out(check);
+      }
+    } else {
+      fn();
+    }
+  }
+  function pause_children(effect2, transitions, local) {
+    if ((effect2.f & INERT) !== 0) return;
+    effect2.f ^= INERT;
+    if (effect2.transitions !== null) {
+      for (const transition of effect2.transitions) {
+        if (transition.is_global || local) {
+          transitions.push(transition);
+        }
+      }
+    }
+    var child2 = effect2.first;
+    while (child2 !== null) {
+      var sibling2 = child2.next;
+      var transparent = (child2.f & EFFECT_TRANSPARENT) !== 0 || (child2.f & BRANCH_EFFECT) !== 0;
+      pause_children(child2, transitions, transparent ? local : false);
+      child2 = sibling2;
     }
   }
   let is_throwing_error = false;
@@ -1084,7 +1132,7 @@
     event_handle(array_from(all_registered_events));
     root_event_handles.add(event_handle);
     var component = void 0;
-    var unmount = effect_root(() => {
+    var unmount = component_root(() => {
       var anchor_node = anchor ?? target.appendChild(create_text());
       branch(() => {
         if (context) {
@@ -1119,7 +1167,6 @@
           }
         }
         root_event_handles.delete(event_handle);
-        mounted_components.delete(component);
         if (anchor_node !== anchor) {
           (_a = anchor_node.parentNode) == null ? void 0 : _a.removeChild(anchor_node);
         }

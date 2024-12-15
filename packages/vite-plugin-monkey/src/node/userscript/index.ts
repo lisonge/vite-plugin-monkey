@@ -167,6 +167,7 @@ export interface FinalUserScript extends GreasyforkUserScript {
   supportURL?: string;
   connect: string[];
   sandbox?: string;
+  tag: string[];
   antifeature: AntifeatureType[];
 
   'exclude-match': string[];
@@ -230,6 +231,7 @@ export const finalMonkeyOptionToComment = async (
 
     connect,
     sandbox,
+    tag,
     resource,
     grant,
     noframes,
@@ -307,6 +309,9 @@ export const finalMonkeyOptionToComment = async (
 
   connect.forEach((s) => {
     attrList.push(['connect', s]);
+  });
+  tag.forEach((s) => {
+    attrList.push(['tag', s]);
   });
 
   webRequest.forEach((s) => {
@@ -469,6 +474,7 @@ const defaultSortFormat = (p0: [string, ...string[]][]) => {
     filter(([k]) => k == 'resource').sort(stringSort),
 
     filter(([k]) => k == 'sandbox'),
+    filter(([k]) => k == 'tag'),
 
     filter(([k]) => k == 'connect'),
 

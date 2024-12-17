@@ -1,5 +1,5 @@
 import type { FinalUserScript, Format, MonkeyUserScript } from './userscript';
-import { AlignFunc } from './userscript/common';
+import type { AlignFunc, FormatMode } from './userscript/common';
 
 export type IPromise<T> = T | Promise<T>;
 
@@ -88,7 +88,7 @@ export interface FinalMonkeyOption {
     align: number | boolean | AlignFunc;
     generate: (uOptions: {
       userscript: string;
-      mode: `serve` | `build` | `meta`;
+      mode: FormatMode;
     }) => IPromise<string>;
   };
   userscript: FinalUserScript;
@@ -101,6 +101,7 @@ export interface FinalMonkeyOption {
   build: {
     fileName: string;
     metaFileName?: () => string;
+    metaLocalFileName?: () => string;
     autoGrant: boolean;
     externalGlobals: [string, IArray<string | Mod2UrlFn>][];
     externalResource: Record<
@@ -191,6 +192,21 @@ export interface MonkeyOption {
      * @default false
      */
     metaFileName?: string | boolean | ((fileName: string) => string);
+
+    /**
+     * build bundle userscript local comment file name, this file is only include comment
+     *
+     * it can be used with build local file
+     *
+     * it should end with '.meta.user.js', if set false, will not generate this file
+     *
+     * if set true, will equal to fileName.replace(/\\.user\\.js$/,'.meta.local.user.js')
+     *
+     * you can use local userscript manager to install this js and it can load your build file
+     *
+     * @default false
+     */
+    metaLocalFileName?: string | boolean | ((fileName: string) => string);
 
     /**
      * this config can be array or object, array=Object.entries(object)

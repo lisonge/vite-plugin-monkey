@@ -1,3 +1,5 @@
+import type { GmContextType } from '../client/index';
+
 export const fn2string = <T extends (...args: any[]) => any>(
   fn: T,
   ...args: Parameters<T>
@@ -29,6 +31,80 @@ export const fcToHtml = <T extends (...args: any[]) => any>(
   );
 };
 
+/**
+ * 根据meta信息生成处理@grant 注入到window
+ * 可修复GM_xxx is undefined
+ * @package entrySrc 脚本入口地址
+ * @param metaData // ==UserScript== 信息
+ */
+export const serverInjectGMApiFn = (entrySrc: string, metaData: string) => {
+  const api_key = `__monkeyApi-` + new URL(entrySrc).origin;
+
+  let metaDataSplit = metaData.split('\n');
+  /** 每一项都是@grant的兼容处理函数字符串 */
+  let grantCompatibilityProcessing: string[] = [];
+  /** 是否已添加GM.的处理 */
+  let isAddGMList = false;
+  for (let index = 0; index < metaDataSplit.length; index++) {
+    let metaDataItem = metaDataSplit[index];
+    let metaGrantValueMatch = metaDataItem.match(
+      /[\s]*\/\/[\s]*@grant[\s]+([\S]+)/i,
+    );
+    if (metaGrantValueMatch) {
+      let metaGrantValue =
+        metaGrantValueMatch[metaGrantValueMatch.length - 1].trim();
+      if (metaGrantValue.startsWith('GM.')) {
+        // GM.addElement
+        // GM.addStyle
+        // ...
+        if (isAddGMList) {
+          continue;
+        }
+        isAddGMList = true;
+        grantCompatibilityProcessing.push(`
+        if (window.GM == null && typeof GM === "object") {
+          Reflect.set(GM_Api, "GM", GM);
+          GM_repair_count++;
+        }`);
+      } else if (metaGrantValue.startsWith('window.')) {
+        // ↓不做处理
+        // window.close
+        // window.focus
+        // window.onurlchange
+      } else {
+        grantCompatibilityProcessing.push(`
+        if (typeof ${metaGrantValue} !== "undefined" && ${metaGrantValue} != null && window.${metaGrantValue} == null) {
+          Reflect.set(GM_Api, "${metaGrantValue}", ${metaGrantValue});
+          GM_repair_count++;
+        }`);
+      }
+    }
+  }
+
+  return `
+  ;(()=>{
+    let GM_Api = {};
+    let GM_repair_count = 0;
+    if (typeof unsafeWindow !== "undefined" && unsafeWindow == window) {
+      console.log("[vite-plugin-monkey] window == unsafeWindow repair GM api");
+${grantCompatibilityProcessing.join('\n')}
+    } else {
+      if(typeof unsafeWindow === "object" && unsafeWindow){
+        if (unsafeWindow.GM == null && typeof GM === "object") {
+          Reflect.set(GM_Api, "GM", GM);
+          GM_repair_count++;
+        }
+      }
+    }
+    Object.freeze(GM_Api);
+    document["${api_key}"] = GM_Api;
+    if(GM_repair_count > 0){
+      console.log("[vite-plugin-monkey] repair GM api count: " + GM_repair_count);
+    }
+})();
+  `;
+};
+
 export const serverInjectFn = ({ entrySrc = `` }) => {
   // @ts-ignore
   // eslint-disable-next-line @typescript-eslint/no-unused-expressions
@@ -42,44 +118,112 @@ export const serverInjectFn = ({ entrySrc = `` }) => {
   const entryScript = document.createElement('script');
   entryScript.type = 'module';
   entryScript.src = entrySrc;
-  document.head.insertBefore(entryScript, document.head.firstChild);
-  console.log(`[vite-plugin-monkey] mount entry module to document.head`);
+
+  let injectFn = function () {
+    let mountPositionStr = '';
+    if (document.head) {
+      if (document.head.firstChild) {
+        document.head.insertBefore(entryScript, document.head.firstChild);
+        mountPositionStr = 'document.head first';
+      } else {
+        document.head.appendChild(entryScript);
+        mountPositionStr = 'document.head last';
+      }
+    } else {
+      if (document.documentElement) {
+        if (document.documentElement.firstChild) {
+          document.documentElement.insertBefore(
+            entryScript,
+            document.documentElement.firstChild,
+          );
+          mountPositionStr = 'document.documentElement first';
+        } else {
+          document.documentElement.appendChild(entryScript);
+          mountPositionStr = 'document.documentElement last';
+        }
+      } else {
+        // 部分情况下documentElement未加载出来
+      }
+    }
+    return mountPositionStr == '' ? null : mountPositionStr;
+  };
+
+  let mountPosition = injectFn();
+  if (mountPosition == null) {
+    let intervalId = setInterval(() => {
+      let mountPosition = injectFn();
+      if (mountPosition != null) {
+        clearInterval(intervalId);
+        console.log(
+          `[vite-plugin-monkey] interval check mount entry module to ` +
+            mountPosition,
+        );
+      }
+    }, 5);
+  } else {
+    console.log(`[vite-plugin-monkey] mount entry module to ` + mountPosition);
+  }
 };
 
 export const cssInjectFn = (css: string) => {
   const style = document.createElement('style');
   style.dataset.source = 'vite-plugin-monkey';
   style.textContent = css;
-  document.head.append(style);
+  if (document.head) {
+    document.head.appendChild(style);
+  } else if (document.documentElement.childNodes.length === 0) {
+    document.documentElement.appendChild(style);
+  } else {
+    document.documentElement.insertBefore(
+      style,
+      document.documentElement.childNodes[0],
+    );
+  }
 };
 
 export const mountGmApiFn = (meta: ImportMeta, apiNames: string[] = []) => {
   const key = `__monkeyWindow-` + new URL(meta.url).origin;
+  const api_key = `__monkeyApi-` + new URL(meta.url).origin;
   // @ts-ignore
   const monkeyWindow: Window = document[key];
+  // @ts-ignore
+  const monkeyApi: Partial<GmContextType> = document[api_key] ?? {};
   if (!monkeyWindow) {
     console.log(`[vite-plugin-monkey] not found monkeyWindow`);
     return;
   }
 
   // @ts-ignore
-  window.unsafeWindow = window;
+  window.unsafeWindow = monkeyApi?.unsafeWindow ?? window;
   console.log(`[vite-plugin-monkey] mount unsafeWindow to unsafeWindow`);
 
-  apiNames.push('GM');
-  let mountedApiSize = 0;
+  /** @type {string[]} */
+  let mountedApiNameList = [];
+  /** @type {string[]} */
+  // @ts-ignore
+  let unmountedApiNameList = [];
+  // extra import api
+  apiNames.push('GM', 'unsafeWindow');
   apiNames.forEach((apiName) => {
     // @ts-ignore
-    const fn = monkeyWindow[apiName];
+    const fn = monkeyApi?.[apiName] ?? monkeyWindow[apiName];
     if (fn) {
       // @ts-ignore
-      window[apiName] = monkeyWindow[apiName];
-      mountedApiSize++;
+      window[apiName] = fn;
+      mountedApiNameList.push(apiName);
+    } else {
+      unmountedApiNameList.push(apiName);
     }
   });
   console.log(
-    `[vite-plugin-monkey] mount ${mountedApiSize}/${apiNames.length} GM api to unsafeWindow`,
+    `[vite-plugin-monkey] mount ${mountedApiNameList.length}/${apiNames.length} GM_api to unsafeWindow`,
   );
+  if (unmountedApiNameList.length) {
+    console.log(
+      // @ts-ignore
+      `[vite-plugin-monkey] unmount ${unmountedApiNameList.join('、')}`,
+    );
+  }
 };
 
 export const virtualHtmlTemplate = async (url: string) => {
@@ -89,7 +233,7 @@ export const virtualHtmlTemplate = async (url: string) => {
   u.searchParams.set('origin', u.origin);
   if (window == window.parent) {
     location.href = u.href;
-    await delay(500);
+    await delay(3500);
     window.close();
     return;
   }
@@ -169,7 +313,7 @@ export const previewTemplate = async (urls: string[]) => {
   if (window == window.parent && urls.length == 1) {
     const u = new URL(urls[0], location.origin);
     location.href = u.href;
-    await delay(500);
+    await delay(3500);
     window.close();
     return;
   } else if (urls.length == 0) {

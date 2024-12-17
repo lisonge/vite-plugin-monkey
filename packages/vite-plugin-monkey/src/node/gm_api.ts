@@ -37,7 +37,7 @@ const gmMembers = [
   'GM.deleteValues',
   'GM.download',
   'GM.getResourceText',
-  'GM.getResourceURL',
+  'GM.getResourceUrl',
   'GM.getTab',
   'GM.getTabs',
   'GM.getValue',

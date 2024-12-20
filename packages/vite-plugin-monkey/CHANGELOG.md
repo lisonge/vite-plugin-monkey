@@ -1,6 +1,5 @@
-# v5.0.1
+# v5.0.2
 
 ## What's Changed
 
-- fix: GM_registerMenuCommand type (#203)
-- perf: set GmXmlhttpRequestOption context default generic type
+- fix: GrantType GM.getResourceURL to GM.getResourceUrl

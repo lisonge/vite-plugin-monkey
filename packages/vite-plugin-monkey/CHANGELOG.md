@@ -1,10 +1,6 @@
-# v5.0.0
+# v5.0.1
 
-## Features
+## What's Changed
 
-- add support for vite v6
-- add userscript meta tag
-
-## Breaking Changes
-
-- refactor TypeScript interfaces for GM api
+- fix: GM_registerMenuCommand type (#203)
+- perf: set GmXmlhttpRequestOption context default generic type

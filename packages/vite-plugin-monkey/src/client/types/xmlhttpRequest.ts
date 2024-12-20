@@ -41,17 +41,22 @@ interface GmErrorEvent<R extends GmResponseType>
   error: string;
 }
 
-export interface GmResponseEvent<R extends GmResponseType, C>
+export interface GmResponseEvent<R extends GmResponseType, C = undefined>
   extends GmResponseEventBase<R> {
   finalUrl: string;
   context: C;
 }
 
-export interface GmProgressResponseEvent<R extends GmResponseType, C>
-  extends GmResponseEvent<R, C>,
+export interface GmProgressResponseEvent<
+  R extends GmResponseType,
+  C = undefined,
+> extends GmResponseEvent<R, C>,
     GmProgressEventBase {}
 
-export interface GmXmlhttpRequestOption<R extends GmResponseType, C> {
+export interface GmXmlhttpRequestOption<
+  R extends GmResponseType,
+  C = undefined,
+> {
   method?: string;
   url: string;
   headers?: Record<string, string>;

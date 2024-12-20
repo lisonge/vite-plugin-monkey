@@ -9,16 +9,14 @@ export interface GmRegisterMenuCommandType {
   <T extends MouseEvent | KeyboardEvent>(
     caption: string,
     onClick: (event: T) => void,
-    accessKey?: string,
-    options?: GmMenuCommandOptions,
+    optionsOrAccessKey?: string | GmMenuCommandOptions,
   ): string | number;
 }
 export interface GmAsyncRegisterMenuCommandType {
   <T extends MouseEvent | KeyboardEvent>(
     caption: string,
     onClick: (event: T) => void,
-    accessKey?: string,
-    options?: GmMenuCommandOptions,
+    optionsOrAccessKey?: string | GmMenuCommandOptions,
   ): string | number | Promise<string | number>;
 }
 

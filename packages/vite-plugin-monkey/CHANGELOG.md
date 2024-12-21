@@ -1,5 +1,5 @@
-# v5.0.2
+# v5.0.3
 
 ## What's Changed
 
-- fix: GrantType GM.getResourceURL to GM.getResourceUrl
+- fix: GmSetClipboardType type (#204)

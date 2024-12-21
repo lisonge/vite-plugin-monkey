@@ -37,6 +37,7 @@ const gmMembers = [
   'GM.deleteValues',
   'GM.download',
   'GM.getResourceText',
+  // https://www.tampermonkey.net/documentation.php#api:GM_getResourceURL
   'GM.getResourceUrl',
   'GM.getTab',
   'GM.getTabs',

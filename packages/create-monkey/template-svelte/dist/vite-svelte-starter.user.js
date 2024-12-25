@@ -60,8 +60,9 @@
   function enable_legacy_mode_flag() {
     legacy_mode_flag = true;
   }
-  function source(v) {
-    return {
+  const TEMPLATE_USE_IMPORT_NODE = 1 << 1;
+  function source(v, stack) {
+    var signal = {
       f: 0,
       // TODO ideally we could skip this altogether, but it causes type errors
       v,
@@ -69,6 +70,7 @@
       equals,
       version: 0
     };
+    return signal;
   }
   function state(v) {
     return /* @__PURE__ */ push_derived_source(source(v));
@@ -139,7 +141,6 @@
       }
     }
   }
-  const TEMPLATE_USE_IMPORT_NODE = 1 << 1;
   var $window;
   var first_child_getter;
   var next_sibling_getter;
@@ -423,7 +424,7 @@
     pause_children(effect2, transitions, true);
     run_out_transitions(transitions, () => {
       destroy_effect(effect2);
-      if (callback) callback();
+      callback();
     });
   }
   function run_out_transitions(transitions, fn) {
@@ -482,7 +483,7 @@
   function set_untracked_writes(value) {
     untracked_writes = value;
   }
-  let current_version = 0;
+  let current_version = 1;
   let skip_reaction = false;
   let component_context = null;
   function increment_version() {
@@ -527,7 +528,7 @@
           }
         }
       }
-      if (!is_unowned) {
+      if (!is_unowned || active_effect !== null && !skip_reaction) {
         set_signal_status(reaction, CLEAN);
       }
     }
@@ -953,6 +954,10 @@
       {}
     );
   }
+  const PASSIVE_EVENTS = ["touchstart", "touchmove"];
+  function is_passive_event(name) {
+    return PASSIVE_EVENTS.includes(name);
+  }
   const all_registered_events = /* @__PURE__ */ new Set();
   const root_event_handles = /* @__PURE__ */ new Set();
   function delegate(events) {
@@ -1094,10 +1099,6 @@
       /** @type {Node} */
       dom
     );
-  }
-  const PASSIVE_EVENTS = ["touchstart", "touchmove"];
-  function is_passive_event(name) {
-    return PASSIVE_EVENTS.includes(name);
   }
   function set_text(text, value) {
     var str = value == null ? "" : typeof value === "object" ? value + "" : value;

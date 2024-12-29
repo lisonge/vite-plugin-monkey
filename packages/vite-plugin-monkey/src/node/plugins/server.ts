@@ -62,6 +62,7 @@ export const serverPlugin = (finalOption: FinalMonkeyOption): Plugin => {
       server.middlewares.use(async (req, res, next) => {
         const reqUrl = req.url;
         if (
+          req.method === 'GET' &&
           reqUrl &&
           [installUserPath, entryPath, pullPath, gmApiPath].some((u) =>
             reqUrl.startsWith(u),

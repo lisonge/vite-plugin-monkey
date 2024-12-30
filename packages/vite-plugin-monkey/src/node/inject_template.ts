@@ -29,7 +29,11 @@ export const fcToHtml = <T extends (...args: any[]) => any>(
   );
 };
 
-export const serverInjectFn = ({ entrySrc = `` }) => {
+export interface ScriptOptions {
+  entrySrc: string;
+}
+export const serverInjectFn = ({ entrySrc }: ScriptOptions) => {
+  /// https://github.com/Tampermonkey/tampermonkey/issues/1567
   // @ts-ignore
   // eslint-disable-next-line @typescript-eslint/no-unused-expressions
   window.GM; // must exist, see https://github.com/Tampermonkey/tampermonkey/issues/1567
@@ -38,19 +42,31 @@ export const serverInjectFn = ({ entrySrc = `` }) => {
   // @ts-ignore
   document[key] = window;
   console.log(`[vite-plugin-monkey] mount monkeyWindow to document`);
-
-  const entryScript = document.createElement('script');
-  entryScript.type = 'module';
-  entryScript.src = entrySrc;
-  document.head.insertBefore(entryScript, document.head.firstChild);
+  // @ts-ignore
+  if (typeof GM_addElement === 'function') {
+    // @ts-ignore
+    GM_addElement(document.head, 'script', {
+      type: 'module',
+      src: entrySrc,
+    });
+  } else {
+    const script = document.createElement('script');
+    script.type = 'module';
+    // @ts-ignore
+    if (window.trustedTypes) {
+      // https://github.com/lisonge/vite-plugin-monkey/issues/205
+      // @ts-ignore
+      const policy = window.trustedTypes.createPolicy(key, {
+        createScriptURL: (input: unknown) => input,
+      });
+      const trustedScriptURL = policy.createScriptURL(entrySrc);
+      script.src = trustedScriptURL;
+    } else {
+      script.src = entrySrc;
+    }
+    document.head.append(script);
+  }
   console.log(`[vite-plugin-monkey] mount entry module to document.head`);
-};
-
-export const cssInjectFn = (css: string) => {
-  const style = document.createElement('style');
-  style.dataset.source = 'vite-plugin-monkey';
-  style.textContent = css;
-  document.head.append(style);
 };
 
 export const mountGmApiFn = (meta: ImportMeta, apiNames: string[] = []) => {

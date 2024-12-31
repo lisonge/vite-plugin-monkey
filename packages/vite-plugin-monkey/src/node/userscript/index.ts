@@ -300,7 +300,7 @@ export const finalMonkeyOptionToComment = async (
   });
 
   if (mode === 'meta-local') {
-    attrList.push(['require', 'file://' + filePath]);
+    attrList.push(['require', 'file:///' + filePath]);
   }
 
   Object.entries({ ...resource, ...collectResource }).forEach(([k, v]) => {

@@ -5,7 +5,7 @@
 // @author     monkey
 // @icon       https://vitejs.dev/logo.svg
 // @match      https://www.google.com/
-// @require    https://cdn.jsdelivr.net/npm/preact@10.25.2/dist/preact.min.js
+// @require    https://cdn.jsdelivr.net/npm/preact@10.25.3/dist/preact.min.js
 // @grant      GM_addStyle
 // ==/UserScript==
 
@@ -17,11 +17,11 @@
   var f$1 = 0;
   function u$1(e2, t2, n, o2, i2, u2) {
     t2 || (t2 = {});
-    var a2, c2, l2 = t2;
-    "ref" in t2 && (a2 = t2.ref, delete t2.ref);
-    var p2 = { type: e2, props: l2, key: n, ref: a2, __k: null, __: null, __b: 0, __e: null, __c: null, constructor: void 0, __v: --f$1, __i: -1, __u: 0, __source: i2, __self: u2 };
-    if ("function" == typeof e2 && (a2 = e2.defaultProps)) for (c2 in a2) void 0 === l2[c2] && (l2[c2] = a2[c2]);
-    return preact.options.vnode && preact.options.vnode(p2), p2;
+    var a2, c2, p2 = t2;
+    if ("ref" in p2) for (c2 in p2 = {}, t2) "ref" == c2 ? a2 = t2[c2] : p2[c2] = t2[c2];
+    var l2 = { type: e2, props: p2, key: n, ref: a2, __k: null, __: null, __b: 0, __e: null, __c: null, constructor: void 0, __v: --f$1, __i: -1, __u: 0, __source: i2, __self: u2 };
+    if ("function" == typeof e2 && (a2 = e2.defaultProps)) for (c2 in a2) void 0 === p2[c2] && (p2[c2] = a2[c2]);
+    return preact.options.vnode && preact.options.vnode(l2), l2;
   }
   var t, r, u, i, o = 0, f = [], c = preact.options, e = c.__b, a = c.__r, v = c.diffed, l = c.__c, m = c.unmount, s = c.__;
   function d(n, t2) {

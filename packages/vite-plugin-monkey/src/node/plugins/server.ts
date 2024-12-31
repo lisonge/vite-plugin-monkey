@@ -54,9 +54,20 @@ export const serverPlugin = (finalOption: FinalMonkeyOption): Plugin => {
       // support dev env
       finalOption.userscript.grant.add('*');
 
+      // https://github.com/lisonge/vite-plugin-monkey/issues/205
+      server.middlewares.use((_, res, next) => {
+        if (
+          res.getHeader('Access-Control-Allow-Private-Network') === undefined
+        ) {
+          res.setHeader('Access-Control-Allow-Private-Network', 'true');
+        }
+        next();
+      });
+
       server.middlewares.use(async (req, res, next) => {
         const reqUrl = req.url;
         if (
+          req.method === 'GET' &&
           reqUrl &&
           [installUserPath, entryPath, pullPath, gmApiPath].some((u) =>
             reqUrl.startsWith(u),

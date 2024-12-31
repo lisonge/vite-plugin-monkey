@@ -105,7 +105,85 @@ ${grantCompatibilityProcessing.join('\n')}
   `;
 };
 
-export const serverInjectFn = ({ entrySrc = `` }) => {
+/**
+ * 根据meta信息生成处理@grant 注入到window
+ * 可修复GM_xxx is undefined
+ * @package entrySrc 脚本入口地址
+ * @param metaData // ==UserScript== 信息
+ */
+export const serverInjectGMApiFn = (entrySrc: string, metaData: string) => {
+  const api_key = `__monkeyApi-` + new URL(entrySrc).origin;
+
+  let metaDataSplit = metaData.split('\n');
+  /** 每一项都是@grant的兼容处理函数字符串 */
+  let grantCompatibilityProcessing: string[] = [];
+  /** 是否已添加GM.的处理 */
+  let isAddGMList = false;
+  for (let index = 0; index < metaDataSplit.length; index++) {
+    let metaDataItem = metaDataSplit[index];
+    let metaGrantValueMatch = metaDataItem.match(
+      /[\s]*\/\/[\s]*@grant[\s]+([\S]+)/i,
+    );
+    if (metaGrantValueMatch) {
+      let metaGrantValue =
+        metaGrantValueMatch[metaGrantValueMatch.length - 1].trim();
+      if (metaGrantValue.startsWith('GM.')) {
+        // GM.addElement
+        // GM.addStyle
+        // ...
+        if (isAddGMList) {
+          continue;
+        }
+        isAddGMList = true;
+        grantCompatibilityProcessing.push(`
+        if (window.GM == null && typeof GM === "object") {
+          Reflect.set(GM_Api, "GM", GM);
+          GM_repair_count++;
+        }`);
+      } else if (metaGrantValue.startsWith('window.')) {
+        // ↓不做处理
+        // window.close
+        // window.focus
+        // window.onurlchange
+      } else {
+        grantCompatibilityProcessing.push(`
+        if (typeof ${metaGrantValue} !== "undefined" && ${metaGrantValue} != null && window.${metaGrantValue} == null) {
+          Reflect.set(GM_Api, "${metaGrantValue}", ${metaGrantValue});
+          GM_repair_count++;
+        }`);
+      }
+    }
+  }
+
+  return `
+  ;(()=>{
+    let GM_Api = {};
+    let GM_repair_count = 0;
+    if (typeof unsafeWindow !== "undefined" && unsafeWindow == window) {
+      console.log("[vite-plugin-monkey] window == unsafeWindow repair GM api");
+${grantCompatibilityProcessing.join('\n')}
+    } else {
+      if(typeof unsafeWindow === "object" && unsafeWindow){
+        if (unsafeWindow.GM == null && typeof GM === "object") {
+          Reflect.set(GM_Api, "GM", GM);
+          GM_repair_count++;
+        }
+      }
+    }
+    Object.freeze(GM_Api);
+    document["${api_key}"] = GM_Api;
+    if(GM_repair_count > 0){
+      console.log("[vite-plugin-monkey] repair GM api count: " + GM_repair_count);
+    }
+})();
+  `;
+};
+
+export interface ScriptOptions {
+  entrySrc: string;
+}
+export const serverInjectFn = ({ entrySrc }: ScriptOptions) => {
+  /// https://github.com/Tampermonkey/tampermonkey/issues/1567
   // @ts-ignore
   // eslint-disable-next-line @typescript-eslint/no-unused-expressions
   window.GM; // must exist, see https://github.com/Tampermonkey/tampermonkey/issues/1567
@@ -114,7 +192,29 @@ export const serverInjectFn = ({ entrySrc = `` }) => {
   // @ts-ignore
   document[key] = window;
   console.log(`[vite-plugin-monkey] mount monkeyWindow to document`);
-
+  // @ts-ignore
+  if (typeof GM_addElement === 'function') {
+    // @ts-ignore
+    GM_addElement(document.head, 'script', {
+      type: 'module',
+      src: entrySrc,
+    });
+  } else {
+    const script = document.createElement('script');
+    script.type = 'module';
+    // @ts-ignore
+    if (window.trustedTypes) {
+      // https://github.com/lisonge/vite-plugin-monkey/issues/205
+      // @ts-ignore
+      const policy = window.trustedTypes.createPolicy(key, {
+        createScriptURL: (input: unknown) => input,
+      });
+      const trustedScriptURL = policy.createScriptURL(entrySrc);
+      script.src = trustedScriptURL;
+    } else {
+      script.src = entrySrc;
+    }
+  }
   const entryScript = document.createElement('script');
   entryScript.type = 'module';
   entryScript.src = entrySrc;

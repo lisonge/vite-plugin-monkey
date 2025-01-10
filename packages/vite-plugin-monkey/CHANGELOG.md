@@ -1,6 +1,5 @@
-# v5.0.4
+# v5.0.5
 
 ## What's Changed
 
-- fix: add Access-Control-Allow-Private-Network header (#205)
-- fix: chrome TrustedScriptURL error (#205)
+- fix: auto grant not work for monkeyWindow.xxx (#206)

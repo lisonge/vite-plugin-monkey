@@ -1,5 +1,7 @@
 import type { IPromise } from '../types';
 
+export type FormatMode = `serve` | `build` | `meta` | `meta-local`;
+
 /**
  * format userscript comment
  */
@@ -17,7 +19,7 @@ export interface Format {
    */
   generate?: (uOptions: {
     userscript: string;
-    mode: `serve` | `build` | `meta`;
+    mode: FormatMode;
   }) => IPromise<string>;
 }
 

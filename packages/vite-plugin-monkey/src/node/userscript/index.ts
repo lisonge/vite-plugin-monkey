@@ -1,6 +1,6 @@
 import { grantNames, type GrantType } from '../gm_api';
 import type { FinalMonkeyOption, IArray, LocaleType } from '../types';
-import type { Format } from './common';
+import type { Format, FormatMode } from './common';
 import type { GreasemonkeyUserScript, GreaseRunAt } from './greasemonkey';
 import type {
   AntifeatureType,
@@ -185,7 +185,8 @@ export const finalMonkeyOptionToComment = async (
     collectResource,
   }: FinalMonkeyOption,
   collectGrantSet: Set<string>,
-  mode: `serve` | `build` | `meta`,
+  mode: FormatMode,
+  filePath?: string | undefined,
 ): Promise<string> => {
   let attrList: [string, ...string[]][] = [];
   const {
@@ -298,6 +299,10 @@ export const finalMonkeyOptionToComment = async (
     attrList.push(['require', s]);
   });
 
+  if (mode === 'meta-local') {
+    attrList.push(['require', 'file:///' + filePath]);
+  }
+
   Object.entries({ ...resource, ...collectResource }).forEach(([k, v]) => {
     attrList.push(['resource', k, v]);
   });
@@ -370,6 +375,7 @@ export const finalMonkeyOptionToComment = async (
     );
 
     // format all
+    // 格式化key和value之间的空格
     const maxLen = Math.max(...attrList.map((s) => s[0].length));
     attrList.forEach((s) => {
       s[0] = s[0].padEnd(alignN + maxLen);

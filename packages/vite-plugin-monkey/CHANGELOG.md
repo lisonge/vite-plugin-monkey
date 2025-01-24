@@ -1,5 +1,5 @@
-# v5.0.5
+# v5.0.6
 
 ## What's Changed
 
-- fix: auto grant not work for monkeyWindow.xxx (#206)
+- fix: GM_addElement attributes type error (#209)

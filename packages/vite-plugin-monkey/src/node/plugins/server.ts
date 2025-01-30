@@ -4,7 +4,12 @@ import path from 'node:path';
 import { Plugin, ResolvedConfig, normalizePath } from 'vite';
 import { logger } from '../_logger';
 import { cyrb53hash, existFile, isFirstBoot, toValidURL } from '../_util';
-import { fn2string, mountGmApiFn, serverInjectFn } from '../inject_template';
+import {
+  fn2string,
+  mountGmApiFn,
+  serverInjectFn,
+  serverInjectGMApiFn,
+} from '../inject_template';
 import { openBrowser } from '../open_browser';
 import type { FinalMonkeyOption } from '../types';
 import { gmIdentifiers } from '../gm_api';
@@ -94,13 +99,15 @@ export const serverPlugin = (finalOption: FinalMonkeyOption): Plugin => {
             }
             Reflect.set(globalThis, restartStoreKey, origin);
             const u = new URL(entryPath, origin);
+            const metadata = await finalMonkeyOptionToComment(
+              finalOption,
+              new Set(),
+              'serve',
+            );
             res.end(
               [
-                await finalMonkeyOptionToComment(
-                  finalOption,
-                  new Set(),
-                  'serve',
-                ),
+                metadata,
+                serverInjectGMApiFn(u.href, metadata),
                 fn2string(serverInjectFn, {
                   entrySrc: u.href,
                 }),

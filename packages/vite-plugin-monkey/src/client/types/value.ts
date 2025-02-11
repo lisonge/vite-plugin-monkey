@@ -7,13 +7,25 @@ export interface GmAsyncGetValueType {
 }
 
 export interface GmGetValuesType {
-  (keys: string[]): any[];
-  (keyValues: Record<string, any>): any[];
+  <T extends Record<string, any>>(): T;
+  /**
+   * @example
+   * const values1 = GM_getValues(['key1', 'key2']); // { key1: any; key2: any }
+   * const values2 = GM_getValues<{ key1: string; key2: number }>(['key1', 'key2']);
+   */
+  <T extends Record<string, any>>(keys: (keyof T)[]): T;
+  <T extends Record<string, any>>(keyValues: T): T;
 }
 
 export interface GmAsyncGetValuesType {
-  (keys: string[]): Promise<any[]>;
-  (keyValues: Record<string, any>): Promise<any[]>;
+  <T extends Record<string, any>>(): Promise<T>;
+  /**
+   * @example
+   * const values1 = await GM.getValues(['key1', 'key2']); // { key1: any; key2: any }
+   * const values2 = await GM.getValues<{ key1: string; key2: number }>(['key1', 'key2']);
+   */
+  <T extends Record<string, any>>(keys: (keyof T)[]): Promise<T>;
+  <T extends Record<string, any>>(keyValues: T): Promise<T>;
 }
 
 export interface GmSetValueType {

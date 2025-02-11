@@ -1,5 +1,5 @@
-# v5.0.6
+# v5.0.7
 
 ## What's Changed
 
-- fix: GM_addElement attributes type error (#209)
+- fix: GM getValues type (#211)

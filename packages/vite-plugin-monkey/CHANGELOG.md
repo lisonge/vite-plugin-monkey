@@ -1,5 +1,6 @@
-# v5.0.7
+# v5.0.8
 
 ## What's Changed
 
-- fix: GM getValues type (#211)
+- fix: GmCookie type
+- fix: GmValueListenerId type

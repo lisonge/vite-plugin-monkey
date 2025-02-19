@@ -68,6 +68,12 @@ export interface GmAsyncDeleteValuesType {
   (keys: string[]): Promise<void>;
 }
 
+/**
+ * - tampermonkey -> number
+ * - violentmonkey -> string
+ */
+export type GmValueListenerId = string | number;
+
 export interface GmAddValueChangeListenerType {
   <T = any>(
     name: string,
@@ -77,7 +83,7 @@ export interface GmAddValueChangeListenerType {
       newValue?: T,
       remote?: boolean,
     ) => void,
-  ): string;
+  ): GmValueListenerId;
 }
 export interface GmAsyncAddValueChangeListenerType {
   <T = any>(
@@ -88,12 +94,12 @@ export interface GmAsyncAddValueChangeListenerType {
       newValue?: T,
       remote?: boolean,
     ) => void,
-  ): string | number | Promise<string | number>;
+  ): GmValueListenerId | Promise<GmValueListenerId>;
 }
 
 export interface GmRemoveValueChangeListenerType {
-  (listenerId: string | number): void;
+  (listenerId: GmValueListenerId): void;
 }
 export interface GmAsyncRemoveValueChangeListenerType {
-  (listenerId: string | number): void;
+  (listenerId: GmValueListenerId): void;
 }

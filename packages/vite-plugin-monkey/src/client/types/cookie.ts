@@ -4,6 +4,7 @@ interface GmPartitionKeyType {
 
 interface GmCallbackCookie {
   domain: string;
+  expirationDate?: number;
   firstPartyDomain?: string;
   partitionKey?: GmPartitionKeyType;
   hostOnly: boolean;
@@ -26,8 +27,8 @@ interface GmCookieListOptions {
 
 interface GmCookieSetOptions {
   url?: string;
-  name?: string;
-  value?: string;
+  name: string;
+  value: string;
   domain?: string;
   firstPartyDomain?: string;
   partitionKey?: GmPartitionKeyType;
@@ -39,7 +40,7 @@ interface GmCookieSetOptions {
 
 interface GmCookieDeleteOptions {
   url?: string;
-  name?: string;
+  name: string;
   firstPartyDomain?: string;
   partitionKey?: GmPartitionKeyType;
 }
@@ -58,7 +59,8 @@ export interface GmCookieType {
 }
 
 export interface GmAsyncCookieType {
+  list(): Promise<GmCallbackCookie[]>;
   list(details: GmCookieListOptions): Promise<GmCallbackCookie[]>;
   set(details: GmCookieSetOptions): Promise<void>;
-  delete(details: { name?: string; url?: string }): Promise<void>;
+  delete(details: GmCookieDeleteOptions): Promise<void>;
 }

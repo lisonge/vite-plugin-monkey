@@ -70,28 +70,35 @@ export const finalBundlePlugin = (finalOption: FinalMonkeyOption): Plugin => {
 
         // https://stackoverflow.com/questions/52086611/regex-for-matching-js-import-statements
         const importRegex =
-          /import(\s*(?:[^\s{}]+\s*,?)?(?:\s*\{(?:\s*[^\s"'{}]+\s*,?)+\})?\s*)from\s*(['"])([^'"\n]+)(?:['"])/g;
+          /import(\s*(?:[^\n;{}]+\s*,?)?(?:\s*\{(?:\s*[^\s"'{}]+\s*,?)+\})?\s*)from\s*(['"])([^'"\n]+)(?:['"])/g;
         const result = code.replace(
           importRegex,
           (match, imports: string, _quote, pkg: string) => {
             if (modulesRegex.test(pkg)) {
-              const hasDefaultImport = !imports.trim().startsWith('{');
-              const hasNamedImports = imports.includes('{');
+              const namedImports = [...imports.matchAll(/\{([^}]*)\}/g)]
+                .flatMap((m) => m[1].trim().split(','))
+                .map((s) => s.trim().replace(/\sas\s/, ':'))
+                .filter((s) => s);
+              const nonNamedImports = imports
+                .replace(/\{[^{}]*\}/g, '')
+                .trim()
+                .split(',')
+                .map((s) => s.trim())
+                .filter((s) => s);
 
               const url = modulesList[pkg];
               let res = '';
 
-              if (hasDefaultImport) {
-                const defaultImport = imports.trim().split(',')[0];
-                res += `const ${defaultImport} = await import("${url}").then(m => m.default);\n`;
+              if (namedImports.length > 0) {
+                res += `const {${namedImports.join(',')}} = await import("${url}");`;
               }
 
-              if (hasNamedImports) {
-                const namedImports = imports
-                  .trim()
-                  .split(',')[1]
-                  .replaceAll('as', ':');
-                res += `const ${namedImports} = await import("${url}");\n`;
+              for (const currentImport of nonNamedImports) {
+                if (currentImport.match(/\sas\s/)) {
+                  res += `const ${currentImport.split(/\sas\s/)[1].trim()} = await import("${url}");`;
+                } else {
+                  res += `const ${currentImport} = await import("${url}").then((m) => m.default);`;
+                }
               }
 
               return res;

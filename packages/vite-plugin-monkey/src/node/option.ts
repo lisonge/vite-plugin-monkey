@@ -116,6 +116,14 @@ export const resolvedOption = (
     Object.entries(externalGlobals2).forEach((s) => externalGlobals.push(s));
   }
 
+  const userExternalModules = build?.externalModules ?? {};
+  const externalModules: [string, string | Mod2UrlFn][] = [];
+  if (userExternalModules instanceof Array) {
+    userExternalModules.forEach((s) => externalModules.push(s));
+  } else {
+    Object.entries(userExternalModules).forEach((s) => externalModules.push(s));
+  }
+
   const { grant = [], $extra = [] } = pluginOption.userscript ?? {};
   let {
     name = {},
@@ -300,9 +308,11 @@ export const resolvedOption = (
       fileName,
       metaFileName: metaFileFc ? () => metaFileFc(fileName) : undefined,
       autoGrant: build.autoGrant ?? true,
-      externalGlobals: externalGlobals,
+      externalGlobals,
+      externalModules,
       externalResource: externalResource2,
     },
+    importsList: {},
     collectRequireUrls: [],
     collectResource: {},
     globalsPkg2VarName: {},

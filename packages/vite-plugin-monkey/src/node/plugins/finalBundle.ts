@@ -75,29 +75,26 @@ export const finalBundlePlugin = (finalOption: FinalMonkeyOption): Plugin => {
           importRegex,
           (match, imports: string, _quote, pkg: string) => {
             if (modulesRegex.test(pkg)) {
-              const isDefaultImport = !imports.includes('{');
-              const hasDefaultImportAlongNamedImports =
-                imports.includes('{') && !imports.trim().startsWith('{');
+              const hasDefaultImport = !imports.trim().startsWith('{');
+              const hasNamedImports = imports.includes('{');
 
               const url = modulesList[pkg];
+              let res = '';
 
-              if (isDefaultImport) {
-                return `const ${imports} = await import("${url}").then(m => m.default);\n`;
+              if (hasDefaultImport) {
+                const defaultImport = imports.trim().split(',')[0];
+                res += `const ${defaultImport} = await import("${url}").then(m => m.default);\n`;
               }
 
-              if (hasDefaultImportAlongNamedImports) {
-                const defaultImport = imports.trim().split(',')[0];
+              if (hasNamedImports) {
                 const namedImports = imports
                   .trim()
                   .split(',')[1]
                   .replaceAll('as', ':');
-                return (
-                  `const ${defaultImport} = await import("${url}").then(m => m.default);\n` +
-                  `const ${namedImports} = ${defaultImport};\n`
-                );
+                res += `const ${namedImports} = await import("${url}");\n`;
               }
 
-              return `const ${imports.replaceAll('as', ':')} = await import("${url}");\n`;
+              return res;
             }
             return match;
           },

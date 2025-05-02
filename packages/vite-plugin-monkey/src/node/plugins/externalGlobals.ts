@@ -53,7 +53,10 @@ export const externalGlobalsPlugin = (
         build: {
           rollupOptions: {
             external(source, _importer, _isResolved) {
-              return source in globalsPkg2VarName;
+              return (
+                source in finalOption.globalsPkg2VarName ||
+                source in finalOption.importsList
+              );
             },
             // output: {
             //   globals: globalsPkg2VarName,

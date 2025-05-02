@@ -58,6 +58,10 @@ export type ExternalGlobals =
   | Record<string, IArray<string | Mod2UrlFn>>
   | [string, IArray<string | Mod2UrlFn>][];
 
+export type ExternalModules =
+  | Record<string, string | Mod2UrlFn>
+  | [string, string | Mod2UrlFn][];
+
 export type ExternalResource = Record<
   string,
   | string
@@ -103,6 +107,7 @@ export interface FinalMonkeyOption {
     metaFileName?: () => string;
     autoGrant: boolean;
     externalGlobals: [string, IArray<string | Mod2UrlFn>][];
+    externalModules: [string, string | Mod2UrlFn][];
     externalResource: Record<
       string,
       {
@@ -114,6 +119,7 @@ export interface FinalMonkeyOption {
     >;
   };
   collectRequireUrls: string[];
+  importsList: Record<string, string>;
   collectResource: Record<string, string>;
   globalsPkg2VarName: Record<string, string>;
   requirePkgList: { moduleName: string; url: string }[];
@@ -242,6 +248,13 @@ export interface MonkeyOption {
      * ]
      */
     externalGlobals?: ExternalGlobals;
+
+    /**
+     * same as `externalGlobals`, but the imports will be treated as modules
+     *
+     * @see https://github.com/lisonge/vite-plugin-monkey/issues/180
+     */
+    externalModules?: ExternalModules;
 
     /**
      * according to final code bundle, auto inject GM_* or GM.* to userscript comment grant

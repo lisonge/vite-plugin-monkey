@@ -61,6 +61,55 @@ export const finalBundlePlugin = (finalOption: FinalMonkeyOption): Plugin => {
 
       const tlaIdentifier = lazyValue(() => findSafeTlaIdentifier(rawBundle));
 
+      const transformImports = (code: string) => {
+        const modulesList = finalOption.importsList;
+        const modules = Object.keys(modulesList);
+        const modulesRegex = new RegExp(`^(${modules.join('|')})(/|$)`);
+
+        if (!modules.length) return code;
+
+        // https://stackoverflow.com/questions/52086611/regex-for-matching-js-import-statements
+        const importRegex =
+          /import(\s*(?:[^\n;{}]+\s*,?)?(?:\s*\{(?:\s*[^\s"'{}]+\s*,?)+\})?\s*)from\s*(['"])([^'"\n]+)(?:['"])/g;
+        const result = code.replace(
+          importRegex,
+          (match, imports: string, _quote, pkg: string) => {
+            if (modulesRegex.test(pkg)) {
+              const namedImports = [...imports.matchAll(/\{([^}]*)\}/g)]
+                .flatMap((m) => m[1].trim().split(','))
+                .map((s) => s.trim().replace(/\sas\s/, ':'))
+                .filter((s) => s);
+              const nonNamedImports = imports
+                .replace(/\{[^{}]*\}/g, '')
+                .trim()
+                .split(',')
+                .map((s) => s.trim())
+                .filter((s) => s);
+
+              const url = modulesList[pkg];
+              let res = '';
+
+              if (namedImports.length > 0) {
+                res += `const {${namedImports.join(',')}} = await import("${url}");`;
+              }
+
+              for (const currentImport of nonNamedImports) {
+                if (currentImport.match(/\sas\s/)) {
+                  res += `const ${currentImport.split(/\sas\s/)[1].trim()} = await import("${url}");`;
+                } else {
+                  res += `const ${currentImport} = await import("${url}").then((m) => m.default);`;
+                }
+              }
+
+              return res;
+            }
+            return match;
+          },
+        );
+
+        return result;
+      };
+
       const buildResult = (await build({
         logLevel: 'error',
         configFile: false,
@@ -95,6 +144,7 @@ export const finalBundlePlugin = (finalOption: FinalMonkeyOption): Plugin => {
                 ) ?? [];
               if (chunk && chunk.type == 'chunk' && k) {
                 usedModules.add(k);
+                chunk.code = transformImports(chunk.code);
                 if (!hasDynamicImport) {
                   const ch = transformTlaToIdentifier(
                     this,
@@ -125,7 +175,10 @@ export const finalBundlePlugin = (finalOption: FinalMonkeyOption): Plugin => {
           target: 'esnext',
           rollupOptions: {
             external(source) {
-              return source in finalOption.globalsPkg2VarName;
+              return (
+                source in finalOption.globalsPkg2VarName ||
+                source in finalOption.importsList
+              );
             },
             output: {
               globals: finalOption.globalsPkg2VarName,

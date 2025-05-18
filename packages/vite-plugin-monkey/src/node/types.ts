@@ -112,6 +112,7 @@ export interface FinalMonkeyOption {
         nodeLoader?: (pkgOptions: PkgOptions) => IPromise<string>;
       }
     >;
+    preamble: string;
   };
   collectRequireUrls: string[];
   collectResource: Record<string, string>;
@@ -331,5 +332,12 @@ export interface MonkeyOption {
     cssSideEffects?: (
       css: string,
     ) => IPromise<string | ((css: string) => void)>;
+
+    /**
+     * A preamble that will be put immediately after the userscript header.
+     *
+     * @default ''
+     */
+    preamble?: string;
   };
 }

@@ -231,7 +231,12 @@ export const finalBundlePlugin = (finalOption: FinalMonkeyOption): Plugin => {
         'build',
       );
 
-      const mergedCode = [comment, injectCssCode, finalJsCode]
+      const mergedCode = [
+        comment,
+        finalOption.build.preamble,
+        injectCssCode,
+        finalJsCode,
+      ]
         .filter((s) => s)
         .join(`\n\n`)
         .trimEnd();

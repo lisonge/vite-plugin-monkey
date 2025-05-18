@@ -61,6 +61,7 @@ export default (pluginOption: MonkeyOption): Plugin[] => {
             input: finalPluginOption.entry,
           },
           sourcemap: false,
+          preamble: finalPluginOption.build.preamble,
 
           // TODO
           // sourcemap: sourcemap,

@@ -302,6 +302,7 @@ export const resolvedOption = (
       autoGrant: build.autoGrant ?? true,
       externalGlobals: externalGlobals,
       externalResource: externalResource2,
+      preamble: build.preamble ?? '',
     },
     collectRequireUrls: [],
     collectResource: {},

@@ -40,7 +40,7 @@ interface RawPackageJson {
 }
 interface PackageJson {
   name: string;
-  version: string;
+  version?: string;
   description?: string;
   license?: string;
   author?: string;
@@ -61,7 +61,6 @@ export const projectPkg = (() => {
 
   const target: PackageJson = {
     name: 'monkey',
-    version: '1.0.0',
   };
   Object.entries(rawTarget).forEach(([k, v]) => {
     if (typeof v == 'string') {

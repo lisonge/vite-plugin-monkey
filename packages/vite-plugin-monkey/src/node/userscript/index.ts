@@ -55,13 +55,10 @@ interface MergemonkeyUserScript {
    */
   name?: string | LocaleType<string>;
 
-  /**
-   * @default 'vite-plugin-monkey'
-   */
   namespace?: string;
 
   /**
-   * @default package.json.version??'1.0.0'
+   * @default package.json.version
    */
   version?: string;
 
@@ -72,7 +69,7 @@ interface MergemonkeyUserScript {
   description?: string | LocaleType<string>;
 
   /**
-   * @default package.json.author??'monkey'
+   * @default package.json.author
    */
   author?: string;
 
@@ -130,17 +127,16 @@ interface MergemonkeyUserScript {
 /**
  * UserScript, merge metadata from Greasemonkey, Tampermonkey, Violentmonkey, Greasyfork
  */
-export interface MonkeyUserScript
-  extends GreasemonkeyUserScript,
-    TampermonkeyUserScript,
-    ViolentmonkeyUserScript,
-    GreasyforkUserScript,
-    MergemonkeyUserScript {}
+export type MonkeyUserScript = GreasemonkeyUserScript &
+  TampermonkeyUserScript &
+  ViolentmonkeyUserScript &
+  GreasyforkUserScript &
+  MergemonkeyUserScript;
 
 export interface FinalUserScript extends GreasyforkUserScript {
   name: LocaleType<string>;
-  namespace: string;
-  version: string;
+  namespace?: string;
+  version?: string;
   description: LocaleType<string>;
   icon?: string;
   include: string[];
@@ -152,7 +148,7 @@ export interface FinalUserScript extends GreasyforkUserScript {
   unwrap: boolean;
   webRequest: string[];
 
-  author: string;
+  author?: string;
   copyright?: string;
   homepage?: string;
   homepageURL?: string;

@@ -1,6 +1,6 @@
 import { grantNames, type GrantType } from '../gm_api';
 import type { FinalMonkeyOption, IArray, LocaleType } from '../types';
-import type { Format } from './common';
+import type { Format, FormatMode } from './common';
 import type { GreasemonkeyUserScript, GreaseRunAt } from './greasemonkey';
 import type {
   AntifeatureType,
@@ -55,13 +55,10 @@ interface MergemonkeyUserScript {
    */
   name?: string | LocaleType<string>;
 
-  /**
-   * @default 'vite-plugin-monkey'
-   */
   namespace?: string;
 
   /**
-   * @default package.json.version??'1.0.0'
+   * @default package.json.version
    */
   version?: string;
 
@@ -72,7 +69,7 @@ interface MergemonkeyUserScript {
   description?: string | LocaleType<string>;
 
   /**
-   * @default package.json.author??'monkey'
+   * @default package.json.author
    */
   author?: string;
 
@@ -130,17 +127,16 @@ interface MergemonkeyUserScript {
 /**
  * UserScript, merge metadata from Greasemonkey, Tampermonkey, Violentmonkey, Greasyfork
  */
-export interface MonkeyUserScript
-  extends GreasemonkeyUserScript,
-    TampermonkeyUserScript,
-    ViolentmonkeyUserScript,
-    GreasyforkUserScript,
-    MergemonkeyUserScript {}
+export type MonkeyUserScript = GreasemonkeyUserScript &
+  TampermonkeyUserScript &
+  ViolentmonkeyUserScript &
+  GreasyforkUserScript &
+  MergemonkeyUserScript;
 
 export interface FinalUserScript extends GreasyforkUserScript {
   name: LocaleType<string>;
-  namespace: string;
-  version: string;
+  namespace?: string;
+  version?: string;
   description: LocaleType<string>;
   icon?: string;
   include: string[];
@@ -152,7 +148,7 @@ export interface FinalUserScript extends GreasyforkUserScript {
   unwrap: boolean;
   webRequest: string[];
 
-  author: string;
+  author?: string;
   copyright?: string;
   homepage?: string;
   homepageURL?: string;
@@ -185,7 +181,8 @@ export const finalMonkeyOptionToComment = async (
     collectResource,
   }: FinalMonkeyOption,
   collectGrantSet: Set<string>,
-  mode: `serve` | `build` | `meta`,
+  mode: FormatMode,
+  filePath?: string | undefined,
 ): Promise<string> => {
   let attrList: [string, ...string[]][] = [];
   const {
@@ -298,6 +295,10 @@ export const finalMonkeyOptionToComment = async (
     attrList.push(['require', s]);
   });
 
+  if (mode === 'meta-local') {
+    attrList.push(['require', 'file:///' + filePath]);
+  }
+
   Object.entries({ ...resource, ...collectResource }).forEach(([k, v]) => {
     attrList.push(['resource', k, v]);
   });
@@ -370,6 +371,7 @@ export const finalMonkeyOptionToComment = async (
     );
 
     // format all
+    // 格式化key和value之间的空格
     const maxLen = Math.max(...attrList.map((s) => s[0].length));
     attrList.forEach((s) => {
       s[0] = s[0].padEnd(alignN + maxLen);

@@ -85,7 +85,7 @@ graph LR;
 
 ## 配置
 
-[MonkeyOption](/packages/vite-plugin-monkey/src/node/types.ts#L120)
+[MonkeyOption](/packages/vite-plugin-monkey/src/node/userscript/index.ts#L130)
 
 <details open>
   <summary>MonkeyOption Type</summary>
@@ -575,7 +575,3 @@ export default defineConfig([
   },
 ]);
 ```
-
-## 贡献
-
-请提交你的修改到 [dev](https://github.com/lisonge/vite-plugin-monkey/tree/dev) 分支

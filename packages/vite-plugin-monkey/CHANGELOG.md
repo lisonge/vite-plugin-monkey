@@ -1,6 +1,5 @@
-# v5.0.8
+# v5.0.9
 
 ## What's Changed
 
-- fix: GmCookie type
-- fix: GmValueListenerId type
+- fix: rmove the default value namespace, version and author (#230)

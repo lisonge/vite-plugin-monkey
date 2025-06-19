@@ -85,9 +85,7 @@ graph LR;
 
 ## Config
 
-<!-- template-start-MonkeyOption -->
-
-[MonkeyOption](/packages/vite-plugin-monkey/src/node/types.ts#L120)
+[MonkeyOption](/packages/vite-plugin-monkey/src/node/userscript/index.ts#L130)
 
 <details open>
   <summary>MonkeyOption Type</summary>
@@ -308,8 +306,6 @@ export type MonkeyOption = {
 ```
 
 </details>
-
-<!-- template-end-MonkeyOption -->
 
 ## CDN util for external
 
@@ -591,7 +587,3 @@ export default defineConfig([
   },
 ]);
 ```
-
-## Contribution
-
-please commit your changes to [dev](https://github.com/lisonge/vite-plugin-monkey/tree/dev) branch

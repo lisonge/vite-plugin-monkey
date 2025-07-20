@@ -1,5 +1,5 @@
 import type { GmWebRequestRule } from '../../client/types/webRequest';
-import type { IArray, LocaleType } from '../types';
+import type { IArray, LocaleType } from '../utils/types';
 
 export type TamperRunAt =
   | 'document-start'

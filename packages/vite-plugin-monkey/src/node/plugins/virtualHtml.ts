@@ -1,11 +1,8 @@
 import type { Plugin } from 'vite';
-import { virtualHtmlTemplate, fcToHtml } from '../inject_template';
-import type { FinalMonkeyOption } from '../types';
+import { virtualHtmlTemplate, fcToHtml } from '../utils/template';
 import { installUserPath } from './server';
 
-// https://github.com/vitejs/vite/blob/2401253b9aa487c50edb5ec571d5ba7adc949e27/packages/vite/src/node/server/middlewares/indexHtml.ts#L275
-
-export const virtualHtmlPlugin = (_: FinalMonkeyOption): Plugin => {
+export const virtualHtmlFactory = (): Plugin => {
   return {
     name: 'monkey:virtualHtml',
     apply: 'serve',

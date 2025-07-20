@@ -1,3 +1,9 @@
 packages:
-  - 'packages/*'
-  - 'playground/*'
+  - packages/*
+  - playground/*
+
+onlyBuiltDependencies:
+  - core-js
+  - esbuild
+  - simple-git-hooks
+  - vue-demi

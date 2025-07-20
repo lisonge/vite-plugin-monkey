@@ -1,40 +1,39 @@
-import { Plugin, transformWithEsbuild } from 'vite';
-import type { FinalMonkeyOption } from '../types';
+import type { Plugin } from 'vite';
+import { miniCode } from '../utils/others';
 
-const cssLoader = (resourceName: string) => {
+const cssLoader = (name: string) => {
   // @ts-ignore
-  const css = GM_getResourceText(resourceName);
+  const css = GM_getResourceText(name);
   // @ts-ignore
   GM_addStyle(css);
   return css;
 };
 
-const jsonLoader = (resourceName: string): unknown =>
+const jsonLoader = (name: string): unknown =>
   // @ts-ignore
-  JSON.parse(GM_getResourceText(resourceName));
+  JSON.parse(GM_getResourceText(name));
 
-const urlLoader = (resourceName: string, mediaType: string) =>
+const urlLoader = (name: string, type: string) =>
   // @ts-ignore
-  GM_getResourceURL(resourceName, false).replace(
+  GM_getResourceURL(name, false).replace(
     /^data:application;base64,/,
-    `data:${mediaType};base64,`,
+    `data:${type};base64,`,
   );
 
-const rawLoader = (resourceName: string) =>
+const rawLoader = (name: string) =>
   // @ts-ignore
-  GM_getResourceText(resourceName);
+  GM_getResourceText(name);
 
-const moduleSourceCode = [
+const loaderCode = [
   `export const cssLoader = ${cssLoader}`,
   `export const jsonLoader = ${jsonLoader}`,
   `export const urlLoader = ${urlLoader}`,
   `export const rawLoader = ${rawLoader}`,
 ].join(';');
 
-export const externalLoaderPlugin = (_: FinalMonkeyOption): Plugin => {
+export const externalLoaderFactory = (): Plugin => {
   return {
     name: 'monkey:externalLoader',
-    enforce: 'pre',
     apply: 'build',
     async resolveId(id) {
       if (id == 'virtual:plugin-monkey-loader') {
@@ -43,15 +42,7 @@ export const externalLoaderPlugin = (_: FinalMonkeyOption): Plugin => {
     },
     async load(id) {
       if (id == '\0virtual:plugin-monkey-loader') {
-        return transformWithEsbuild(
-          moduleSourceCode,
-          '/virtual/plugin-monkey-loader/index.js',
-          {
-            minify: true,
-            sourcemap: true,
-            legalComments: 'none',
-          },
-        );
+        return miniCode(loaderCode, 'js');
       }
     },
   };

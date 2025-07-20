@@ -1,33 +1,39 @@
 import type { OutputChunk, RollupOutput } from 'rollup';
-import { Plugin, ResolvedConfig, build } from 'vite';
-import { lazyValue } from '../_lazy';
+import type { Plugin, ResolvedConfig } from 'vite';
+import { build } from 'vite';
+import { finalMonkeyOptionToComment } from '../userscript';
+import { collectGrant } from '../utils/grant';
 import {
-  collectGrant,
   getInjectCssCode,
   moduleExportExpressionWrapper,
-} from '../_util';
-import { getSystemjsRequireUrls, systemjsTexts } from '../systemjs';
+} from '../utils/others';
+import { getSystemjsRequireUrls, getSystemjsTexts } from '../utils/systemjs';
 import {
-  findSafeTlaIdentifier,
+  getSafeTlaIdentifier,
   transformIdentifierToTla,
   transformTlaToIdentifier,
-} from '../topLevelAwait';
-import type { FinalMonkeyOption } from '../types';
-import { finalMonkeyOptionToComment } from '../userscript';
+} from '../utils/topLevelAwait';
+import type { ResolvedMonkeyOption } from '../utils/types';
 
 const __entry_name = `__monkey.entry.js`;
 
-// https://github.com/vitejs/vite/blob/1df2cfcbebd95a139da7dc30aad487c81b153b45/packages/plugin-legacy/src/index.ts#L718
+// https://github.com/vitejs/vite/blob/main/packages/plugin-legacy/src/index.ts
 const polyfillId = '\0vite/legacy-polyfills';
 
 const systemJsImportMapPrefix = `user`;
 
-export const finalBundlePlugin = (finalOption: FinalMonkeyOption): Plugin => {
+export const buildBundleFactory = (
+  getOption: () => Promise<ResolvedMonkeyOption>,
+): Plugin => {
+  let option: ResolvedMonkeyOption;
   let viteConfig: ResolvedConfig;
   return {
-    name: 'monkey:finalBundle',
+    name: 'monkey:buildBundle',
     apply: 'build',
     enforce: 'post',
+    async config() {
+      option = await getOption();
+    },
     async configResolved(resolvedConfig) {
       viteConfig = resolvedConfig;
     },
@@ -59,7 +65,7 @@ export const finalBundlePlugin = (finalOption: FinalMonkeyOption): Plugin => {
 
       const usedModules = new Set<string>();
 
-      const tlaIdentifier = lazyValue(() => findSafeTlaIdentifier(rawBundle));
+      const tlaIdentifier = getSafeTlaIdentifier(rawBundle);
 
       const buildResult = (await build({
         logLevel: 'error',
@@ -67,7 +73,7 @@ export const finalBundlePlugin = (finalOption: FinalMonkeyOption): Plugin => {
         esbuild: false,
         plugins: [
           {
-            name: 'mokey:mock',
+            name: 'monkey:mock',
             enforce: 'pre',
             resolveId(source, importer, options) {
               if (!importer && options.isEntry) {
@@ -99,7 +105,7 @@ export const finalBundlePlugin = (finalOption: FinalMonkeyOption): Plugin => {
                   const ch = transformTlaToIdentifier(
                     this,
                     chunk,
-                    tlaIdentifier.value,
+                    tlaIdentifier,
                   );
                   if (ch) return ch;
                 }
@@ -114,7 +120,7 @@ export const finalBundlePlugin = (finalOption: FinalMonkeyOption): Plugin => {
                 return;
               }
               Object.entries(iifeBundle).forEach(([_, chunk]) => {
-                transformIdentifierToTla(this, chunk, tlaIdentifier.value);
+                transformIdentifierToTla(this, chunk, tlaIdentifier);
               });
             },
           },
@@ -125,10 +131,10 @@ export const finalBundlePlugin = (finalOption: FinalMonkeyOption): Plugin => {
           target: 'esnext',
           rollupOptions: {
             external(source) {
-              return source in finalOption.globalsPkg2VarName;
+              return source in option.globalsPkg2VarName;
             },
             output: {
-              globals: finalOption.globalsPkg2VarName,
+              globals: option.globalsPkg2VarName,
             },
           },
           lib: {
@@ -166,7 +172,7 @@ export const finalBundlePlugin = (finalOption: FinalMonkeyOption): Plugin => {
         systemJsModules.push(`System.import(${entryName}, "./");`);
         finalJsCode = systemJsModules.join('\n');
         const usedModuleIds = Array.from(this.getModuleIds()).filter(
-          (d) => d in finalOption.globalsPkg2VarName,
+          (d) => d in option.globalsPkg2VarName,
         );
         // {vue:'xxx:vue'}
         const importsMap = usedModuleIds.reduce(
@@ -186,7 +192,7 @@ export const finalBundlePlugin = (finalOption: FinalMonkeyOption): Plugin => {
               `System.set(${JSON.stringify(
                 `${systemJsImportMapPrefix}:${id}`,
               )}, ${moduleExportExpressionWrapper(
-                finalOption.globalsPkg2VarName[id],
+                option.globalsPkg2VarName[id],
               )});`,
           ),
           '\n' + finalJsCode,
@@ -194,13 +200,13 @@ export const finalBundlePlugin = (finalOption: FinalMonkeyOption): Plugin => {
           .filter((s) => s)
           .join('\n');
 
-        if (typeof finalOption.systemjs == 'function') {
-          finalOption.collectRequireUrls.push(
-            ...getSystemjsRequireUrls(finalOption.systemjs),
+        if (typeof option.systemjs == 'function') {
+          option.collectRequireUrls.push(
+            ...getSystemjsRequireUrls(option.systemjs),
           );
         } else {
           finalJsCode =
-            (await systemjsTexts.value).join('\n') + '\n' + finalJsCode;
+            (await getSystemjsTexts()).join('\n') + '\n' + finalJsCode;
         }
       } else {
         // use iife
@@ -211,10 +217,10 @@ export const finalBundlePlugin = (finalOption: FinalMonkeyOption): Plugin => {
         });
       }
 
-      const injectCssCode = await getInjectCssCode(finalOption, rawBundle);
+      const injectCssCode = await getInjectCssCode(option, rawBundle);
 
       let collectGrantSet: Set<string>;
-      if (finalOption.build.autoGrant) {
+      if (option.build.autoGrant) {
         collectGrantSet = collectGrant(
           this,
           chunks,
@@ -226,7 +232,7 @@ export const finalBundlePlugin = (finalOption: FinalMonkeyOption): Plugin => {
       }
 
       const comment = await finalMonkeyOptionToComment(
-        finalOption,
+        option,
         collectGrantSet,
         'build',
       );
@@ -236,22 +242,22 @@ export const finalBundlePlugin = (finalOption: FinalMonkeyOption): Plugin => {
         .join(`\n\n`)
         .trimEnd();
       if (fristEntryChunk) {
-        fristEntryChunk.fileName = finalOption.build.fileName;
+        fristEntryChunk.fileName = option.build.fileName;
         fristEntryChunk.code = mergedCode;
       } else {
         this.emitFile({
           type: 'asset',
-          fileName: finalOption.build.fileName,
+          fileName: option.build.fileName,
           source: mergedCode,
         });
       }
 
-      if (finalOption.build.metaFileName) {
+      if (option.build.metaFileName) {
         this.emitFile({
           type: 'asset',
-          fileName: finalOption.build.metaFileName(),
+          fileName: option.build.metaFileName(),
           source: await finalMonkeyOptionToComment(
-            finalOption,
+            option,
             collectGrantSet,
             'meta',
           ),

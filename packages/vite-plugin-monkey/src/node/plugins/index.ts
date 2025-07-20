@@ -1,31 +1,31 @@
-import { virtualHtmlPlugin } from './virtualHtml';
-import { fixViteAssetPlugin } from './fixViteAsset';
-import { fixViteClientPlugin } from './fixViteClient';
-import { serverPlugin } from './server';
-import { externalGlobalsPlugin } from './externalGlobals';
-import { externalLoaderPlugin } from './externalLoader';
+import { buildBundleFactory } from './buildBundle';
+import { configFactory } from './config';
+import { externalGlobalsFactory } from './externalGlobals';
+import { externalLoaderFactory } from './externalLoader';
 import { externalResourcePlugin } from './externalResource';
-import { finalBundlePlugin } from './finalBundle';
-import { perviewPlugin } from './perview';
-import { redirectClientPlugin } from './redirectClient';
+import { fixAssetUrlFactory } from './fixAssetUrl';
+import { fixClientFactory } from './fixClient';
+import { fixCssUrlFactory } from './fixCssUrl';
+import { perviewFactory } from './perview';
+import { redirectClientFactory } from './redirectClient';
+import { serverFactory } from './server';
+import { virtualHtmlFactory } from './virtualHtml';
 
-const monkeyPluginList = [
-  // only serve
-  virtualHtmlPlugin,
-  fixViteAssetPlugin,
-  fixViteClientPlugin,
-  serverPlugin,
+const factorys = [
+  configFactory,
 
-  // only build pre
-  redirectClientPlugin,
-  externalLoaderPlugin,
+  virtualHtmlFactory,
+  fixClientFactory,
+  fixAssetUrlFactory,
+  fixCssUrlFactory,
+  serverFactory,
+  perviewFactory,
+
+  redirectClientFactory,
+  externalGlobalsFactory,
+  externalLoaderFactory,
   externalResourcePlugin,
-  externalGlobalsPlugin,
-
-  // only build, final build
-  finalBundlePlugin,
-
-  // only preview
-  perviewPlugin,
+  buildBundleFactory,
 ];
-export default monkeyPluginList;
+
+export default factorys;

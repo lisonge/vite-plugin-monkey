@@ -1,4 +1,4 @@
-import type { ModuleToUrlFc } from './types';
+import type { ModuleToUrlFc } from './utils/types';
 
 /**
  * `https://cdn.jsdelivr.net/npm/${name}@${version}/${pathname}`
@@ -95,7 +95,7 @@ export const bootcdn = (
   pathname = '',
 ): [string, ModuleToUrlFc] => {
   console.warn(
-    'bootcdn will return virus-infected code. Please stop using it and switch to other sources. now it will return jsdelivr url.',
+    '[plugin-monkey] bootcdn will return virus-infected code. Please stop using it and switch to other sources. now it will return jsdelivr url.',
   );
   return [
     exportVarName,
@@ -133,7 +133,7 @@ export const staticfile = (
   pathname = '',
 ): [string, ModuleToUrlFc] => {
   console.warn(
-    'staticfile will return virus-infected code. Please stop using it and switch to other sources. now it will return jsdelivr url.',
+    '[plugin-monkey] staticfile will return virus-infected code. Please stop using it and switch to other sources. now it will return jsdelivr url.',
   );
   return [
     exportVarName,

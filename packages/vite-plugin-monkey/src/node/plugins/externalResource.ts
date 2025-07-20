@@ -1,28 +1,33 @@
-import { normalizePath, Plugin, ResolvedConfig } from 'vite';
-import type { FinalMonkeyOption, PkgOptions } from '../types';
-import { getModuleRealInfo, miniCode } from '../_util';
-import { lookup, mimes } from 'mrmime';
-import { URLSearchParams } from 'node:url';
+import { normalizePath } from 'vite';
+import { miniCode } from '../utils/others';
+import { getModuleRealInfo } from '../utils/pkg';
+import type { PkgOptions, ResolvedMonkeyOption } from '../utils/types';
+import type { Plugin, ResolvedConfig } from 'vite';
 
 const resourceImportPrefix = '\0monkey-resource-import:';
 
 export const externalResourcePlugin = (
-  finalOption: FinalMonkeyOption,
+  getOption: () => Promise<ResolvedMonkeyOption>,
 ): Plugin => {
+  let option: ResolvedMonkeyOption;
+  let viteConfig: ResolvedConfig;
+  let mrmime: typeof import('mrmime');
   const resourceRecord: Record<
     string,
     { resourceName: string; resourceUrl: string }
   > = {};
-  let viteConfig: ResolvedConfig;
   return {
     name: 'monkey:externalResource',
-    enforce: 'pre',
     apply: 'build',
+    async config() {
+      option = await getOption();
+      mrmime = await import('mrmime');
+    },
     configResolved(config) {
       viteConfig = config;
     },
     async resolveId(id) {
-      const { externalResource } = finalOption.build;
+      const { externalResource } = option.build;
       if (id in externalResource) {
         return resourceImportPrefix + id + '\0';
       }
@@ -44,7 +49,7 @@ export const externalResourcePlugin = (
     },
     async load(id) {
       if (id.startsWith(resourceImportPrefix) && id.endsWith('\0')) {
-        const { externalResource } = finalOption.build;
+        const { externalResource } = option.build;
         const importName = id.substring(
           resourceImportPrefix.length,
           id.length - 1,
@@ -104,7 +109,7 @@ export const externalResourcePlugin = (
         let moduleCode: string | undefined = undefined;
         const [resource, query] = importName.split('?', 2);
         const ext = resource.split('.').pop()!;
-        const mimeType = lookup(ext) ?? 'application/octet-stream';
+        const mimeType = mrmime.lookup(ext) ?? 'application/octet-stream';
         const suffixSet = new URLSearchParams(query);
         if (suffixSet.has('url') || suffixSet.has('inline')) {
           moduleCode = [
@@ -131,7 +136,7 @@ export const externalResourcePlugin = (
             `export default loader(...${JSON.stringify([resourceName])})`,
           ].join(';');
         } else if (viteConfig.assetsInclude(importName.split('?', 1)[0])) {
-          const mediaType = mimes[ext];
+          const mediaType = mrmime.mimes[ext];
           moduleCode = [
             `import {urlLoader as loader} from 'virtual:plugin-monkey-loader'`,
             `export default loader(...${JSON.stringify([
@@ -146,9 +151,9 @@ export const externalResourcePlugin = (
             moduleCode.includes('jsonLoader') ||
             moduleCode.includes('cssLoader')
           ) {
-            finalOption.userscript.grant.add('GM_getResourceText');
+            option.userscript.grant.add('GM_getResourceText');
           } else if (moduleCode.includes('urlLoader')) {
-            finalOption.userscript.grant.add('GM_getResourceURL');
+            option.userscript.grant.add('GM_getResourceURL');
           }
           return miniCode(moduleCode);
         }
@@ -175,7 +180,7 @@ export const externalResourcePlugin = (
           }
         },
       );
-      finalOption.collectResource = collectResource;
+      option.collectResource = collectResource;
     },
   };
 };

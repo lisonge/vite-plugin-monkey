@@ -1,26 +1,24 @@
-import { normalizePath, Plugin } from 'vite';
-import type { FinalMonkeyOption } from '../types';
-import { getModuleRealInfo } from '../_util';
+import { normalizePath } from 'vite';
+import type { ResolvedMonkeyOption } from '../utils/types';
+import { getModuleRealInfo } from '../utils/pkg';
+import type { Plugin } from 'vite';
 
-// const dynamicImportPrefix = '\0monkey-dynamic-import:';
-
-export const externalGlobalsPlugin = (
-  finalOption: FinalMonkeyOption,
+export const externalGlobalsFactory = (
+  getOption: () => Promise<ResolvedMonkeyOption>,
 ): Plugin => {
-  const { globalsPkg2VarName, requirePkgList } = finalOption;
+  let option: ResolvedMonkeyOption;
   return {
     name: 'monkey:externalGlobals',
     enforce: 'pre',
     apply: 'build',
     async config() {
-      for (const [moduleName, varName2LibUrl] of finalOption.build
-        .externalGlobals) {
+      option = await getOption();
+      for (const [moduleName, varName2LibUrl] of option.build.externalGlobals) {
         const { name, version } = await getModuleRealInfo(moduleName);
-
         if (typeof varName2LibUrl == 'string') {
-          globalsPkg2VarName[moduleName] = varName2LibUrl;
+          option.globalsPkg2VarName[moduleName] = varName2LibUrl;
         } else if (typeof varName2LibUrl == 'function') {
-          globalsPkg2VarName[moduleName] = await varName2LibUrl(
+          option.globalsPkg2VarName[moduleName] = await varName2LibUrl(
             version,
             name,
             moduleName,
@@ -28,9 +26,9 @@ export const externalGlobalsPlugin = (
         } else if (varName2LibUrl instanceof Array) {
           const [varName, ...libUrlList] = varName2LibUrl;
           if (typeof varName == 'string') {
-            globalsPkg2VarName[moduleName] = varName;
+            option.globalsPkg2VarName[moduleName] = varName;
           } else if (typeof varName == 'function') {
-            globalsPkg2VarName[moduleName] = await varName(
+            option.globalsPkg2VarName[moduleName] = await varName(
               version,
               name,
               moduleName,
@@ -39,9 +37,9 @@ export const externalGlobalsPlugin = (
           for (const libUrl of libUrlList) {
             // keep add order
             if (typeof libUrl == 'string') {
-              requirePkgList.push({ url: libUrl, moduleName });
+              option.requirePkgList.push({ url: libUrl, moduleName });
             } else if (typeof libUrl == 'function') {
-              requirePkgList.push({
+              option.requirePkgList.push({
                 url: await libUrl(version, name, moduleName),
                 moduleName,
               });
@@ -53,42 +51,17 @@ export const externalGlobalsPlugin = (
         build: {
           rollupOptions: {
             external(source, _importer, _isResolved) {
-              return source in globalsPkg2VarName;
+              return source in option.globalsPkg2VarName;
             },
-            // output: {
-            //   globals: globalsPkg2VarName,
-            //   inlineDynamicImports: true, // see https://rollupjs.org/guide/en/#outputinlinedynamicimports
-            // },
           },
         },
       };
     },
-
-    // async resolveDynamicImport(specifier, _importer) {
-    //   if (typeof specifier == 'string' && specifier in globalsPkg2VarName) {
-    //     return dynamicImportPrefix + specifier + '\0';
-    //   }
-    // },
-
-    // async load(id) {
-    //   if (id.startsWith(dynamicImportPrefix) && id.endsWith('\0')) {
-    //     const rawId = id.slice(dynamicImportPrefix.length, id.length - 1);
-    //     if (rawId in globalsPkg2VarName) {
-    //       return `export {default} from '${rawId}';export * from '${rawId}';`;
-    //     }
-    //   }
-    // },
-
     async generateBundle() {
       const usedModIdSet = new Set(
         Array.from(this.getModuleIds()).map((s) => normalizePath(s)),
       );
-      // Array.from(usedModIdSet).forEach((id) => {
-      //   if (id.startsWith(dynamicImportPrefix) && id.endsWith('\0')) {
-      //     usedModIdSet.add(id.slice(dynamicImportPrefix.length, id.length - 1));
-      //   }
-      // });
-      finalOption.collectRequireUrls = requirePkgList
+      option.collectRequireUrls = option.requirePkgList
         .filter((p) => usedModIdSet.has(p.moduleName))
         .map((p) => p.url);
     },

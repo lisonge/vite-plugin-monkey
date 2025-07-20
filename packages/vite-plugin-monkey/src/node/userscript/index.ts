@@ -1,6 +1,5 @@
-import { grantNames, type GrantType } from '../gm_api';
-import type { FinalMonkeyOption, IArray, LocaleType } from '../types';
-import type { Format } from './common';
+import { grantNames, type GrantType } from '../utils/gmApi';
+import type { ResolvedMonkeyOption, IArray, LocaleType } from '../utils/types';
 import type { GreasemonkeyUserScript, GreaseRunAt } from './greasemonkey';
 import type {
   AntifeatureType,
@@ -8,10 +7,9 @@ import type {
   TamperRunAt,
 } from './tampermonkey';
 import type { ViolentmonkeyUserScript, ViolentRunAt } from './violentmonkey';
-import { ViolentInjectInto } from './violentmonkey';
+import type { ViolentInjectInto } from './violentmonkey';
 
 export type {
-  Format,
   GreasemonkeyUserScript,
   TampermonkeyUserScript,
   ViolentmonkeyUserScript,
@@ -174,15 +172,11 @@ export interface FinalUserScript extends GreasyforkUserScript {
 }
 
 export const finalMonkeyOptionToComment = async (
-  {
-    userscript,
-    format,
-    collectRequireUrls,
-    collectResource,
-  }: FinalMonkeyOption,
+  option: ResolvedMonkeyOption,
   collectGrantSet: Set<string>,
   mode: `serve` | `build` | `meta`,
 ): Promise<string> => {
+  const { userscript, collectRequireUrls, collectResource } = option;
   let attrList: [string, ...string[]][] = [];
   const {
     name,
@@ -340,21 +334,13 @@ export const finalMonkeyOptionToComment = async (
 
   attrList = defaultSortFormat(attrList);
 
-  let { align = 2 } = format;
-
-  if (align === true) {
-    align = 2;
-  }
-
   // format
-  if (typeof align == 'number' && Number.isInteger(align) && align >= 1) {
-    const alignN = align;
-
+  if (option.align >= 1) {
     const formatKey = (subAttrList: [string, ...string[]][]) => {
       if (subAttrList.length == 0) return;
       const maxLen = Math.max(...subAttrList.map((s) => s[1].length));
       subAttrList.forEach((s) => {
-        s[1] = s[1].padEnd(alignN + maxLen);
+        s[1] = s[1].padEnd(option.align + maxLen);
       });
     };
 
@@ -364,14 +350,11 @@ export const finalMonkeyOptionToComment = async (
         (s) => s[0] == 'antifeature' || s[0].startsWith('antifeature:'),
       ),
     );
-
     // format all
     const maxLen = Math.max(...attrList.map((s) => s[0].length));
     attrList.forEach((s) => {
-      s[0] = s[0].padEnd(alignN + maxLen);
+      s[0] = s[0].padEnd(option.align + maxLen);
     });
-  } else if (typeof align == 'function') {
-    attrList = await align(attrList);
   }
 
   const uString = [
@@ -391,7 +374,7 @@ export const finalMonkeyOptionToComment = async (
     .map((s) => '//\x20' + s)
     .join('\n');
 
-  return format.generate({ userscript: uString, mode });
+  return option.generate({ userscript: uString, mode });
 };
 
 const stringSort = (a: [string, ...string[]], b: [string, ...string[]]) => {

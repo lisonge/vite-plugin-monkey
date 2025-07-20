@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 import monkey, { cdn, util } from 'vite-plugin-monkey';
 
-export default defineConfig(async ({ command, mode }) => ({
+export default defineConfig(() => ({
   plugins: [
     monkey({
       entry: 'src/main.ts',
@@ -13,12 +13,9 @@ export default defineConfig(async ({ command, mode }) => ({
       },
       build: {
         externalGlobals: {
-          vue: cdn.jsdelivr('Vue', 'dist/vue.global.prod.js').concat(
-            await util.fn2dataUrl(() => {
-              // @ts-ignore
-              window.Vue = Vue;
-            }),
-          ),
+          vue: cdn
+            .jsdelivr('Vue', 'dist/vue.global.prod.js')
+            .concat(util.dataUrl('window.Vue=Vue')),
           'element-plus': cdn.jsdelivr('ElementPlus', 'dist/index.full.min.js'),
         },
         externalResource: {

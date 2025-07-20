@@ -5,8 +5,8 @@
 // @author     author_name
 // @icon       https://vitejs.dev/logo.svg
 // @match      https://songe.li/*
-// @tag        233
-// @tag        456
+// @tag        tag1
+// @tag        tag2
 // @grant      GM_addStyle
 // @grant      GM_getValue
 // @grant      GM_registerMenuCommand
@@ -19,17 +19,26 @@
 (function () {
   'use strict';
 
-  var _GM = /* @__PURE__ */ (() => typeof GM != "undefined" ? GM : void 0)();
-  var _GM_getValue = /* @__PURE__ */ (() => typeof GM_getValue != "undefined" ? GM_getValue : void 0)();
-  var _GM_registerMenuCommand = /* @__PURE__ */ (() => typeof GM_registerMenuCommand != "undefined" ? GM_registerMenuCommand : void 0)();
-  var _GM_webRequest = /* @__PURE__ */ (() => typeof GM_webRequest != "undefined" ? GM_webRequest : void 0)();
+  var _documentCurrentScript = typeof document !== 'undefined' ? document.currentScript : null;
+  var key = `__monkeyWindow-` + (() => {
+    try {
+      return new URL((_documentCurrentScript && _documentCurrentScript.tagName.toUpperCase() === 'SCRIPT' && _documentCurrentScript.src || new URL('__entry.js', document.baseURI).href)).origin;
+    } catch {
+      return location.origin;
+    }
+  })();
+  var monkeyWindow = document[key] ?? window;
+  var GM = /* @__PURE__ */ (() => monkeyWindow.GM)();
+  var GM_getValue = /* @__PURE__ */ (() => monkeyWindow.GM_getValue)();
+  var GM_registerMenuCommand = /* @__PURE__ */ (() => monkeyWindow.GM_registerMenuCommand)();
+  var GM_webRequest = /* @__PURE__ */ (() => monkeyWindow.GM_webRequest)();
   console.log(`hello wolrd`);
-  console.log(Object.keys(_GM));
-  _GM_registerMenuCommand("", (e) => {
+  console.log(Object.keys(GM));
+  GM_registerMenuCommand("", (e) => {
   });
-  _GM_getValue("key", String("default"));
+  GM_getValue("key", String("default"));
   console.log(
-    _GM_webRequest([], (...args) => {
+    GM_webRequest([], (...args) => {
       console.log(args);
     })
   );

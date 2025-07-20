@@ -18,11 +18,9 @@
 // @supportURL         https://github.com/lisonge/vite-plugin-monkey/issues
 // @include            /^https:\/\/i\.songe\.li\/.*/
 // @match              https://songe.li/
-// @require            https://cdn.jsdelivr.net/npm/prettier@3.4.2/standalone.js
-// @resource           element-plus/dist/index.css  https://cdn.jsdelivr.net/npm/element-plus@2.9.1/dist/index.css
+// @require            https://cdn.jsdelivr.net/npm/prettier@3.6.2/standalone.js
 // @grant              GM_addElement
 // @grant              GM_addStyle
 // @grant              GM_cookie
-// @grant              GM_getResourceText
 // @grant              unsafeWindow
 // ==/UserScript==

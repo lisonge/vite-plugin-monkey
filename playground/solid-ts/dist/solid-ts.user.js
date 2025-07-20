@@ -2,7 +2,6 @@
 // @name       solid-ts
 // @namespace  npm/vite-plugin-monkey
 // @version    0.0.0
-// @author     monkey
 // @icon       https://vitejs.dev/logo.svg
 // @match      https://www.google.com/
 // @grant      GM_addStyle
@@ -13,6 +12,7 @@
 (function () {
   'use strict';
 
+  const IS_DEV = false;
   const equalFn = (a, b) => a === b;
   const signalOptions = {
     equals: equalFn
@@ -128,7 +128,7 @@
           }
           if (Updates.length > 1e6) {
             Updates = [];
-            if (false) ;
+            if (IS_DEV) ;
             throw new Error();
           }
         }, false);
@@ -140,11 +140,7 @@
     if (!node.fn) return;
     cleanNode(node);
     const time = ExecCount;
-    runComputation(
-      node,
-      node.value,
-      time
-    );
+    runComputation(node, node.value, time);
   }
   function runComputation(node, value, time) {
     let nextValue;
@@ -253,8 +249,7 @@
       if (source.sources) {
         const state = source.state;
         if (state === STALE) {
-          if (source !== ignore && (!source.updatedAt || source.updatedAt < ExecCount))
-            runTop(source);
+          if (source !== ignore && (!source.updatedAt || source.updatedAt < ExecCount)) runTop(source);
         } else if (state === PENDING) lookUpstream(source, ignore);
       }
     }
@@ -372,7 +367,7 @@
       element.textContent = "";
     };
   }
-  function template(html, isImportNode, isSVG) {
+  function template(html, isImportNode, isSVG, isMathML) {
     let node;
     const create = () => {
       const t = document.createElement("template");
@@ -528,11 +523,7 @@
       } else if (t === "function") {
         if (unwrap) {
           while (typeof item === "function") item = item();
-          dynamic = normalizeIncomingArray(
-            normalized,
-            Array.isArray(item) ? item : [item],
-            Array.isArray(prev) ? prev : [prev]
-          ) || dynamic;
+          dynamic = normalizeIncomingArray(normalized, Array.isArray(item) ? item : [item], Array.isArray(prev) ? prev : [prev]) || dynamic;
         } else {
           normalized.push(item);
           dynamic = true;
@@ -557,8 +548,7 @@
         const el = current[i];
         if (node !== el) {
           const isParent = el.parentNode === parent;
-          if (!inserted && !i)
-            isParent ? parent.replaceChild(node, el) : parent.insertBefore(node, marker);
+          if (!inserted && !i) isParent ? parent.replaceChild(node, el) : parent.insertBefore(node, marker);
           else isParent && el.remove();
         } else inserted = true;
       }
@@ -566,13 +556,10 @@
     return [node];
   }
   const App$1 = "_App_9g4xh_1";
-  const logo = "_logo_9g4xh_5";
   const header = "_header_9g4xh_11";
   const link = "_link_9g4xh_22";
   const styles = {
     App: App$1,
-    logo,
-    "logo-spin": "_logo-spin_9g4xh_1",
     header,
     link
   };

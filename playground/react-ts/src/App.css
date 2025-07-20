@@ -34,6 +34,7 @@
 
 .card {
   padding: 2em;
+  background: url('./assets/fluidicon.png');
 }
 
 .read-the-docs {

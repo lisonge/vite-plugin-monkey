@@ -30,18 +30,10 @@
 (async function (prettier) {
   'use strict';
 
-  var _documentCurrentScript = typeof document !== 'undefined' ? document.currentScript : null;
-  var key = `__monkeyWindow-` + (() => {
-    try {
-      return new URL((_documentCurrentScript && _documentCurrentScript.tagName.toUpperCase() === 'SCRIPT' && _documentCurrentScript.src || new URL('__entry.js', document.baseURI).href)).origin;
-    } catch {
-      return location.origin;
-    }
-  })();
-  var monkeyWindow = document[key] ?? window;
-  var unsafeWindow = /* @__PURE__ */ (() => monkeyWindow.unsafeWindow)();
-  var GM_addElement = /* @__PURE__ */ (() => monkeyWindow.GM_addElement)();
-  var GM_cookie = /* @__PURE__ */ (() => monkeyWindow.GM_cookie)();
+  var _GM_addElement = /* @__PURE__ */ (() => typeof GM_addElement != "undefined" ? GM_addElement : void 0)();
+  var _GM_cookie = /* @__PURE__ */ (() => typeof GM_cookie != "undefined" ? GM_cookie : void 0)();
+  var _unsafeWindow = /* @__PURE__ */ (() => typeof unsafeWindow != "undefined" ? unsafeWindow : void 0)();
+  var _monkeyWindow = /* @__PURE__ */ (() => window)();
   var Ti = Object.create;
   var _e = Object.defineProperty;
   var bi = Object.getOwnPropertyDescriptor;
@@ -7267,14 +7259,14 @@
     return code;
   };
   console.log("document.readyState", document.readyState);
-  console.log(monkeyWindow);
-  GM_addElement && GM_addElement("div", { innerHTML: "hello" });
-  if (unsafeWindow == window) {
+  console.log(_monkeyWindow);
+  _GM_addElement && _GM_addElement("div", { innerHTML: "hello" });
+  if (_unsafeWindow == window) {
     console.log("scope->host");
   } else {
     console.log("scope->monkey");
   }
-  GM_cookie?.list({}, (cookies, error) => {
+  _GM_cookie?.list({}, (cookies, error) => {
     if (error) {
       console.log(error);
     } else {

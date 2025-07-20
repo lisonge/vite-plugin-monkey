@@ -12,4 +12,3 @@
 // @grant      GM_registerMenuCommand
 // @grant      GM_webRequest
 // ==/UserScript==
-// hello

@@ -14,20 +14,12 @@
 (async function () {
   'use strict';
 
-  var _documentCurrentScript = typeof document !== 'undefined' ? document.currentScript : null;
-  var key = `__monkeyWindow-` + (() => {
-    try {
-      return new URL((_documentCurrentScript && _documentCurrentScript.tagName.toUpperCase() === 'SCRIPT' && _documentCurrentScript.src || new URL('__entry.js', document.baseURI).href)).origin;
-    } catch {
-      return location.origin;
-    }
-  })();
-  var monkeyWindow = document[key] ?? window;
-  var GM_deleteValue = /* @__PURE__ */ (() => monkeyWindow.GM_deleteValue)();
-  GM_deleteValue("key");
+  var _GM_deleteValue = /* @__PURE__ */ (() => typeof GM_deleteValue != "undefined" ? GM_deleteValue : void 0)();
+  var _monkeyWindow = /* @__PURE__ */ (() => window)();
+  _GM_deleteValue("key");
   await( fetch(`/`));
   await( fetch(`/`));
-  console.log(monkeyWindow.onurlchange);
+  console.log(_monkeyWindow.onurlchange);
   for await (const x of [1, 2, 3, 4, 5]) {
     await( fetch(`/` + x));
   };

@@ -1,4 +1,7 @@
 {
   "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "./"
+  },
   "include": ["src", "tsup.config.ts", "scripts"]
 }

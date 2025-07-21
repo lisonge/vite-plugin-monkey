@@ -31,8 +31,6 @@ const pkgFpList = (await fs.readdir(process.cwd()))
   .filter((v) => v.startsWith('template-'))
   .map((v) => v + '/package.json');
 
-const reactPkgList = ['react', 'react-dom', '@types/react', '@types/react-dom'];
-
 const updateDependencies = async (
   text: string,
   dependencies: Record<string, string> | undefined,
@@ -42,9 +40,6 @@ const updateDependencies = async (
   const tasks = Object.entries(dependencies).map(
     async ([pkgName, oldPkgVersion]) => {
       const newVersion = await getPkgLatestVersion(pkgName);
-      if (reactPkgList.includes(pkgName) && !newVersion.startsWith('18.')) {
-        return;
-      }
       const oldVersion = '1234567890'.includes(oldPkgVersion[0])
         ? oldPkgVersion
         : oldPkgVersion.slice(1);
@@ -79,5 +74,3 @@ for (const pkgFp of pkgFpList) {
     console.log('No Updates\n');
   }
 }
-
-//

@@ -2,10 +2,9 @@
 // @name       vite-vue-starter
 // @namespace  npm/vite-plugin-monkey
 // @version    0.0.0
-// @author     monkey
 // @icon       https://vitejs.dev/logo.svg
 // @match      https://www.google.com/
-// @require    https://cdn.jsdelivr.net/npm/vue@3.5.13/dist/vue.global.prod.js
+// @require    https://cdn.jsdelivr.net/npm/vue@3.5.17/dist/vue.global.prod.js
 // @grant      GM_addStyle
 // ==/UserScript==
 

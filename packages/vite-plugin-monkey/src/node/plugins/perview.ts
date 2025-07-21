@@ -1,11 +1,10 @@
 import path from 'node:path';
 import type { Plugin, ResolvedConfig } from 'vite';
 import { normalizePath } from 'vite';
-import { walk } from '../_util';
-import { fcToHtml, previewTemplate } from '../inject_template';
-import type { FinalMonkeyOption } from '../types';
+import { walk } from '../utils/others';
+import { fcToHtml, previewTemplate } from '../utils/template';
 
-export const perviewPlugin = (_: FinalMonkeyOption): Plugin => {
+export const perviewFactory = (): Plugin => {
   let viteConfig: ResolvedConfig;
   return {
     name: 'monkey:perview',

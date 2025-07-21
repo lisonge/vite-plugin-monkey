@@ -1,8 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
-import './index.css';
 import imgUrl3 from './assets/fluidicon.png';
+import './index.css';
+import { GM_getTab } from '$';
+
+console.log(GM_getTab);
 
 console.log({ imgUrl3 });
 

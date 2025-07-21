@@ -1,11 +1,10 @@
 import type { Plugin } from 'vite';
-import type { FinalMonkeyOption } from '../types';
-import { gmIdentifiers } from '../gm_api';
+import { gmIdentifiers } from '../utils/gmApi';
 
 // https://github.com/Tampermonkey/tampermonkey/issues/1567
 const clientSourceId = 'vite-plugin-monkey/dist/client';
-const clientId = '\0vite-plugin-monkey/dist/client';
-export const redirectClientPlugin = (_: FinalMonkeyOption): Plugin => {
+const clientId = '\0' + clientSourceId;
+export const redirectClientFactory = (): Plugin => {
   return {
     name: 'monkey:redirectClient',
     enforce: 'pre',
@@ -21,7 +20,7 @@ export const redirectClientPlugin = (_: FinalMonkeyOption): Plugin => {
         // https://github.com/evanw/esbuild/issues/2267#issuecomment-1138445856
         const declarations = identifiers
           .map((v) => {
-            return `var _${v} = /* @__PURE__ */ (() => typeof ${v} != "undefined" ? ${v} : void 0)();`;
+            return `var _${v} = /* @__PURE__ */ (() => typeof ${v} != "undefined" ? ${v} : undefined)();`;
           })
           .concat('var _monkeyWindow = /* @__PURE__ */ (() => window)();');
         const exportIdentifiers = identifiers.concat('monkeyWindow');

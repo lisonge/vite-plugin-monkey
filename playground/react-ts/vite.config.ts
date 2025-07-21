@@ -1,5 +1,5 @@
-import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
 import monkey, { cdn } from 'vite-plugin-monkey';
 
 export default defineConfig({
@@ -17,13 +17,6 @@ export default defineConfig({
         ],
       },
       build: {
-        externalGlobals: {
-          react: cdn.jsdelivr('React', 'umd/react.production.min.js'),
-          'react-dom': cdn.jsdelivr(
-            'ReactDOM',
-            'umd/react-dom.production.min.js',
-          ),
-        },
         externalResource: {
           'element-plus/dist/index.css': cdn.jsdelivr(),
           'element-plus/dist/index.css?url': cdn.jsdelivr(),

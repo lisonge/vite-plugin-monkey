@@ -5,14 +5,13 @@
 // @author     author_name
 // @icon       https://vitejs.dev/logo.svg
 // @match      https://songe.li/*
-// @tag        233
-// @tag        456
+// @tag        tag1
+// @tag        tag2
 // @grant      GM_addStyle
 // @grant      GM_getValue
 // @grant      GM_registerMenuCommand
 // @grant      GM_webRequest
 // ==/UserScript==
-// hello
 
 (o=>{if(typeof GM_addStyle=="function"){GM_addStyle(o);return}const t=document.createElement("style");t.textContent=o,document.head.append(t)})(" .read-the-docs{color:#888;position:fixed;top:60px;right:0;bottom:0;left:260px;background:#fff;z-index:1050;padding:10px 20px 200px;overflow-y:auto;box-shadow:-2px 2px 6px #bbb}body{display:flex;background-color:#0ff} ");
 

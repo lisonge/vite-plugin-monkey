@@ -1,16 +1,11 @@
-export const fn2string = <T extends (...args: any[]) => any>(
-  fn: T,
-  ...args: Parameters<T>
-) => {
-  return `;(${fn})(...${JSON.stringify(args, undefined, 2)});`;
-};
+import { stringifyFunction } from './others';
 
 const htmlText = /* html */ `
 <!DOCTYPE html>
 <html>
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="https://vitejs.dev/logo.svg" />
+    <link rel="icon" type="image/svg+xml" href="https://vite.dev/logo.svg" />
     <title>Vite</title>
   </head>
   <script type="module" data-source="vite-plugin-monkey">
@@ -23,16 +18,10 @@ export const fcToHtml = <T extends (...args: any[]) => any>(
   fn: T,
   ...args: Parameters<T>
 ) => {
-  return htmlText.replace(
-    `__CODE__`,
-    `;(${fn})(...${JSON.stringify(args, void 0, 2)});`,
-  );
+  return htmlText.replace(`__CODE__`, stringifyFunction(fn, ...args));
 };
 
-export interface ScriptOptions {
-  entrySrc: string;
-}
-export const serverInjectFn = ({ entrySrc }: ScriptOptions) => {
+export const serverInjectFn = (entrySrc: string) => {
   /// https://github.com/Tampermonkey/tampermonkey/issues/1567
   // @ts-ignore
   // eslint-disable-next-line @typescript-eslint/no-unused-expressions

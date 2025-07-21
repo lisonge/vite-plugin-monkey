@@ -7,6 +7,8 @@
     "moduleResolution": "bundler",
     "jsx": "preserve",
     "noEmit": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "verbatimModuleSyntax": true,
+    "rootDir": "./"
   }
 }

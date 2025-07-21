@@ -85,19 +85,46 @@ graph LR;
 
 ## 配置
 
-[MonkeyOption](/packages/vite-plugin-monkey/src/node/userscript/index.ts#L130)
-
-<details open>
-  <summary>MonkeyOption Type</summary>
-
 ```ts
-export type MonkeyOption = {
+export interface MonkeyOption {
   /**
    * userscript entry file path
    */
   entry: string;
+
+  /**
+   * userscript comment
+   */
   userscript?: MonkeyUserScript;
-  format?: Format;
+
+  /**
+   * @deprecated use {@link align} or {@link generate} instead
+   */
+  format?: {
+    /**
+     * @deprecated use {@link align} instead
+     */
+    align?: unknown;
+
+    /**
+     * @deprecated use {@link generate} instead
+     */
+    generate?: unknown;
+  };
+
+  /**
+   * align userscript comment
+   * @default 2
+   */
+  align?: number | false;
+
+  /**
+   * custom generate userscript comment
+   */
+  generate?: (options: {
+    userscript: string;
+    mode: `serve` | `build` | `meta`;
+  }) => Thenable<string>;
 
   /**
    * alias of vite-plugin-monkey/dist/client
@@ -198,11 +225,7 @@ export type MonkeyOption = {
      *     cdn
      *       .jsdelivr('Vue', 'dist/vue.global.prod.js')
      *       .concat('https://unpkg.com/vue-demi@latest/lib/index.iife.js')
-     *       .concat(
-     *         await util.fn2dataUrl(() => {
-     *           window.Vue = Vue;
-     *         }),
-     *       ),
+     *       .concat(util.dataUrl('window.Vue=Vue')),
      *   ],
      *   ['pinia', cdn.jsdelivr('Pinia', 'dist/pinia.iife.prod.js')],
      *   [
@@ -216,17 +239,9 @@ export type MonkeyOption = {
     /**
      * according to final code bundle, auto inject GM_* or GM.* to userscript comment grant
      *
-     * tree shaking code, then if code.includes('GM_xxx'), add \@grant GM_xxx to userscript
      * @default true
      */
     autoGrant?: boolean;
-
-    /**
-     * @deprecated use [viteConfig.build.cssMinify](https://vitejs.dev/config/build-options.html#build-cssminify) in vite>=4.2.0
-     *
-     * now minifyCss will not work
-     */
-    minifyCss?: boolean;
 
     /**
      * @example
@@ -300,9 +315,9 @@ export type MonkeyOption = {
      */
     cssSideEffects?: (
       css: string,
-    ) => IPromise<string | ((css: string) => void)>;
+    ) => Thenable<string | ((css: string) => void)>;
   };
-};
+}
 ```
 
 ## 排除依赖的 CDN 工具

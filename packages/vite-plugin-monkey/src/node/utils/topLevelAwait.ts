@@ -1,4 +1,4 @@
-import * as acorn from 'acorn';
+import type * as acorn from 'acorn';
 import * as acornWalk from 'acorn-walk';
 import MagicString from 'magic-string';
 import type {
@@ -15,7 +15,7 @@ interface AwaitCallExpression extends acorn.CallExpression {
 const awaitOffset = `await`.length;
 const initTlaIdentifier = `_TLA_`;
 
-export const findSafeTlaIdentifier = (rawBundle: OutputBundle) => {
+export const getSafeTlaIdentifier = (rawBundle: OutputBundle) => {
   const codes: string[] = [];
   for (const chunk of Object.values(rawBundle)) {
     if (chunk.type == 'chunk') {

@@ -1,35 +1,51 @@
-import { DomUtils, ElementType, parseDocument } from 'htmlparser2';
 import fs from 'node:fs/promises';
+import type { ServerResponse } from 'node:http';
 import path from 'node:path';
-import { Plugin, ResolvedConfig, normalizePath } from 'vite';
-import { logger } from '../_logger';
-import { cyrb53hash, existFile, isFirstBoot, toValidURL } from '../_util';
-import { fn2string, mountGmApiFn, serverInjectFn } from '../inject_template';
-import { openBrowser } from '../open_browser';
-import type { FinalMonkeyOption } from '../types';
-import { gmIdentifiers } from '../gm_api';
+import type { Plugin, ResolvedConfig } from 'vite';
+import { normalizePath } from 'vite';
 import { finalMonkeyOptionToComment } from '../userscript';
+import { gmIdentifiers } from '../utils/gmApi';
+import { openBrowser } from '../utils/openBrowser';
+import {
+  existFile,
+  isFirstBoot,
+  parserHtmlScriptResult,
+  safeURL,
+  simpleHash,
+  stringifyFunction,
+} from '../utils/others';
+import { mountGmApiFn, serverInjectFn } from '../utils/template';
+import type { ResolvedMonkeyOption } from '../utils/types';
 
-export const installUserPath = '/__vite-plugin-monkey.install.user.js';
-const gmApiPath = '/__vite-plugin-monkey.gm.api.js';
-const entryPath = '/__vite-plugin-monkey.entry.js';
-const pullPath = '/__vite-plugin-monkey.pull.js';
+const urlPrefix = '/__vite-plugin-monkey.';
+export const installUserPath = urlPrefix + 'install.user.js';
+const gmApiPath = urlPrefix + 'gm.api.js';
+const entryPath = urlPrefix + 'entry.js';
+const pullPath = urlPrefix + 'pull.js';
+
 const restartStoreKey = '__vite_plugin_monkey_install_url';
+const localHost = '127.0.0.1';
+const localOrigin = `http://${localHost}`;
+const htmlPlaceholder = '<html><head></head><body></body></html>';
 
-export const serverPlugin = (finalOption: FinalMonkeyOption): Plugin => {
+export const serverFactory = (
+  getOption: () => Promise<ResolvedMonkeyOption>,
+): Plugin => {
+  let option: ResolvedMonkeyOption;
   let viteConfig: ResolvedConfig;
   return {
     name: 'monkey:server',
     apply: 'serve',
     async config(userConfig) {
+      option = await getOption();
       return {
         preview: {
-          host: userConfig.preview?.host ?? '127.0.0.1',
+          host: userConfig.preview?.host ?? localHost,
           cors: true,
         },
         server: {
-          host: userConfig.server?.host ?? '127.0.0.1',
-          open: userConfig.server?.open ?? finalOption.server.open,
+          host: userConfig.server?.host ?? localHost,
+          open: userConfig.server?.open ?? option.server.open,
           cors: true,
         },
       };
@@ -38,146 +54,104 @@ export const serverPlugin = (finalOption: FinalMonkeyOption): Plugin => {
       viteConfig = resolvedConfig;
     },
     async configureServer(server) {
-      for (const [k, v] of Object.entries(finalOption.userscript.name)) {
-        Reflect.set(
-          finalOption.userscript.name,
-          k,
-          finalOption.server.prefix(v),
-        );
+      for (const [k, v] of Object.entries(option.userscript.name)) {
+        Reflect.set(option.userscript.name, k, option.server.prefix(v));
       }
 
       // support dev env
-      finalOption.userscript.grant.add('*');
+      option.userscript.grant.add('*');
 
       // https://github.com/lisonge/vite-plugin-monkey/issues/205
       server.middlewares.use((_, res, next) => {
-        if (
-          res.getHeader('Access-Control-Allow-Private-Network') === undefined
-        ) {
-          res.setHeader('Access-Control-Allow-Private-Network', 'true');
+        const name = 'access-control-allow-private-network';
+        if (!res.hasHeader(name)) {
+          res.setHeader(name, 'true');
         }
         next();
       });
+
+      const setScriptHeader = (res: ServerResponse) => {
+        res.setHeader('access-control-allow-origin', '*');
+        res.setHeader('content-type', 'application/javascript');
+      };
 
       server.middlewares.use(async (req, res, next) => {
-        const reqUrl = req.url;
-        if (
-          req.method === 'GET' &&
-          reqUrl &&
-          [installUserPath, entryPath, pullPath, gmApiPath].some((u) =>
-            reqUrl.startsWith(u),
-          )
-        ) {
-          Object.entries({
-            'access-control-allow-origin': '*',
-            'content-type': 'application/javascript',
-          }).forEach(([k, v]) => {
-            res.setHeader(k, v);
-          });
-          const usp = new URLSearchParams(reqUrl.split('?', 2)[1]);
-
-          if (reqUrl.startsWith(installUserPath)) {
-            let origin = toValidURL(usp.get(`origin`))?.origin;
-            if (!origin) {
-              const { https, port } = viteConfig.server;
-              let { host } = viteConfig.server;
-              if (host == '0.0.0.0') {
-                host = '127.0.0.1';
-              }
-              origin = `${https ? 'https' : 'http'}://${host}:${port}`;
-              logger.warn(
-                `can not get origin from install url query parameter, use ${origin}`,
-                {
-                  time: true,
-                },
+        if (!(req.method === 'GET' && req.url && req.url.startsWith(urlPrefix)))
+          return next();
+        const url = new URL(req.url, localOrigin);
+        if (url.pathname === installUserPath) {
+          setScriptHeader(res);
+          const origin =
+            safeURL(url.searchParams.get('origin'))?.origin ||
+            (() => {
+              const host = ((h) => {
+                return typeof h === 'string'
+                  ? h !== '0.0.0.0'
+                    ? h
+                    : localHost
+                  : localHost;
+              })(viteConfig.server.host);
+              return `${viteConfig.server.https ? 'https' : 'http'}://${host}:${viteConfig.server.port}`;
+            })();
+          Reflect.set(globalThis, restartStoreKey, origin);
+          res.end(
+            [
+              await finalMonkeyOptionToComment(option, new Set(), 'serve'),
+              stringifyFunction(
+                serverInjectFn,
+                new URL(entryPath, origin).href,
+              ),
+              '',
+            ].join('\n\n'),
+          );
+        } else if (url.pathname === entryPath) {
+          setScriptHeader(res);
+          const results = await server
+            .transformIndexHtml('/', htmlPlaceholder, req.originalUrl)
+            .then(parserHtmlScriptResult);
+          const entryUrls: string[] = (
+            option.server.mountGmApi ? [gmApiPath] : []
+          ).concat(
+            results.map((v) => {
+              return (
+                v.src ||
+                `${pullPath}?text=${Buffer.from(v.text, 'utf-8').toString('base64url')}`
               );
-            }
-            Reflect.set(globalThis, restartStoreKey, origin);
-            const u = new URL(entryPath, origin);
+            }),
+          );
+          const realEntry = path.isAbsolute(option.entry)
+            ? normalizePath(path.relative(viteConfig.root, option.entry))
+            : option.entry;
+          const entryUrl = new URL(realEntry, localOrigin);
+          entryUrls.push(entryUrl.pathname + entryUrl.search);
+          res.end(
+            entryUrls.map((s) => `import ${JSON.stringify(s)};`).join('\n'),
+          );
+        } else if (url.pathname === pullPath) {
+          setScriptHeader(res);
+          res.end(
+            Buffer.from(
+              url.searchParams.get('text') ?? '',
+              'base64url',
+            ).toString('utf-8'),
+          );
+        } else if (url.pathname === gmApiPath) {
+          setScriptHeader(res);
+          if (option.server.mountGmApi) {
             res.end(
-              [
-                await finalMonkeyOptionToComment(
-                  finalOption,
-                  new Set(),
-                  'serve',
-                ),
-                fn2string(serverInjectFn, {
-                  entrySrc: u.href,
-                }),
-                '',
-              ].join('\n\n'),
+              `;(${mountGmApiFn})(import.meta, ${JSON.stringify(gmIdentifiers)});`,
             );
-          } else if (reqUrl.startsWith(entryPath)) {
-            const htmlText = await server.transformIndexHtml(
-              '/',
-              `<html><head></head></html>`,
-              req.originalUrl,
-            );
-
-            const doc = parseDocument(htmlText);
-            type Element =
-              ReturnType<typeof DomUtils.findAll> extends Array<infer T>
-                ? T
-                : never;
-            const scriptList = DomUtils.getElementsByTagType(
-              ElementType.Script,
-              doc,
-            ) as Element[];
-
-            const entryList: string[] = finalOption.server.mountGmApi
-              ? [gmApiPath]
-              : [];
-            scriptList.forEach((p) => {
-              const src = p.attribs.src ?? '';
-              const textNode = p.firstChild;
-              let text = '';
-              if (textNode?.type == ElementType.Text) {
-                text = textNode.data ?? '';
-              }
-              if (src) {
-                entryList.push(src);
-              } else {
-                const usp = new URLSearchParams({
-                  text: Buffer.from(text, 'utf-8').toString('base64url'),
-                });
-                entryList.push(pullPath + `?` + usp.toString());
-              }
-            });
-
-            let realEntry = finalOption.entry;
-            if (path.isAbsolute(realEntry)) {
-              realEntry = normalizePath(
-                path.relative(viteConfig.root, realEntry),
-              );
-            }
-            const entryUrl = new URL(realEntry, 'http://127.0.0.1');
-            entryList.push(entryUrl.pathname + entryUrl.search);
-            res.end(
-              entryList.map((s) => `import ${JSON.stringify(s)};`).join('\n'),
-            );
-          } else if (reqUrl.startsWith(pullPath)) {
-            res.end(
-              Buffer.from(usp.get('text') ?? '', 'base64url').toString('utf-8'),
-            );
-          } else if (reqUrl.startsWith(gmApiPath)) {
-            if (finalOption.server.mountGmApi) {
-              res.end(
-                `;(${mountGmApiFn})(import.meta, ${JSON.stringify(gmIdentifiers)});`,
-              );
-            } else {
-              res.end('');
-            }
+          } else {
+            res.end('');
           }
-          return;
+        } else {
+          next();
         }
-
-        next();
       });
 
-      if (finalOption.server.open) {
-        const cacheUserPath = `node_modules/.vite/__vite-plugin-monkey.cache.${cyrb53hash(
-          viteConfig.configFile,
-        )}.user.js`;
+      if (option.server.open) {
+        const hash = simpleHash(viteConfig.configFile);
+        const cacheUserPath = `node_modules/.vite/__vite-plugin-monkey.cache.${hash}.user.js`;
         let cacheComment = '';
         if (await existFile(cacheUserPath)) {
           cacheComment = (await fs.readFile(cacheUserPath)).toString('utf-8');
@@ -185,14 +159,16 @@ export const serverPlugin = (finalOption: FinalMonkeyOption): Plugin => {
           await fs.mkdir(path.dirname(cacheUserPath)).catch(() => {});
         }
         const newComment = await finalMonkeyOptionToComment(
-          finalOption,
+          option,
           new Set(),
           'serve',
         );
         const installUrl = Reflect.get(globalThis, restartStoreKey);
         if (!isFirstBoot() && cacheComment != newComment && installUrl) {
-          openBrowser(installUrl, true, logger);
-          logger.info('reopen, config comment has changed', { time: true });
+          openBrowser(installUrl);
+          setTimeout(() => {
+            console.log('[plugin-monkey] reopen, config comment has changed');
+          });
         }
         await fs.writeFile(cacheUserPath, newComment).catch(() => {});
       }

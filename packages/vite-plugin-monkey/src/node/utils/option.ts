@@ -1,28 +1,28 @@
-import { logger } from './_logger';
-import { miniCode, projectPkg } from './_util';
-import { jsdelivr } from './cdn';
-import { fn2string } from './inject_template';
+import { miniCode, stringifyFunction } from './others';
+import { jsdelivr } from '../cdn';
 import type {
-  FinalMonkeyOption,
+  ResolvedMonkeyOption,
   IArray,
-  IPromise,
+  Thenable,
   Mod2UrlFn,
   MonkeyOption,
   Pkg2UrlFn,
   PkgOptions,
 } from './types';
+import { getProjectPkg } from './pkg';
 
-export const resolvedOption = (
+export const resolvedOption = async (
   pluginOption: MonkeyOption,
-): FinalMonkeyOption => {
-  const build = pluginOption.build ?? {};
-
-  if (build.minifyCss !== undefined) {
-    logger.warn(
-      `monkeyConfig.build.minifyCss is deprecated, use viteConfig.build.cssMinify in vite>=4.2.0`,
-      { time: false },
-    );
+): Promise<ResolvedMonkeyOption> => {
+  if (pluginOption.format) {
+    setTimeout(() => {
+      console.log(
+        '[vite-plugin] `format` option is deprecated, use `align` and `generate` instead',
+      );
+    });
   }
+
+  const build = pluginOption.build ?? {};
 
   const { externalResource = {} } = build;
   const externalResource2: Record<
@@ -31,7 +31,7 @@ export const resolvedOption = (
       resourceUrl: Pkg2UrlFn;
       resourceName: Pkg2UrlFn;
       loader?: (pkgOptions: PkgOptions) => unknown;
-      nodeLoader?: (pkgOptions: PkgOptions) => IPromise<string>;
+      nodeLoader?: (pkgOptions: PkgOptions) => Thenable<string>;
     }
   > = {};
 
@@ -72,7 +72,7 @@ export const resolvedOption = (
       let resourceName2: Pkg2UrlFn = () => k;
       let nodeLoader2:
         | undefined
-        | ((pkgOptions: PkgOptions) => IPromise<string>) = undefined;
+        | ((pkgOptions: PkgOptions) => Thenable<string>) = undefined;
       if (typeof resourceUrl == 'string') {
         resourceUrl2 = () => resourceUrl;
       } else {
@@ -116,6 +116,8 @@ export const resolvedOption = (
     Object.entries(externalGlobals2).forEach((s) => externalGlobals.push(s));
   }
 
+  const projectPkg = await getProjectPkg();
+
   const { grant = [], $extra = [] } = pluginOption.userscript ?? {};
   let {
     name = {},
@@ -132,7 +134,7 @@ export const resolvedOption = (
   if (typeof name == 'string') {
     name = { '': name };
   } else if (!('' in name)) {
-    name = { '': projectPkg.name, ...name };
+    name = { ...(projectPkg.name ? { '': projectPkg.name } : {}), ...name };
   }
   if (typeof description == 'string') {
     description = {
@@ -240,7 +242,7 @@ export const resolvedOption = (
       };
     });
 
-  const config: FinalMonkeyOption = {
+  const config: ResolvedMonkeyOption = {
     userscript: {
       name,
       namespace,
@@ -285,10 +287,8 @@ export const resolvedOption = (
     },
     clientAlias: pluginOption.clientAlias ?? '$',
     entry: pluginOption.entry,
-    format: {
-      align: pluginOption.format?.align ?? 2,
-      generate: pluginOption.format?.generate ?? ((o) => o.userscript),
-    },
+    align: pluginOption.align === false ? 0 : (pluginOption.align ?? 2),
+    generate: pluginOption.generate ?? ((uOptions) => uOptions.userscript),
     server: {
       mountGmApi: server.mountGmApi ?? false,
       open:
@@ -313,7 +313,7 @@ export const resolvedOption = (
       if (typeof codeOrFc == 'string') {
         return codeOrFc;
       }
-      return miniCode(fn2string(codeOrFc, css), 'js');
+      return miniCode(stringifyFunction(codeOrFc, css), 'js');
     },
   };
 

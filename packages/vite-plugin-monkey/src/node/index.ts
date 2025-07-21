@@ -1,73 +1,34 @@
 import type { Plugin } from 'vite';
-import { resolvedOption } from './option';
-import monkeyPluginList from './plugins';
-import type { MonkeyOption } from './types';
-import type {
-  Format,
-  GreasemonkeyUserScript,
-  MonkeyUserScript,
-  TampermonkeyUserScript,
-  ViolentmonkeyUserScript,
-} from './userscript';
+import factorys from './plugins';
+import { resolvedOption } from './utils/option';
+import type { MonkeyOption, ResolvedMonkeyOption } from './utils/types';
+import { dataUrl } from './utils/others';
+import type { InlinePreset } from 'unimport';
+import { gmIdentifiers } from './utils/gmApi';
 
+export type * from './types';
 export * as cdn from './cdn';
-export * as util from './util';
-export type {
-  MonkeyUserScript,
-  TampermonkeyUserScript,
-  ViolentmonkeyUserScript,
-  GreasemonkeyUserScript,
-  Format,
-  MonkeyOption,
-};
 
 export default (pluginOption: MonkeyOption): Plugin[] => {
-  const finalPluginOption = resolvedOption(pluginOption);
+  let option: ResolvedMonkeyOption;
+  return factorys.map((f) =>
+    f(async () => {
+      return option || resolvedOption(pluginOption).then((v) => (option = v));
+    }),
+  );
+};
 
-  const monkeyPlugin: Plugin = {
-    name: 'monkey:entry',
-    enforce: 'post',
-    async config(userConfig, { command }) {
-      const isServe = command == 'serve';
+/**
+ * GM api preset when you use unimport or unplugin-auto-import
+ *
+ * Note, there is not comment in automatically generated unimport.d.ts/auto-imports.d.ts file
+ */
+const unimportPreset = {
+  from: 'vite-plugin-monkey/dist/client',
+  imports: ['GM', ...gmIdentifiers, 'unsafeWindow', 'monkeyWindow'],
+} satisfies InlinePreset;
 
-      return {
-        resolve: {
-          alias: {
-            [finalPluginOption.clientAlias]: 'vite-plugin-monkey/dist/client',
-          },
-        },
-        define: {
-          'process.env.NODE_ENV':
-            userConfig.define?.['process.env.NODE_ENV'] ??
-            JSON.stringify(
-              userConfig.mode ?? (isServe ? 'development' : 'production'),
-            ),
-        },
-        esbuild: {
-          supported: {
-            'top-level-await': true,
-          },
-        },
-        build: {
-          assetsInlineLimit: Number.MAX_SAFE_INTEGER,
-          chunkSizeWarningLimit: Number.MAX_SAFE_INTEGER,
-          modulePreload: false,
-          assetsDir: './',
-          cssCodeSplit: false,
-          minify: userConfig.build?.minify ?? false,
-          cssMinify: userConfig.build?.cssMinify ?? true,
-          rollupOptions: {
-            // serve pre-bundling need
-            input: finalPluginOption.entry,
-          },
-          sourcemap: false,
-
-          // TODO
-          // sourcemap: sourcemap,
-        },
-      };
-    },
-  };
-
-  return [monkeyPlugin, ...monkeyPluginList.map((m) => m(finalPluginOption))];
+export const util = {
+  dataUrl,
+  unimportPreset,
 };

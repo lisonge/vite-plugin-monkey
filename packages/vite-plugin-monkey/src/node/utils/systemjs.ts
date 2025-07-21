@@ -1,9 +1,8 @@
+import fs from 'node:fs/promises';
 import module from 'node:module';
 import type systemjsPkgT from 'systemjs/package.json';
-import { ModuleToUrlFc } from './types';
-import fs from 'node:fs/promises';
-import { lazyValue } from './_lazy';
-import { dataUrl } from './util';
+import { dataUrl } from './others';
+import type { ModuleToUrlFc } from './types';
 
 const _require = module.createRequire(import.meta.url);
 
@@ -21,7 +20,7 @@ const systemjsAbsolutePaths = systemjsSubPaths.map((s) => {
   return _require.resolve(`systemjs/` + s);
 });
 
-export const systemjsTexts = lazyValue(() => {
+export const getSystemjsTexts = async (): Promise<string[]> => {
   return Promise.all(
     systemjsAbsolutePaths
       .map((s) =>
@@ -35,7 +34,7 @@ export const systemjsTexts = lazyValue(() => {
       )
       .concat([Promise.resolve(customSystemInstanceCode)]),
   );
-});
+};
 
 export const getSystemjsRequireUrls = (fn: ModuleToUrlFc) => {
   return systemjsSubPaths

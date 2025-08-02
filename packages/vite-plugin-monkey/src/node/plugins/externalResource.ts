@@ -18,6 +18,7 @@ export const externalResourcePlugin = (
   > = {};
   return {
     name: 'monkey:externalResource',
+    enforce: 'pre',
     apply: 'build',
     async config() {
       option = await getOption();

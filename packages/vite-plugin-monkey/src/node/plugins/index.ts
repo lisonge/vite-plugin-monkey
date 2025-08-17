@@ -2,7 +2,7 @@ import { buildBundleFactory } from './buildBundle';
 import { configFactory } from './config';
 import { externalGlobalsFactory } from './externalGlobals';
 import { externalLoaderFactory } from './externalLoader';
-import { externalResourcePlugin } from './externalResource';
+import { externalResourceFactory } from './externalResource';
 import { fixAssetUrlFactory } from './fixAssetUrl';
 import { fixClientFactory } from './fixClient';
 import { fixCssUrlFactory } from './fixCssUrl';
@@ -23,8 +23,8 @@ const factorys = [
 
   redirectClientFactory,
   externalGlobalsFactory,
+  externalResourceFactory,
   externalLoaderFactory,
-  externalResourcePlugin,
   buildBundleFactory,
 ];
 

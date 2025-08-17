@@ -6,7 +6,7 @@ import type { Plugin, ResolvedConfig } from 'vite';
 
 const resourceImportPrefix = '\0monkey-resource-import:';
 
-export const externalResourcePlugin = (
+export const externalResourceFactory = (
   getOption: () => Promise<ResolvedMonkeyOption>,
 ): Plugin => {
   let option: ResolvedMonkeyOption;

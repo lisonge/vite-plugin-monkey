@@ -1,0 +1,18 @@
+{
+  "name": "css-postcss-test",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch"
+  },
+  "devDependencies": {
+    "@types/greasemonkey": "4",
+    "autoprefixer": "^10.4.20",
+    "postcss-discard-comments": "^7.0.3",
+    "postcss-nested": "^6.2.0",
+    "typescript": "^5.6.3",
+    "vite": "^7.0.4",
+    "vite-plugin-monkey": "workspace:*"
+  }
+}

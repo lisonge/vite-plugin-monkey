@@ -1,5 +1,6 @@
 import { buildBundleFactory } from './buildBundle';
 import { configFactory } from './config';
+import { cssOnDemandFactory } from './cssOnDemand';
 import { externalGlobalsFactory } from './externalGlobals';
 import { externalLoaderFactory } from './externalLoader';
 import { externalResourcePlugin } from './externalResource';
@@ -25,6 +26,7 @@ const factorys = [
   externalGlobalsFactory,
   externalLoaderFactory,
   externalResourcePlugin,
+  cssOnDemandFactory,
   buildBundleFactory,
 ];
 

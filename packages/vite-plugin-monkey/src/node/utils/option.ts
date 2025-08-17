@@ -300,6 +300,7 @@ export const resolvedOption = async (
       fileName,
       metaFileName: metaFileFc ? () => metaFileFc(fileName) : undefined,
       autoGrant: build.autoGrant ?? true,
+      cssOnDemand: build.cssOnDemand ?? false,
       externalGlobals: externalGlobals,
       externalResource: externalResource2,
     },

@@ -1,0 +1,29 @@
+/* 动态加载样式文件 */
+.extra-component {
+  border: 3px solid #28a745;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 15px 0;
+  background: linear-gradient(
+    45deg,
+    rgba(40, 167, 69, 0.1),
+    rgba(40, 167, 69, 0.05)
+  );
+  backdrop-filter: blur(5px);
+  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.2);
+}
+
+.extra-header {
+  font-weight: bold;
+  color: #28a745;
+  font-size: 1.2rem;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.extra-content {
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.9);
+  font-style: italic;
+}

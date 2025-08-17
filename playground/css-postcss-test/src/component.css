@@ -1,0 +1,36 @@
+/* 组件样式 - 测试动态加载和PostCSS处理 */
+.component {
+  border: 2px solid #007bff;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 12px 0; /* 嵌套样式测试 */
+  .title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 8px;
+    &.primary {
+      color: #007bff;
+    }
+    &.secondary {
+      color: #6c757d;
+    }
+  }
+  .description {
+    line-height: 1.5;
+    p {
+      margin: 8px 0;
+      &:first-child {
+        margin-top: 0;
+      }
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  } /* 测试复杂的transform属性（需要自动前缀） */
+  &:hover {
+    transform: scale(1.02); /* 这个应该被autoprefixer处理 */
+    transition: transform 0.2s ease-in-out;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+  }
+}
+/* 这个注释也应该被移除 */

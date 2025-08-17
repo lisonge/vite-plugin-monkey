@@ -1,0 +1,58 @@
+/* 主要样式文件 - 测试PostCSS嵌套和自动前缀 */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+
+  /* 嵌套样式 - 测试postcss-nested */
+  .header {
+    background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+    padding: 20px;
+    border-radius: 8px;
+
+    h1 {
+      color: white;
+      margin: 0;
+      font-size: 2rem;
+
+      &:hover {
+        transform: scale(1.05); /* 测试autoprefixer */
+        transition: transform 0.3s ease;
+      }
+    }
+  }
+
+  .content {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    .card {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 15px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+      &:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px); /* 测试autoprefixer */
+        transition: all 0.3s ease;
+      }
+
+      h3 {
+        margin-top: 0;
+        color: #333;
+      }
+
+      p {
+        line-height: 1.6;
+        color: #666;
+      }
+    }
+  }
+}
+
+/* 这是一个测试注释，应该被postcss-discard-comments移除 */

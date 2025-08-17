@@ -99,6 +99,7 @@ export interface ResolvedMonkeyOption {
     fileName: string;
     metaFileName?: () => string;
     autoGrant: boolean;
+    cssOnDemand?: boolean;
     externalGlobals: [string, IArray<string | Mod2UrlFn>][];
     externalResource: Record<
       string,
@@ -318,6 +319,13 @@ export interface MonkeyOption {
      * cdn.jsdelivr()[1]
      */
     systemjs?: 'inline' | ModuleToUrlFc;
+
+    /**
+     * Enable CSS on-demand injection
+     * When enabled, CSS imports will be replaced with GM_addStyle calls for on-demand loading
+     * @default false
+     */
+    cssOnDemand?: boolean;
 
     /**
      * @default

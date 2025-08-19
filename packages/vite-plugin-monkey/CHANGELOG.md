@@ -1,5 +1,5 @@
-# v6.0.1
+# v7.0.0
 
 ## What's Changed
 
-- fix(externalResourcePlugin): set enforce to pre (#236)
+- refactor: css side effects (#240)

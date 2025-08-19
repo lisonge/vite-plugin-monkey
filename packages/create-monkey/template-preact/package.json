@@ -9,11 +9,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "preact": "^10.26.9"
+    "preact": "^10.27.1"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.10.2",
-    "vite": "^7.0.5",
-    "vite-plugin-monkey": "^6.0.0"
+    "vite": "^7.1.3",
+    "vite-plugin-monkey": "^7.0.0"
   }
 }

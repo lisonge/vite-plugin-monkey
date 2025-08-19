@@ -4,15 +4,15 @@
 // @version    0.0.0
 // @icon       https://vitejs.dev/logo.svg
 // @match      https://www.google.com/
-// @require    https://cdn.jsdelivr.net/npm/react@19.1.0/umd/react.production.min.js
-// @require    https://cdn.jsdelivr.net/npm/react-dom@19.1.0/umd/react-dom.production.min.js
 // @grant      GM_addStyle
 // ==/UserScript==
 
-(o=>{if(typeof GM_addStyle=="function"){GM_addStyle(o);return}const e=document.createElement("style");e.textContent=o,document.head.append(e)})(" #root{max-width:1280px;margin:0 auto;padding:2rem;text-align:center}.logo{height:6em;padding:1.5em;will-change:filter}.logo:hover{filter:drop-shadow(0 0 2em #646cffaa)}.logo.react:hover{filter:drop-shadow(0 0 2em #61dafbaa)}@keyframes logo-spin{0%{transform:rotate(0)}to{transform:rotate(360deg)}}@media (prefers-reduced-motion: no-preference){a:nth-of-type(2) .logo{animation:logo-spin infinite 20s linear}}.card{padding:2em}.read-the-docs{color:#888}:root{font-family:Inter,Avenir,Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;font-weight:400;color-scheme:light dark;color:#ffffffde;background-color:#242424;font-synthesis:none;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;-webkit-text-size-adjust:100%}a{font-weight:500;color:#646cff;text-decoration:inherit}a:hover{color:#535bf2}body{margin:0;display:flex;place-items:center;min-width:320px;min-height:100vh}h1{font-size:3.2em;line-height:1.1}button{border-radius:8px;border:1px solid transparent;padding:.6em 1.2em;font-size:1em;font-weight:500;font-family:inherit;background-color:#1a1a1a;cursor:pointer;transition:border-color .25s}button:hover{border-color:#646cff}button:focus,button:focus-visible{outline:4px auto -webkit-focus-ring-color}@media (prefers-color-scheme: light){:root{color:#213547;background-color:#fff}a:hover{color:#747bff}button{background-color:#f9f9f9}} ");
-
-(function (require$$1, require$$2) {
+(function () {
   'use strict';
+
+  const d=new Set;const o = async e=>{d.has(e)||(d.add(e),(t=>{typeof GM_addStyle=="function"?GM_addStyle(t):document.head.appendChild(document.createElement("style")).append(t);})(e));};
+
+  o(" #root{max-width:1280px;margin:0 auto;padding:2rem;text-align:center}.logo{height:6em;padding:1.5em;will-change:filter}.logo:hover{filter:drop-shadow(0 0 2em #646cffaa)}.logo.react:hover{filter:drop-shadow(0 0 2em #61dafbaa)}@keyframes logo-spin{0%{transform:rotate(0)}to{transform:rotate(360deg)}}@media (prefers-reduced-motion: no-preference){a:nth-of-type(2) .logo{animation:logo-spin infinite 20s linear}}.card{padding:2em}.read-the-docs{color:#888}:root{font-family:Inter,Avenir,Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;font-weight:400;color-scheme:light dark;color:#ffffffde;background-color:#242424;font-synthesis:none;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;-webkit-text-size-adjust:100%}a{font-weight:500;color:#646cff;text-decoration:inherit}a:hover{color:#535bf2}body{margin:0;display:flex;place-items:center;min-width:320px;min-height:100vh}h1{font-size:3.2em;line-height:1.1}button{border-radius:8px;border:1px solid transparent;padding:.6em 1.2em;font-size:1em;font-weight:500;font-family:inherit;background-color:#1a1a1a;cursor:pointer;transition:border-color .25s}button:hover{border-color:#646cff}button:focus,button:focus-visible{outline:4px auto -webkit-focus-ring-color}@media (prefers-color-scheme: light){:root{color:#213547;background-color:#fff}a:hover{color:#747bff}button{background-color:#f9f9f9}} ");
 
   function getDefaultExportFromCjs(x) {
     return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, "default") ? x["default"] : x;
@@ -66,6 +66,458 @@
     return jsxRuntime.exports;
   }
   var jsxRuntimeExports = requireJsxRuntime();
+  var react = { exports: {} };
+  var react_production = {};
+  /**
+   * @license React
+   * react.production.js
+   *
+   * Copyright (c) Meta Platforms, Inc. and affiliates.
+   *
+   * This source code is licensed under the MIT license found in the
+   * LICENSE file in the root directory of this source tree.
+   */
+  var hasRequiredReact_production;
+  function requireReact_production() {
+    if (hasRequiredReact_production) return react_production;
+    hasRequiredReact_production = 1;
+    var REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = Symbol.for("react.suspense"), REACT_MEMO_TYPE = Symbol.for("react.memo"), REACT_LAZY_TYPE = Symbol.for("react.lazy"), MAYBE_ITERATOR_SYMBOL = Symbol.iterator;
+    function getIteratorFn(maybeIterable) {
+      if (null === maybeIterable || "object" !== typeof maybeIterable) return null;
+      maybeIterable = MAYBE_ITERATOR_SYMBOL && maybeIterable[MAYBE_ITERATOR_SYMBOL] || maybeIterable["@@iterator"];
+      return "function" === typeof maybeIterable ? maybeIterable : null;
+    }
+    var ReactNoopUpdateQueue = {
+      isMounted: function() {
+        return false;
+      },
+      enqueueForceUpdate: function() {
+      },
+      enqueueReplaceState: function() {
+      },
+      enqueueSetState: function() {
+      }
+    }, assign = Object.assign, emptyObject = {};
+    function Component(props, context, updater) {
+      this.props = props;
+      this.context = context;
+      this.refs = emptyObject;
+      this.updater = updater || ReactNoopUpdateQueue;
+    }
+    Component.prototype.isReactComponent = {};
+    Component.prototype.setState = function(partialState, callback) {
+      if ("object" !== typeof partialState && "function" !== typeof partialState && null != partialState)
+        throw Error(
+          "takes an object of state variables to update or a function which returns an object of state variables."
+        );
+      this.updater.enqueueSetState(this, partialState, callback, "setState");
+    };
+    Component.prototype.forceUpdate = function(callback) {
+      this.updater.enqueueForceUpdate(this, callback, "forceUpdate");
+    };
+    function ComponentDummy() {
+    }
+    ComponentDummy.prototype = Component.prototype;
+    function PureComponent(props, context, updater) {
+      this.props = props;
+      this.context = context;
+      this.refs = emptyObject;
+      this.updater = updater || ReactNoopUpdateQueue;
+    }
+    var pureComponentPrototype = PureComponent.prototype = new ComponentDummy();
+    pureComponentPrototype.constructor = PureComponent;
+    assign(pureComponentPrototype, Component.prototype);
+    pureComponentPrototype.isPureReactComponent = true;
+    var isArrayImpl = Array.isArray, ReactSharedInternals = { H: null, A: null, T: null, S: null, V: null }, hasOwnProperty = Object.prototype.hasOwnProperty;
+    function ReactElement(type, key, self, source, owner, props) {
+      self = props.ref;
+      return {
+        $$typeof: REACT_ELEMENT_TYPE,
+        type,
+        key,
+        ref: void 0 !== self ? self : null,
+        props
+      };
+    }
+    function cloneAndReplaceKey(oldElement, newKey) {
+      return ReactElement(
+        oldElement.type,
+        newKey,
+        void 0,
+        void 0,
+        void 0,
+        oldElement.props
+      );
+    }
+    function isValidElement(object) {
+      return "object" === typeof object && null !== object && object.$$typeof === REACT_ELEMENT_TYPE;
+    }
+    function escape(key) {
+      var escaperLookup = { "=": "=0", ":": "=2" };
+      return "$" + key.replace(/[=:]/g, function(match) {
+        return escaperLookup[match];
+      });
+    }
+    var userProvidedKeyEscapeRegex = /\/+/g;
+    function getElementKey(element, index) {
+      return "object" === typeof element && null !== element && null != element.key ? escape("" + element.key) : index.toString(36);
+    }
+    function noop$1() {
+    }
+    function resolveThenable(thenable) {
+      switch (thenable.status) {
+        case "fulfilled":
+          return thenable.value;
+        case "rejected":
+          throw thenable.reason;
+        default:
+          switch ("string" === typeof thenable.status ? thenable.then(noop$1, noop$1) : (thenable.status = "pending", thenable.then(
+            function(fulfilledValue) {
+              "pending" === thenable.status && (thenable.status = "fulfilled", thenable.value = fulfilledValue);
+            },
+            function(error) {
+              "pending" === thenable.status && (thenable.status = "rejected", thenable.reason = error);
+            }
+          )), thenable.status) {
+            case "fulfilled":
+              return thenable.value;
+            case "rejected":
+              throw thenable.reason;
+          }
+      }
+      throw thenable;
+    }
+    function mapIntoArray(children, array, escapedPrefix, nameSoFar, callback) {
+      var type = typeof children;
+      if ("undefined" === type || "boolean" === type) children = null;
+      var invokeCallback = false;
+      if (null === children) invokeCallback = true;
+      else
+        switch (type) {
+          case "bigint":
+          case "string":
+          case "number":
+            invokeCallback = true;
+            break;
+          case "object":
+            switch (children.$$typeof) {
+              case REACT_ELEMENT_TYPE:
+              case REACT_PORTAL_TYPE:
+                invokeCallback = true;
+                break;
+              case REACT_LAZY_TYPE:
+                return invokeCallback = children._init, mapIntoArray(
+                  invokeCallback(children._payload),
+                  array,
+                  escapedPrefix,
+                  nameSoFar,
+                  callback
+                );
+            }
+        }
+      if (invokeCallback)
+        return callback = callback(children), invokeCallback = "" === nameSoFar ? "." + getElementKey(children, 0) : nameSoFar, isArrayImpl(callback) ? (escapedPrefix = "", null != invokeCallback && (escapedPrefix = invokeCallback.replace(userProvidedKeyEscapeRegex, "$&/") + "/"), mapIntoArray(callback, array, escapedPrefix, "", function(c) {
+          return c;
+        })) : null != callback && (isValidElement(callback) && (callback = cloneAndReplaceKey(
+          callback,
+          escapedPrefix + (null == callback.key || children && children.key === callback.key ? "" : ("" + callback.key).replace(
+            userProvidedKeyEscapeRegex,
+            "$&/"
+          ) + "/") + invokeCallback
+        )), array.push(callback)), 1;
+      invokeCallback = 0;
+      var nextNamePrefix = "" === nameSoFar ? "." : nameSoFar + ":";
+      if (isArrayImpl(children))
+        for (var i = 0; i < children.length; i++)
+          nameSoFar = children[i], type = nextNamePrefix + getElementKey(nameSoFar, i), invokeCallback += mapIntoArray(
+            nameSoFar,
+            array,
+            escapedPrefix,
+            type,
+            callback
+          );
+      else if (i = getIteratorFn(children), "function" === typeof i)
+        for (children = i.call(children), i = 0; !(nameSoFar = children.next()).done; )
+          nameSoFar = nameSoFar.value, type = nextNamePrefix + getElementKey(nameSoFar, i++), invokeCallback += mapIntoArray(
+            nameSoFar,
+            array,
+            escapedPrefix,
+            type,
+            callback
+          );
+      else if ("object" === type) {
+        if ("function" === typeof children.then)
+          return mapIntoArray(
+            resolveThenable(children),
+            array,
+            escapedPrefix,
+            nameSoFar,
+            callback
+          );
+        array = String(children);
+        throw Error(
+          "Objects are not valid as a React child (found: " + ("[object Object]" === array ? "object with keys {" + Object.keys(children).join(", ") + "}" : array) + "). If you meant to render a collection of children, use an array instead."
+        );
+      }
+      return invokeCallback;
+    }
+    function mapChildren(children, func, context) {
+      if (null == children) return children;
+      var result = [], count = 0;
+      mapIntoArray(children, result, "", "", function(child) {
+        return func.call(context, child, count++);
+      });
+      return result;
+    }
+    function lazyInitializer(payload) {
+      if (-1 === payload._status) {
+        var ctor = payload._result;
+        ctor = ctor();
+        ctor.then(
+          function(moduleObject) {
+            if (0 === payload._status || -1 === payload._status)
+              payload._status = 1, payload._result = moduleObject;
+          },
+          function(error) {
+            if (0 === payload._status || -1 === payload._status)
+              payload._status = 2, payload._result = error;
+          }
+        );
+        -1 === payload._status && (payload._status = 0, payload._result = ctor);
+      }
+      if (1 === payload._status) return payload._result.default;
+      throw payload._result;
+    }
+    var reportGlobalError = "function" === typeof reportError ? reportError : function(error) {
+      if ("object" === typeof window && "function" === typeof window.ErrorEvent) {
+        var event = new window.ErrorEvent("error", {
+          bubbles: true,
+          cancelable: true,
+          message: "object" === typeof error && null !== error && "string" === typeof error.message ? String(error.message) : String(error),
+          error
+        });
+        if (!window.dispatchEvent(event)) return;
+      } else if ("object" === typeof process && "function" === typeof process.emit) {
+        process.emit("uncaughtException", error);
+        return;
+      }
+      console.error(error);
+    };
+    function noop() {
+    }
+    react_production.Children = {
+      map: mapChildren,
+      forEach: function(children, forEachFunc, forEachContext) {
+        mapChildren(
+          children,
+          function() {
+            forEachFunc.apply(this, arguments);
+          },
+          forEachContext
+        );
+      },
+      count: function(children) {
+        var n = 0;
+        mapChildren(children, function() {
+          n++;
+        });
+        return n;
+      },
+      toArray: function(children) {
+        return mapChildren(children, function(child) {
+          return child;
+        }) || [];
+      },
+      only: function(children) {
+        if (!isValidElement(children))
+          throw Error(
+            "React.Children.only expected to receive a single React element child."
+          );
+        return children;
+      }
+    };
+    react_production.Component = Component;
+    react_production.Fragment = REACT_FRAGMENT_TYPE;
+    react_production.Profiler = REACT_PROFILER_TYPE;
+    react_production.PureComponent = PureComponent;
+    react_production.StrictMode = REACT_STRICT_MODE_TYPE;
+    react_production.Suspense = REACT_SUSPENSE_TYPE;
+    react_production.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE = ReactSharedInternals;
+    react_production.__COMPILER_RUNTIME = {
+      __proto__: null,
+      c: function(size) {
+        return ReactSharedInternals.H.useMemoCache(size);
+      }
+    };
+    react_production.cache = function(fn) {
+      return function() {
+        return fn.apply(null, arguments);
+      };
+    };
+    react_production.cloneElement = function(element, config, children) {
+      if (null === element || void 0 === element)
+        throw Error(
+          "The argument must be a React element, but you passed " + element + "."
+        );
+      var props = assign({}, element.props), key = element.key, owner = void 0;
+      if (null != config)
+        for (propName in void 0 !== config.ref && (owner = void 0), void 0 !== config.key && (key = "" + config.key), config)
+          !hasOwnProperty.call(config, propName) || "key" === propName || "__self" === propName || "__source" === propName || "ref" === propName && void 0 === config.ref || (props[propName] = config[propName]);
+      var propName = arguments.length - 2;
+      if (1 === propName) props.children = children;
+      else if (1 < propName) {
+        for (var childArray = Array(propName), i = 0; i < propName; i++)
+          childArray[i] = arguments[i + 2];
+        props.children = childArray;
+      }
+      return ReactElement(element.type, key, void 0, void 0, owner, props);
+    };
+    react_production.createContext = function(defaultValue) {
+      defaultValue = {
+        $$typeof: REACT_CONTEXT_TYPE,
+        _currentValue: defaultValue,
+        _currentValue2: defaultValue,
+        _threadCount: 0,
+        Provider: null,
+        Consumer: null
+      };
+      defaultValue.Provider = defaultValue;
+      defaultValue.Consumer = {
+        $$typeof: REACT_CONSUMER_TYPE,
+        _context: defaultValue
+      };
+      return defaultValue;
+    };
+    react_production.createElement = function(type, config, children) {
+      var propName, props = {}, key = null;
+      if (null != config)
+        for (propName in void 0 !== config.key && (key = "" + config.key), config)
+          hasOwnProperty.call(config, propName) && "key" !== propName && "__self" !== propName && "__source" !== propName && (props[propName] = config[propName]);
+      var childrenLength = arguments.length - 2;
+      if (1 === childrenLength) props.children = children;
+      else if (1 < childrenLength) {
+        for (var childArray = Array(childrenLength), i = 0; i < childrenLength; i++)
+          childArray[i] = arguments[i + 2];
+        props.children = childArray;
+      }
+      if (type && type.defaultProps)
+        for (propName in childrenLength = type.defaultProps, childrenLength)
+          void 0 === props[propName] && (props[propName] = childrenLength[propName]);
+      return ReactElement(type, key, void 0, void 0, null, props);
+    };
+    react_production.createRef = function() {
+      return { current: null };
+    };
+    react_production.forwardRef = function(render) {
+      return { $$typeof: REACT_FORWARD_REF_TYPE, render };
+    };
+    react_production.isValidElement = isValidElement;
+    react_production.lazy = function(ctor) {
+      return {
+        $$typeof: REACT_LAZY_TYPE,
+        _payload: { _status: -1, _result: ctor },
+        _init: lazyInitializer
+      };
+    };
+    react_production.memo = function(type, compare) {
+      return {
+        $$typeof: REACT_MEMO_TYPE,
+        type,
+        compare: void 0 === compare ? null : compare
+      };
+    };
+    react_production.startTransition = function(scope) {
+      var prevTransition = ReactSharedInternals.T, currentTransition = {};
+      ReactSharedInternals.T = currentTransition;
+      try {
+        var returnValue = scope(), onStartTransitionFinish = ReactSharedInternals.S;
+        null !== onStartTransitionFinish && onStartTransitionFinish(currentTransition, returnValue);
+        "object" === typeof returnValue && null !== returnValue && "function" === typeof returnValue.then && returnValue.then(noop, reportGlobalError);
+      } catch (error) {
+        reportGlobalError(error);
+      } finally {
+        ReactSharedInternals.T = prevTransition;
+      }
+    };
+    react_production.unstable_useCacheRefresh = function() {
+      return ReactSharedInternals.H.useCacheRefresh();
+    };
+    react_production.use = function(usable) {
+      return ReactSharedInternals.H.use(usable);
+    };
+    react_production.useActionState = function(action, initialState, permalink) {
+      return ReactSharedInternals.H.useActionState(action, initialState, permalink);
+    };
+    react_production.useCallback = function(callback, deps) {
+      return ReactSharedInternals.H.useCallback(callback, deps);
+    };
+    react_production.useContext = function(Context) {
+      return ReactSharedInternals.H.useContext(Context);
+    };
+    react_production.useDebugValue = function() {
+    };
+    react_production.useDeferredValue = function(value, initialValue) {
+      return ReactSharedInternals.H.useDeferredValue(value, initialValue);
+    };
+    react_production.useEffect = function(create, createDeps, update) {
+      var dispatcher = ReactSharedInternals.H;
+      if ("function" === typeof update)
+        throw Error(
+          "useEffect CRUD overload is not enabled in this build of React."
+        );
+      return dispatcher.useEffect(create, createDeps);
+    };
+    react_production.useId = function() {
+      return ReactSharedInternals.H.useId();
+    };
+    react_production.useImperativeHandle = function(ref, create, deps) {
+      return ReactSharedInternals.H.useImperativeHandle(ref, create, deps);
+    };
+    react_production.useInsertionEffect = function(create, deps) {
+      return ReactSharedInternals.H.useInsertionEffect(create, deps);
+    };
+    react_production.useLayoutEffect = function(create, deps) {
+      return ReactSharedInternals.H.useLayoutEffect(create, deps);
+    };
+    react_production.useMemo = function(create, deps) {
+      return ReactSharedInternals.H.useMemo(create, deps);
+    };
+    react_production.useOptimistic = function(passthrough, reducer) {
+      return ReactSharedInternals.H.useOptimistic(passthrough, reducer);
+    };
+    react_production.useReducer = function(reducer, initialArg, init) {
+      return ReactSharedInternals.H.useReducer(reducer, initialArg, init);
+    };
+    react_production.useRef = function(initialValue) {
+      return ReactSharedInternals.H.useRef(initialValue);
+    };
+    react_production.useState = function(initialState) {
+      return ReactSharedInternals.H.useState(initialState);
+    };
+    react_production.useSyncExternalStore = function(subscribe, getSnapshot, getServerSnapshot) {
+      return ReactSharedInternals.H.useSyncExternalStore(
+        subscribe,
+        getSnapshot,
+        getServerSnapshot
+      );
+    };
+    react_production.useTransition = function() {
+      return ReactSharedInternals.H.useTransition();
+    };
+    react_production.version = "19.1.1";
+    return react_production;
+  }
+  var hasRequiredReact;
+  function requireReact() {
+    if (hasRequiredReact) return react.exports;
+    hasRequiredReact = 1;
+    {
+      react.exports = requireReact_production();
+    }
+    return react.exports;
+  }
+  var reactExports = requireReact();
+  const React = /* @__PURE__ */ getDefaultExportFromCjs(reactExports);
   var client = { exports: {} };
   var reactDomClient_production = {};
   var scheduler = { exports: {} };
@@ -343,6 +795,184 @@
     }
     return scheduler.exports;
   }
+  var reactDom = { exports: {} };
+  var reactDom_production = {};
+  /**
+   * @license React
+   * react-dom.production.js
+   *
+   * Copyright (c) Meta Platforms, Inc. and affiliates.
+   *
+   * This source code is licensed under the MIT license found in the
+   * LICENSE file in the root directory of this source tree.
+   */
+  var hasRequiredReactDom_production;
+  function requireReactDom_production() {
+    if (hasRequiredReactDom_production) return reactDom_production;
+    hasRequiredReactDom_production = 1;
+    var React2 = requireReact();
+    function formatProdErrorMessage(code) {
+      var url = "https://react.dev/errors/" + code;
+      if (1 < arguments.length) {
+        url += "?args[]=" + encodeURIComponent(arguments[1]);
+        for (var i = 2; i < arguments.length; i++)
+          url += "&args[]=" + encodeURIComponent(arguments[i]);
+      }
+      return "Minified React error #" + code + "; visit " + url + " for the full message or use the non-minified dev environment for full errors and additional helpful warnings.";
+    }
+    function noop() {
+    }
+    var Internals = {
+      d: {
+        f: noop,
+        r: function() {
+          throw Error(formatProdErrorMessage(522));
+        },
+        D: noop,
+        C: noop,
+        L: noop,
+        m: noop,
+        X: noop,
+        S: noop,
+        M: noop
+      },
+      p: 0,
+      findDOMNode: null
+    }, REACT_PORTAL_TYPE = Symbol.for("react.portal");
+    function createPortal$1(children, containerInfo, implementation) {
+      var key = 3 < arguments.length && void 0 !== arguments[3] ? arguments[3] : null;
+      return {
+        $$typeof: REACT_PORTAL_TYPE,
+        key: null == key ? null : "" + key,
+        children,
+        containerInfo,
+        implementation
+      };
+    }
+    var ReactSharedInternals = React2.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE;
+    function getCrossOriginStringAs(as, input) {
+      if ("font" === as) return "";
+      if ("string" === typeof input)
+        return "use-credentials" === input ? input : "";
+    }
+    reactDom_production.__DOM_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE = Internals;
+    reactDom_production.createPortal = function(children, container) {
+      var key = 2 < arguments.length && void 0 !== arguments[2] ? arguments[2] : null;
+      if (!container || 1 !== container.nodeType && 9 !== container.nodeType && 11 !== container.nodeType)
+        throw Error(formatProdErrorMessage(299));
+      return createPortal$1(children, container, null, key);
+    };
+    reactDom_production.flushSync = function(fn) {
+      var previousTransition = ReactSharedInternals.T, previousUpdatePriority = Internals.p;
+      try {
+        if (ReactSharedInternals.T = null, Internals.p = 2, fn) return fn();
+      } finally {
+        ReactSharedInternals.T = previousTransition, Internals.p = previousUpdatePriority, Internals.d.f();
+      }
+    };
+    reactDom_production.preconnect = function(href, options) {
+      "string" === typeof href && (options ? (options = options.crossOrigin, options = "string" === typeof options ? "use-credentials" === options ? options : "" : void 0) : options = null, Internals.d.C(href, options));
+    };
+    reactDom_production.prefetchDNS = function(href) {
+      "string" === typeof href && Internals.d.D(href);
+    };
+    reactDom_production.preinit = function(href, options) {
+      if ("string" === typeof href && options && "string" === typeof options.as) {
+        var as = options.as, crossOrigin = getCrossOriginStringAs(as, options.crossOrigin), integrity = "string" === typeof options.integrity ? options.integrity : void 0, fetchPriority = "string" === typeof options.fetchPriority ? options.fetchPriority : void 0;
+        "style" === as ? Internals.d.S(
+          href,
+          "string" === typeof options.precedence ? options.precedence : void 0,
+          {
+            crossOrigin,
+            integrity,
+            fetchPriority
+          }
+        ) : "script" === as && Internals.d.X(href, {
+          crossOrigin,
+          integrity,
+          fetchPriority,
+          nonce: "string" === typeof options.nonce ? options.nonce : void 0
+        });
+      }
+    };
+    reactDom_production.preinitModule = function(href, options) {
+      if ("string" === typeof href)
+        if ("object" === typeof options && null !== options) {
+          if (null == options.as || "script" === options.as) {
+            var crossOrigin = getCrossOriginStringAs(
+              options.as,
+              options.crossOrigin
+            );
+            Internals.d.M(href, {
+              crossOrigin,
+              integrity: "string" === typeof options.integrity ? options.integrity : void 0,
+              nonce: "string" === typeof options.nonce ? options.nonce : void 0
+            });
+          }
+        } else null == options && Internals.d.M(href);
+    };
+    reactDom_production.preload = function(href, options) {
+      if ("string" === typeof href && "object" === typeof options && null !== options && "string" === typeof options.as) {
+        var as = options.as, crossOrigin = getCrossOriginStringAs(as, options.crossOrigin);
+        Internals.d.L(href, as, {
+          crossOrigin,
+          integrity: "string" === typeof options.integrity ? options.integrity : void 0,
+          nonce: "string" === typeof options.nonce ? options.nonce : void 0,
+          type: "string" === typeof options.type ? options.type : void 0,
+          fetchPriority: "string" === typeof options.fetchPriority ? options.fetchPriority : void 0,
+          referrerPolicy: "string" === typeof options.referrerPolicy ? options.referrerPolicy : void 0,
+          imageSrcSet: "string" === typeof options.imageSrcSet ? options.imageSrcSet : void 0,
+          imageSizes: "string" === typeof options.imageSizes ? options.imageSizes : void 0,
+          media: "string" === typeof options.media ? options.media : void 0
+        });
+      }
+    };
+    reactDom_production.preloadModule = function(href, options) {
+      if ("string" === typeof href)
+        if (options) {
+          var crossOrigin = getCrossOriginStringAs(options.as, options.crossOrigin);
+          Internals.d.m(href, {
+            as: "string" === typeof options.as && "script" !== options.as ? options.as : void 0,
+            crossOrigin,
+            integrity: "string" === typeof options.integrity ? options.integrity : void 0
+          });
+        } else Internals.d.m(href);
+    };
+    reactDom_production.requestFormReset = function(form) {
+      Internals.d.r(form);
+    };
+    reactDom_production.unstable_batchedUpdates = function(fn, a) {
+      return fn(a);
+    };
+    reactDom_production.useFormState = function(action, initialState, permalink) {
+      return ReactSharedInternals.H.useFormState(action, initialState, permalink);
+    };
+    reactDom_production.useFormStatus = function() {
+      return ReactSharedInternals.H.useHostTransitionStatus();
+    };
+    reactDom_production.version = "19.1.1";
+    return reactDom_production;
+  }
+  var hasRequiredReactDom;
+  function requireReactDom() {
+    if (hasRequiredReactDom) return reactDom.exports;
+    hasRequiredReactDom = 1;
+    function checkDCE() {
+      if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ === "undefined" || typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.checkDCE !== "function") {
+        return;
+      }
+      try {
+        __REACT_DEVTOOLS_GLOBAL_HOOK__.checkDCE(checkDCE);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    {
+      checkDCE();
+      reactDom.exports = requireReactDom_production();
+    }
+    return reactDom.exports;
+  }
   /**
    * @license React
    * react-dom-client.production.js
@@ -356,7 +986,7 @@
   function requireReactDomClient_production() {
     if (hasRequiredReactDomClient_production) return reactDomClient_production;
     hasRequiredReactDomClient_production = 1;
-    var Scheduler = requireScheduler(), React = require$$1, ReactDOM2 = require$$2;
+    var Scheduler = requireScheduler(), React2 = requireReact(), ReactDOM2 = requireReactDom();
     function formatProdErrorMessage(code) {
       var url = "https://react.dev/errors/" + code;
       if (1 < arguments.length) {
@@ -524,7 +1154,7 @@
         }
       return null;
     }
-    var isArrayImpl = Array.isArray, ReactSharedInternals = React.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, ReactDOMSharedInternals = ReactDOM2.__DOM_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, sharedNotPendingObject = {
+    var isArrayImpl = Array.isArray, ReactSharedInternals = React2.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, ReactDOMSharedInternals = ReactDOM2.__DOM_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, sharedNotPendingObject = {
       pending: false,
       data: null,
       method: null,
@@ -11310,13 +11940,13 @@
         0 === i && attemptExplicitHydrationTarget(target);
       }
     };
-    var isomorphicReactPackageVersion$jscomp$inline_1785 = React.version;
-    if ("19.1.0" !== isomorphicReactPackageVersion$jscomp$inline_1785)
+    var isomorphicReactPackageVersion$jscomp$inline_1785 = React2.version;
+    if ("19.1.1" !== isomorphicReactPackageVersion$jscomp$inline_1785)
       throw Error(
         formatProdErrorMessage(
           527,
           isomorphicReactPackageVersion$jscomp$inline_1785,
-          "19.1.0"
+          "19.1.1"
         )
       );
     ReactDOMSharedInternals.findDOMNode = function(componentOrElement) {
@@ -11334,10 +11964,10 @@
     };
     var internals$jscomp$inline_2256 = {
       bundleType: 0,
-      version: "19.1.0",
+      version: "19.1.1",
       rendererPackageName: "react-dom",
       currentDispatcherRef: ReactSharedInternals,
-      reconcilerVersion: "19.1.0"
+      reconcilerVersion: "19.1.1"
     };
     if ("undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__) {
       var hook$jscomp$inline_2257 = __REACT_DEVTOOLS_GLOBAL_HOOK__;
@@ -11404,7 +12034,7 @@
       listenToAllSupportedEvents(container);
       return new ReactDOMHydrationRoot(initialChildren);
     };
-    reactDomClient_production.version = "19.1.0";
+    reactDomClient_production.version = "19.1.1";
     return reactDomClient_production;
   }
   var hasRequiredClient;
@@ -11432,7 +12062,7 @@
   const reactLogo = "data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20xmlns:xlink='http://www.w3.org/1999/xlink'%20aria-hidden='true'%20role='img'%20class='iconify%20iconify--logos'%20width='35.93'%20height='32'%20preserveAspectRatio='xMidYMid%20meet'%20viewBox='0%200%20256%20228'%3e%3cpath%20fill='%2300D8FF'%20d='M210.483%2073.824a171.49%20171.49%200%200%200-8.24-2.597c.465-1.9.893-3.777%201.273-5.621c6.238-30.281%202.16-54.676-11.769-62.708c-13.355-7.7-35.196.329-57.254%2019.526a171.23%20171.23%200%200%200-6.375%205.848a155.866%20155.866%200%200%200-4.241-3.917C100.759%203.829%2077.587-4.822%2063.673%203.233C50.33%2010.957%2046.379%2033.89%2051.995%2062.588a170.974%20170.974%200%200%200%201.892%208.48c-3.28.932-6.445%201.924-9.474%202.98C17.309%2083.498%200%2098.307%200%20113.668c0%2015.865%2018.582%2031.778%2046.812%2041.427a145.52%20145.52%200%200%200%206.921%202.165a167.467%20167.467%200%200%200-2.01%209.138c-5.354%2028.2-1.173%2050.591%2012.134%2058.266c13.744%207.926%2036.812-.22%2059.273-19.855a145.567%20145.567%200%200%200%205.342-4.923a168.064%20168.064%200%200%200%206.92%206.314c21.758%2018.722%2043.246%2026.282%2056.54%2018.586c13.731-7.949%2018.194-32.003%2012.4-61.268a145.016%20145.016%200%200%200-1.535-6.842c1.62-.48%203.21-.974%204.76-1.488c29.348-9.723%2048.443-25.443%2048.443-41.52c0-15.417-17.868-30.326-45.517-39.844Zm-6.365%2070.984c-1.4.463-2.836.91-4.3%201.345c-3.24-10.257-7.612-21.163-12.963-32.432c5.106-11%209.31-21.767%2012.459-31.957c2.619.758%205.16%201.557%207.61%202.4c23.69%208.156%2038.14%2020.213%2038.14%2029.504c0%209.896-15.606%2022.743-40.946%2031.14Zm-10.514%2020.834c2.562%2012.94%202.927%2024.64%201.23%2033.787c-1.524%208.219-4.59%2013.698-8.382%2015.893c-8.067%204.67-25.32-1.4-43.927-17.412a156.726%20156.726%200%200%201-6.437-5.87c7.214-7.889%2014.423-17.06%2021.459-27.246c12.376-1.098%2024.068-2.894%2034.671-5.345a134.17%20134.17%200%200%201%201.386%206.193ZM87.276%20214.515c-7.882%202.783-14.16%202.863-17.955.675c-8.075-4.657-11.432-22.636-6.853-46.752a156.923%20156.923%200%200%201%201.869-8.499c10.486%202.32%2022.093%203.988%2034.498%204.994c7.084%209.967%2014.501%2019.128%2021.976%2027.15a134.668%20134.668%200%200%201-4.877%204.492c-9.933%208.682-19.886%2014.842-28.658%2017.94ZM50.35%20144.747c-12.483-4.267-22.792-9.812-29.858-15.863c-6.35-5.437-9.555-10.836-9.555-15.216c0-9.322%2013.897-21.212%2037.076-29.293c2.813-.98%205.757-1.905%208.812-2.773c3.204%2010.42%207.406%2021.315%2012.477%2032.332c-5.137%2011.18-9.399%2022.249-12.634%2032.792a134.718%20134.718%200%200%201-6.318-1.979Zm12.378-84.26c-4.811-24.587-1.616-43.134%206.425-47.789c8.564-4.958%2027.502%202.111%2047.463%2019.835a144.318%20144.318%200%200%201%203.841%203.545c-7.438%207.987-14.787%2017.08-21.808%2026.988c-12.04%201.116-23.565%202.908-34.161%205.309a160.342%20160.342%200%200%201-1.76-7.887Zm110.427%2027.268a347.8%20347.8%200%200%200-7.785-12.803c8.168%201.033%2015.994%202.404%2023.343%204.08c-2.206%207.072-4.956%2014.465-8.193%2022.045a381.151%20381.151%200%200%200-7.365-13.322Zm-45.032-43.861c5.044%205.465%2010.096%2011.566%2015.065%2018.186a322.04%20322.04%200%200%200-30.257-.006c4.974-6.559%2010.069-12.652%2015.192-18.18ZM82.802%2087.83a323.167%20323.167%200%200%200-7.227%2013.238c-3.184-7.553-5.909-14.98-8.134-22.152c7.304-1.634%2015.093-2.97%2023.209-3.984a321.524%20321.524%200%200%200-7.848%2012.897Zm8.081%2065.352c-8.385-.936-16.291-2.203-23.593-3.793c2.26-7.3%205.045-14.885%208.298-22.6a321.187%20321.187%200%200%200%207.257%2013.246c2.594%204.48%205.28%208.868%208.038%2013.147Zm37.542%2031.03c-5.184-5.592-10.354-11.779-15.403-18.433c4.902.192%209.899.29%2014.978.29c5.218%200%2010.376-.117%2015.453-.343c-4.985%206.774-10.018%2012.97-15.028%2018.486Zm52.198-57.817c3.422%207.8%206.306%2015.345%208.596%2022.52c-7.422%201.694-15.436%203.058-23.88%204.071a382.417%20382.417%200%200%200%207.859-13.026a347.403%20347.403%200%200%200%207.425-13.565Zm-16.898%208.101a358.557%20358.557%200%200%201-12.281%2019.815a329.4%20329.4%200%200%201-23.444.823c-7.967%200-15.716-.248-23.178-.732a310.202%20310.202%200%200%201-12.513-19.846h.001a307.41%20307.41%200%200%201-10.923-20.627a310.278%20310.278%200%200%201%2010.89-20.637l-.001.001a307.318%20307.318%200%200%201%2012.413-19.761c7.613-.576%2015.42-.876%2023.31-.876H128c7.926%200%2015.743.303%2023.354.883a329.357%20329.357%200%200%201%2012.335%2019.695a358.489%20358.489%200%200%201%2011.036%2020.54a329.472%20329.472%200%200%201-11%2020.722Zm22.56-122.124c8.572%204.944%2011.906%2024.881%206.52%2051.026c-.344%201.668-.73%203.367-1.15%205.09c-10.622-2.452-22.155-4.275-34.23-5.408c-7.034-10.017-14.323-19.124-21.64-27.008a160.789%20160.789%200%200%201%205.888-5.4c18.9-16.447%2036.564-22.941%2044.612-18.3ZM128%2090.808c12.625%200%2022.86%2010.235%2022.86%2022.86s-10.235%2022.86-22.86%2022.86s-22.86-10.235-22.86-22.86s10.235-22.86%2022.86-22.86Z'%3e%3c/path%3e%3c/svg%3e";
   const viteLogo = "data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20xmlns:xlink='http://www.w3.org/1999/xlink'%20aria-hidden='true'%20role='img'%20class='iconify%20iconify--logos'%20width='31.88'%20height='32'%20preserveAspectRatio='xMidYMid%20meet'%20viewBox='0%200%20256%20257'%3e%3cdefs%3e%3clinearGradient%20id='IconifyId1813088fe1fbc01fb466'%20x1='-.828%25'%20x2='57.636%25'%20y1='7.652%25'%20y2='78.411%25'%3e%3cstop%20offset='0%25'%20stop-color='%2341D1FF'%3e%3c/stop%3e%3cstop%20offset='100%25'%20stop-color='%23BD34FE'%3e%3c/stop%3e%3c/linearGradient%3e%3clinearGradient%20id='IconifyId1813088fe1fbc01fb467'%20x1='43.376%25'%20x2='50.316%25'%20y1='2.242%25'%20y2='89.03%25'%3e%3cstop%20offset='0%25'%20stop-color='%23FFEA83'%3e%3c/stop%3e%3cstop%20offset='8.333%25'%20stop-color='%23FFDD35'%3e%3c/stop%3e%3cstop%20offset='100%25'%20stop-color='%23FFA800'%3e%3c/stop%3e%3c/linearGradient%3e%3c/defs%3e%3cpath%20fill='url(%23IconifyId1813088fe1fbc01fb466)'%20d='M255.153%2037.938L134.897%20252.976c-2.483%204.44-8.862%204.466-11.382.048L.875%2037.958c-2.746-4.814%201.371-10.646%206.827-9.67l120.385%2021.517a6.537%206.537%200%200%200%202.322-.004l117.867-21.483c5.438-.991%209.574%204.796%206.877%209.62Z'%3e%3c/path%3e%3cpath%20fill='url(%23IconifyId1813088fe1fbc01fb467)'%20d='M185.432.063L96.44%2017.501a3.268%203.268%200%200%200-2.634%203.014l-5.474%2092.456a3.268%203.268%200%200%200%203.997%203.378l24.777-5.718c2.318-.535%204.413%201.507%203.936%203.838l-7.361%2036.047c-.495%202.426%201.782%204.5%204.151%203.78l15.304-4.649c2.372-.72%204.652%201.36%204.15%203.788l-11.698%2056.621c-.732%203.542%203.979%205.473%205.943%202.437l1.313-2.028l72.516-144.72c1.215-2.423-.88-5.186-3.54-4.672l-25.505%204.922c-2.396.462-4.435-1.77-3.759-4.114l16.646-57.705c.677-2.35-1.37-4.583-3.769-4.113Z'%3e%3c/path%3e%3c/svg%3e";
   function App() {
-    const [count, setCount] = require$$1.useState(0);
+    const [count, setCount] = reactExports.useState(0);
     return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "App", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "https://vitejs.dev", target: "_blank", children: /* @__PURE__ */ jsxRuntimeExports.jsx("img", { src: viteLogo, className: "logo", alt: "Vite logo" }) }),
@@ -11460,7 +12090,7 @@
       return app;
     })()
   ).render(
-    /* @__PURE__ */ jsxRuntimeExports.jsx(require$$1.StrictMode, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(App, {}) })
+    /* @__PURE__ */ jsxRuntimeExports.jsx(React.StrictMode, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(App, {}) })
   );
 
-})(React, ReactDOM);
+})();

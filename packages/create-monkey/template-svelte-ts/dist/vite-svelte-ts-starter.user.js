@@ -7,10 +7,12 @@
 // @grant      GM_addStyle
 // ==/UserScript==
 
-(e=>{if(typeof GM_addStyle=="function"){GM_addStyle(e);return}const o=document.createElement("style");o.textContent=e,document.head.append(o)})(" :root{font-family:Inter,Avenir,Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;font-weight:400;color-scheme:light dark;color:#ffffffde;background-color:#242424;font-synthesis:none;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;-webkit-text-size-adjust:100%}a{font-weight:500;color:#646cff;text-decoration:inherit}a:hover{color:#535bf2}body{margin:0;display:flex;place-items:center;min-width:320px;min-height:100vh}h1{font-size:3.2em;line-height:1.1}.card{padding:2em}#app{max-width:1280px;margin:0 auto;padding:2rem;text-align:center}button{border-radius:8px;border:1px solid transparent;padding:.6em 1.2em;font-size:1em;font-weight:500;font-family:inherit;background-color:#1a1a1a;cursor:pointer;transition:border-color .25s}button:hover{border-color:#646cff}button:focus,button:focus-visible{outline:4px auto -webkit-focus-ring-color}@media (prefers-color-scheme: light){:root{color:#213547;background-color:#fff}a:hover{color:#747bff}button{background-color:#f9f9f9}}.logo.svelte-11cv5lq{height:6em;padding:1.5em;will-change:filter;transition:filter .3s}.logo.svelte-11cv5lq:hover{filter:drop-shadow(0 0 2em #646cffaa)}.logo.svelte.svelte-11cv5lq:hover{filter:drop-shadow(0 0 2em #ff3e00aa)}.read-the-docs.svelte-11cv5lq{color:#888} ");
-
 (function () {
   'use strict';
+
+  const d=new Set;const o = async e=>{d.has(e)||(d.add(e),(t=>{typeof GM_addStyle=="function"?GM_addStyle(t):document.head.appendChild(document.createElement("style")).append(t);})(e));};
+
+  o(" :root{font-family:Inter,Avenir,Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;font-weight:400;color-scheme:light dark;color:#ffffffde;background-color:#242424;font-synthesis:none;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;-webkit-text-size-adjust:100%}a{font-weight:500;color:#646cff;text-decoration:inherit}a:hover{color:#535bf2}body{margin:0;display:flex;place-items:center;min-width:320px;min-height:100vh}h1{font-size:3.2em;line-height:1.1}.card{padding:2em}#app{max-width:1280px;margin:0 auto;padding:2rem;text-align:center}button{border-radius:8px;border:1px solid transparent;padding:.6em 1.2em;font-size:1em;font-weight:500;font-family:inherit;background-color:#1a1a1a;cursor:pointer;transition:border-color .25s}button:hover{border-color:#646cff}button:focus,button:focus-visible{outline:4px auto -webkit-focus-ring-color}@media (prefers-color-scheme: light){:root{color:#213547;background-color:#fff}a:hover{color:#747bff}button{background-color:#f9f9f9}}.logo.svelte-11cv5lq{height:6em;padding:1.5em;will-change:filter;transition:filter .3s}.logo.svelte-11cv5lq:hover{filter:drop-shadow(0 0 2em #646cffaa)}.logo.svelte.svelte-11cv5lq:hover{filter:drop-shadow(0 0 2em #ff3e00aa)}.read-the-docs.svelte-11cv5lq{color:#888} ");
 
   const DEV = false;
   var is_array = Array.isArray;
@@ -444,7 +446,7 @@
      * They keys of this map are identical to `this.#previous`
      * @type {Map<Source, any>}
      */
-    #current = /* @__PURE__ */ new Map();
+    current = /* @__PURE__ */ new Map();
     /**
      * The values of any sources that are updated in this batch _before_ those updates took place.
      * They keys of this map are identical to `this.#current`
@@ -503,6 +505,16 @@
      */
     #block_effects = [];
     /**
+     * Deferred effects (which run after async work has completed) that are DIRTY
+     * @type {Effect[]}
+     */
+    #dirty_effects = [];
+    /**
+     * Deferred effects that are MAYBE_DIRTY
+     * @type {Effect[]}
+     */
+    #maybe_dirty_effects = [];
+    /**
      * A set of branches that still exist, but will be destroyed when this batch
      * is committed — we skip over these during `process`
      * @type {Set<Effect>}
@@ -512,13 +524,13 @@
      *
      * @param {Effect[]} root_effects
      */
-    #process(root_effects) {
+    process(root_effects) {
       queued_root_effects = [];
       var current_values = null;
       if (batches.size > 1) {
         current_values = /* @__PURE__ */ new Map();
         batch_deriveds = /* @__PURE__ */ new Map();
-        for (const [source2, current] of this.#current) {
+        for (const [source2, current] of this.current) {
           current_values.set(source2, { v: source2.v, wv: source2.wv });
           source2.v = current;
         }
@@ -536,19 +548,25 @@
         this.#traverse_effect_tree(root2);
       }
       if (this.#async_effects.length === 0 && this.#pending === 0) {
+        this.#commit();
         var render_effects = this.#render_effects;
         var effects = this.#effects;
         this.#render_effects = [];
         this.#effects = [];
         this.#block_effects = [];
-        this.#commit();
+        current_batch = null;
         flush_queued_effects(render_effects);
         flush_queued_effects(effects);
+        if (current_batch === null) {
+          current_batch = this;
+        } else {
+          batches.delete(this);
+        }
         this.#deferred?.resolve();
       } else {
-        for (const e of this.#render_effects) set_signal_status(e, CLEAN);
-        for (const e of this.#effects) set_signal_status(e, CLEAN);
-        for (const e of this.#block_effects) set_signal_status(e, CLEAN);
+        this.#defer_effects(this.#render_effects);
+        this.#defer_effects(this.#effects);
+        this.#defer_effects(this.#block_effects);
       }
       if (current_values) {
         for (const [source2, { v, wv }] of current_values) {
@@ -585,11 +603,11 @@
             effect.f ^= CLEAN;
           } else if ((flags & EFFECT) !== 0) {
             this.#effects.push(effect);
-          } else if (is_dirty(effect)) {
+          } else if ((flags & CLEAN) === 0) {
             if ((flags & ASYNC) !== 0) {
               var effects = effect.b?.pending ? this.#boundary_async_effects : this.#async_effects;
               effects.push(effect);
-            } else {
+            } else if (is_dirty(effect)) {
               if ((effect.f & BLOCK_EFFECT) !== 0) this.#block_effects.push(effect);
               update_effect(effect);
             }
@@ -609,6 +627,17 @@
       }
     }
     /**
+     * @param {Effect[]} effects
+     */
+    #defer_effects(effects) {
+      for (const e of effects) {
+        const target = (e.f & DIRTY) !== 0 ? this.#dirty_effects : this.#maybe_dirty_effects;
+        target.push(e);
+        set_signal_status(e, CLEAN);
+      }
+      effects.length = 0;
+    }
+    /**
      * Associate a change to a given source with the current
      * batch, noting its previous and current values
      * @param {Source} source
@@ -618,7 +647,7 @@
       if (!this.#previous.has(source2)) {
         this.#previous.set(source2, value);
       }
-      this.#current.set(source2, source2.v);
+      this.current.set(source2, source2.v);
     }
     activate() {
       current_batch = this;
@@ -638,7 +667,7 @@
     }
     flush() {
       if (queued_root_effects.length > 0) {
-        this.flush_effects();
+        flush_effects();
       } else {
         this.#commit();
       }
@@ -649,27 +678,6 @@
         batches.delete(this);
       }
       this.deactivate();
-    }
-    flush_effects() {
-      var was_updating_effect = is_updating_effect;
-      is_flushing = true;
-      try {
-        var flush_count = 0;
-        set_is_updating_effect(true);
-        while (queued_root_effects.length > 0) {
-          if (flush_count++ > 1e3) {
-            var updates, entry;
-            if (DEV) ;
-            infinite_loop_guard();
-          }
-          this.#process(queued_root_effects);
-          old_values.clear();
-        }
-      } finally {
-        is_flushing = false;
-        set_is_updating_effect(was_updating_effect);
-        last_scheduled_effect = null;
-      }
     }
     /**
      * Append and remove branches to/from the DOM
@@ -688,16 +696,12 @@
     decrement() {
       this.#pending -= 1;
       if (this.#pending === 0) {
-        for (const e of this.#render_effects) {
+        for (const e of this.#dirty_effects) {
           set_signal_status(e, DIRTY);
           schedule_effect(e);
         }
-        for (const e of this.#effects) {
-          set_signal_status(e, DIRTY);
-          schedule_effect(e);
-        }
-        for (const e of this.#block_effects) {
-          set_signal_status(e, DIRTY);
+        for (const e of this.#maybe_dirty_effects) {
+          set_signal_status(e, MAYBE_DIRTY);
           schedule_effect(e);
         }
         this.#render_effects = [];
@@ -714,11 +718,11 @@
     settled() {
       return (this.#deferred ??= deferred()).promise;
     }
-    static ensure(autoflush = true) {
+    static ensure() {
       if (current_batch === null) {
         const batch = current_batch = new Batch();
         batches.add(current_batch);
-        if (autoflush) {
+        {
           Batch.enqueue(() => {
             if (current_batch !== batch) {
               return;
@@ -737,6 +741,28 @@
       tasks.unshift(task);
     }
   }
+  function flush_effects() {
+    var was_updating_effect = is_updating_effect;
+    is_flushing = true;
+    try {
+      var flush_count = 0;
+      set_is_updating_effect(true);
+      while (queued_root_effects.length > 0) {
+        var batch = Batch.ensure();
+        if (flush_count++ > 1e3) {
+          var updates, entry;
+          if (DEV) ;
+          infinite_loop_guard();
+        }
+        batch.process(queued_root_effects);
+        old_values.clear();
+      }
+    } finally {
+      is_flushing = false;
+      set_is_updating_effect(was_updating_effect);
+      last_scheduled_effect = null;
+    }
+  }
   function infinite_loop_guard() {
     try {
       effect_update_depth_exceeded();
@@ -744,31 +770,33 @@
       invoke_error_boundary(error, last_scheduled_effect);
     }
   }
+  let eager_block_effects = null;
   function flush_queued_effects(effects) {
     var length = effects.length;
     if (length === 0) return;
-    for (var i = 0; i < length; i++) {
-      var effect = effects[i];
-      if ((effect.f & (DESTROYED | INERT)) === 0) {
-        if (is_dirty(effect)) {
-          var wv = write_version;
-          update_effect(effect);
-          if (effect.deps === null && effect.first === null && effect.nodes_start === null) {
-            if (effect.teardown === null && effect.ac === null) {
-              unlink_effect(effect);
-            } else {
-              effect.fn = null;
-            }
+    var i = 0;
+    while (i < length) {
+      var effect = effects[i++];
+      if ((effect.f & (DESTROYED | INERT)) === 0 && is_dirty(effect)) {
+        eager_block_effects = [];
+        update_effect(effect);
+        if (effect.deps === null && effect.first === null && effect.nodes_start === null) {
+          if (effect.teardown === null && effect.ac === null) {
+            unlink_effect(effect);
+          } else {
+            effect.fn = null;
           }
-          if (write_version > wv && (effect.f & USER_EFFECT) !== 0) {
-            break;
+        }
+        if (eager_block_effects.length > 0) {
+          old_values.clear();
+          for (const e of eager_block_effects) {
+            update_effect(e);
           }
+          eager_block_effects = [];
         }
       }
     }
-    for (; i < length; i += 1) {
-      schedule_effect(effects[i]);
-    }
+    eager_block_effects = null;
   }
   function schedule_effect(signal) {
     var effect = last_scheduled_effect = signal;
@@ -822,7 +850,7 @@
         old_values.set(source2, old_value);
       }
       source2.v = value;
-      const batch = Batch.ensure();
+      var batch = Batch.ensure();
       batch.capture(source2, old_value);
       if ((source2.f & DERIVED) !== 0) {
         if ((source2.f & DIRTY) !== 0) {
@@ -857,7 +885,8 @@
       var reaction = reactions[i];
       var flags = reaction.f;
       if (!runes && reaction === active_effect) continue;
-      if ((flags & DIRTY) === 0) {
+      var not_dirty = (flags & DIRTY) === 0;
+      if (not_dirty) {
         set_signal_status(reaction, status);
       }
       if ((flags & DERIVED) !== 0) {
@@ -866,7 +895,15 @@
           reaction,
           MAYBE_DIRTY
         );
-      } else if ((flags & DIRTY) === 0) {
+      } else if (not_dirty) {
+        if ((flags & BLOCK_EFFECT) !== 0) {
+          if (eager_block_effects !== null) {
+            eager_block_effects.push(
+              /** @type {Effect} */
+              reaction
+            );
+          }
+        }
         schedule_effect(
           /** @type {Effect} */
           reaction
@@ -1116,6 +1153,18 @@
       return next_sibling;
     }
   }
+  function without_reactive_context(fn) {
+    var previous_reaction = active_reaction;
+    var previous_effect = active_effect;
+    set_active_reaction(null);
+    set_active_effect(null);
+    try {
+      return fn();
+    } finally {
+      set_active_reaction(previous_reaction);
+      set_active_effect(previous_effect);
+    }
+  }
   function push_effect(effect, parent_effect) {
     var parent_last = parent_effect.last;
     if (parent_last === null) {
@@ -1165,7 +1214,7 @@
       if (parent !== null) {
         push_effect(effect, parent);
       }
-      if (active_reaction !== null && (active_reaction.f & DERIVED) !== 0) {
+      if (active_reaction !== null && (active_reaction.f & DERIVED) !== 0 && (type & ROOT_EFFECT) === 0) {
         var derived2 = (
           /** @type {Derived} */
           active_reaction
@@ -1225,7 +1274,12 @@
     var effect = signal.first;
     signal.first = signal.last = null;
     while (effect !== null) {
-      effect.ac?.abort(STALE_REACTION);
+      const controller = effect.ac;
+      if (controller !== null) {
+        without_reactive_context(() => {
+          controller.abort(STALE_REACTION);
+        });
+      }
       var next = effect.next;
       if ((effect.f & ROOT_EFFECT) !== 0) {
         effect.parent = null;
@@ -1477,15 +1531,18 @@
     untracking = false;
     update_version = ++read_version;
     if (reaction.ac !== null) {
-      reaction.ac.abort(STALE_REACTION);
+      without_reactive_context(() => {
+        reaction.ac.abort(STALE_REACTION);
+      });
       reaction.ac = null;
     }
     try {
       reaction.f |= REACTION_IS_UPDATING;
-      var result = (
+      var fn = (
         /** @type {Function} */
-        (0, reaction.fn)()
+        reaction.fn
       );
+      var result = fn();
       var deps = reaction.deps;
       if (new_deps !== null) {
         var i;
@@ -1719,6 +1776,7 @@
       fn(events);
     }
   }
+  let last_propagated_event = null;
   function handle_event_propagation(event) {
     var handler_element = this;
     var owner_document = (
@@ -1731,8 +1789,9 @@
       /** @type {null | Element} */
       path[0] || event.target
     );
+    last_propagated_event = event;
     var path_idx = 0;
-    var handled_at = event.__root;
+    var handled_at = last_propagated_event === event && event.__root;
     if (handled_at) {
       var at_idx = path.indexOf(handled_at);
       if (at_idx !== -1 && (handler_element === document || handler_element === /** @type {any} */

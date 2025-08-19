@@ -1,8 +1,13 @@
 import { defineConfig } from 'vite';
-import monkey from 'vite-plugin-monkey';
+import vue from '@vitejs/plugin-vue';
+import monkey, { cdn } from 'vite-plugin-monkey';
+import unocss from 'unocss/vite';
+import { presetMini } from 'unocss';
 
 export default defineConfig({
   plugins: [
+    vue(),
+    unocss({ presets: [presetMini()] }),
     monkey({
       entry: 'src/main.ts',
       userscript: {
@@ -13,7 +18,14 @@ export default defineConfig({
       },
       build: {
         metaFileName: true,
-        // cssSideEffects: (css) => `GM_addStyle(${JSON.stringify(css)});`,
+        externalGlobals: {
+          vue: cdn.jsdelivr('Vue'),
+        },
+        externalResource: {
+          'element-plus/dist/index.css': cdn.jsdelivr(),
+          'element-plus/dist/index.css?inline': cdn.jsdelivr(),
+          'normalize.css': cdn.jsdelivr(),
+        },
       },
     }),
   ],

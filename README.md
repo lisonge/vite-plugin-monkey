@@ -289,33 +289,21 @@ export interface MonkeyOption {
 
     /**
      * @default
-     * const defaultFc = () => {
-     *   return (e: string) => {
-     *     if (typeof GM_addStyle == 'function') {
-     *       GM_addStyle(e);
-     *       return;
-     *     }
-     *     const o = document.createElement('style');
-     *     o.textContent = e;
-     *     document.head.append(o);
-     *   };
+     * const importCss = (css: string): void => {
+     *   if (typeof GM_addStyle === 'function') {
+     *     GM_addStyle(css);
+     *   } else {
+     *     document.head.appendChild(document.createElement('style')).append(css);
+     *   }
      * };
      * @example
-     * const defaultFc1 = () => {
-     *   return (e: string) => {
-     *     const o = document.createElement('style');
-     *     o.textContent = e;
-     *     document.head.append(o);
-     *   };
-     * };
-     * const defaultFc2 = (css:string)=>{
-     *   const t = JSON.stringify(css)
-     *   return `(e=>{const o=document.createElement("style");o.textContent=e,document.head.append(o)})(${t})`
-     * }
+     * // example1
+     * importCss.toString()
+     * 
+     * // example2
+     * `(a)=>GM_addStyle(a)`
      */
-    cssSideEffects?: (
-      css: string,
-    ) => Thenable<string | ((css: string) => void)>;
+    cssSideEffects?: string | ((css: string) => void)
   };
 }
 ```

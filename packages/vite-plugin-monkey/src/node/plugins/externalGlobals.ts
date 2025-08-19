@@ -50,9 +50,7 @@ export const externalGlobalsFactory = (
       return {
         build: {
           rollupOptions: {
-            external(source, _importer, _isResolved) {
-              return source in option.globalsPkg2VarName;
-            },
+            external: Object.keys(option.globalsPkg2VarName),
           },
         },
       };

@@ -4,7 +4,8 @@ import { build } from 'vite';
 import { finalMonkeyOptionToComment } from '../userscript';
 import { collectGrant } from '../utils/grant';
 import {
-  getInjectCssCode,
+  getCssModuleCode,
+  miniCode,
   moduleExportExpressionWrapper,
 } from '../utils/others';
 import { getSystemjsRequireUrls, getSystemjsTexts } from '../utils/systemjs';
@@ -14,8 +15,11 @@ import {
   transformTlaToIdentifier,
 } from '../utils/topLevelAwait';
 import type { ResolvedMonkeyOption } from '../utils/types';
+import { cssModuleId, virtualCssModuleId } from './css';
 
 const __entry_name = `__monkey.entry.js`;
+const cssModuleEntryId = cssModuleId + `-entry`;
+const virtualCssModuleEntryId = '\0' + cssModuleEntryId;
 
 // https://github.com/vitejs/vite/blob/main/packages/plugin-legacy/src/index.ts
 const polyfillId = '\0vite/legacy-polyfills';
@@ -59,6 +63,32 @@ export const buildBundleFactory = (
         (s) => s.facadeModuleId != polyfillId,
       );
 
+      const cssCode = Object.entries(rawBundle)
+        .map(([k, v]) => {
+          if (v.type == 'asset' && k.endsWith('.css')) {
+            delete rawBundle[k];
+            return v.source.toString();
+          }
+        })
+        .filter(Boolean)
+        .join('')
+        .trim();
+
+      let cssJsCode = '';
+      const entryCode = (() => {
+        const e = Array.from(entryChunks);
+        const codes: string[] = [];
+        if (cssCode) {
+          if (e[0].facadeModuleId === polyfillId) {
+            codes.push(`import ${JSON.stringify(`./${e[0].fileName}`)};`);
+            e.shift();
+          }
+          codes.push(`import '${cssModuleEntryId}';`);
+        }
+        codes.push(...e.map((c) => `import '${c.fileName}';`));
+        return codes.join('\n');
+      })();
+
       const hasDynamicImport = entryChunks.some(
         (e) => e.dynamicImports.length > 0,
       );
@@ -79,6 +109,8 @@ export const buildBundleFactory = (
               if (!importer && options.isEntry) {
                 return '\0' + source;
               }
+              if (source === cssModuleEntryId) return virtualCssModuleEntryId;
+              if (source === cssModuleId) return virtualCssModuleId;
               const chunk = Object.values(rawBundle).find(
                 (chunk) =>
                   chunk.type == 'chunk' && source.endsWith(chunk.fileName),
@@ -89,11 +121,18 @@ export const buildBundleFactory = (
             },
             async load(id) {
               if (!id.startsWith('\0')) return;
-
+              if (id === virtualCssModuleEntryId) {
+                // use \x20 compat unocss
+                return miniCode(
+                  `import css from '${cssModuleId}'; css(${JSON.stringify('\x20' + cssCode + '\x20')});`,
+                );
+              }
+              if (id === virtualCssModuleId) {
+                cssJsCode = getCssModuleCode(option.cssSideEffects);
+                return miniCode(cssJsCode);
+              }
               if (id.endsWith(__entry_name)) {
-                return entryChunks
-                  .map((a) => `import ${JSON.stringify(`./${a.fileName}`)};`)
-                  .join('\n');
+                return entryCode;
               }
               const [k, chunk] =
                 Object.entries(rawBundle).find(([_, chunk]) =>
@@ -111,7 +150,7 @@ export const buildBundleFactory = (
                 }
                 return {
                   code: chunk.code,
-                  map: chunk.map,
+                  map: null,
                 };
               }
             },
@@ -130,9 +169,7 @@ export const buildBundleFactory = (
           minify: false,
           target: 'esnext',
           rollupOptions: {
-            external(source) {
-              return source in option.globalsPkg2VarName;
-            },
+            external: Object.keys(option.globalsPkg2VarName),
             output: {
               globals: option.globalsPkg2VarName,
             },
@@ -216,15 +253,12 @@ export const buildBundleFactory = (
           }
         });
       }
-
-      const injectCssCode = await getInjectCssCode(option, rawBundle);
-
       let collectGrantSet: Set<string>;
       if (option.build.autoGrant) {
         collectGrantSet = collectGrant(
           this,
           chunks,
-          injectCssCode,
+          cssJsCode,
           viteConfig.build.minify !== false,
         );
       } else {
@@ -237,7 +271,7 @@ export const buildBundleFactory = (
         'build',
       );
 
-      const mergedCode = [comment, injectCssCode, finalJsCode]
+      const mergedCode = [comment, finalJsCode]
         .filter((s) => s)
         .join(`\n\n`)
         .trimEnd();

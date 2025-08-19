@@ -1,10 +1,70 @@
-import { normalizePath } from 'vite';
-import { miniCode } from '../utils/others';
-import { getModuleRealInfo } from '../utils/pkg';
-import type { PkgOptions, ResolvedMonkeyOption } from '../utils/types';
+import MagicString from 'magic-string';
 import type { Plugin, ResolvedConfig } from 'vite';
+import {
+  getProgramImportNodes,
+  getSafeIdentifier,
+  getUpperCaseName,
+  miniCode,
+} from '../utils/others';
+import { getModuleRealInfo } from '../utils/pkg';
+import type { ResolvedMonkeyOption } from '../utils/types';
 
-const resourceImportPrefix = '\0monkey-resource-import:';
+const loaderModuleCode = `
+import { GM_addStyle, GM_getResourceText, GM_getResourceURL } from 'vite-plugin-monkey/dist/client';
+export const cssLoader = (name) => GM_addStyle(GM_getResourceText(name));
+export const jsonLoader = (name) => JSON.parse(GM_getResourceText(name));
+export const rawLoader = (name) => GM_getResourceText(name);
+export const urlLoader = (name, type) => {
+  return GM_getResourceURL(name, false).replace(
+    /^data:application;base64,/,
+    'data:' + type + ';base64',
+  );
+};
+`;
+const loaderModId = 'virtual:monkey-loader';
+const virtualloaderModId = '\0' + loaderModId;
+
+const getExportModuleCode = (
+  name: string,
+  dynamic: boolean,
+  params: unknown[],
+): string => {
+  const valueLiteral = `(${name}(${params.map((v) => JSON.stringify(v)).join(',')}))`;
+  return [
+    `import {${name}} from '${loaderModId}'`,
+    dynamic
+      ? `let cache; export default async()=>cache??(cache=${valueLiteral})`
+      : `export default ${valueLiteral}`,
+  ].join(';');
+};
+
+const resPrefix = 'virtual:monkey-resource-';
+const resDynamicPrefix = 'virtual:monkey-resource-dynamic-';
+const isRawResId = (id: string): boolean => {
+  return id.startsWith(resPrefix) || id.startsWith(resDynamicPrefix);
+};
+const getValueResId = (value: string, dynamic = false): string => {
+  return (dynamic ? resDynamicPrefix : resPrefix) + encodeURIComponent(value);
+};
+const getVirtualResId = (id: string): string => {
+  // append end \0 or encodeURIComponent to prevent handler that other plugin, such as css plugin
+  return '\0' + id + '\0';
+};
+
+const getResNameTuple = (
+  id: string,
+): [name: string, dynamic: boolean] | undefined => {
+  if (id.startsWith('\0') && id.endsWith('\0')) {
+    if (id.startsWith(resDynamicPrefix, 1)) {
+      return [
+        decodeURIComponent(id.slice(resDynamicPrefix.length + 1, -1)),
+        true,
+      ];
+    } else if (id.startsWith(resPrefix, 1)) {
+      return [decodeURIComponent(id.slice(resPrefix.length + 1, -1)), false];
+    }
+  }
+};
 
 export const externalResourceFactory = (
   getOption: () => Promise<ResolvedMonkeyOption>,
@@ -16,161 +76,123 @@ export const externalResourceFactory = (
     string,
     { resourceName: string; resourceUrl: string }
   > = {};
+  let resKeys: string[];
   return {
     name: 'monkey:externalResource',
-    enforce: 'pre',
+    enforce: 'post',
     apply: 'build',
     async config() {
       option = await getOption();
       mrmime = await import('mrmime');
+      resKeys = Object.keys(option.build.externalResource);
     },
     configResolved(config) {
       viteConfig = config;
     },
-    async resolveId(id) {
-      const { externalResource } = option.build;
-      if (id in externalResource) {
-        return resourceImportPrefix + id + '\0';
-      }
-      // see https://github.com/vitejs/vite/blob/5d56e421625b408879672a1dd4e774bae3df674f/packages/vite/src/node/plugins/css.ts#L431-L434
-      const [resource, query] = id.split('?', 2);
-      if (resource.endsWith('.css') && query) {
-        const id2 = [
-          resource,
-          '?',
-          query
-            .split('&')
-            .filter((e) => e != 'used')
-            .join(`&`),
-        ].join('');
-        if (id2 in externalResource) {
-          return resourceImportPrefix + id2 + '\0';
+    resolveId(id) {
+      if (id === loaderModId) return virtualloaderModId;
+      if (isRawResId(id)) return getVirtualResId(id);
+    },
+    async transform(code) {
+      if (!code.includes('import')) return;
+      if (!resKeys.some((k) => code.includes(k))) return;
+      const nodes = getProgramImportNodes(this.parse(code)).filter((n) =>
+        resKeys.includes(n.value),
+      );
+      if (!nodes.length) return;
+      const ms = new MagicString(code);
+      const importCodes: string[] = [];
+      for (const { node, value } of nodes) {
+        if (node.type === 'ImportDeclaration') {
+          ms.update(
+            node.source.start,
+            node.source.end,
+            JSON.stringify(getValueResId(value)),
+          );
+        } else {
+          const loadName = getSafeIdentifier(
+            getUpperCaseName(value) || 'r',
+            code,
+            importCodes,
+          );
+          importCodes.push(
+            `import ${loadName} from ${JSON.stringify(getValueResId(value, true))};`,
+          );
+          ms.update(node.start, node.end, `${loadName}()`);
         }
       }
+      ms.prepend(importCodes.join('\n'));
+      return {
+        code: ms.toString(),
+        map: ms.generateMap(),
+      };
     },
     async load(id) {
-      if (id.startsWith(resourceImportPrefix) && id.endsWith('\0')) {
-        const { externalResource } = option.build;
-        const importName = id.substring(
-          resourceImportPrefix.length,
-          id.length - 1,
+      if (id === virtualloaderModId) return miniCode(loaderModuleCode);
+      const [importName, dynamic] = getResNameTuple(id) || [];
+      if (dynamic === undefined) return;
+      if (!importName) return;
+      const pkg = await getModuleRealInfo(importName);
+      const resOption = option.build.externalResource[importName];
+      const resourceName = await resOption.resourceName({ ...pkg, importName });
+      const resourceUrl = await resOption.resourceUrl({ ...pkg, importName });
+      resourceRecord[importName] = {
+        resourceName,
+        resourceUrl,
+      };
+      const loaderParam = {
+        ...pkg,
+        resourceName,
+        resourceUrl,
+        importName,
+        dynamic,
+      };
+      if (resOption.nodeLoader) {
+        return miniCode(resOption.nodeLoader(loaderParam));
+      } else if (resOption.loader) {
+        const valueLiteral = `((${resOption.loader})(${JSON.stringify(loaderParam)}))`;
+        return miniCode(
+          dynamic
+            ? `let cache; export default async()=>cache??(cache=${valueLiteral})`
+            : `export default ${valueLiteral}`,
         );
-        if (!(importName in externalResource)) {
-          return;
-        }
-        const pkg = await getModuleRealInfo(importName);
-        const {
-          resourceName: resourceNameFn,
-          resourceUrl: resourceUrlFn,
-          loader,
-          nodeLoader,
-        } = externalResource[importName];
-        const resourceName = await resourceNameFn({ ...pkg, importName });
-        const resourceUrl = await resourceUrlFn({ ...pkg, importName });
-        resourceRecord[importName] = {
-          resourceName,
-          resourceUrl,
-        };
-
-        if (nodeLoader) {
-          return miniCode(
-            await nodeLoader({
-              ...pkg,
-              resourceName,
-              resourceUrl,
-              importName,
-            }),
-          );
-        } else if (loader) {
-          let fnText: string;
-          if (
-            loader.prototype && // not arrow function
-            loader.name.length > 0 &&
-            loader.name != 'function' // not anonymous function
-          ) {
-            if (Reflect.get(loader, Symbol.toStringTag) == 'AsyncFunction') {
-              fnText = loader
-                .toString()
-                .replace(/^[\s\S]+?\(/, 'async function(');
-            } else {
-              fnText = loader.toString().replace(/^[\s\S]+?\(/, 'function(');
-            }
-          } else {
-            fnText = loader.toString();
-          }
-          return miniCode(
-            `export default (${fnText})(${JSON.stringify({
-              resourceUrl,
-              importName,
-              ...pkg,
-            } as PkgOptions)})`,
-          );
-        }
-
-        let moduleCode: string | undefined = undefined;
-        const [resource, query] = importName.split('?', 2);
-        const ext = resource.split('.').pop()!;
-        const mimeType = mrmime.lookup(ext) ?? 'application/octet-stream';
-        const suffixSet = new URLSearchParams(query);
-        if (suffixSet.has('url') || suffixSet.has('inline')) {
-          moduleCode = [
-            `import {urlLoader as loader} from 'virtual:plugin-monkey-loader'`,
-            `export default loader(...${JSON.stringify([
-              resourceName,
-              mimeType,
-            ])})`,
-          ].join(';');
-        } else if (suffixSet.has('raw')) {
-          moduleCode = [
-            `import {rawLoader as loader} from 'virtual:plugin-monkey-loader'`,
-            `export default loader(...${JSON.stringify([resourceName])})`,
-          ].join(';');
-        } else if (ext == 'json') {
-          // export name will bring side effect
-          moduleCode = [
-            `import {jsonLoader as loader} from 'virtual:plugin-monkey-loader'`,
-            `export default loader(...${JSON.stringify([resourceName])})`,
-          ].join(';');
-        } else if (ext == 'css') {
-          moduleCode = [
-            `import {cssLoader as loader} from 'virtual:plugin-monkey-loader'`,
-            `export default loader(...${JSON.stringify([resourceName])})`,
-          ].join(';');
-        } else if (viteConfig.assetsInclude(importName.split('?', 1)[0])) {
-          const mediaType = mrmime.mimes[ext];
-          moduleCode = [
-            `import {urlLoader as loader} from 'virtual:plugin-monkey-loader'`,
-            `export default loader(...${JSON.stringify([
-              resourceName,
-              mediaType,
-            ])})`,
-          ].join(';');
-        }
-        if (moduleCode) {
-          if (
-            moduleCode.includes('rawLoader') ||
-            moduleCode.includes('jsonLoader') ||
-            moduleCode.includes('cssLoader')
-          ) {
-            option.userscript.grant.add('GM_getResourceText');
-          } else if (moduleCode.includes('urlLoader')) {
-            option.userscript.grant.add('GM_getResourceURL');
-          }
-          return miniCode(moduleCode);
-        }
-
-        throw new Error(`module: ${importName} not found loader`);
       }
+      const [resourcePath, query] = importName.split('?', 2);
+      const ext = resourcePath.split('.').at(-1) ?? '';
+      const mimeType = mrmime.lookup(ext) ?? 'application/octet-stream';
+      const suffixSet = new URLSearchParams(query);
+      const moduleCode = (() => {
+        if (suffixSet.has('inline') && ext === 'css') {
+          // css?inline -> string content
+          return getExportModuleCode('rawLoader', dynamic, [resourceName]);
+        } else if (suffixSet.has('url') || suffixSet.has('inline')) {
+          return getExportModuleCode('urlLoader', dynamic, [
+            resourceName,
+            mimeType,
+          ]);
+        } else if (suffixSet.has('raw')) {
+          return getExportModuleCode('rawLoader', dynamic, [resourceName]);
+        } else if (ext == 'json') {
+          return getExportModuleCode('jsonLoader', dynamic, [resourceName]);
+        } else if (ext == 'css') {
+          return getExportModuleCode('cssLoader', dynamic, [resourceName]);
+        } else if (viteConfig.assetsInclude(resourcePath)) {
+          return getExportModuleCode('urlLoader', dynamic, [
+            resourceName,
+            mimeType,
+          ]);
+        } else {
+          throw new Error(`module: ${importName} not found loader`);
+        }
+      })();
+      return miniCode(moduleCode);
     },
     generateBundle() {
-      const usedModIdSet = new Set(
-        Array.from(this.getModuleIds()).map((s) => normalizePath(s)),
-      );
-      Array.from(usedModIdSet).forEach((id) => {
-        if (id.startsWith(resourceImportPrefix) && id.endsWith('\0')) {
-          usedModIdSet.add(
-            id.substring(resourceImportPrefix.length, id.length - 1),
-          );
+      const usedModIdSet = new Set<string>();
+      Array.from(this.getModuleIds()).forEach((id) => {
+        const name = getResNameTuple(id)?.[0];
+        if (name) {
+          usedModIdSet.add(name);
         }
       });
       const collectResource: Record<string, string> = {};

@@ -1,7 +1,6 @@
 import { buildBundleFactory } from './buildBundle';
 import { configFactory } from './config';
 import { externalGlobalsFactory } from './externalGlobals';
-import { externalLoaderFactory } from './externalLoader';
 import { externalResourceFactory } from './externalResource';
 import { fixAssetUrlFactory } from './fixAssetUrl';
 import { fixClientFactory } from './fixClient';
@@ -10,6 +9,7 @@ import { perviewFactory } from './perview';
 import { redirectClientFactory } from './redirectClient';
 import { serverFactory } from './server';
 import { virtualHtmlFactory } from './virtualHtml';
+import { cssFactory } from './css';
 
 const factorys = [
   configFactory,
@@ -24,7 +24,7 @@ const factorys = [
   redirectClientFactory,
   externalGlobalsFactory,
   externalResourceFactory,
-  externalLoaderFactory,
+  cssFactory,
   buildBundleFactory,
 ];
 

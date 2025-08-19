@@ -1,15 +1,14 @@
-import { miniCode, stringifyFunction } from './others';
 import { jsdelivr } from '../cdn';
+import { getProjectPkg } from './pkg';
 import type {
-  ResolvedMonkeyOption,
   IArray,
-  Thenable,
   Mod2UrlFn,
   MonkeyOption,
   Pkg2UrlFn,
   PkgOptions,
+  ResolvedMonkeyOption,
+  Thenable,
 } from './types';
-import { getProjectPkg } from './pkg';
 
 export const resolvedOption = async (
   pluginOption: MonkeyOption,
@@ -226,22 +225,6 @@ export const resolvedOption = async (
 
   const metaFileFc = metaFileName;
 
-  const cssSideEffects =
-    build.cssSideEffects ||
-    (() => {
-      return (e: string) => {
-        // @ts-ignore
-        if (typeof GM_addStyle == 'function') {
-          // @ts-ignore
-          GM_addStyle(e);
-          return;
-        }
-        const o = document.createElement('style');
-        o.textContent = e;
-        document.head.append(o);
-      };
-    });
-
   const config: ResolvedMonkeyOption = {
     userscript: {
       name,
@@ -308,13 +291,7 @@ export const resolvedOption = async (
     globalsPkg2VarName: {},
     requirePkgList: [],
     systemjs: build.systemjs ?? jsdelivr()[1],
-    cssSideEffects: async (css) => {
-      const codeOrFc = await cssSideEffects(css);
-      if (typeof codeOrFc == 'string') {
-        return codeOrFc;
-      }
-      return miniCode(stringifyFunction(codeOrFc, css), 'js');
-    },
+    cssSideEffects: build.cssSideEffects,
   };
 
   return config;

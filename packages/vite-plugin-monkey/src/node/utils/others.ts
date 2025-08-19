@@ -1,10 +1,11 @@
+import * as acornWalk from 'acorn-walk';
 import { resolve } from 'import-meta-resolve';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import type { OutputBundle } from 'rollup';
+import type { ProgramNode } from 'rollup';
 import { transformWithEsbuild } from 'vite';
-import type { ResolvedMonkeyOption } from './types';
+import type { Thenable } from './types';
 
 export const isFirstBoot = (): boolean => {
   return (Reflect.get(globalThis, '__vite_start_time') ?? 0) < 1000;
@@ -22,9 +23,12 @@ export const existFile = async (path: string) => {
   }
 };
 
-export const miniCode = async (code: string, type: 'css' | 'js' = 'js') => {
+export const miniCode = async (
+  code: Thenable<string>,
+  type: 'css' | 'js' = 'js',
+) => {
   return (
-    await transformWithEsbuild(code, 'any_name.' + type, {
+    await transformWithEsbuild(await code, 'any_name.' + type, {
       minify: true,
       sourcemap: false,
       legalComments: 'none',
@@ -59,24 +63,6 @@ export async function* walk(dirPath: string) {
     }
   }
 }
-
-export const getInjectCssCode = async (
-  option: ResolvedMonkeyOption,
-  bundle: OutputBundle,
-) => {
-  const cssTexts: string[] = [];
-  Object.entries(bundle).forEach(([k, v]) => {
-    if (v.type == 'asset' && k.endsWith('.css')) {
-      cssTexts.push(v.source.toString());
-      delete bundle[k];
-    }
-  });
-  const css = cssTexts.join('').trim();
-  if (css) {
-    // use \x20 to compat unocss, see https://github.com/lisonge/vite-plugin-monkey/issues/45
-    return await option.cssSideEffects(`\x20` + css + `\x20`);
-  }
-};
 
 export const stringifyFunction = <T extends (...args: any[]) => any>(
   fn: T,
@@ -147,6 +133,7 @@ export const parserHtmlScriptResult = (html: string): ScriptResult[] => {
   });
 };
 
+import type { ImportDeclaration, ImportExpression } from 'acorn';
 import crypto from 'node:crypto';
 
 export const simpleHash = (str = ''): string => {
@@ -165,4 +152,109 @@ export const safeURL = (
   try {
     return new URL(url, base);
   } catch {}
+};
+
+export const getSafeIdentifier = (
+  prefix: string,
+  code: string,
+  others?: string[],
+): string => {
+  let n = 0;
+  let identifier = prefix;
+  while (
+    code.includes(identifier) ||
+    (others && others.some((c) => c.includes(identifier)))
+  ) {
+    n++;
+    identifier = `${prefix}${n.toString(16)}`;
+  }
+  return identifier;
+};
+
+export interface ImportNodeItem {
+  node: ImportExpression | ImportDeclaration;
+  value: string;
+}
+
+export const getProgramImportNodes = (
+  program: ProgramNode,
+): ImportNodeItem[] => {
+  const nodes: ImportNodeItem[] = [];
+  acornWalk.simple(program, {
+    ImportDeclaration(node) {
+      const s = node.source;
+      if (s.type === 'Literal') {
+        const value = s.value;
+        if (!value) return;
+        if (typeof value !== 'string') return;
+        nodes.push({
+          node,
+          value,
+        });
+      }
+    },
+    ImportExpression(node) {
+      const s = node.source;
+      if (s.type === 'Literal') {
+        const value = s.value;
+        if (!value) return;
+        if (typeof value !== 'string') return;
+        nodes.push({
+          node,
+          value,
+        });
+      } else if (s.type === 'TemplateLiteral') {
+        if (s.expressions.length) return;
+        if (s.quasis.length !== 1) return;
+        const value = s.quasis[0].value.cooked;
+        if (!value) return;
+        if (typeof value !== 'string') return;
+        nodes.push({
+          node,
+          value,
+        });
+      }
+    },
+  });
+  return nodes;
+};
+
+const nameReg = /[0-9a-zA-Z_]+/g;
+const autoPreUnderline = (v: string): string => {
+  if (!v) return '_';
+  return Number.isInteger(Number(v[0])) ? `_${v}` : v;
+};
+export const getUpperCaseName = (value: string): string | undefined => {
+  const list = value.match(nameReg);
+  if (!list?.length) return;
+  return list
+    .map((v, i) => {
+      if (i === 0) return autoPreUnderline(v);
+      return v[0].toUpperCase() + v.substring(1);
+    })
+    .join('');
+};
+
+const defaultCssSideEffects = (css: string) => {
+  // @ts-ignore
+  if (typeof GM_addStyle === 'function') {
+    // @ts-ignore
+    GM_addStyle(css);
+  } else {
+    document.head.appendChild(document.createElement('style')).append(css);
+  }
+};
+
+export const getCssModuleCode = (
+  f: string | ((css: string) => void) | undefined,
+): string => {
+  f ??= defaultCssSideEffects;
+  return `
+const set = new Set();
+export default async (css) => {
+  if (set.has(css)) return;
+  set.add(css);
+  ${`(${f})(css);`}
+};
+`;
 };

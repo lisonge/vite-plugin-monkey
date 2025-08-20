@@ -1,5 +1,5 @@
-# v7.0.0
+# v7.0.1
 
 ## What's Changed
 
-- refactor: css side effects (#240)
+- fix(css): exclude all module css exts (#241)

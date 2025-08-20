@@ -23,6 +23,7 @@ const styleExts = [
   '.postcss',
   '.sss',
 ];
+const exludeModuleExts = styleExts.map((v) => '.module' + v);
 
 const appendInline = (value: string): string => {
   return value + '?inline';
@@ -48,12 +49,12 @@ export const cssFactory = (
   ): Promise<boolean> => {
     if (!value) return false;
     if (exlcudeChars.some((c) => value.includes(c))) return false;
+    if (exludeModuleExts.some((c) => value.endsWith(c))) return false;
     if (option.build.externalResource[value]) return false;
-    if (value.endsWith('.module.css')) return false;
     const resolvedId = (await context.resolve(value, id))?.id;
     if (!resolvedId) return false;
     if (exlcudeChars.some((c) => resolvedId.includes(c))) return false;
-    if (resolvedId.endsWith('.module.css')) return false;
+    if (exludeModuleExts.some((c) => resolvedId.endsWith(c))) return false;
     return styleExts.some((e) => resolvedId.endsWith(e));
   };
   return {

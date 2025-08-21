@@ -333,8 +333,6 @@ there is the following cdn to use, full detail see [cdn.ts](/packages/vite-plugi
 
 - [jsdelivr](https://www.jsdelivr.com/)
 - [unpkg](https://unpkg.com/)
-- [bytecdntp](https://cdn.bytedance.com/)
-- [baomitu](https://cdn.baomitu.com/)
 - [cdnjs](https://cdnjs.com/libraries)
 - [zhimg](https://unpkg.zhimg.com/)
 - [npmmirror](https://registry.npmmirror.com/)

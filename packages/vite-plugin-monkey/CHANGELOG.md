@@ -1,5 +1,5 @@
-# v7.0.1
+# v7.0.2
 
 ## What's Changed
 
-- fix(css): exclude all module css exts (#241)
+- fix: static-import-css (#243)

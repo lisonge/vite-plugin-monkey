@@ -1,7 +1,7 @@
 import { GM, GM_getValue, GM_registerMenuCommand, GM_webRequest } from '$';
 import 'uno.css';
-import './style.css';
 console.log(`hello wolrd`);
+import './style.css';
 // console.log(monkeyWindow.close());
 // @ts-ignore
 import Test from './Test.vue';

@@ -1,5 +1,6 @@
-# v7.0.2
+# v7.0.3
 
 ## What's Changed
 
-- fix: static-import-css (#243)
+- fix: error build entry path (#245)
+- chore: remove invalid CDNs (#244)

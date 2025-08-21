@@ -224,7 +224,11 @@ const autoPreUnderline = (v: string): string => {
   if (!v) return '_';
   return Number.isInteger(Number(v[0])) ? `_${v}` : v;
 };
-export const getUpperCaseName = (value: string): string | undefined => {
+
+export const getUpperCaseName = (
+  value: string | undefined,
+): string | undefined => {
+  if (!value) return;
   const list = value.match(nameReg);
   if (!list?.length) return;
   return list

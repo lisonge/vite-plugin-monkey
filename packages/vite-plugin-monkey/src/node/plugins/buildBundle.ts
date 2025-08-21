@@ -85,7 +85,7 @@ export const buildBundleFactory = (
           }
           codes.push(`import '${cssModuleEntryId}';`);
         }
-        codes.push(...e.map((c) => `import '${c.fileName}';`));
+        codes.push(...e.map((c) => `import './${c.fileName}';`));
         return codes.join('\n');
       })();
 

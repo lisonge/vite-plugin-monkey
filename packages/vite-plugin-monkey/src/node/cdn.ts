@@ -69,24 +69,6 @@ export const unpkg = (
 };
 
 /**
- * `https://lf9-cdn-tos.bytecdntp.com/cdn/expire-10-y/${name}/${version}/${pathname}`
- * @param exportVarName cdn-exportVarName or resourceName
- * @see https://cdn.bytedance.com/
- */
-export const bytecdntp = (
-  exportVarName = '',
-  pathname = '',
-): [string, ModuleToUrlFc] => {
-  return [
-    exportVarName,
-    (version, name, _importName = '', resolveName = '') => {
-      const p = pathname || resolveName;
-      return `https://lf9-cdn-tos.bytecdntp.com/cdn/expire-10-y/${name}/${version}/${p}`;
-    },
-  ];
-};
-
-/**
  * `https://fastly.jsdelivr.net/npm/${name}@${version}/${pathname}`
  * @deprecated bootcdn will return virus-infected code. Please stop using it and switch to other sources
  */
@@ -102,24 +84,6 @@ export const bootcdn = (
     (version, name, _importName = '', resolveName = '') => {
       const p = pathname || resolveName;
       return `https://fastly.jsdelivr.net/npm/${name}@${version}/${p}`;
-    },
-  ];
-};
-
-/**
- * `https://lib.baomitu.com/${name}/${version}/${pathname}`
- * @param exportVarName cdn-exportVarName or resourceName
- * @see https://cdn.baomitu.com/
- */
-export const baomitu = (
-  exportVarName = '',
-  pathname = '',
-): [string, ModuleToUrlFc] => {
-  return [
-    exportVarName,
-    (version, name, _importName = '', resolveName = '') => {
-      const p = pathname || resolveName;
-      return `https://lib.baomitu.com/${name}/${version}/${p}`;
     },
   ];
 };

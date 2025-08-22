@@ -12,7 +12,7 @@
 (async function () {
   'use strict';
 
-  var _monkeyWindow = /* @__PURE__ */ (() => window)();
+  var _monkeyWindow = (() => window)();
   console.log(await( window?.fetch(`/`)));
   for await (const v of [Promise.resolve(1), Promise.resolve(2)]) {
     console.log(v);

@@ -27,12 +27,12 @@
 
   const style2Css = ".style2{background-color:red}";
   const style3Scss = ".style3{background-color:#00f}";
-  var _GM = /* @__PURE__ */ (() => typeof GM != "undefined" ? GM : void 0)();
-  var _GM_addStyle = /* @__PURE__ */ (() => typeof GM_addStyle != "undefined" ? GM_addStyle : void 0)();
-  var _GM_getResourceText = /* @__PURE__ */ (() => typeof GM_getResourceText != "undefined" ? GM_getResourceText : void 0)();
-  var _GM_getValue = /* @__PURE__ */ (() => typeof GM_getValue != "undefined" ? GM_getValue : void 0)();
-  var _GM_registerMenuCommand = /* @__PURE__ */ (() => typeof GM_registerMenuCommand != "undefined" ? GM_registerMenuCommand : void 0)();
-  var _GM_webRequest = /* @__PURE__ */ (() => typeof GM_webRequest != "undefined" ? GM_webRequest : void 0)();
+  var _GM = (() => typeof GM != "undefined" ? GM : void 0)();
+  var _GM_addStyle = (() => typeof GM_addStyle != "undefined" ? GM_addStyle : void 0)();
+  var _GM_getResourceText = (() => typeof GM_getResourceText != "undefined" ? GM_getResourceText : void 0)();
+  var _GM_getValue = (() => typeof GM_getValue != "undefined" ? GM_getValue : void 0)();
+  var _GM_registerMenuCommand = (() => typeof GM_registerMenuCommand != "undefined" ? GM_registerMenuCommand : void 0)();
+  var _GM_webRequest = (() => typeof GM_webRequest != "undefined" ? GM_webRequest : void 0)();
   const cssLoader = (e2) => _GM_addStyle(_GM_getResourceText(e2)), rawLoader = (e2) => _GM_getResourceText(e2);
   let e$2;
   const normalizeCss = async () => e$2 ?? (e$2 = cssLoader("normalize.css"));
@@ -68,7 +68,7 @@
       })
     ], 64);
   }
-  const Test = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-0eae1295"]]);
+  const Test = _export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-0eae1295"]]);
   console.log(`hello wolrd`);
   console.log(Test);
   console.log(Object.keys(_GM));

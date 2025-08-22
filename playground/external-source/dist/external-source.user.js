@@ -35,11 +35,11 @@
     return Object.freeze(n);
   }
 
-  const Vue__namespace = /*#__PURE__*/_interopNamespaceDefault(Vue);
+  const Vue__namespace = _interopNamespaceDefault(Vue);
 
-  var _GM_addStyle = /* @__PURE__ */ (() => typeof GM_addStyle != "undefined" ? GM_addStyle : void 0)();
-  var _GM_getResourceText = /* @__PURE__ */ (() => typeof GM_getResourceText != "undefined" ? GM_getResourceText : void 0)();
-  var _unsafeWindow = /* @__PURE__ */ (() => typeof unsafeWindow != "undefined" ? unsafeWindow : void 0)();
+  var _GM_addStyle = (() => typeof GM_addStyle != "undefined" ? GM_addStyle : void 0)();
+  var _GM_getResourceText = (() => typeof GM_getResourceText != "undefined" ? GM_getResourceText : void 0)();
+  var _unsafeWindow = (() => typeof unsafeWindow != "undefined" ? unsafeWindow : void 0)();
   const cssLoader = (e) => _GM_addStyle(_GM_getResourceText(e)), rawLoader = (e) => _GM_getResourceText(e);
   cssLoader("element-plus/dist/index.css");
   const name = "element-plus";
@@ -98,10 +98,8 @@
     ElButton: elementPlus.ElButton,
     ElementPlusPkg,
     unsafeWindow: _unsafeWindow,
-    // tInline,
-    cssRaw
-    // cssUrl,
-    // cssInline,
-  });
+cssRaw
+
+});
 
 })(Vue, ElementPlus);

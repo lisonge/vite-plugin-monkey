@@ -18,33 +18,28 @@
 (function (vue, pinia$1, ElementPlus) {
   'use strict';
 
-  var _GM_addStyle = /* @__PURE__ */ (() => typeof GM_addStyle != "undefined" ? GM_addStyle : void 0)();
-  var _GM_getResourceText = /* @__PURE__ */ (() => typeof GM_getResourceText != "undefined" ? GM_getResourceText : void 0)();
+  var _GM_addStyle = (() => typeof GM_addStyle != "undefined" ? GM_addStyle : void 0)();
+  var _GM_getResourceText = (() => typeof GM_getResourceText != "undefined" ? GM_getResourceText : void 0)();
   const cssLoader = (e) => _GM_addStyle(_GM_getResourceText(e));
   cssLoader("element-plus/dist/index.css");
   const useMainStore = pinia$1.defineStore("main", {
-    // a function that returns a fresh state
-    state: () => ({
+state: () => ({
       counter: 0,
       name: "Eduardo"
     }),
-    // optional getters
-    getters: {
-      // getters receive the state as first parameter
-      doubleCounter: (state) => state.counter * 2,
-      // use getters in other getters
-      doubleCounterPlusOne() {
+getters: {
+doubleCounter: (state) => state.counter * 2,
+doubleCounterPlusOne() {
         return this.doubleCounter + 1;
       }
     },
-    // optional actions
-    actions: {
+actions: {
       reset() {
         this.counter = 0;
       }
     }
   });
-  const _sfc_main = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main = vue.defineComponent({
     __name: "App",
     setup(__props) {
       const main = useMainStore();

@@ -22,7 +22,7 @@ System.register("./__entry.js", [], (function (exports, module) {
   return {
     execute: (async function () {
 
-      const scriptRel = /* @__PURE__ */ function detectScriptRel() {
+      const scriptRel = function detectScriptRel() {
         const relList = typeof document !== "undefined" && document.createElement("link").relList;
         return relList && relList.supports && relList.supports("modulepreload") ? "modulepreload" : "preload";
       }();
@@ -61,7 +61,7 @@ System.register("./__entry.js", [], (function (exports, module) {
             document.head.appendChild(link);
             if (isCss) return new Promise((res, rej) => {
               link.addEventListener("load", res);
-              link.addEventListener("error", () => rej(/* @__PURE__ */ new Error(`Unable to preload CSS for ${dep}`)));
+              link.addEventListener("error", () => rej( new Error(`Unable to preload CSS for ${dep}`)));
             });
           }));
         }

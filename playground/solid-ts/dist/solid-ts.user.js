@@ -336,7 +336,7 @@
         a[aEnd] = b[bEnd];
       } else {
         if (!map) {
-          map = /* @__PURE__ */ new Map();
+          map = new Map();
           let i = bStart;
           while (i < bEnd) map.set(b[i], i++);
         }
@@ -381,7 +381,7 @@
     return fn;
   }
   function delegateEvents(eventNames, document2 = window.document) {
-    const e = document2[$$EVENTS] || (document2[$$EVENTS] = /* @__PURE__ */ new Set());
+    const e = document2[$$EVENTS] || (document2[$$EVENTS] = new Set());
     for (let i = 0, l = eventNames.length; i < l; i++) {
       const name = eventNames[i];
       if (!e.has(name)) {
@@ -567,7 +567,7 @@
     header,
     link
   };
-  var _tmpl$ = /* @__PURE__ */ template(`<div><header><div></div><p>Edit <code>src/App.tsx,</code> and save to reload.</p><a href=https://github.com/solidjs/solid target=_blank rel="noopener noreferrer">Learn Solid`);
+  var _tmpl$ = template(`<div><header><div></div><p>Edit <code>src/App.tsx,</code> and save to reload.</p><a href=https://github.com/solidjs/solid target=_blank rel="noopener noreferrer">Learn Solid`);
   const delay = async (n = 0) => {
     return new Promise((res) => {
       setTimeout(res, n);

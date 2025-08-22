@@ -42,6 +42,7 @@
   },
   "homepage": "https://github.com/lisonge/vite-plugin-monkey#readme",
   "dependencies": {
+    "acorn": "^8.15.0",
     "acorn-walk": "^8.3.4",
     "cross-spawn": "^7.0.6",
     "htmlparser2": "^10.0.0",

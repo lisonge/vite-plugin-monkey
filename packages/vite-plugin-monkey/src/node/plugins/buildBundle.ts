@@ -7,6 +7,7 @@ import {
   getCssModuleCode,
   miniCode,
   moduleExportExpressionWrapper,
+  removeComment,
 } from '../utils/others';
 import { getSystemjsRequireUrls, getSystemjsTexts } from '../utils/systemjs';
 import {
@@ -252,6 +253,9 @@ export const buildBundleFactory = (
             finalJsCode = chunk.code;
           }
         });
+      }
+      if (!viteConfig.build.minify) {
+        finalJsCode = await removeComment(finalJsCode);
       }
       let collectGrantSet: Set<string>;
       if (option.build.autoGrant) {

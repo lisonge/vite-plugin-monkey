@@ -262,3 +262,41 @@ export default async (css) => {
 };
 `;
 };
+
+export const removeComment = async (code: string): Promise<string> => {
+  if (!(code.includes('/*') || code.includes('//'))) return code;
+  const ranges: [number, number][] = [];
+  (await import('acorn')).parse(code, {
+    ecmaVersion: 'latest',
+    sourceType: 'module',
+    onComment(_isBlock, text, start, end) {
+      // https://esbuild.github.io/api/#legal-comments
+      // remove /*! #__NO_SIDE_EFFECTS__ */
+      if (text.includes('@license')) return;
+      if (text.includes('@preserve')) return;
+      while (start > 0 && !code[start - 1].trim()) {
+        start--;
+      }
+      while (end < code.length && !code[end].trim()) {
+        end++;
+      }
+      ranges.push([start, end]);
+    },
+  });
+  if (!ranges.length) return code;
+  const getSeparator = (start: number, end: number): string => {
+    while (start < end) {
+      if (code[start] === '\n') return '\n';
+      start++;
+    }
+    return '\x20';
+  };
+  let newCode = '';
+  let lastIndex = 0;
+  for (const [start, end] of ranges) {
+    newCode += code.slice(lastIndex, start) + getSeparator(start, end);
+    lastIndex = end;
+  }
+  newCode += code.slice(lastIndex);
+  return newCode;
+};

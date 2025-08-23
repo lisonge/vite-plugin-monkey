@@ -9,7 +9,8 @@
   "files": [
     "dist",
     "global.d.ts",
-    "client.d.ts"
+    "client.d.ts",
+    "style.d.ts"
   ],
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"

@@ -27,3 +27,4 @@ if (location.search.includes('test')) {
 } else {
   import('element-plus/dist/index.css');
 }
+import './style4.scss';

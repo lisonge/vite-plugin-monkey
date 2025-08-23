@@ -1,5 +1,3 @@
 # What's Changed
 
-- feat: styleImport (#250)
-- perf: removeComment (#247)
-- fix: ignore empty css text (#249)
+- fix: add files style.d.ts

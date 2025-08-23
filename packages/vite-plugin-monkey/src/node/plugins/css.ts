@@ -44,10 +44,11 @@ const filterAsync = async <T>(
 };
 
 const staticCssIdSuffix = '__plugin-monkey-static-css';
+// https://github.com/lisonge/vite-plugin-monkey/issues/249
 const staticCssTemplate = `
 import {0} from '{1}';
 import importCSS from '${cssModuleId}';
-importCSS({0});
+{0} && importCSS({0});
 export default undefined;
 `.trimStart();
 

@@ -1,3 +1,4 @@
+import type { Plugin } from 'vite';
 import type { FinalUserScript, MonkeyUserScript } from '../userscript';
 
 export type Thenable<T> = T | Promise<T>;
@@ -174,6 +175,28 @@ export interface MonkeyOption {
    * }
    */
   clientAlias?: string;
+
+  /**
+   * handle CSS imports as style nodes([HTMLStyleElement](https://developer.mozilla.org/docs/Web/API/HTMLStyleElement))
+   *
+   * If you use [Shadow DOM](https://developer.mozilla.org/docs/Web/API/Web_components/Using_shadow_DOM) (style isolation) to place your interface application, this is very useful.
+   *
+   * Support `.css?style`, `.less?style`, `.sass?style`, `.scss?style`, `.styl?style`, `.stylus?style`, `.pcss?style`, `.postcss?style` and `.sss?style` imports
+   *
+   * add `/// <reference types="vite-plugin-monkey/style" />` to vite-env.d.ts for type hint
+   *
+   * @example
+   * import style1 from './style1.css?style':
+   * import style2 from 'normalize.css?style';
+   * const container = document.createElement('div').attachShadow({ mode: 'open' });
+   * container.append(style1, style2); // with hmr when change style1.css
+   * const style3 = style1.cloneNode(); // it will still have hmr
+   *
+   * @default
+   * true
+   */
+  styleImport?: boolean;
+
   server?: {
     /**
      * auto open install url in default browser when userscript comment change
@@ -338,4 +361,11 @@ export interface MonkeyOption {
      */
     cssSideEffects?: string | ((css: string) => void);
   };
+}
+
+export interface MonkeyPluginFactory {
+  (
+    getOption: () => Promise<ResolvedMonkeyOption>,
+    pluginOption: MonkeyOption,
+  ): Plugin | undefined;
 }

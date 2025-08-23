@@ -11,11 +11,12 @@ export * as cdn from './cdn';
 
 export default (pluginOption: MonkeyOption): Plugin[] => {
   let option: ResolvedMonkeyOption;
-  return factorys.map((f) =>
-    f(async () => {
-      return option || resolvedOption(pluginOption).then((v) => (option = v));
-    }),
-  );
+  const getOption = async () => {
+    return option || resolvedOption(pluginOption).then((v) => (option = v));
+  };
+  return factorys
+    .map((f) => f(getOption, pluginOption))
+    .filter(Boolean) as Plugin[];
 };
 
 /**

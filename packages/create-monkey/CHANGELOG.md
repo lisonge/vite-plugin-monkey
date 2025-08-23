@@ -1,5 +1,3 @@
-# v1.39.0
-
-## Features
+# What's Changed
 
 - update template dependency

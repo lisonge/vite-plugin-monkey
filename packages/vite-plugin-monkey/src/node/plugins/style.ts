@@ -61,12 +61,15 @@ export default style;
 if (import.meta.hot) {
   style.setAttribute('data-vite-dev-id', {0});
   const nodes = [style];
-  const cloneNode = style.cloneNode;
-  style.cloneNode = function (...args) {
-    const s = cloneNode.call(this, ...args);
-    nodes.push(s);
+  const fakeCloneNode = function (...args) {
+    const s = Node.prototype.cloneNode.call(this, ...args);
+    if (args[0] === true) {
+      s.cloneNode = fakeCloneNode;
+      nodes.push(s);
+    }
     return s;
   };
+  style.cloneNode = fakeCloneNode;
   import.meta.hot.accept({0}, (v) => {
     const t = String(v.default || '');
     nodes.forEach((s) => {

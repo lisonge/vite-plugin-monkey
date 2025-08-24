@@ -190,7 +190,7 @@ export interface MonkeyOption {
    * import style2 from 'normalize.css?style';
    * const container = document.createElement('div').attachShadow({ mode: 'open' });
    * container.append(style1, style2); // with hmr when change style1.css
-   * const style3 = style1.cloneNode(); // it will still have hmr
+   * const style3 = style1.cloneNode(true); // it will still have hmr
    *
    * @default
    * true

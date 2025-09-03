@@ -1,3 +1,3 @@
 # What's Changed
 
-- fix: style cloneNode hmr
+- feat: add GM_audio type (#252)

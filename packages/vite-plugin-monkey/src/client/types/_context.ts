@@ -1,5 +1,6 @@
 import type { GmAddElementType } from './addElement';
 import type { GmAddStyleType } from './addStyle';
+import type { GmAudioType } from './audio';
 import type { GmCookieType } from './cookie';
 import type { GmDownloadType } from './download';
 import type { GmGetResourceTextType } from './getResourceText';
@@ -200,6 +201,15 @@ export interface GmContextType {
    * @available tampermonkey
    */
   GM_cookie: GmCookieType;
+
+  /**
+   * @see https://www.tampermonkey.net/documentation.php#api:GM_audio.setMute
+   * @see https://www.tampermonkey.net/documentation.php#api:GM_audio.getState
+   * @see https://www.tampermonkey.net/documentation.php#api:GM_audio.addStateChangeListener
+   * @see https://www.tampermonkey.net/documentation.php#api:GM_audio.removeStateChangeListener
+   * @available tampermonkey
+   */
+  GM_audio: GmAudioType;
 
   /**
    * @see https://www.tampermonkey.net/documentation.php#api:window.onurlchange

@@ -1,5 +1,6 @@
 import type { GmAsyncAddElementType } from './addElement';
 import type { GmAsyncAddStyleType } from './addStyle';
+import type { GmAsyncAudioType } from './audio';
 import type { GmAsyncCookieType } from './cookie';
 import type { GmAsyncDownloadType } from './download';
 import type { GmAsyncGetResourceTextType } from './getResourceText';
@@ -60,4 +61,5 @@ export interface GmType {
   download: GmAsyncDownloadType;
   cookie: GmAsyncCookieType;
   webRequest: GmAsyncWebRequestType;
+  audio: GmAsyncAudioType;
 }

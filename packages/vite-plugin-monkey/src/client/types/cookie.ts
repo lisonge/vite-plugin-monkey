@@ -1,3 +1,5 @@
+import type { GmVoidCallback } from './_share';
+
 interface GmPartitionKeyType {
   topLevelSite?: string;
 }
@@ -46,16 +48,13 @@ interface GmCookieDeleteOptions {
 }
 
 interface GmCookieListCallback {
-  (cookies: GmCallbackCookie[], error: string | null): void;
-}
-interface GmCookieCallback {
-  (error: string | null): void;
+  (cookies: GmCallbackCookie[], error: any): void;
 }
 
 export interface GmCookieType {
   list(details: GmCookieListOptions, callback?: GmCookieListCallback): void;
-  set(details: GmCookieSetOptions, callback?: GmCookieCallback): void;
-  delete(details: GmCookieDeleteOptions, callback?: GmCookieCallback): void;
+  set(details: GmCookieSetOptions, callback?: GmVoidCallback): void;
+  delete(details: GmCookieDeleteOptions, callback?: GmVoidCallback): void;
 }
 
 export interface GmAsyncCookieType {

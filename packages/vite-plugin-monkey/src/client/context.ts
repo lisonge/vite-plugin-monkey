@@ -178,3 +178,12 @@ export const GM_webRequest = /* @__PURE__ */ (() => w.GM_webRequest)();
  * @available tampermonkey
  */
 export const GM_cookie = /* @__PURE__ */ (() => w.GM_cookie)();
+
+/**
+ * @see https://www.tampermonkey.net/documentation.php#api:GM_audio.setMute
+ * @see https://www.tampermonkey.net/documentation.php#api:GM_audio.getState
+ * @see https://www.tampermonkey.net/documentation.php#api:GM_audio.addStateChangeListener
+ * @see https://www.tampermonkey.net/documentation.php#api:GM_audio.removeStateChangeListener
+ * @available tampermonkey
+ */
+export const GM_audio = /* @__PURE__ */ (() => w.GM_audio)();

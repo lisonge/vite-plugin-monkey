@@ -26,6 +26,7 @@ export const gmIdentifiers = [
   'GM_unregisterMenuCommand',
   'GM_webRequest',
   'GM_xmlhttpRequest',
+  'GM_audio',
 ] as const;
 
 const gmMembers = [
@@ -57,6 +58,7 @@ const gmMembers = [
   'GM.unregisterMenuCommand',
   'GM.webRequest',
   'GM.xmlHttpRequest',
+  'GM.audio',
 ] as const;
 
 const othersGrantNames = [

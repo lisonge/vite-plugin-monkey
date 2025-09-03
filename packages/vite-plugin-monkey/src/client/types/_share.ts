@@ -14,3 +14,9 @@ export interface GmProgressEventBase {
 export interface GmReponseEventListener<Event> {
   (this: Event, event: Event): void;
 }
+
+export interface GmVoidCallback {
+  (error: any): void;
+}
+
+export type GmAnyFuntion = (...args: any[]) => any;

@@ -22,40 +22,28 @@ export const fcToHtml = <T extends (...args: any[]) => any>(
 };
 
 export const serverInjectFn = (entrySrc: string) => {
-  /// https://github.com/Tampermonkey/tampermonkey/issues/1567
   // @ts-ignore
   // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-  window.GM; // must exist, see https://github.com/Tampermonkey/tampermonkey/issues/1567
+  window.GM; // must exist, see Tampermonkey/tampermonkey#1567
 
   const key = `__monkeyWindow-` + new URL(entrySrc).origin;
   // @ts-ignore
   document[key] = window;
-  console.log(`[vite-plugin-monkey] mount monkeyWindow to document`);
-  // @ts-ignore
-  if (typeof GM_addElement === 'function') {
+
+  // GM_addElement is not wokring, see #254
+  const script = document.createElement('script');
+  script.type = 'module';
+  // @ts-ignore use chrome trustedTypes, see #205
+  if (window.trustedTypes) {
     // @ts-ignore
-    GM_addElement(document.head, 'script', {
-      type: 'module',
-      src: entrySrc,
+    const policy = window.trustedTypes.createPolicy(key, {
+      createScriptURL: (input: unknown) => input,
     });
+    script.src = policy.createScriptURL(entrySrc);
   } else {
-    const script = document.createElement('script');
-    script.type = 'module';
-    // @ts-ignore
-    if (window.trustedTypes) {
-      // https://github.com/lisonge/vite-plugin-monkey/issues/205
-      // @ts-ignore
-      const policy = window.trustedTypes.createPolicy(key, {
-        createScriptURL: (input: unknown) => input,
-      });
-      const trustedScriptURL = policy.createScriptURL(entrySrc);
-      script.src = trustedScriptURL;
-    } else {
-      script.src = entrySrc;
-    }
-    document.head.append(script);
+    script.src = entrySrc;
   }
-  console.log(`[vite-plugin-monkey] mount entry module to document.head`);
+  document.head.append(script);
 };
 
 export const mountGmApiFn = (meta: ImportMeta, apiNames: string[] = []) => {
@@ -63,28 +51,20 @@ export const mountGmApiFn = (meta: ImportMeta, apiNames: string[] = []) => {
   // @ts-ignore
   const monkeyWindow: Window = document[key];
   if (!monkeyWindow) {
-    console.log(`[vite-plugin-monkey] not found monkeyWindow`);
+    console.warn(`[vite-plugin-monkey] not found monkeyWindow`);
     return;
   }
-
   // @ts-ignore
   window.unsafeWindow = window;
-  console.log(`[vite-plugin-monkey] mount unsafeWindow to unsafeWindow`);
-
   apiNames.push('GM');
-  let mountedApiSize = 0;
   apiNames.forEach((apiName) => {
     // @ts-ignore
     const fn = monkeyWindow[apiName];
     if (fn) {
       // @ts-ignore
       window[apiName] = monkeyWindow[apiName];
-      mountedApiSize++;
     }
   });
-  console.log(
-    `[vite-plugin-monkey] mount ${mountedApiSize}/${apiNames.length} GM api to unsafeWindow`,
-  );
 };
 
 export const virtualHtmlTemplate = async (url: string) => {

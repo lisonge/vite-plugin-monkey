@@ -15,8 +15,8 @@ export interface GmAudioStateChangeListener {
 }
 
 export interface GmAudioType {
-  setMute(details: GmAudioMuteDetails, callback: GmVoidCallback): void;
-  getMute(callback: (state: GmAudioMuteState) => void): void;
+  setMute(details: GmAudioMuteDetails, callback?: GmVoidCallback): void;
+  getState(callback: (state: GmAudioMuteState) => void): void;
   addStateChangeListener(
     listener: GmAudioStateChangeListener,
     callback: GmVoidCallback,
@@ -29,7 +29,7 @@ export interface GmAudioType {
 
 export interface GmAsyncAudioType {
   setMute(details: GmAudioMuteDetails): Promise<void>;
-  getMute(): Promise<GmAudioMuteState>;
+  getState(): Promise<GmAudioMuteState>;
   addStateChangeListener(listener: GmAudioStateChangeListener): Promise<void>;
   removeStateChangeListener(listener: GmAnyFuntion): Promise<void>;
 }

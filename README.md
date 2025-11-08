@@ -315,7 +315,7 @@ export interface MonkeyOption {
      *   if (typeof GM_addStyle === 'function') {
      *     GM_addStyle(css);
      *   } else {
-     *     document.head.appendChild(document.createElement('style')).append(css)
+     *     (document.head || document.documentElement).appendChild(document.createElement('style')).append(css)
      *   }
      * };
      * @example

@@ -245,7 +245,10 @@ const defaultCssSideEffects = (css: string) => {
     // @ts-ignore
     GM_addStyle(css);
   } else {
-    document.head.appendChild(document.createElement('style')).append(css);
+    // see #262
+    (document.head || document.documentElement)
+      .appendChild(document.createElement('style'))
+      .append(css);
   }
 };
 

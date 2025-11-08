@@ -1,4 +1,3 @@
 # What's Changed
 
-- fix: GM_audio getState type error (#253)
-- fix: GM_addElement server entrySrc script not wokring (#254)
+- fix: document.head may be null when run-at document-start (#262) (#264)

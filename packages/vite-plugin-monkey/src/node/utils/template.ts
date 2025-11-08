@@ -43,7 +43,9 @@ export const serverInjectFn = (entrySrc: string) => {
   } else {
     script.src = entrySrc;
   }
-  document.head.append(script);
+  // see #262
+  // document.head may be null when run-at document-start
+  (document.head || document.documentElement).append(script);
 };
 
 export const mountGmApiFn = (meta: ImportMeta, apiNames: string[] = []) => {

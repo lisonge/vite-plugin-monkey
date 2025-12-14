@@ -136,12 +136,12 @@ export const parserHtmlScriptResult = (html: string): ScriptResult[] => {
 import type { ImportDeclaration, ImportExpression } from 'acorn';
 import crypto from 'node:crypto';
 
-export const simpleHash = (str = ''): string => {
+export const simpleHash = (str: string | undefined): string => {
   return crypto
     .createHash('md5')
     .update(str || '')
     .digest('base64url')
-    .substring(0, 8);
+    .substring(0, 16);
 };
 
 export const safeURL = (

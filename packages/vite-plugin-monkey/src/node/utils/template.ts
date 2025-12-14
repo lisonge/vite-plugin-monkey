@@ -21,12 +21,11 @@ export const fcToHtml = <T extends (...args: any[]) => any>(
   return htmlText.replace(`__CODE__`, stringifyFunction(fn, ...args));
 };
 
-export const serverInjectFn = (entrySrc: string) => {
+export const serverInjectFn = (entrySrc: string, key: string) => {
   // @ts-ignore
   // eslint-disable-next-line @typescript-eslint/no-unused-expressions
   window.GM; // must exist, see Tampermonkey/tampermonkey#1567
 
-  const key = `__monkeyWindow-` + new URL(entrySrc).origin;
   // @ts-ignore
   document[key] = window;
 
@@ -48,8 +47,7 @@ export const serverInjectFn = (entrySrc: string) => {
   (document.head || document.documentElement).append(script);
 };
 
-export const mountGmApiFn = (meta: ImportMeta, apiNames: string[] = []) => {
-  const key = `__monkeyWindow-` + new URL(meta.url).origin;
+export const mountGmApiFn = (key: string, apiNames: string[]) => {
   // @ts-ignore
   const monkeyWindow: Window = document[key];
   if (!monkeyWindow) {

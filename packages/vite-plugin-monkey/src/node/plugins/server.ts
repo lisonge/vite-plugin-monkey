@@ -33,11 +33,22 @@ export const serverFactory = (
 ): Plugin => {
   let option: ResolvedMonkeyOption;
   let viteConfig: ResolvedConfig;
+  let monkeyWindowKey = '';
   return {
     name: 'monkey:server',
     apply: 'serve',
     async config(userConfig) {
       option = await getOption();
+      for (const [k, v] of Object.entries(option.userscript.name)) {
+        Reflect.set(option.userscript.name, k, option.server.prefix(v));
+      }
+      option.userscript.grant.add('*');
+      // see #270
+      monkeyWindowKey =
+        `__monkeyWindow-` +
+        simpleHash(
+          await finalMonkeyOptionToComment(option, new Set(), 'serve'),
+        );
       return {
         preview: {
           host: userConfig.preview?.host ?? localHost,
@@ -53,14 +64,15 @@ export const serverFactory = (
     async configResolved(resolvedConfig) {
       viteConfig = resolvedConfig;
     },
-    async configureServer(server) {
-      for (const [k, v] of Object.entries(option.userscript.name)) {
-        Reflect.set(option.userscript.name, k, option.server.prefix(v));
+    transform(code, id) {
+      if (id.endsWith('/vite-plugin-monkey/dist/client/index.mjs')) {
+        return code.replaceAll(
+          '__MONKEY_WINDOW_KEY__',
+          JSON.stringify(monkeyWindowKey),
+        );
       }
-
-      // support dev env
-      option.userscript.grant.add('*');
-
+    },
+    async configureServer(server) {
       // https://github.com/lisonge/vite-plugin-monkey/issues/205
       server.middlewares.use((_, res, next) => {
         const name = 'access-control-allow-private-network';
@@ -100,6 +112,7 @@ export const serverFactory = (
               stringifyFunction(
                 serverInjectFn,
                 new URL(entryPath, origin).href,
+                monkeyWindowKey,
               ),
               '',
             ].join('\n\n'),
@@ -139,7 +152,11 @@ export const serverFactory = (
           setScriptHeader(res);
           if (option.server.mountGmApi) {
             res.end(
-              `;(${mountGmApiFn})(import.meta, ${JSON.stringify(gmIdentifiers)});`,
+              stringifyFunction(
+                mountGmApiFn,
+                monkeyWindowKey,
+                gmIdentifiers.concat(),
+              ),
             );
           } else {
             res.end('');

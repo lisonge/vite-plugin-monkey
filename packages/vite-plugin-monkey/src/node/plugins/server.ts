@@ -65,7 +65,12 @@ export const serverFactory = (
       viteConfig = resolvedConfig;
     },
     transform(code, id) {
-      if (id.endsWith('/vite-plugin-monkey/dist/client/index.mjs')) {
+      // /node_modules/.vite/deps/vite-plugin-monkey_dist_client.js?v=337b7f78
+      // /vite-plugin-monkey/dist/client/index.mjs
+      if (
+        id.includes('vite-plugin-monkey') &&
+        code.includes('__MONKEY_WINDOW_KEY__')
+      ) {
         return code.replaceAll(
           '__MONKEY_WINDOW_KEY__',
           JSON.stringify(monkeyWindowKey),

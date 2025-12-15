@@ -65,10 +65,11 @@ export const serverFactory = (
       viteConfig = resolvedConfig;
     },
     transform(code, id) {
-      // /node_modules/.vite/deps/vite-plugin-monkey_dist_client.js?v=337b7f78
-      // /vite-plugin-monkey/dist/client/index.mjs
+      // pnpm workspace -> /vite-plugin-monkey/dist/client/index.mjs
+      // vite -> /node_modules/.vite/deps/vite-plugin-monkey_dist_client.js?v=337b7f78
+      // vite -> https://github.com/lisonge/vite-plugin-monkey/issues/271#issuecomment-3656136669
       if (
-        id.includes('vite-plugin-monkey') &&
+        (id.includes('vite-plugin-monkey') || id.includes('/node_modules/')) &&
         code.includes('__MONKEY_WINDOW_KEY__')
       ) {
         return code.replaceAll(

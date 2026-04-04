@@ -3,7 +3,7 @@ import { resolve } from 'import-meta-resolve';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { transformWithEsbuild, type Rollup } from 'vite';
+import { transformWithEsbuild } from 'vite';
 import type { Thenable } from './types';
 
 export const isFirstBoot = (): boolean => {
@@ -175,9 +175,7 @@ export interface ImportNodeItem {
   value: string;
 }
 
-export const getProgramImportNodes = (
-  program: Rollup.ProgramNode,
-): ImportNodeItem[] => {
+export const getProgramImportNodes = (program: any): ImportNodeItem[] => {
   const nodes: ImportNodeItem[] = [];
   acornWalk.simple(program, {
     ImportDeclaration(node) {

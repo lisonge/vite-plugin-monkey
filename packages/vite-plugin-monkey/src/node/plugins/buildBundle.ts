@@ -1,5 +1,6 @@
-import type { Plugin, ResolvedConfig, Rollup } from 'vite';
+import type { Plugin, ResolvedConfig } from 'vite';
 import { build } from 'vite';
+import type { OutputChunk, RollupOutput } from '../utils/compat';
 import { finalMonkeyOptionToComment } from '../userscript';
 import { collectGrant } from '../utils/grant';
 import {
@@ -42,8 +43,8 @@ export const buildBundleFactory = (
       viteConfig = resolvedConfig;
     },
     async generateBundle(_, rawBundle) {
-      const entryChunks: Rollup.OutputChunk[] = [];
-      const chunks: Rollup.OutputChunk[] = [];
+      const entryChunks: OutputChunk[] = [];
+      const chunks: OutputChunk[] = [];
       Object.values(rawBundle).forEach((chunk) => {
         if (chunk.type == 'chunk') {
           if (chunk.facadeModuleId != polyfillId) {
@@ -114,7 +115,7 @@ export const buildBundleFactory = (
               const chunk = Object.values(rawBundle).find(
                 (chunk) =>
                   chunk.type == 'chunk' && source.endsWith(chunk.fileName),
-              ) as Rollup.OutputChunk | undefined;
+              ) as OutputChunk | undefined;
               if (chunk) {
                 return '\0' + source;
               }
@@ -181,7 +182,7 @@ export const buildBundleFactory = (
             fileName: () => `__entry.js`,
           },
         },
-      })) as Rollup.RollupOutput[];
+      })) as RollupOutput[];
       usedModules.forEach((k) => {
         if (fristEntryChunk != rawBundle[k]) {
           delete rawBundle[k];

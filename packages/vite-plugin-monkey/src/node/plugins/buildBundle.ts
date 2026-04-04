@@ -1,5 +1,5 @@
 import type { Plugin, ResolvedConfig } from 'vite';
-import { build } from 'vite';
+import { build, version } from 'vite';
 import type { OutputChunk, RollupOutput } from '../utils/compat';
 import { finalMonkeyOptionToComment } from '../userscript';
 import { collectGrant } from '../utils/grant';
@@ -101,7 +101,8 @@ export const buildBundleFactory = (
       const buildResult = (await build({
         logLevel: 'error',
         configFile: false,
-        esbuild: false,
+        // Disable esbuild/oxc transforms — code is already transformed
+        ...(parseInt(version) < 8 ? { esbuild: false } : { oxc: false as any }),
         plugins: [
           {
             name: 'monkey:mock',

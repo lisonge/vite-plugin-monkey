@@ -1,4 +1,4 @@
-import type { Plugin } from 'vite';
+import { version, type Plugin } from 'vite';
 import type { ResolvedMonkeyOption } from '../utils/types';
 
 export const configFactory = (
@@ -15,11 +15,14 @@ export const configFactory = (
             [option.clientAlias]: 'vite-plugin-monkey/dist/client',
           },
         },
-        esbuild: {
-          supported: {
-            'top-level-await': true,
+        // Rolldown (Vite 8+) supports top-level await natively
+        ...(parseInt(version) < 8 && {
+          esbuild: {
+            supported: {
+              'top-level-await': true,
+            },
           },
-        },
+        }),
         build: {
           assetsInlineLimit: Number.MAX_SAFE_INTEGER,
           chunkSizeWarningLimit: Number.MAX_SAFE_INTEGER,

@@ -1,10 +1,10 @@
 import * as acornWalk from 'acorn-walk';
-import type { OutputChunk, PluginContext } from 'rollup';
+import type { Rollup } from 'vite';
 import { grantNames } from './gmApi';
 
 export const collectGrant = (
-  context: PluginContext,
-  chunks: OutputChunk[],
+  context: Rollup.PluginContext,
+  chunks: Rollup.OutputChunk[],
   injectCssCode: string | undefined,
   minify: boolean,
 ): Set<string> => {

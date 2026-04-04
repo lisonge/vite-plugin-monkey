@@ -1,7 +1,6 @@
 import MagicString from 'magic-string';
 import fs from 'node:fs/promises';
-import type { TransformPluginContext } from 'rollup';
-import type { Plugin } from 'vite';
+import type { Plugin, Rollup } from 'vite';
 import {
   getProgramImportNodes,
   getSafeIdentifier,
@@ -57,7 +56,7 @@ export const cssFactory = (
 ): Plugin => {
   let option: ResolvedMonkeyOption;
   const isCssImport = async (
-    context: TransformPluginContext,
+    context: Rollup.TransformPluginContext,
     importer: string,
     value: string,
   ): Promise<boolean> => {

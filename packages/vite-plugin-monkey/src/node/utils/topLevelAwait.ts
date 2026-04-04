@@ -1,12 +1,7 @@
 import type * as acorn from 'acorn';
 import * as acornWalk from 'acorn-walk';
 import MagicString from 'magic-string';
-import type {
-  OutputAsset,
-  OutputBundle,
-  OutputChunk,
-  PluginContext,
-} from 'rollup';
+import type { Rollup } from 'vite';
 
 interface AwaitCallExpression extends acorn.CallExpression {
   callee: acorn.Identifier;
@@ -15,7 +10,7 @@ interface AwaitCallExpression extends acorn.CallExpression {
 const awaitOffset = `await`.length;
 const initTlaIdentifier = `_TLA_`;
 
-export const getSafeTlaIdentifier = (rawBundle: OutputBundle) => {
+export const getSafeTlaIdentifier = (rawBundle: Rollup.OutputBundle) => {
   const codes: string[] = [];
   for (const chunk of Object.values(rawBundle)) {
     if (chunk.type == 'chunk') {
@@ -57,8 +52,8 @@ const includes = (
 };
 
 export const transformTlaToIdentifier = (
-  context: PluginContext,
-  chunk: OutputAsset | OutputChunk,
+  context: Rollup.PluginContext,
+  chunk: Rollup.OutputAsset | Rollup.OutputChunk,
   identifier: string,
 ) => {
   if (chunk.type == 'chunk') {
@@ -112,8 +107,8 @@ export const transformTlaToIdentifier = (
 };
 
 export const transformIdentifierToTla = (
-  context: PluginContext,
-  chunk: OutputAsset | OutputChunk,
+  context: Rollup.PluginContext,
+  chunk: Rollup.OutputAsset | Rollup.OutputChunk,
   identifier: string,
 ) => {
   if (chunk.type == 'chunk') {

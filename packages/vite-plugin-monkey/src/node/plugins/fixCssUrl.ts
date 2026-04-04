@@ -10,7 +10,8 @@ export const fixCssUrlFactory = (): Plugin => {
       return {
         css: {
           postcss: {
-            plugins: [postUrl({ url: 'inline' })],
+            // cast needed: postcss-url may resolve a different postcss version than vite
+            plugins: [postUrl({ url: 'inline' })] as any[],
           },
         },
       };

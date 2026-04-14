@@ -34,9 +34,9 @@ export interface GmDownloadProgressEvent extends GmProgressEventBase {
 
 export interface GmDownloadOptions {
   /**
-   * URL from where the data should be downloaded
+   * URL from where the data should be downloaded, or a Blob/File object
    */
-  url: string;
+  url: string | Blob | File;
   /**
    * Filename - for security reasons the file extension needs to be
    * whitelisted at Tampermonkey options page

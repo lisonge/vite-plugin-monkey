@@ -24,10 +24,10 @@ jobs:
       - run: pnpm build
 
       - if: ${{ startsWith(github.ref_name, 'v') }}
-        run: pnpm -F vite-plugin-monkey publish
+        run: pnpm -F vite-plugin-monkey publish --no-git-checks
 
       - if: ${{ startsWith(github.ref_name, 'create-monkey') }}
-        run: pnpm -F create-monkey publish
+        run: pnpm -F create-monkey publish --no-git-checks
 
       - if: ${{ startsWith(github.ref_name, 'v') }}
         uses: actions/create-release@v1

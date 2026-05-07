@@ -70,3 +70,8 @@ Learn Solid
 };`;
 console.log(await formatCode(tsxCode, 'tsx'));
 //-------------------------
+
+
+const css = document.createElement('style');
+css.append('body { background-color: red; }');
+document.head.appendChild(css);

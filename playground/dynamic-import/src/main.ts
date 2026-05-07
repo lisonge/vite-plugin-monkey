@@ -6,3 +6,7 @@ console.log({
   default: ElementPlus.default,
 });
 export {};
+
+if (location.search.includes('b')) {
+  await import('./b');
+}

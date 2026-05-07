@@ -1,3 +1,4 @@
 # What's Changed
 
-- fix: GmLogType parameter type  (#272)
+- migrate to vite 8
+- drop support for vite 7

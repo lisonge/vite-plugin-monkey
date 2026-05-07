@@ -36,13 +36,16 @@ export interface GmResponseEventBase<R extends GmResponseType> {
   statusText: string;
 }
 
-interface GmErrorEvent<R extends GmResponseType>
-  extends GmResponseEventBase<R> {
+interface GmErrorEvent<
+  R extends GmResponseType,
+> extends GmResponseEventBase<R> {
   error: string;
 }
 
-export interface GmResponseEvent<R extends GmResponseType, C = undefined>
-  extends GmResponseEventBase<R> {
+export interface GmResponseEvent<
+  R extends GmResponseType,
+  C = undefined,
+> extends GmResponseEventBase<R> {
   finalUrl: string;
   context: C;
 }
@@ -50,8 +53,8 @@ export interface GmResponseEvent<R extends GmResponseType, C = undefined>
 export interface GmProgressResponseEvent<
   R extends GmResponseType,
   C = undefined,
-> extends GmResponseEvent<R, C>,
-    GmProgressEventBase {}
+>
+  extends GmResponseEvent<R, C>, GmProgressEventBase {}
 
 export interface GmXmlhttpRequestOption<
   R extends GmResponseType,
@@ -157,8 +160,8 @@ export interface GmXmlhttpRequestType extends GmXmlhttpRequestExtType {
 export interface GmAsyncXmlhttpRequestReturnType<
   R extends GmResponseType,
   C = any,
-> extends GmAbortHandle,
-    Promise<GmResponseEvent<R, C>> {}
+>
+  extends GmAbortHandle, Promise<GmResponseEvent<R, C>> {}
 
 export interface GmAsyncXmlhttpRequestType extends GmXmlhttpRequestExtType {
   <R extends GmResponseType = 'text', C = any>(

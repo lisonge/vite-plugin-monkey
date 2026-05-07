@@ -6,7 +6,7 @@ import type {
   OutputBundle,
   OutputChunk,
   PluginContext,
-} from 'rollup';
+} from 'rolldown';
 
 interface AwaitCallExpression extends acorn.CallExpression {
   callee: acorn.Identifier;

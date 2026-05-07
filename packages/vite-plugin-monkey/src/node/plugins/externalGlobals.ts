@@ -49,7 +49,7 @@ export const externalGlobalsFactory = (
       }
       return {
         build: {
-          rollupOptions: {
+          rolldownOptions: {
             external: Object.keys(option.globalsPkg2VarName),
           },
         },

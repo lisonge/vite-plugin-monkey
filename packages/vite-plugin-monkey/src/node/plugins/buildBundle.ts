@@ -1,11 +1,11 @@
-import type { OutputChunk, RollupOutput } from 'rollup';
+import * as acornWalk from 'acorn-walk';
+import type { OutputChunk, RolldownOutput } from 'rolldown';
 import type { Plugin, ResolvedConfig } from 'vite';
 import { build } from 'vite';
 import { finalMonkeyOptionToComment } from '../userscript';
 import { collectGrant } from '../utils/grant';
 import {
   getCssModuleCode,
-  miniCode,
   moduleExportExpressionWrapper,
   removeComment,
 } from '../utils/others';
@@ -90,111 +90,103 @@ export const buildBundleFactory = (
         return codes.join('\n');
       })();
 
-      const hasDynamicImport = entryChunks.some(
-        (e) => e.dynamicImports.length > 0,
-      );
+      const hasDynamicImport = entryChunks.some((e) => {
+        // check has import('./a')
+        if (e.dynamicImports.length) return true;
+        if (!e.code.includes('import')) return false;
+        // check has import('vue')
+        let a = Boolean(false);
+        const ast = this.parse(e.code);
+        try {
+          acornWalk.simple(ast, {
+            ImportExpression() {
+              a = true;
+              throw new Error('stop');
+            },
+          });
+        } catch {}
+        return a;
+      });
 
       const usedModules = new Set<string>();
 
       const tlaIdentifier = getSafeTlaIdentifier(rawBundle);
 
-      const buildResult = (await build({
-        logLevel: 'error',
-        configFile: false,
-        esbuild: false,
-        plugins: [
-          {
-            name: 'monkey:mock',
-            enforce: 'pre',
-            resolveId(source, importer, options) {
-              if (!importer && options.isEntry) {
-                return '\0' + source;
-              }
-              if (source === cssModuleEntryId) return virtualCssModuleEntryId;
-              if (source === cssModuleId) return virtualCssModuleId;
-              const chunk = Object.values(rawBundle).find(
-                (chunk) =>
-                  chunk.type == 'chunk' && source.endsWith(chunk.fileName),
-              ) as OutputChunk | undefined;
-              if (chunk) {
-                return '\0' + source;
-              }
-            },
-            async load(id) {
-              if (!id.startsWith('\0')) return;
-              if (id === virtualCssModuleEntryId) {
-                // use \x20 compat unocss
-                return miniCode(
-                  `import css from '${cssModuleId}'; css(${JSON.stringify('\x20' + cssCode + '\x20')});`,
-                );
-              }
-              if (id === virtualCssModuleId) {
-                cssJsCode = getCssModuleCode(option.cssSideEffects);
-                return miniCode(cssJsCode);
-              }
-              if (id.endsWith(__entry_name)) {
-                return entryCode;
-              }
-              const [k, chunk] =
-                Object.entries(rawBundle).find(([_, chunk]) =>
-                  id.endsWith(chunk.fileName),
-                ) ?? [];
-              if (chunk && chunk.type == 'chunk' && k) {
-                usedModules.add(k);
-                if (!hasDynamicImport) {
-                  const ch = transformTlaToIdentifier(
-                    this,
-                    chunk,
-                    tlaIdentifier,
-                  );
-                  if (ch) return ch;
-                }
-                return {
-                  code: chunk.code,
-                  map: null,
-                };
-              }
-            },
-            generateBundle(_, iifeBundle) {
-              if (hasDynamicImport) {
-                return;
-              }
-              Object.entries(iifeBundle).forEach(([_, chunk]) => {
-                transformIdentifierToTla(this, chunk, tlaIdentifier);
-              });
-            },
-          },
-        ],
-        build: {
-          write: false,
-          minify: false,
-          target: 'esnext',
-          rollupOptions: {
-            external: Object.keys(option.globalsPkg2VarName),
-            output: {
-              globals: option.globalsPkg2VarName,
-            },
-          },
-          lib: {
-            entry: __entry_name,
-            formats: [hasDynamicImport ? 'system' : 'iife'] as any,
-            name: hasDynamicImport ? undefined : '__expose__',
-            fileName: () => `__entry.js`,
+      let finalJsCode = ``;
+
+      const mockPlugin = {
+        name: 'monkey:mock',
+        resolveId: {
+          order: 'pre' as const,
+          handler: (
+            source: string,
+            importer: string | undefined,
+            options: { isEntry: boolean },
+          ): string | undefined => {
+            if (!importer && options.isEntry) {
+              return '\0' + source;
+            }
+            if (source === cssModuleEntryId) return virtualCssModuleEntryId;
+            if (source === cssModuleId) return virtualCssModuleId;
+            const chunk = Object.values(rawBundle).find(
+              (chunk) =>
+                chunk.type == 'chunk' && source.endsWith(chunk.fileName),
+            ) as OutputChunk | undefined;
+            if (chunk) {
+              return '\0' + source;
+            }
           },
         },
-      })) as RollupOutput[];
-      usedModules.forEach((k) => {
-        if (fristEntryChunk != rawBundle[k]) {
-          delete rawBundle[k];
-        }
-      });
+        load: {
+          order: 'pre' as const,
+          handler: (id: string): string | undefined => {
+            if (!id.startsWith('\0')) return;
+            if (id === virtualCssModuleEntryId) {
+              // use \x20 compat unocss
+              return `import { _css } from '${cssModuleId}'; _css(${JSON.stringify('\x20' + cssCode + '\x20')});`;
+            }
+            if (id === virtualCssModuleId) {
+              cssJsCode = getCssModuleCode(option.cssSideEffects);
+              return cssJsCode;
+            }
+            if (id.endsWith(__entry_name)) {
+              return entryCode;
+            }
+            const [k, chunk] =
+              Object.entries(rawBundle).find(([_, chunk]) =>
+                id.endsWith(chunk.fileName),
+              ) ?? [];
+            if (chunk && chunk.type == 'chunk' && k) {
+              usedModules.add(k);
+              if (!hasDynamicImport) {
+                const ch = transformTlaToIdentifier(this, chunk, tlaIdentifier);
+                if (ch) return ch.code;
+              }
+              return chunk.code;
+            }
+          },
+        },
+      };
 
-      const buildBundle = buildResult[0].output.flat();
-      let finalJsCode = ``;
       if (hasDynamicImport) {
+        // use rollup build systemjs
+        const { rollup } = await import('rollup');
+        const buildResult = await (
+          await rollup({
+            logLevel: 'silent',
+            external: Object.keys(option.globalsPkg2VarName),
+            input: __entry_name,
+            plugins: [mockPlugin],
+          })
+        ).generate({
+          globals: option.globalsPkg2VarName,
+          format: 'systemjs',
+          sourcemap: false,
+        });
+        const chunks = buildResult.output.flat();
         const systemJsModules: string[] = [];
         let entryName = '';
-        Object.entries(buildBundle).forEach(([_, chunk]) => {
+        chunks.forEach((chunk) => {
           if (chunk.type == 'chunk') {
             const name = JSON.stringify(`./` + chunk.fileName);
             systemJsModules.push(
@@ -247,13 +239,57 @@ export const buildBundleFactory = (
             (await getSystemjsTexts()).join('\n') + '\n' + finalJsCode;
         }
       } else {
-        // use iife
-        Object.entries(buildBundle).forEach(([_, chunk]) => {
+        // use vite(rolldown) build iife
+        const buildResult = (await build({
+          logLevel: 'error',
+          configFile: false,
+          build: {
+            write: false,
+            minify: false,
+            target: 'esnext',
+            modulePreload: false,
+            rolldownOptions: {
+              external: Object.keys(option.globalsPkg2VarName),
+              output: {
+                globals: option.globalsPkg2VarName,
+                comments: false,
+              },
+            },
+            lib: {
+              entry: __entry_name,
+              formats: ['iife'],
+              name: '__expose__',
+              fileName: () => '__entry.js',
+            },
+          },
+          plugins: [
+            {
+              ...mockPlugin,
+              generateBundle: {
+                order: 'pre',
+                handler(_, iifeBundle) {
+                  Object.entries(iifeBundle).forEach(([_, chunk]) => {
+                    transformIdentifierToTla(this, chunk, tlaIdentifier);
+                  });
+                },
+              },
+            },
+          ],
+        })) as RolldownOutput[];
+        const chunks = buildResult[0].output.flat();
+        chunks.forEach((chunk) => {
           if (chunk.type == 'chunk' && chunk.isEntry) {
             finalJsCode = chunk.code;
           }
         });
       }
+
+      usedModules.forEach((k) => {
+        if (fristEntryChunk != rawBundle[k]) {
+          delete rawBundle[k];
+        }
+      });
+
       if (!viteConfig.build.minify) {
         finalJsCode = await removeComment(finalJsCode);
       }
@@ -275,10 +311,11 @@ export const buildBundleFactory = (
         'build',
       );
 
-      const mergedCode = [comment, finalJsCode]
-        .filter((s) => s)
-        .join(`\n\n`)
-        .trimEnd();
+      const mergedCode =
+        [comment, finalJsCode]
+          .filter((s) => s)
+          .join(`\n\n`)
+          .trimEnd() + '\n';
       if (fristEntryChunk) {
         fristEntryChunk.fileName = option.build.fileName;
         fristEntryChunk.code = mergedCode;

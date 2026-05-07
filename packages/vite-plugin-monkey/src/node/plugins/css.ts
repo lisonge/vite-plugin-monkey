@@ -1,6 +1,6 @@
 import MagicString from 'magic-string';
 import fs from 'node:fs/promises';
-import type { TransformPluginContext } from 'rollup';
+import type { TransformPluginContext } from 'rolldown';
 import type { Plugin } from 'vite';
 import {
   getProgramImportNodes,
@@ -9,10 +9,10 @@ import {
 } from '../utils/others';
 import type { ResolvedMonkeyOption } from '../utils/types';
 
-export const cssModuleId = 'virtual:monkey-css-side-effects';
+export const cssModuleId = 'virtual:monkey-css';
 export const virtualCssModuleId = '\0' + cssModuleId;
 
-// https://github.com/vitejs/vite/blob/v7.1.2/packages/vite/src/node/constants.ts#L97
+// https://github.com/vitejs/vite/blob/main/packages/vite/src/node/constants.ts
 const styleExts = [
   '.css',
   '.less',
@@ -43,12 +43,12 @@ const filterAsync = async <T>(
   return arr.filter((_, index) => results[index]);
 };
 
-const staticCssIdSuffix = '__plugin-monkey-static-css';
+const staticCssIdSuffix = '__monkey-css';
 // https://github.com/lisonge/vite-plugin-monkey/issues/249
 const staticCssTemplate = `
 import {0} from '{1}';
-import importCSS from '${cssModuleId}';
-{0} && importCSS({0});
+import { _css } from '${cssModuleId}';
+{0} && _css({0});
 export default undefined;
 `.trimStart();
 
@@ -87,7 +87,7 @@ export const cssFactory = (
       option = await getOption();
       return {
         build: {
-          rollupOptions: {
+          rolldownOptions: {
             external: [cssModuleId],
           },
         },
@@ -122,9 +122,9 @@ export const cssFactory = (
       );
       if (!importedCssNodes.length) return;
       const ms = new MagicString(code);
-      const loadName = getSafeIdentifier('importCSS', code);
+      const loadName = getSafeIdentifier('_css', code);
       const importList: string[] = [
-        `import ${loadName} from '${cssModuleId}';`,
+        `import {_css as ${loadName}} from '${cssModuleId}';`,
       ];
       const nameCache: Record<string, string> = {};
       for (const n of importedCssNodes) {

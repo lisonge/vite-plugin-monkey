@@ -1,6 +1,6 @@
 {
   "name": "create-monkey",
-  "version": "1.43.0",
+  "version": "1.44.0",
   "description": "create-monkey",
   "main": "dist/index.mjs",
   "type": "module",

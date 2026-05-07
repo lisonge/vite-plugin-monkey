@@ -7,7 +7,6 @@ import { collectGrant } from '../utils/grant';
 import {
   getCssModuleCode,
   moduleExportExpressionWrapper,
-  removeComment,
 } from '../utils/others';
 import { getSystemjsRequireUrls, getSystemjsTexts } from '../utils/systemjs';
 import {
@@ -17,6 +16,7 @@ import {
 } from '../utils/topLevelAwait';
 import type { ResolvedMonkeyOption } from '../utils/types';
 import { cssModuleId, virtualCssModuleId } from './css';
+import MagicString from 'magic-string';
 
 const __entry_name = `__monkey.entry.js`;
 const cssModuleEntryId = cssModuleId + `-entry`;
@@ -182,6 +182,8 @@ export const buildBundleFactory = (
           globals: option.globalsPkg2VarName,
           format: 'systemjs',
           sourcemap: false,
+          strict: true,
+          compact: true,
         });
         const chunks = buildResult.output.flat();
         const systemJsModules: string[] = [];
@@ -200,7 +202,7 @@ export const buildBundleFactory = (
           }
         });
         systemJsModules.push(`System.import(${entryName}, "./");`);
-        finalJsCode = systemJsModules.join('\n');
+        finalJsCode = systemJsModules.map((v) => v.trim()).join('\n');
         const usedModuleIds = Array.from(this.getModuleIds()).filter(
           (d) => d in option.globalsPkg2VarName,
         );
@@ -225,9 +227,9 @@ export const buildBundleFactory = (
                 option.globalsPkg2VarName[id],
               )});`,
           ),
-          '\n' + finalJsCode,
+          finalJsCode,
         ]
-          .filter((s) => s)
+          .filter((s) => s.trim())
           .join('\n');
 
         if (typeof option.systemjs == 'function') {
@@ -253,6 +255,10 @@ export const buildBundleFactory = (
               output: {
                 globals: option.globalsPkg2VarName,
                 comments: false,
+                strict: false, // rolldown will add 'use strict' to the file top instead of the wrapper function next line
+              },
+              experimental: {
+                attachDebugInfo: 'none',
               },
             },
             lib: {
@@ -282,6 +288,40 @@ export const buildBundleFactory = (
             finalJsCode = chunk.code;
           }
         });
+
+        // add 'use strict' to the wrapper function next line
+        const ms = new MagicString(finalJsCode);
+        const ast = this.parse(finalJsCode);
+        try {
+          acornWalk.simple(
+            ast,
+            {
+              FunctionExpression(node) {
+                const indentSize = (() => {
+                  if (!node.body.body.length) return 0;
+                  const st = node.body.body[0].start;
+                  let i = st;
+                  while (i > 0 && finalJsCode[i] !== '\n') {
+                    i--;
+                  }
+                  if (!i) return 0;
+                  return st - i;
+                })();
+                ms.appendRight(
+                  node.body.start + 1,
+                  `\n${' '.repeat(indentSize)}'use strict';`,
+                );
+                throw new Error('stop');
+              },
+            },
+            { ...acornWalk.base, Function: () => {} },
+          );
+        } catch (e) {
+          if (!(e instanceof Error && e.message === 'stop')) {
+            throw e;
+          }
+        }
+        finalJsCode = ms.toString();
       }
 
       usedModules.forEach((k) => {
@@ -290,9 +330,6 @@ export const buildBundleFactory = (
         }
       });
 
-      if (!viteConfig.build.minify) {
-        finalJsCode = await removeComment(finalJsCode);
-      }
       let collectGrantSet: Set<string>;
       if (option.build.autoGrant) {
         collectGrantSet = collectGrant(

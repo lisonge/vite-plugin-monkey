@@ -36,6 +36,10 @@ export const configFactory = (
               }
               defaultHandler(level, log);
             },
+            experimental: {
+              // https://github.com/rolldown/rolldown/issues/9006
+              attachDebugInfo: 'none',
+            },
           },
         },
       };

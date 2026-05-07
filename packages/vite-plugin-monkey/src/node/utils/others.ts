@@ -1,11 +1,9 @@
 import type { Program } from '@oxc-project/types';
-import type { OutputChunk, RolldownOutput } from 'rolldown';
 import * as acornWalk from 'acorn-walk';
 import { resolve } from 'import-meta-resolve';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { build } from 'vite';
 
 export const isFirstBoot = (): boolean => {
   return (Reflect.get(globalThis, '__vite_start_time') ?? 0) < 1000;
@@ -249,58 +247,4 @@ export const _css = async (t) => {
   ${`(${f})(t);`}
 };
 `.trimStart();
-};
-
-export const removeComment = async (code: string): Promise<string> => {
-  if (!(code.includes('/*') || code.includes('//'))) return code;
-  const buildResult = (await build({
-    logLevel: 'error',
-    configFile: false,
-    build: {
-      minify: false,
-      target: 'esnext',
-      modulePreload: false,
-      assetsInlineLimit: Number.MAX_SAFE_INTEGER,
-      chunkSizeWarningLimit: Number.MAX_SAFE_INTEGER,
-      sourcemap: false,
-      write: false,
-      rolldownOptions: {
-        platform: 'browser',
-        output: {
-          comments: false,
-        },
-      },
-      lib: {
-        entry: 'index.js',
-        formats: ['es'],
-      },
-    },
-    plugins: [
-      {
-        name: 'monkey:mock',
-        resolveId: {
-          order: 'pre',
-          handler(id) {
-            return '\0' + id;
-          },
-        },
-        load: {
-          order: 'pre',
-          handler() {
-            return code;
-          },
-        },
-      },
-    ],
-  })) as RolldownOutput[];
-  const chunks = buildResult[0].output.flat() as OutputChunk[];
-  const newCode = chunks[0].code.trim();
-  const codes = newCode.split('\n');
-  if (codes.length && codes[0].startsWith('//')) {
-    codes.shift();
-  }
-  if (codes.length && codes.at(-1)!.startsWith('//')) {
-    codes.pop();
-  }
-  return codes.join('\n').trim();
 };

@@ -12,6 +12,7 @@
 // ==/UserScript==
 
 (async function() {
+  'use strict';
 	var _GM_addStyle = typeof GM_addStyle != "undefined" ? GM_addStyle : void 0;
 	var _GM_deleteValue = typeof GM_deleteValue != "undefined" ? GM_deleteValue : void 0;
 	var _GM_getResourceText = typeof GM_getResourceText != "undefined" ? GM_getResourceText : void 0;
@@ -19,19 +20,21 @@
 	var cssLoader = (name) => _GM_addStyle(_GM_getResourceText(name));
 	cssLoader("element-plus/dist/index.css");
 	_GM_deleteValue("key");
-	await fetch(`/`);
-	await fetch(`/`);
+	await(fetch(`/`));
+	await(fetch(`/`));
 	console.log(_monkeyWindow.onurlchange);
-	for await (const x of [
-		1,
-		2,
-		3,
-		4,
-		5
-	]) await fetch(`/` + x);
+	await(async () => {
+		for await (const x of [
+			1,
+			2,
+			3,
+			4,
+			5
+		]) await(fetch(`/` + x));
+	})();
 	var fn = async () => {
 		const r = await fetch(`/`);
 		console.log(r);
 	};
-	await fn();
+	await(fn());
 })();

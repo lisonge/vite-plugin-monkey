@@ -19,6 +19,7 @@
 // ==/UserScript==
 
 (async function(vue) {
+  'use strict';
 	var s = new Set();
 	var _css = async (t) => {
 		if (s.has(t)) return;
@@ -77,11 +78,11 @@
 		console.log(args);
 	}));
 	if (location.search.includes("test")) {
-		await _css(style2_default);
+		await(_css(style2_default));
 		_css(style3_default);
 		_css(style3_default);
 		_$2();
-		const x = await _$1();
+		const x = await(_$1());
 		console.log(x);
 	} else _();
 })(Vue);

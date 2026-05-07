@@ -29,6 +29,7 @@
 // ==/UserScript==
 
 (async function(prettier, prettier_plugins_babel) {
+  'use strict';
 	var __create = Object.create;
 	var __defProp = Object.defineProperty;
 	var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
@@ -101,7 +102,7 @@
 		}
 	});
 	console.log("format tsx code");
-	console.log(await formatCode(`const App=()=>{return(<div class={styles.App}>
+	console.log(await(formatCode(`const App=()=>{return(<div class={styles.App}>
 <header class={styles.header}>
 <img src={logo} class={styles.logo} alt="logo" />
 <p>
@@ -118,7 +119,7 @@ Learn Solid
 </header>
 </div>
 );
-};`, "tsx"));
+};`, "tsx")));
 	var css = document.createElement("style");
 	css.append("body { background-color: red; }");
 	document.head.appendChild(css);

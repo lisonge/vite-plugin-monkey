@@ -10,10 +10,13 @@
 // ==/UserScript==
 
 (async function() {
+  'use strict';
 	var _monkeyWindow = window;
-	console.log(await window?.fetch(`/`));
-	for await (const v of [Promise.resolve(1), Promise.resolve(2)]) console.log(v);
-	console.log((+await fetch(`/`) || await fetch(`/`)) && await fetch(`/`));
+	console.log(await(window?.fetch(`/`)));
+	await(async () => {
+		for await (const v of [Promise.resolve(1), Promise.resolve(2)]) console.log(v);
+	})();
+	console.log((+await(fetch(`/`)) || await(fetch(`/`))) && await(fetch(`/`)));
 	if (_monkeyWindow.onurlchange === null) _monkeyWindow.addEventListener("urlchange", console.log);
 	_monkeyWindow.focus();
 	_monkeyWindow.close();

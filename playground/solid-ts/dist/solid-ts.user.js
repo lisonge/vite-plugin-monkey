@@ -8,6 +8,7 @@
 // ==/UserScript==
 
 (function() {
+  'use strict';
 	var s = new Set();
 	var _css = async (t) => {
 		if (s.has(t)) return;

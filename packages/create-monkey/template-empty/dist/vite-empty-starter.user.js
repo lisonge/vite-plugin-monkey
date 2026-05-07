@@ -6,9 +6,7 @@
 // @match      https://www.google.com/
 // ==/UserScript==
 
-(function () {
-	'use strict';
-
+(function() {
+  'use strict';
 	console.log("hello world");
-
 })();

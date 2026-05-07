@@ -10,7 +10,7 @@ export const fixCssUrlFactory = (): Plugin => {
       return {
         css: {
           postcss: {
-            plugins: [postUrl({ url: 'inline' })],
+            plugins: [postUrl({ url: 'inline' }) as any],
           },
         },
       };

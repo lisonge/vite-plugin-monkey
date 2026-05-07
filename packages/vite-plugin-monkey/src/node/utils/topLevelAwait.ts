@@ -6,7 +6,7 @@ import type {
   OutputBundle,
   OutputChunk,
   PluginContext,
-} from 'rollup';
+} from 'rolldown';
 
 interface AwaitCallExpression extends acorn.CallExpression {
   callee: acorn.Identifier;
@@ -165,12 +165,10 @@ export const transformIdentifierToTla = (
         ms.update(callee.start, callee.end, 'await');
       });
       forTlaCallNodes.forEach((node) => {
-        // __topLevelAwait_FOR ((async()=>{ /*start*/for await(const x of xxx){}/*end*/  })()); -> for await(const x of xxx){}
-        // @ts-ignore
-        const forOfNode = node.arguments?.[0]?.callee?.body
-          ?.body?.[0] as acorn.ForOfStatement;
-        ms.update(node.start, forOfNode.start, '');
-        ms.update(forOfNode.end, node.end, '');
+        // if vite minify is true, the parant expression will be a comma expression, so we need to keep it as an expression
+        const arg0 = node.arguments[0];
+        ms.update(node.start, arg0.start, 'await');
+        ms.update(arg0.end, node.end, '');
       });
       topFnNodes.forEach((node) => {
         ms.appendLeft(node.start, `async\x20`);

@@ -29,7 +29,7 @@ export default defineConfig(async ({ command, mode }) => ({
         metaFileName: true,
         externalGlobals: {
           prettier: cdn.jsdelivr('prettier', 'standalone.js'),
-          'prettier/parser-babel': [
+          'prettier/plugins/babel': [
             'prettierPlugins.babel',
             async (version, name, moduleName) => {
               // name == `prettier`

@@ -63,8 +63,7 @@ export interface GmDownloadType {
   (url: string, name?: string): GmAbortHandle<boolean>;
 }
 export interface GmDownloadAsyncAbortHandle
-  extends Promise<GmResponseEvent<'blob', undefined>>,
-    GmAbortHandle<boolean> {}
+  extends Promise<GmResponseEvent<'blob', undefined>>, GmAbortHandle<boolean> {}
 
 export interface GmAsyncDownloadType {
   (options: GmDownloadOptions): GmDownloadAsyncAbortHandle;

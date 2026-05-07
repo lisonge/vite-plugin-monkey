@@ -345,16 +345,16 @@ export interface MonkeyOption {
 
     /**
      * @default
-     * const importCss = (css: string): void => {
+     * const _css = (c: string): void => {
      *   if (typeof GM_addStyle === 'function') {
-     *     GM_addStyle(css);
+     *     GM_addStyle(c);
      *   } else {
-     *     ((document.head || document.documentElement)).appendChild(document.createElement('style')).append(css)
+     *     ((document.head || document.documentElement)).appendChild(document.createElement('style')).append(c)
      *   }
      * };
      * @example
      * // example1
-     * importCss.toString()
+     * _css.toString()
      *
      * // example2
      * `(a)=>GM_addStyle(a)`

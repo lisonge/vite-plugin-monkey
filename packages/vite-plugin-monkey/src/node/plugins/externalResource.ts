@@ -4,7 +4,6 @@ import {
   getProgramImportNodes,
   getSafeIdentifier,
   getUpperCaseName,
-  miniCode,
 } from '../utils/others';
 import { getModuleRealInfo } from '../utils/pkg';
 import type { ResolvedMonkeyOption } from '../utils/types';
@@ -33,8 +32,9 @@ const getExportModuleCode = (
   return [
     `import {${name}} from '${loaderModId}'`,
     dynamic
-      ? `let cache; export default async()=>cache??(cache=${valueLiteral})`
-      : `export default ${valueLiteral}`,
+      ? `let cache; export const _ = () => cache ?? (cache = ${valueLiteral})`
+      : `export const _ = ${valueLiteral}`,
+    `export default _`,
   ].join(';');
 };
 
@@ -116,7 +116,7 @@ export const externalResourceFactory = (
             importCodes,
           );
           importCodes.push(
-            `import ${loadName} from ${JSON.stringify(getValueResId(value, true))};`,
+            `import { _ as ${loadName}} from ${JSON.stringify(getValueResId(value, true))};`,
           );
           ms.update(node.start, node.end, `${loadName}()`);
         }
@@ -128,7 +128,7 @@ export const externalResourceFactory = (
       };
     },
     async load(id) {
-      if (id === virtualloaderModId) return miniCode(loaderModuleCode);
+      if (id === virtualloaderModId) return loaderModuleCode;
       const [importName, dynamic] = getResNameTuple(id) || [];
       if (dynamic === undefined) return;
       if (!importName) return;
@@ -148,13 +148,13 @@ export const externalResourceFactory = (
         dynamic,
       };
       if (resOption.nodeLoader) {
-        return miniCode(resOption.nodeLoader(loaderParam));
+        return resOption.nodeLoader(loaderParam);
       } else if (resOption.loader) {
         const valueLiteral = `((${resOption.loader})(${JSON.stringify(loaderParam)}))`;
-        return miniCode(
-          dynamic
-            ? `let cache; export default async()=>cache??(cache=${valueLiteral})`
-            : `export default ${valueLiteral}`,
+        return (
+          (dynamic
+            ? `let cache; export const _ async()=>cache??(cache=${valueLiteral})`
+            : `export const _ ${valueLiteral}`) + `\nexport default _`
         );
       }
       const [resourcePath, query] = importName.split('?', 2);
@@ -185,7 +185,7 @@ export const externalResourceFactory = (
           throw new Error(`module: ${importName} not found loader`);
         }
       })();
-      return miniCode(moduleCode);
+      return moduleCode;
     },
     generateBundle() {
       const usedModIdSet = new Set<string>();

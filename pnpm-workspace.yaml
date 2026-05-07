@@ -3,7 +3,11 @@ packages:
   - playground/*
 
 onlyBuiltDependencies:
+  - '@parcel/watcher'
   - core-js
   - esbuild
   - simple-git-hooks
   - vue-demi
+
+overrides:
+  vitefu: 1.1.3

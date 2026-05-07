@@ -3,5 +3,5 @@
   "compilerOptions": {
     "rootDir": "./"
   },
-  "include": ["src", "tsup.config.ts", "scripts"]
+  "include": ["src", "tsdown.config.ts", "scripts"]
 }

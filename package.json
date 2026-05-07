@@ -7,73 +7,58 @@
     "format": "prettier --cache --write --ignore-unknown .",
     "lint": "eslint --cache --fix .",
     "build": "pnpm -r --filter=./packages/* build",
-    "build:playground": "pnpm -r --filter=./playground/* build",
-    "ci-publish": "tsx scripts/publishCI.ts"
+    "build:playground": "pnpm -r --filter=./playground/* build"
   },
   "dependencies": {
-    "@commitlint/cli": "19.8.1",
-    "@commitlint/config-conventional": "19.8.1",
-    "@commitlint/types": "19.8.1",
-    "@eslint/js": "9.33.0",
+    "@eslint/js": "10.0.1",
     "@types/cross-spawn": "6.0.6",
     "@types/fs-extra": "11.0.4",
     "@types/minimist": "1.2.5",
-    "@types/node": "24.3.0",
+    "@types/node": "25.6.0",
     "@types/postcss-url": "10.0.4",
     "@types/prompts": "2.4.9",
-    "@types/react": "19.1.10",
-    "@types/react-dom": "19.1.7",
-    "@types/semver": "7.7.0",
-    "@vitejs/plugin-legacy": "7.2.1",
-    "@vitejs/plugin-react": "5.0.0",
-    "@vitejs/plugin-vue": "6.0.1",
-    "acorn": "8.15.0",
-    "acorn-walk": "8.3.4",
-    "element-plus": "2.10.7",
-    "eslint": "9.33.0",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "@types/semver": "7.7.1",
+    "@vitejs/plugin-legacy": "8.0.1",
+    "@vitejs/plugin-react": "6.0.1",
+    "@vitejs/plugin-vue": "6.0.6",
+    "acorn": "8.16.0",
+    "acorn-walk": "8.3.5",
+    "element-plus": "2.13.7",
+    "eslint": "10.2.0",
     "eslint-config-prettier": "10.1.8",
-    "eslint-plugin-unused-imports": "4.2.0",
-    "execa": "9.6.0",
-    "fs-extra": "11.3.1",
-    "lint-staged": "16.1.5",
-    "magic-string": "0.30.17",
+    "eslint-plugin-unused-imports": "4.4.1",
+    "execa": "9.6.1",
+    "fs-extra": "11.3.4",
+    "lint-staged": "16.4.0",
+    "magic-string": "0.30.21",
     "minimist": "1.2.8",
     "normalize.css": "8.0.1",
     "picocolors": "1.1.1",
-    "pinia": "3.0.3",
+    "pinia": "3.0.4",
     "postcss-url": "10.1.3",
-    "prettier": "3.6.2",
-    "react": "19.1.1",
-    "react-dom": "19.1.1",
-    "sass-embedded": "1.90.0",
-    "semver": "7.7.2",
+    "prettier": "3.8.2",
+    "react": "19.2.5",
+    "react-dom": "19.2.5",
+    "sass-embedded": "1.99.0",
+    "semver": "7.7.4",
     "simple-git-hooks": "2.13.1",
-    "solid-js": "1.9.9",
-    "terser": "5.43.1",
-    "tsup": "8.5.0",
-    "tsx": "4.20.4",
-    "typescript": "5.9.2",
-    "typescript-eslint": "8.40.0",
-    "unimport": "5.2.0",
-    "unocss": "66.4.2",
-    "unplugin-auto-import": "20.0.0",
-    "vite": "7.1.2",
-    "vite-plugin-solid": "2.11.8",
-    "vue": "3.5.18"
+    "solid-js": "1.9.12",
+    "terser": "5.46.1",
+    "tsdown": "0.21.10",
+    "tsx": "4.21.0",
+    "typescript": "6.0.2",
+    "typescript-eslint": "8.58.1",
+    "unimport": "6.1.0",
+    "unocss": "66.6.8",
+    "unplugin-auto-import": "21.0.0",
+    "vite": "8.0.8",
+    "vite-plugin-solid": "2.11.12",
+    "vue": "3.5.32"
   },
   "simple-git-hooks": {
-    "pre-commit": "pnpm exec lint-staged",
-    "commit-msg": "pnpm exec commitlint --edit $1"
-  },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ],
-    "rules": {
-      "subject-case": [
-        0
-      ]
-    }
+    "pre-commit": "pnpm exec lint-staged"
   },
   "lint-staged": {
     "*.{js,cjs,mjs,ts}": [
@@ -85,8 +70,8 @@
     ]
   },
   "volta": {
-    "node": "24.4.1",
-    "pnpm": "10.14.0"
+    "node": "24.15.0",
+    "pnpm": "10.33.2"
   },
-  "packageManager": "pnpm@10.14.0"
+  "packageManager": "pnpm@10.33.2"
 }

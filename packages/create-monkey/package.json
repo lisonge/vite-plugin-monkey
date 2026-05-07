@@ -2,25 +2,24 @@
   "name": "create-monkey",
   "version": "1.43.0",
   "description": "create-monkey",
-  "main": "index.js",
+  "main": "dist/index.mjs",
   "type": "module",
   "bin": {
-    "create-monkey": "index.js"
+    "create-monkey": "dist/index.mjs"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
   "engines": {
-    "node": ">=14.18.0"
+    "node": ">=20"
   },
   "files": [
-    "index.js",
     "dist",
     "template-*"
   ],
   "scripts": {
     "prebuild": "tsc",
-    "build": "tsup"
+    "build": "tsdown"
   },
   "keywords": [
     "create",

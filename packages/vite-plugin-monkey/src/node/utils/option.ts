@@ -47,7 +47,7 @@ export const resolvedOption = async (
       };
     } else if (v instanceof Array) {
       let resourceUrl2: Pkg2UrlFn;
-      let resourceName2: Pkg2UrlFn = () => k;
+      let resourceName2: Pkg2UrlFn;
       const [resourceName, resourceUrl] = v;
       if (typeof resourceName == 'string') {
         resourceName2 = (pkg) => resourceName || pkg.importName;

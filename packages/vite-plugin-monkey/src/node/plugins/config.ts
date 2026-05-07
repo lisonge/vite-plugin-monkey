@@ -15,22 +15,31 @@ export const configFactory = (
             [option.clientAlias]: 'vite-plugin-monkey/dist/client',
           },
         },
-        esbuild: {
-          supported: {
-            'top-level-await': true,
-          },
-        },
         build: {
           assetsInlineLimit: Number.MAX_SAFE_INTEGER,
           chunkSizeWarningLimit: Number.MAX_SAFE_INTEGER,
-          modulePreload: false,
           assetsDir: './',
           cssCodeSplit: false,
           minify: userConfig.build?.minify ?? false,
           cssMinify: userConfig.build?.cssMinify ?? true,
           sourcemap: false,
-          rollupOptions: {
+          rolldownOptions: {
             input: option.entry,
+            onLog(level, log, defaultHandler) {
+              // ignore top-level await warning
+              if (
+                level === 'warn' &&
+                log.code === 'TOLERATED_TRANSFORM' &&
+                log.message.includes('Top-level await is not available')
+              ) {
+                return;
+              }
+              defaultHandler(level, log);
+            },
+            experimental: {
+              // https://github.com/rolldown/rolldown/issues/9006
+              attachDebugInfo: 'none',
+            },
           },
         },
       };

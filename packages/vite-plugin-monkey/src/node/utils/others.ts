@@ -1,11 +1,9 @@
+import type { Program } from '@oxc-project/types';
 import * as acornWalk from 'acorn-walk';
 import { resolve } from 'import-meta-resolve';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import type { ProgramNode } from 'rollup';
-import { transformWithEsbuild } from 'vite';
-import type { Thenable } from './types';
 
 export const isFirstBoot = (): boolean => {
   return (Reflect.get(globalThis, '__vite_start_time') ?? 0) < 1000;
@@ -21,19 +19,6 @@ export const existFile = async (path: string) => {
   } catch {
     return false;
   }
-};
-
-export const miniCode = async (
-  code: Thenable<string>,
-  type: 'css' | 'js' = 'js',
-) => {
-  return (
-    await transformWithEsbuild(await code, 'any_name.' + type, {
-      minify: true,
-      sourcemap: false,
-      legalComments: 'none',
-    })
-  ).code.trimEnd();
 };
 
 export const moduleExportExpressionWrapper = (expression: string) => {
@@ -97,7 +82,7 @@ export function dataUrl(p0: any, ...args: any[]): string | Promise<string> {
   if (typeof p0 == 'string') {
     return dataJsUrl(p0);
   }
-  return miniCode(stringifyFunction(p0, ...args)).then(dataJsUrl);
+  return dataJsUrl(stringifyFunction(p0, ...args));
 }
 
 import { DomUtils, ElementType, parseDocument } from 'htmlparser2';
@@ -176,9 +161,7 @@ export interface ImportNodeItem {
   value: string;
 }
 
-export const getProgramImportNodes = (
-  program: ProgramNode,
-): ImportNodeItem[] => {
+export const getProgramImportNodes = (program: Program): ImportNodeItem[] => {
   const nodes: ImportNodeItem[] = [];
   acornWalk.simple(program, {
     ImportDeclaration(node) {
@@ -239,16 +222,16 @@ export const getUpperCaseName = (
     .join('');
 };
 
-const defaultCssSideEffects = (css: string) => {
+const defaultCssSideEffects = (c: string) => {
   // @ts-ignore
   if (typeof GM_addStyle === 'function') {
     // @ts-ignore
-    GM_addStyle(css);
+    GM_addStyle(c);
   } else {
     // see #262
     (document.head || document.documentElement)
       .appendChild(document.createElement('style'))
-      .append(css);
+      .append(c);
   }
 };
 
@@ -257,49 +240,11 @@ export const getCssModuleCode = (
 ): string => {
   f ??= defaultCssSideEffects;
   return `
-const set = new Set();
-export default async (css) => {
-  if (set.has(css)) return;
-  set.add(css);
-  ${`(${f})(css);`}
+const s = new Set;
+export const _css = async (t) => {
+  if (s.has(t)) return;
+  s.add(t);
+  ${`(${f})(t);`}
 };
-`;
-};
-
-export const removeComment = async (code: string): Promise<string> => {
-  if (!(code.includes('/*') || code.includes('//'))) return code;
-  const ranges: [number, number][] = [];
-  (await import('acorn')).parse(code, {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    onComment(_isBlock, text, start, end) {
-      // https://esbuild.github.io/api/#legal-comments
-      // remove /*! #__NO_SIDE_EFFECTS__ */
-      if (text.includes('@license')) return;
-      if (text.includes('@preserve')) return;
-      while (start > 0 && !code[start - 1].trim()) {
-        start--;
-      }
-      while (end < code.length && !code[end].trim()) {
-        end++;
-      }
-      ranges.push([start, end]);
-    },
-  });
-  if (!ranges.length) return code;
-  const getSeparator = (start: number, end: number): string => {
-    while (start < end) {
-      if (code[start] === '\n') return '\n';
-      start++;
-    }
-    return '\x20';
-  };
-  let newCode = '';
-  let lastIndex = 0;
-  for (const [start, end] of ranges) {
-    newCode += code.slice(lastIndex, start) + getSeparator(start, end);
-    lastIndex = end;
-  }
-  newCode += code.slice(lastIndex);
-  return newCode;
+`.trimStart();
 };

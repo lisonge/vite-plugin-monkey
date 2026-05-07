@@ -1,9 +1,9 @@
 {
   "name": "vite-plugin-monkey",
-  "version": "7.1.9",
+  "version": "8.0.0-beta.2",
   "description": "A vite plugin server and build your.user.js for userscript engine like Tampermonkey and Violentmonkey and Greasemonkey",
   "main": "dist/node/index.mjs",
-  "types": "dist/node/index.d.ts",
+  "types": "dist/node/index.d.mts",
   "type": "module",
   "sideEffects": false,
   "files": [
@@ -17,7 +17,7 @@
   },
   "scripts": {
     "prebuild": "tsc",
-    "build": "tsup",
+    "build": "tsdown",
     "postbuild": "tsx ./scripts/postbuild.ts",
     "postpublish": "curl -X PUT https://registry-direct.npmmirror.com/vite-plugin-monkey/sync"
   },
@@ -44,20 +44,20 @@
   },
   "homepage": "https://github.com/lisonge/vite-plugin-monkey#readme",
   "dependencies": {
-    "acorn": "^8.15.0",
-    "acorn-walk": "^8.3.4",
+    "acorn-walk": "^8.3.5",
     "cross-spawn": "^7.0.6",
-    "htmlparser2": "^10.0.0",
-    "import-meta-resolve": "^4.1.0",
-    "magic-string": "^0.30.17",
+    "htmlparser2": "^12.0.0",
+    "import-meta-resolve": "^4.2.0",
+    "magic-string": "^0.30.21",
     "mrmime": "^2.0.1",
-    "open": "^10.2.0",
+    "open": "^11.0.0",
     "picocolors": "^1.1.1",
     "postcss-url": "^10.1.3",
+    "rollup": "^4.60.2",
     "systemjs": "^6.15.1"
   },
   "peerDependencies": {
-    "vite": "^6.0.0 || ^7.0.0"
+    "vite": "^8.0.0"
   },
   "peerDependenciesMeta": {
     "vite": {

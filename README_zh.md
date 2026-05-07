@@ -311,7 +311,7 @@ export interface MonkeyOption {
 
     /**
      * @default
-     * const importCss = (css: string): void => {
+     * const _css = (css: string): void => {
      *   if (typeof GM_addStyle === 'function') {
      *     GM_addStyle(css);
      *   } else {
@@ -320,7 +320,7 @@ export interface MonkeyOption {
      * };
      * @example
      * // example1
-     * importCss.toString()
+     * _css.toString()
      *
      * // example2
      * `(a)=>GM_addStyle(a)`

@@ -1,5 +1,5 @@
 import * as acornWalk from 'acorn-walk';
-import type { OutputChunk, PluginContext } from 'rollup';
+import type { OutputChunk, PluginContext } from 'rolldown';
 import { grantNames } from './gmApi';
 
 export const collectGrant = (

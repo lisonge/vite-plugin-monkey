@@ -168,6 +168,7 @@ export const buildBundleFactory = (
         },
       };
 
+      const minify = viteConfig.build.minify ?? false;
       if (hasDynamicImport) {
         // use rollup build systemjs
         const { rollup } = await import('rollup');
@@ -247,12 +248,19 @@ export const buildBundleFactory = (
           configFile: false,
           build: {
             write: false,
-            minify: false,
+            minify,
             target: 'esnext',
             modulePreload: false,
             rolldownOptions: {
               external: Object.keys(option.globalsPkg2VarName),
               output: {
+                minify: minify
+                  ? {
+                      mangle: false,
+                      compress: false,
+                      codegen: true,
+                    }
+                  : undefined,
                 globals: option.globalsPkg2VarName,
                 comments: false,
                 strict: false, // rolldown will add 'use strict' to the file top instead of the wrapper function next line
@@ -309,7 +317,7 @@ export const buildBundleFactory = (
                 })();
                 ms.appendRight(
                   node.body.start + 1,
-                  `\n${' '.repeat(indentSize)}'use strict';`,
+                  `${minify ? '' : '\n'}${' '.repeat(indentSize)}'use strict';`,
                 );
                 throw new Error('stop');
               },

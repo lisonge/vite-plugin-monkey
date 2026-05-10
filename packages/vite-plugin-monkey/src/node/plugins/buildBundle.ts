@@ -261,10 +261,10 @@ export const buildBundleFactory = (
             rolldownOptions: {
               external: Object.keys(option.globalsPkg2VarName),
               output: {
+                // disable rolldown minify when using terser or esbuild, see #280
                 ...(rolldownMinify !== undefined
                   ? { minify: rolldownMinify }
                   : {}),
-                // disable rolldown minify when using terser or esbuild
                 globals: option.globalsPkg2VarName,
                 comments: false,
                 strict: false, // rolldown will add 'use strict' to the file top instead of the wrapper function next line

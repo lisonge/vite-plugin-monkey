@@ -242,6 +242,12 @@ export const buildBundleFactory = (
             (await getSystemjsTexts()).join('\n') + '\n' + finalJsCode;
         }
       } else {
+        const rolldownMinify =
+          (viteConfig.build.minify === undefined ||
+            viteConfig.build.minify === 'oxc') &&
+          !Array.isArray(viteConfig.build.rolldownOptions?.output)
+            ? viteConfig.build.rolldownOptions.output?.minify
+            : undefined;
         // use vite(rolldown) build iife
         const buildResult = (await build({
           logLevel: 'error',
@@ -249,18 +255,16 @@ export const buildBundleFactory = (
           build: {
             write: false,
             minify,
+            terserOptions: viteConfig.build.terserOptions,
             target: 'esnext',
             modulePreload: false,
             rolldownOptions: {
               external: Object.keys(option.globalsPkg2VarName),
               output: {
-                minify: minify
-                  ? {
-                      mangle: false,
-                      compress: false,
-                      codegen: true,
-                    }
-                  : undefined,
+                // disable rolldown minify when using terser or esbuild, see #280
+                ...(rolldownMinify !== undefined
+                  ? { minify: rolldownMinify }
+                  : {}),
                 globals: option.globalsPkg2VarName,
                 comments: false,
                 strict: false, // rolldown will add 'use strict' to the file top instead of the wrapper function next line

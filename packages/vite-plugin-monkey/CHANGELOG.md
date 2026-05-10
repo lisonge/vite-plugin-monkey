@@ -1,3 +1,3 @@
 # What's Changed
 
-- fix: minify not working (#280)
+- fix: minify option regression (#282)

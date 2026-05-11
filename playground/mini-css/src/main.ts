@@ -28,3 +28,6 @@ if (location.search.includes('test')) {
   import('element-plus/dist/index.css');
 }
 import './style4.scss';
+
+import style5 from './style5.css?style';
+console.log(style5);

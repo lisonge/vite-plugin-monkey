@@ -69,6 +69,9 @@
 		], 64);
 	}
 	var Test_default = _plugin_vue_export_helper_default(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-0eae1295"]]);
+	var style5_default = "div{background-color:#00f}";
+	var _style = (b, a = document.createElement("style")) => (a.append(b), a);
+	var style5_css_default = _style(style5_default);
 	console.log(`hello wolrd`);
 	console.log(Test_default);
 	console.log(Object.keys(_GM));
@@ -85,4 +88,5 @@
 		const x = await(_$1());
 		console.log(x);
 	} else _();
+	console.log(style5_css_default);
 })(Vue);

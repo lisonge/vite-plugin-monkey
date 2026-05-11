@@ -1,3 +1,3 @@
 # What's Changed
 
-- fix: top level await wrong syntax generated (#284)
+- perf: shrink `?style` import module identifier length

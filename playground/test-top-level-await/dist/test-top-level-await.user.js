@@ -22,4 +22,9 @@
 	_monkeyWindow.close();
 	_monkeyWindow.unsafeWindow.test = 42;
 	_monkeyWindow.GM_cookie = 42;
+	async function x() {
+		return { y: 1 };
+	}
+	var z = (await(x())).y;
+	console.log(z);
 })();

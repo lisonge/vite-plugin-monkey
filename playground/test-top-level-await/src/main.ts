@@ -20,3 +20,9 @@ monkeyWindow.close();
 monkeyWindow.unsafeWindow.test = 42;
 // @ts-expect-error
 monkeyWindow.GM_cookie = 42;
+
+async function x() {
+  return { y: 1 };
+}
+const z = (await x()).y;
+console.log(z);

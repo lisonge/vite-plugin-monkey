@@ -124,21 +124,41 @@ export const transformIdentifierToTla = (
     const forIdentifier = identifier + `FOR`;
 
     const ast = context.parse(chunk.code);
-    const tlaCallNodes: AwaitCallExpression[] = [];
+    const tlaCallNodes: { node: AwaitCallExpression; needsParens: boolean }[] =
+      [];
     const forTlaCallNodes: AwaitCallExpression[] = [];
     const topFnNodes: acorn.Function[] = [];
-    acornWalk.simple(
+    acornWalk.ancestor(
       ast,
       {
-        CallExpression(node) {
+        CallExpression(node, _state, ancestors) {
           if ('name' in node.callee) {
             const { name, type } = node.callee;
             if (type === `Identifier`) {
               if (name === identifier) {
-                // top level await
-                tlaCallNodes.push({ ...node, callee: node.callee });
+                // `await` has lower precedence than member access / call / tagged template,
+                // so we need parens when the parent consumes this node in those positions:
+                //   _TLA_(x()).y   -> (await(x())).y    (MemberExpression.object)
+                //   _TLA_(x())()   -> (await(x()))()    (CallExpression.callee)
+                //   _TLA_(x())`t`  -> (await(x()))`t`   (TaggedTemplateExpression.tag)
+                // Optional chaining (?.  ?.[  ?.() ) is also covered because acorn
+                // represents it with the same parent node types inside ChainExpression.
+                let needsParens = false;
+                if (ancestors.length >= 2) {
+                  const parent = ancestors[ancestors.length - 2];
+                  needsParens =
+                    (parent.type === 'MemberExpression' &&
+                      (parent as acorn.MemberExpression).object === node) ||
+                    (parent.type === 'CallExpression' &&
+                      (parent as acorn.CallExpression).callee === node) ||
+                    (parent.type === 'TaggedTemplateExpression' &&
+                      (parent as acorn.TaggedTemplateExpression).tag === node);
+                }
+                tlaCallNodes.push({
+                  node: { ...node, callee: node.callee },
+                  needsParens,
+                });
               } else if (name === forIdentifier) {
-                // top level for await
                 forTlaCallNodes.push({ ...node, callee: node.callee });
               }
             }
@@ -159,10 +179,14 @@ export const transformIdentifierToTla = (
     );
     if (tlaCallNodes.length > 0 || forTlaCallNodes.length > 0) {
       const ms = new MagicString(chunk.code, {});
-      tlaCallNodes.forEach((node) => {
+      tlaCallNodes.forEach(({ node, needsParens }) => {
         const callee = node.callee;
-        // __topLevelAwait__ (xxx) -> await (xxx)
+        // __topLevelAwait__(xxx) -> await(xxx)  or  (await(xxx)) when parens needed
         ms.update(callee.start, callee.end, 'await');
+        if (needsParens) {
+          ms.appendLeft(node.start, '(');
+          ms.appendRight(node.end, ')');
+        }
       });
       forTlaCallNodes.forEach((node) => {
         // if vite minify is true, the parant expression will be a comma expression, so we need to keep it as an expression

@@ -12,7 +12,7 @@
 // ==/UserScript==
 
 (async function() {
-  'use strict';
+	"use strict";
 	var _GM_addStyle = typeof GM_addStyle != "undefined" ? GM_addStyle : void 0;
 	var _GM_deleteValue = typeof GM_deleteValue != "undefined" ? GM_deleteValue : void 0;
 	var _GM_getResourceText = typeof GM_getResourceText != "undefined" ? GM_getResourceText : void 0;

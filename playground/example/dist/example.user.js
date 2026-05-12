@@ -29,7 +29,7 @@
 // ==/UserScript==
 
 (async function(prettier, prettier_plugins_babel) {
-  'use strict';
+	"use strict";
 	var __create = Object.create;
 	var __defProp = Object.defineProperty;
 	var __getOwnPropDesc = Object.getOwnPropertyDescriptor;

@@ -10,7 +10,7 @@
 // ==/UserScript==
 
 (async function() {
-  'use strict';
+	"use strict";
 	var _monkeyWindow = window;
 	console.log(await(window?.fetch(`/`)));
 	await(async () => {

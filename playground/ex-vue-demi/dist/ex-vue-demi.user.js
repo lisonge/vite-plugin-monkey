@@ -16,7 +16,7 @@
 // ==/UserScript==
 
 (function(vue, pinia, element_plus) {
-  'use strict';
+	"use strict";
 	var __create = Object.create;
 	var __defProp = Object.defineProperty;
 	var __getOwnPropDesc = Object.getOwnPropertyDescriptor;

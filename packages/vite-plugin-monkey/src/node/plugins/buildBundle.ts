@@ -16,7 +16,6 @@ import {
 } from '../utils/topLevelAwait';
 import type { ResolvedMonkeyOption } from '../utils/types';
 import { cssModuleId, virtualCssModuleId } from './css';
-import MagicString from 'magic-string';
 
 const __entry_name = `__monkey.entry.js`;
 const cssModuleEntryId = cssModuleId + `-entry`;
@@ -268,6 +267,7 @@ export const buildBundleFactory = (
                 globals: option.globalsPkg2VarName,
                 comments: false,
                 strict: false, // rolldown will add 'use strict' to the file top instead of the wrapper function next line
+                intro: `'use strict'`,
               },
               experimental: {
                 attachDebugInfo: 'none',
@@ -300,40 +300,6 @@ export const buildBundleFactory = (
             finalJsCode = chunk.code;
           }
         });
-
-        // add 'use strict' to the wrapper function next line
-        const ms = new MagicString(finalJsCode);
-        const ast = this.parse(finalJsCode);
-        try {
-          acornWalk.simple(
-            ast,
-            {
-              FunctionExpression(node) {
-                const indentSize = (() => {
-                  if (!node.body.body.length) return 0;
-                  const st = node.body.body[0].start;
-                  let i = st;
-                  while (i > 0 && finalJsCode[i] !== '\n') {
-                    i--;
-                  }
-                  if (!i) return 0;
-                  return st - i;
-                })();
-                ms.appendRight(
-                  node.body.start + 1,
-                  `${minify ? '' : '\n'}${' '.repeat(indentSize)}'use strict';`,
-                );
-                throw new Error('stop');
-              },
-            },
-            { ...acornWalk.base, Function: () => {} },
-          );
-        } catch (e) {
-          if (!(e instanceof Error && e.message === 'stop')) {
-            throw e;
-          }
-        }
-        finalJsCode = ms.toString();
       }
 
       usedModules.forEach((k) => {

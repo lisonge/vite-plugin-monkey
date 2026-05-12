@@ -10,9 +10,9 @@ export type * from './types';
 export * as cdn from './cdn';
 
 export default (pluginOption: MonkeyOption): Plugin[] => {
-  let option: ResolvedMonkeyOption;
-  const getOption = async () => {
-    return option || resolvedOption(pluginOption).then((v) => (option = v));
+  let option: Promise<ResolvedMonkeyOption>;
+  const getOption = () => {
+    return (option ??= resolvedOption(pluginOption));
   };
   return factorys
     .map((f) => f(getOption, pluginOption))

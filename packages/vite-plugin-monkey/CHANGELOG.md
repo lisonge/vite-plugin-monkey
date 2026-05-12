@@ -1,3 +1,3 @@
 # What's Changed
 
-- perf: shrink `?style` import module identifier length
+- fix: optimize option resolution in plugin initialization

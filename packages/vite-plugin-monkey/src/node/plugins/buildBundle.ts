@@ -260,14 +260,18 @@ export const buildBundleFactory = (
             rolldownOptions: {
               external: Object.keys(option.globalsPkg2VarName),
               output: {
+                // set some default values which may be overridden by custom viteConfig
+                comments: false,
+                strict: false, // rolldown will add 'use strict' to the file top instead of the wrapper function next line
+                intro: `'use strict'`,
+
+                // preserve output options set in viteConfig, allow overriding values set above
+                ...viteConfig.build.rolldownOptions.output,
                 // disable rolldown minify when using terser or esbuild, see #280
                 ...(rolldownMinify !== undefined
                   ? { minify: rolldownMinify }
                   : {}),
                 globals: option.globalsPkg2VarName,
-                comments: false,
-                strict: false, // rolldown will add 'use strict' to the file top instead of the wrapper function next line
-                intro: `'use strict'`,
               },
               experimental: {
                 attachDebugInfo: 'none',

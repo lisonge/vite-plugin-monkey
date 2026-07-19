@@ -7,6 +7,7 @@ import { externalResourceFactory } from './externalResource';
 import { fixAssetUrlFactory } from './fixAssetUrl';
 import { fixClientFactory } from './fixClient';
 import { fixCssUrlFactory } from './fixCssUrl';
+import { fixWorkerFactory } from './fixWorker';
 import { perviewFactory } from './perview';
 import { removePreloadFactory } from './removePreload';
 import { redirectClientFactory } from './redirectClient';
@@ -21,6 +22,7 @@ const factorys: MonkeyPluginFactory[] = [
   fixClientFactory,
   fixAssetUrlFactory,
   fixCssUrlFactory,
+  fixWorkerFactory,
   serverFactory,
   perviewFactory,
 

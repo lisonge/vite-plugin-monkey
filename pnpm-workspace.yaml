@@ -1,6 +1,7 @@
 packages:
   - create-monkey
   - vite-plugin-monkey
+  - website
   - playground/*
 
 catalog:
@@ -32,6 +33,7 @@ catalog:
   kolorist: ^1.8.0
   lint-staged: 16.4.0
   magic-string: ^0.30.21
+  mermaid: 12.0.0
   minimist: ^1.2.8
   mrmime: ^2.0.1
   normalize.css: 8.0.1
@@ -58,6 +60,7 @@ catalog:
   unplugin-auto-import: 21.0.0
   vite: ^8.0.0
   vite-plugin-solid: 2.11.12
+  vitepress: 2.0.0-alpha.20
   vue: 3.5.32
 
 catalogMode: strict
@@ -78,3 +81,7 @@ allowBuilds:
   core-js: true
   esbuild: true
   simple-git-hooks: true
+
+minimumReleaseAgeExclude:
+  - '@mermaid-js/parser@2.0.0'
+  - mermaid@12.0.0

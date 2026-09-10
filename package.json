@@ -6,7 +6,7 @@
     "postinstall": "simple-git-hooks",
     "format": "prettier --cache --write --ignore-unknown .",
     "lint": "eslint --cache --fix .",
-    "build": "pnpm -r --filter=./create-monkey --filter=./vite-plugin-monkey build",
+    "build": "pnpm -r --filter=./create-monkey --filter=./vite-plugin-monkey --filter=./website build",
     "build:playground": "pnpm -r --filter=./playground/* build"
   },
   "dependencies": {
@@ -55,6 +55,7 @@
     "unplugin-auto-import": "catalog:",
     "vite": "catalog:",
     "vite-plugin-solid": "catalog:",
+    "vitepress": "catalog:",
     "vue": "catalog:"
   },
   "simple-git-hooks": {

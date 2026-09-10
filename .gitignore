@@ -3,6 +3,7 @@ dist
 !/playground/*/dist
 /.vscode/
 .eslintcache
+**/.vitepress/cache/
 *.local
 *.log
 /docs/.vitepress/cache

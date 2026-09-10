@@ -1,0 +1,15 @@
+{
+  "name": "website",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "type-check": "tsc",
+    "dev": "vitepress dev .",
+    "check": "pnpm type-check && node --test .vitepress/markdown/mermaid.test.ts .vitepress/theme/language-preference.test.ts",
+    "build": "pnpm check && vitepress build .",
+    "preview": "vitepress preview ."
+  },
+  "dependencies": {
+    "mermaid": "catalog:"
+  }
+}

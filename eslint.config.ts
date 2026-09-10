@@ -39,6 +39,7 @@ export default defineConfig(
   {
     ignores: [
       '**/dist/',
+      '**/.vitepress/cache/',
       'playground/',
       'create-monkey/template-*/',
       'vite-plugin-monkey/*.d.ts',

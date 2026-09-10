@@ -39,4 +39,4 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           release_name: Release ${{ github.ref_name }}
-          body_path: ./packages/vite-plugin-monkey/CHANGELOG.md
+          body_path: ./vite-plugin-monkey/CHANGELOG.md

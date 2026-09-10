@@ -40,8 +40,8 @@ export default defineConfig(
     ignores: [
       '**/dist/',
       'playground/',
-      'packages/create-monkey/template-*/',
-      'packages/vite-plugin-monkey/*.d.ts',
+      'create-monkey/template-*/',
+      'vite-plugin-monkey/*.d.ts',
     ],
   },
   prettier,

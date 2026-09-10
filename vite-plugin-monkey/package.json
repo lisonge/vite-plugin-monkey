@@ -39,7 +39,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lisonge/vite-plugin-monkey.git",
-    "directory": "packages/vite-plugin-monkey"
+    "directory": "vite-plugin-monkey"
   },
   "bugs": {
     "url": "https://github.com/lisonge/vite-plugin-monkey/issues"

@@ -1,5 +1,6 @@
 packages:
-  - packages/*
+  - create-monkey
+  - vite-plugin-monkey
   - playground/*
 
 catalog:

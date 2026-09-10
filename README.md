@@ -34,15 +34,15 @@ pnpm create monkey
 
 then you can choose the following template
 
-| JavaScript                                                     | TypeScript                                                           |
-| -------------------------------------------------------------- | -------------------------------------------------------------------- |
-| [empty](/packages/create-monkey/template-empty) (only js)      | [empty-ts](/packages/create-monkey/template-empty-ts) (only ts)      |
-| [vanilla](/packages/create-monkey/template-vanilla) (js + css) | [vanilla-ts](/packages/create-monkey/template-vanilla-ts) (ts + css) |
-| [vue](/packages/create-monkey/template-vue)                    | [vue-ts](/packages/create-monkey/template-vue-ts)                    |
-| [react](/packages/create-monkey/template-react)                | [react-ts](/packages/create-monkey/template-react-ts)                |
-| [preact](/packages/create-monkey/template-preact)              | [preact-ts](/packages/create-monkey/template-preact-ts)              |
-| [svelte](/packages/create-monkey/template-svelte)              | [svelte-ts](/packages/create-monkey/template-svelte-ts)              |
-| [solid](/packages/create-monkey/template-solid)                | [solid-ts](/packages/create-monkey/template-solid-ts)                |
+| JavaScript                                            | TypeScript                                                  |
+| ----------------------------------------------------- | ----------------------------------------------------------- |
+| [empty](/create-monkey/template-empty) (only js)      | [empty-ts](/create-monkey/template-empty-ts) (only ts)      |
+| [vanilla](/create-monkey/template-vanilla) (js + css) | [vanilla-ts](/create-monkey/template-vanilla-ts) (ts + css) |
+| [vue](/create-monkey/template-vue)                    | [vue-ts](/create-monkey/template-vue-ts)                    |
+| [react](/create-monkey/template-react)                | [react-ts](/create-monkey/template-react-ts)                |
+| [preact](/create-monkey/template-preact)              | [preact-ts](/create-monkey/template-preact-ts)              |
+| [svelte](/create-monkey/template-svelte)              | [svelte-ts](/create-monkey/template-svelte-ts)              |
+| [solid](/create-monkey/template-solid)                | [solid-ts](/create-monkey/template-solid-ts)                |
 
 <details open>
   <summary>Sample: Initializing a Template</summary>
@@ -351,7 +351,7 @@ export default defineConfig({
 });
 ```
 
-there is the following cdn to use, full detail see [cdn.ts](/packages/vite-plugin-monkey/src/node/cdn.ts)
+there is the following cdn to use, full detail see [cdn.ts](/vite-plugin-monkey/src/node/cdn.ts)
 
 - [jsdelivr](https://www.jsdelivr.com/)
 - [unpkg](https://unpkg.com/)
@@ -466,7 +466,7 @@ console.log({ GM_cookie, unsafeWindow, monkeyWindow, GM_addElement });
 
 test examples, see [/playground](/playground)
 
-and preact/react/svelte/vanilla/vue/solid examples, see [create-monkey](/packages/create-monkey)
+and preact/react/svelte/vanilla/vue/solid examples, see [create-monkey](/create-monkey)
 
 ## Some note
 

@@ -8,10 +8,19 @@ export type TamperRunAt =
   | 'document-idle'
   | 'context-menu';
 
+/**
+ * @see https://greasyfork.org/en/help/antifeatures
+ */
 export interface AntifeatureType {
   tag?: string;
-  type: 'ads' | 'tracking' | 'miner';
-  description: string;
+  type:
+    | 'ads'
+    | 'tracking'
+    | 'miner'
+    | 'referral-link'
+    | 'membership'
+    | 'payment';
+  description?: string;
 }
 
 /**

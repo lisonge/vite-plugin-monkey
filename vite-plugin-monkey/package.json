@@ -17,7 +17,7 @@
     "types": "dist/node/index.d.mts"
   },
   "scripts": {
-    "test": "node --test test/workspace-root.test.ts",
+    "test": "node --test test/*.test.ts",
     "prebuild": "tsc",
     "build": "tsdown",
     "postbuild": "node ./scripts/postbuild.ts",

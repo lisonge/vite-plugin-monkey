@@ -321,7 +321,7 @@ export const finalMonkeyOptionToComment = async (
       },
     );
   }
-  antifeature.forEach(({ description, type, tag }) => {
+  antifeature.forEach(({ description = '', type, tag }) => {
     attrList.push([
       tag ? `antifeature:${tag}` : 'antifeature',
       type,

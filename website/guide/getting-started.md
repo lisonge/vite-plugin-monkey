@@ -1,6 +1,6 @@
-# Getting Started
+# Getting Started {#getting-started}
 
-## Create a Project
+## Create a Project {#create-a-project}
 
 just like vite create
 
@@ -43,7 +43,7 @@ then you can choose the following template
 
 </details>
 
-## Install the Plugin
+## Install the Plugin {#install-the-plugin}
 
 ```shell
 pnpm add -D vite-plugin-monkey

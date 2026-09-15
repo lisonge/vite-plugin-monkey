@@ -1,6 +1,6 @@
-# CDN 与压缩
+# CDN 与压缩 {#cdn-and-minification}
 
-## CDN 工具
+## CDN 工具 {#cdn-utilities}
 
 ```ts
 import { defineConfig } from 'vite';
@@ -31,7 +31,7 @@ export default defineConfig({
 
 如果你想使用其他 CDN，请查看 [external-scripts](https://greasyfork.org/zh-CN/help/external-scripts)
 
-## 压缩混淆
+## 压缩混淆 {#minification}
 
 由于 greasyfork 的 [代码规则](https://greasyfork.org/zh-CN/help/code-rules)
 

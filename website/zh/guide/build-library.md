@@ -1,4 +1,4 @@
-# 构建使用 GM API 的库
+# 构建使用 GM API 的库 {#build-a-library-using-gm-api}
 
 如果您想封装 GM_api 构建一个库后给其他人使用
 

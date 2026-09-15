@@ -1,6 +1,6 @@
-# GM API Usage
+# GM API Usage {#gm-api-usage}
 
-## ESM usage
+## ESM usage {#esm-usage}
 
 we can use GM_api by esm module
 
@@ -34,7 +34,7 @@ GM_cookie.list({}, (cookies, error) => {
 });
 ```
 
-## Global variables usage
+## Global variables usage {#global-variables-usage}
 
 set `monkeyConfig.server.mountGmApi=true`
 
@@ -61,7 +61,7 @@ console.log(GM_cookie == globalThis.GM_cookie);
 console.log({ GM_cookie, unsafeWindow, monkeyWindow, GM_addElement });
 ```
 
-## Auto import usage
+## Auto import usage {#auto-import-usage}
 
 use [unplugin-auto-import](https://github.com/antfu/unplugin-auto-import)
 

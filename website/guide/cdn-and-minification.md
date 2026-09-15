@@ -1,6 +1,6 @@
-# CDN and Minification
+# CDN and Minification {#cdn-and-minification}
 
-## CDN Utilities
+## CDN Utilities {#cdn-utilities}
 
 ```ts
 import { defineConfig } from 'vite';
@@ -31,7 +31,7 @@ there is the following cdn to use, full detail see [cdn.ts](https://github.com/l
 
 if you want use other cdn, you can see [external-scripts](https://greasyfork.org/help/external-scripts)
 
-## Minification
+## Minification {#minification}
 
 because of the [code-rules](https://greasyfork.org/en/help/code-rules) of greasyfork
 

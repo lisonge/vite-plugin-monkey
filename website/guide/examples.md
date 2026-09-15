@@ -1,4 +1,4 @@
-# Examples
+# Examples {#examples}
 
 test examples, see [/playground](https://github.com/lisonge/vite-plugin-monkey/tree/main/playground)
 

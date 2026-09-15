@@ -1,4 +1,4 @@
-# 示例
+# 示例 {#examples}
 
 测试例子，请直接看 [/playground](https://github.com/lisonge/vite-plugin-monkey/tree/main/playground)
 

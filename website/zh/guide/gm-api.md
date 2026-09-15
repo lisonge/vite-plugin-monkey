@@ -1,6 +1,6 @@
-# GM API 用法
+# GM API 用法 {#gm-api-usage}
 
-## ESM 用法
+## ESM 用法 {#esm-usage}
 
 我们可以通过 ESM 模块来使用 GM_api
 
@@ -34,7 +34,7 @@ GM_cookie.list({}, (cookies, error) => {
 });
 ```
 
-## 全局变量用法
+## 全局变量用法 {#global-variables-usage}
 
 先配置 `monkeyConfig.server.mountGmApi=true`
 
@@ -61,7 +61,7 @@ console.log(GM_cookie == globalThis.GM_cookie);
 console.log({ GM_cookie, unsafeWindow, monkeyWindow, GM_addElement });
 ```
 
-## 自动导入用法
+## 自动导入用法 {#auto-import-usage}
 
 配置插件 [unplugin-auto-import](https://github.com/antfu/unplugin-auto-import)
 

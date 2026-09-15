@@ -1,4 +1,4 @@
-# 配置
+# 配置 {#configuration}
 
 ```ts
 export interface MonkeyOption {

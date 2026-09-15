@@ -1,6 +1,6 @@
-# 开始使用
+# 开始使用 {#getting-started}
 
-## 创建项目
+## 创建项目 {#create-a-project}
 
 使用方式与 vite create 一致
 
@@ -43,7 +43,7 @@ pnpm create monkey
 
 </details>
 
-## 安装插件
+## 安装插件 {#install-the-plugin}
 
 ```shell
 pnpm add -D vite-plugin-monkey

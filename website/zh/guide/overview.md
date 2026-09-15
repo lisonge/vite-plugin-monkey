@@ -1,4 +1,4 @@
-# 概览
+# 概览 {#overview}
 
 <p>
   <a href="https://www.npmjs.com/package/vite-plugin-monkey"><img src="https://img.shields.io/npm/v/vite-plugin-monkey.svg" alt="npm package"></a>
@@ -7,7 +7,7 @@
 
 一个 vite 插件，用来辅助开发 [Tampermonkey](https://www.tampermonkey.net/), [Violentmonkey](https://violentmonkey.github.io/), [Greasemonkey](https://www.greasespot.net/), [ScriptCat](https://docs.scriptcat.org/) 等脚本引擎 的脚本
 
-## 主要特性
+## 主要特性 {#feature}
 
 - 支持 Tampermonkey、Violentmonkey、Greasemonkey、ScriptCat 等脚本引擎的辅助开发
 - 打包自动注入脚本配置头部注释

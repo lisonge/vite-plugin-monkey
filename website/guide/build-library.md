@@ -1,4 +1,4 @@
-# Build a Library Using GM API
+# Build a Library Using GM API {#build-a-library-using-gm-api}
 
 If you want to encapsulate GM_api to build a library for others to use
 

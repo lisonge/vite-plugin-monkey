@@ -46,7 +46,6 @@
   },
   "homepage": "https://github.com/lisonge/vite-plugin-monkey#readme",
   "dependencies": {
-    "acorn-walk": "catalog:",
     "cross-spawn": "catalog:",
     "htmlparser2": "catalog:",
     "import-meta-resolve": "catalog:",

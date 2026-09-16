@@ -1,13 +1,18 @@
 import type { Plugin } from 'vite';
 
-const isWorkerRequest = (id: string): boolean => {
+const getWorkerConstructor = (
+  id: string,
+): 'Worker' | 'SharedWorker' | undefined => {
   const queryIndex = id.indexOf('?');
-  if (queryIndex === -1) return false;
+  if (queryIndex === -1) return;
   const query = new URLSearchParams(id.slice(queryIndex + 1));
-  return query.has('worker') && !query.has('url');
+  if (query.has('url')) return;
+  if (query.has('worker')) return 'Worker';
+  if (query.has('sharedworker')) return 'SharedWorker';
 };
 
-const workerWrapper = `
+const workerWrapper = (constructor: 'Worker' | 'SharedWorker') =>
+  `
 const dataUri = \`data:text/javascript;charset=utf-8,\${encodeURIComponent(
   \`import \${JSON.stringify(
     new URL('?worker_file&type=module', import.meta['url']).href,
@@ -15,7 +20,7 @@ const dataUri = \`data:text/javascript;charset=utf-8,\${encodeURIComponent(
 )}\`;
 
 export default function WorkerWrapper(options) {
-  return new Worker(dataUri, {
+  return new ${constructor}(dataUri, {
     type: 'module',
     name: options?.name,
   });
@@ -29,7 +34,8 @@ export const fixWorkerFactory = (): Plugin => {
     enforce: 'pre',
     apply: 'serve',
     load(id) {
-      if (isWorkerRequest(id)) return workerWrapper;
+      const constructor = getWorkerConstructor(id);
+      if (constructor) return workerWrapper(constructor);
     },
   };
 };

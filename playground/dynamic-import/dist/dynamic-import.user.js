@@ -5,7 +5,7 @@
 // @description  default_description
 // @icon         https://vitejs.dev/logo.svg
 // @match        https://songe.li/*
-// @require      https://cdn.jsdelivr.net/npm/vue@3.5.32/dist/vue.global.prod.js
+// @require      https://cdn.jsdelivr.net/npm/vue@3.5.42/dist/vue.global.prod.js
 // @require      data:application/javascript,%3Bwindow.Vue%3DVue%3B
 // @require      https://cdn.jsdelivr.net/npm/element-plus@2.13.7/dist/index.full.min.js
 // @require      https://cdn.jsdelivr.net/npm/systemjs@6.15.1/dist/system.min.js
@@ -23,6 +23,6 @@ console.log({
 	ElementPlus,
 	default: ElementPlus.default
 });
-if (location.search.includes("b")) await module.import('./b-OK_A7RoB-BuwoGuMG.js');})}}));
-System.register("./b-OK_A7RoB-BuwoGuMG.js", [],(function(){'use strict';return{execute:(function(){fetch("/");})}}));
+if (location.search.includes("b")) await module.import('./b-CC_eUgeX-BuwoGuMG.js');})}}));
+System.register("./b-CC_eUgeX-BuwoGuMG.js", [],(function(){'use strict';return{execute:(function(){fetch("/");})}}));
 System.import("./___monkey.entry.js", "./");

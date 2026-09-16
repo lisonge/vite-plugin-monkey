@@ -211,6 +211,8 @@ export interface MonkeyOption {
      * }
      */
     externalResource?: ExternalResource;
+    /** Static asset publishing directory; generates @resource, keeping JS bundled */
+    assetsBaseUrl?: string;
 
     /**
      * when use dynamic-import, plugin will use systemjs build your code

@@ -1,5 +1,6 @@
-import type { Plugin } from 'vite';
+import type { Plugin, UserConfig } from 'vite';
 import type { ResolvedMonkeyOption } from '../utils/types.ts';
+import { assetMarker } from '../utils/assets.ts';
 
 export const configFactory = (
   getOption: (root?: string) => Promise<ResolvedMonkeyOption>,
@@ -12,13 +13,28 @@ export const configFactory = (
       async handler(userConfig) {
         option = await getOption(userConfig.root);
         return {
+          ...(option.build.assetsBaseUrl
+            ? ({
+                experimental: {
+                  renderBuiltUrl(filename, context) {
+                    if (context.type === 'asset') {
+                      return assetMarker(filename);
+                    }
+                    const existing = userConfig.experimental?.renderBuiltUrl;
+                    return existing?.(filename, context);
+                  },
+                },
+              } satisfies UserConfig)
+            : {}),
           resolve: {
             alias: {
               [option.clientAlias]: 'vite-plugin-monkey/dist/client',
             },
           },
           build: {
-            assetsInlineLimit: Number.MAX_SAFE_INTEGER,
+            assetsInlineLimit: option.build.assetsBaseUrl
+              ? 0
+              : Number.MAX_SAFE_INTEGER,
             chunkSizeWarningLimit: Number.MAX_SAFE_INTEGER,
             assetsDir: './',
             cssCodeSplit: false,
@@ -26,6 +42,16 @@ export const configFactory = (
             cssMinify: userConfig.build?.cssMinify ?? true,
             sourcemap: false,
             rolldownOptions: {
+              ...(option.build.assetsBaseUrl &&
+              !Array.isArray(userConfig.build?.rolldownOptions?.output)
+                ? {
+                    output: {
+                      assetFileNames:
+                        userConfig.build?.rolldownOptions?.output
+                          ?.assetFileNames ?? 'assets/[name]-[hash][extname]',
+                    },
+                  }
+                : {}),
               input: option.entry,
               onLog(level, log, defaultHandler) {
                 // ignore top-level await warning

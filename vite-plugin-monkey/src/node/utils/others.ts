@@ -1,5 +1,4 @@
-import type { Program } from '@oxc-project/types';
-import * as acornWalk from 'acorn-walk';
+import { Visitor, type ESTree } from 'vite';
 import { resolve } from 'import-meta-resolve';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -118,7 +117,6 @@ export const parserHtmlScriptResult = (html: string): ScriptResult[] => {
   });
 };
 
-import type { ImportDeclaration, ImportExpression } from 'acorn';
 import crypto from 'node:crypto';
 
 export const simpleHash = (str: string | undefined): string => {
@@ -157,14 +155,16 @@ export const getSafeIdentifier = (
 };
 
 export interface ImportNodeItem {
-  node: ImportExpression | ImportDeclaration;
+  node: ESTree.ImportExpression | ESTree.ImportDeclaration;
   value: string;
 }
 
-export const getProgramImportNodes = (program: Program): ImportNodeItem[] => {
+export const getProgramImportNodes = (
+  program: ESTree.Program,
+): ImportNodeItem[] => {
   const nodes: ImportNodeItem[] = [];
-  acornWalk.simple(program, {
-    ImportDeclaration(node) {
+  new Visitor({
+    'ImportDeclaration:exit'(node) {
       const s = node.source;
       if (s.type === 'Literal') {
         const value = s.value;
@@ -176,7 +176,7 @@ export const getProgramImportNodes = (program: Program): ImportNodeItem[] => {
         });
       }
     },
-    ImportExpression(node) {
+    'ImportExpression:exit'(node) {
       const s = node.source;
       if (s.type === 'Literal') {
         const value = s.value;
@@ -198,7 +198,7 @@ export const getProgramImportNodes = (program: Program): ImportNodeItem[] => {
         });
       }
     },
-  });
+  }).visit(program);
   return nodes;
 };
 

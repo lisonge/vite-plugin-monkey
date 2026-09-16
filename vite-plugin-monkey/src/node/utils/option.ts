@@ -25,6 +25,23 @@ export const resolvedOption = async (
   }
 
   const build = pluginOption.build ?? {};
+  let assetsBaseUrl: string | undefined;
+  if (build.assetsBaseUrl !== undefined) {
+    const url = new URL(build.assetsBaseUrl);
+    if (
+      !['http:', 'https:'].includes(url.protocol) ||
+      url.search ||
+      url.hash ||
+      url.username ||
+      url.password
+    ) {
+      throw new Error(
+        'assetsBaseUrl must be an absolute HTTP(S) directory URL without credentials, query or fragment',
+      );
+    }
+    if (!url.pathname.endsWith('/')) url.pathname += '/';
+    assetsBaseUrl = url.href;
+  }
 
   const { externalResource = {} } = build;
   const externalResource2: Record<
@@ -287,6 +304,7 @@ export const resolvedOption = async (
       prefix: prefix2,
     },
     build: {
+      assetsBaseUrl,
       fileName,
       metaFileName: metaFileFc ? () => metaFileFc(fileName) : undefined,
       autoGrant: build.autoGrant ?? true,

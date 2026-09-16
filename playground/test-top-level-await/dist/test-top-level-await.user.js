@@ -11,7 +11,7 @@
 
 (async function() {
 	"use strict";
-	var _monkeyWindow = window;
+	var _monkeyWindow = (() => window)();
 	console.log(await(window?.fetch(`/`)));
 	await(async () => {
 		for await (const v of [Promise.resolve(1), Promise.resolve(2)]) console.log(v);

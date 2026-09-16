@@ -211,6 +211,8 @@ export interface MonkeyOption {
      * }
      */
     externalResource?: ExternalResource;
+    /** 静态资源发布目录；配置后自动生成 @resource，JS 仍为单文件 */
+    assetsBaseUrl?: string;
 
     /**
      * when use dynamic-import, plugin will use systemjs build your code

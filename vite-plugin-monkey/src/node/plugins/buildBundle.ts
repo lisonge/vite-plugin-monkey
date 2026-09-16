@@ -1,9 +1,9 @@
-import * as acornWalk from 'acorn-walk';
-import type { OutputChunk, RolldownOutput } from 'rolldown';
+import type { Rolldown } from 'vite';
 import type { Plugin, ResolvedConfig } from 'vite';
-import { build } from 'vite';
+import { build, Visitor } from 'vite';
 import { finalMonkeyOptionToComment } from '../userscript/index.ts';
 import { collectGrant } from '../utils/grant.ts';
+import { assetStringExpression, replaceAssetMarkers } from '../utils/assets.ts';
 import {
   getCssModuleCode,
   moduleExportExpressionWrapper,
@@ -45,8 +45,13 @@ export const buildBundleFactory = (
       viteConfig = resolvedConfig;
     },
     async generateBundle(_, rawBundle) {
-      const entryChunks: OutputChunk[] = [];
-      const chunks: OutputChunk[] = [];
+      for (const chunk of Object.values(rawBundle)) {
+        if (chunk.type === 'chunk') {
+          chunk.code = replaceAssetMarkers(this, chunk.code, option, rawBundle);
+        }
+      }
+      const entryChunks: Rolldown.OutputChunk[] = [];
+      const chunks: Rolldown.OutputChunk[] = [];
       Object.values(rawBundle).forEach((chunk) => {
         if (chunk.type == 'chunk') {
           if (chunk.facadeModuleId != polyfillId) {
@@ -68,7 +73,11 @@ export const buildBundleFactory = (
 
       const cssCode = Object.entries(rawBundle)
         .map(([k, v]) => {
-          if (v.type == 'asset' && k.endsWith('.css')) {
+          if (
+            v.type == 'asset' &&
+            k.endsWith('.css') &&
+            !(option.build.assetsBaseUrl && option.collectResource[k])
+          ) {
             delete rawBundle[k];
             return v.source.toString();
           }
@@ -99,14 +108,11 @@ export const buildBundleFactory = (
         // check has import('vue')
         let a = Boolean(false);
         const ast = this.parse(e.code);
-        try {
-          acornWalk.simple(ast, {
-            ImportExpression() {
-              a = true;
-              throw new Error('stop');
-            },
-          });
-        } catch {}
+        new Visitor({
+          ImportExpression() {
+            a = true;
+          },
+        }).visit(ast);
         return a;
       });
 
@@ -133,7 +139,7 @@ export const buildBundleFactory = (
             const chunk = Object.values(rawBundle).find(
               (chunk) =>
                 chunk.type == 'chunk' && source.endsWith(chunk.fileName),
-            ) as OutputChunk | undefined;
+            ) as Rolldown.OutputChunk | undefined;
             if (chunk) {
               return '\0' + source;
             }
@@ -145,7 +151,7 @@ export const buildBundleFactory = (
             if (!id.startsWith('\0')) return;
             if (id === virtualCssModuleEntryId) {
               // use \x20 compat unocss
-              return `import { _css } from '${cssModuleId}'; _css(${JSON.stringify('\x20' + cssCode + '\x20')});`;
+              return `import { _css } from '${cssModuleId}'; _css(${assetStringExpression('\x20' + cssCode + '\x20', option, rawBundle)});`;
             }
             if (id === virtualCssModuleId) {
               cssJsCode = getCssModuleCode(option.cssSideEffects);
@@ -300,7 +306,7 @@ export const buildBundleFactory = (
               },
             },
           ],
-        })) as RolldownOutput[];
+        })) as Rolldown.RolldownOutput[];
         const chunks = buildResult[0].output.flat();
         chunks.forEach((chunk) => {
           if (chunk.type == 'chunk' && chunk.isEntry) {
@@ -327,6 +333,14 @@ export const buildBundleFactory = (
         collectGrantSet = new Set<string>();
       }
 
+      if (
+        option.build.assetsBaseUrl &&
+        Object.keys(option.collectResource).some(
+          (name) => rawBundle[name]?.type === 'asset',
+        )
+      ) {
+        collectGrantSet.add('GM_getResourceURL');
+      }
       const comment = await finalMonkeyOptionToComment(
         option,
         collectGrantSet,

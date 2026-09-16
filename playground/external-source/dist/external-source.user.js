@@ -5,7 +5,7 @@
 // @description  default_description
 // @icon         https://vitejs.dev/logo.svg
 // @match        https://songe.li/
-// @require      https://cdn.jsdelivr.net/npm/vue@3.5.32/dist/vue.global.prod.js
+// @require      https://cdn.jsdelivr.net/npm/vue@3.5.42/dist/vue.global.prod.js
 // @require      data:application/javascript,window.Vue%3DVue
 // @require      https://cdn.jsdelivr.net/npm/element-plus@2.13.7/dist/index.full.min.js
 // @resource     element-plus/dist/index.css      https://cdn.jsdelivr.net/npm/element-plus@2.13.7/dist/index.css
@@ -33,14 +33,14 @@
 		}
 		return to;
 	};
-	var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", {
+	var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule || !__hasOwnProp.call(mod, "default") ? __defProp(target, "default", {
 		value: mod,
 		enumerable: true
 	}) : target, mod));
 	vue = __toESM(vue);
-	var _GM_addStyle = typeof GM_addStyle != "undefined" ? GM_addStyle : void 0;
-	var _GM_getResourceText = typeof GM_getResourceText != "undefined" ? GM_getResourceText : void 0;
-	var _unsafeWindow = typeof unsafeWindow != "undefined" ? unsafeWindow : void 0;
+	var _GM_addStyle = (() => typeof GM_addStyle != "undefined" ? GM_addStyle : void 0)();
+	var _GM_getResourceText = (() => typeof GM_getResourceText != "undefined" ? GM_getResourceText : void 0)();
+	var _unsafeWindow = (() => typeof unsafeWindow != "undefined" ? unsafeWindow : void 0)();
 	var cssLoader = (name) => _GM_addStyle(_GM_getResourceText(name));
 	var rawLoader = (name) => _GM_getResourceText(name);
 	cssLoader("element-plus/dist/index.css");

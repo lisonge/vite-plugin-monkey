@@ -1,21 +1,17 @@
-import type * as acorn from 'acorn';
-import * as acornWalk from 'acorn-walk';
+import { Visitor, type ESTree } from 'vite';
 import MagicString from 'magic-string';
-import type {
-  OutputAsset,
-  OutputBundle,
-  OutputChunk,
-  PluginContext,
-} from 'rolldown';
+import type { Rolldown } from 'vite';
 
-interface AwaitCallExpression extends acorn.CallExpression {
-  callee: acorn.Identifier;
+interface AwaitCallExpression extends ESTree.CallExpression {
+  callee: ESTree.IdentifierReference;
 }
+
+type FunctionNode = ESTree.Function | ESTree.ArrowFunctionExpression;
 
 const awaitOffset = `await`.length;
 const initTlaIdentifier = `_TLA_`;
 
-export const getSafeTlaIdentifier = (rawBundle: OutputBundle) => {
+export const getSafeTlaIdentifier = (rawBundle: Rolldown.OutputBundle) => {
   const codes: string[] = [];
   for (const chunk of Object.values(rawBundle)) {
     if (chunk.type == 'chunk') {
@@ -57,8 +53,8 @@ const includes = (
 };
 
 export const transformTlaToIdentifier = (
-  context: PluginContext,
-  chunk: OutputAsset | OutputChunk,
+  context: Rolldown.PluginContext,
+  chunk: Rolldown.OutputAsset | Rolldown.OutputChunk,
   identifier: string,
 ) => {
   if (chunk.type == 'chunk') {
@@ -67,23 +63,32 @@ export const transformTlaToIdentifier = (
       return;
     }
     const ast = context.parse(code);
-    const tlaNodes: acorn.AwaitExpression[] = [];
-    const tlaForOfNodes: acorn.ForOfStatement[] = [];
-    acornWalk.simple(
-      ast,
-      {
-        AwaitExpression(node) {
-          // top level await
-          tlaNodes.push(node);
-        },
-        ForOfStatement(node) {
-          if (node.await === true) {
-            tlaForOfNodes.push(node);
-          }
-        },
+    const tlaNodes: ESTree.AwaitExpression[] = [];
+    const tlaForOfNodes: ESTree.ForOfStatement[] = [];
+    let functionDepth = 0;
+    const enterFunction = () => {
+      functionDepth++;
+    };
+    const exitFunction = () => {
+      functionDepth--;
+    };
+    new Visitor({
+      FunctionDeclaration: enterFunction,
+      FunctionExpression: enterFunction,
+      ArrowFunctionExpression: enterFunction,
+      'FunctionDeclaration:exit': exitFunction,
+      'FunctionExpression:exit': exitFunction,
+      'ArrowFunctionExpression:exit': exitFunction,
+      'AwaitExpression:exit'(node) {
+        // top level await
+        if (functionDepth === 0) tlaNodes.push(node);
       },
-      { ...acornWalk.base, Function: () => {} },
-    );
+      'ForOfStatement:exit'(node) {
+        if (functionDepth === 0 && node.await === true) {
+          tlaForOfNodes.push(node);
+        }
+      },
+    }).visit(ast);
     if (tlaNodes.length > 0 || tlaForOfNodes.length > 0) {
       const ms = new MagicString(code);
       tlaNodes.forEach((node) => {
@@ -112,8 +117,8 @@ export const transformTlaToIdentifier = (
 };
 
 export const transformIdentifierToTla = (
-  context: PluginContext,
-  chunk: OutputAsset | OutputChunk,
+  context: Rolldown.PluginContext,
+  chunk: Rolldown.OutputAsset | Rolldown.OutputChunk,
   identifier: string,
 ) => {
   if (chunk.type == 'chunk') {
@@ -127,56 +132,60 @@ export const transformIdentifierToTla = (
     const tlaCallNodes: { node: AwaitCallExpression; needsParens: boolean }[] =
       [];
     const forTlaCallNodes: AwaitCallExpression[] = [];
-    const topFnNodes: acorn.Function[] = [];
-    acornWalk.ancestor(
-      ast,
-      {
-        CallExpression(node, _state, ancestors) {
-          if ('name' in node.callee) {
-            const { name, type } = node.callee;
-            if (type === `Identifier`) {
-              if (name === identifier) {
-                // `await` has lower precedence than member access / call / tagged template,
-                // so we need parens when the parent consumes this node in those positions:
-                //   _TLA_(x()).y   -> (await(x())).y    (MemberExpression.object)
-                //   _TLA_(x())()   -> (await(x()))()    (CallExpression.callee)
-                //   _TLA_(x())`t`  -> (await(x()))`t`   (TaggedTemplateExpression.tag)
-                // Optional chaining (?.  ?.[  ?.() ) is also covered because acorn
-                // represents it with the same parent node types inside ChainExpression.
-                let needsParens = false;
-                if (ancestors.length >= 2) {
-                  const parent = ancestors[ancestors.length - 2];
-                  needsParens =
-                    (parent.type === 'MemberExpression' &&
-                      (parent as acorn.MemberExpression).object === node) ||
-                    (parent.type === 'CallExpression' &&
-                      (parent as acorn.CallExpression).callee === node) ||
-                    (parent.type === 'TaggedTemplateExpression' &&
-                      (parent as acorn.TaggedTemplateExpression).tag === node);
-                }
-                tlaCallNodes.push({
-                  node: { ...node, callee: node.callee },
-                  needsParens,
-                });
-              } else if (name === forIdentifier) {
-                forTlaCallNodes.push({ ...node, callee: node.callee });
-              }
+    const topFnNodes: FunctionNode[] = [];
+    let skippedFunctions = 0;
+    const enterFunction = (node: FunctionNode) => {
+      if (skippedFunctions === 0 && topFnNodes.length === 0)
+        topFnNodes.push(node);
+      if (!includes(chunk.code, node.start, node.end, identifier))
+        skippedFunctions++;
+    };
+    const exitFunction = (node: FunctionNode) => {
+      if (!includes(chunk.code, node.start, node.end, identifier))
+        skippedFunctions--;
+    };
+    const needsParensNodes = new Set<ESTree.Node>();
+    new Visitor({
+      FunctionDeclaration: enterFunction,
+      FunctionExpression: enterFunction,
+      ArrowFunctionExpression: enterFunction,
+      'FunctionDeclaration:exit': exitFunction,
+      'FunctionExpression:exit': exitFunction,
+      'ArrowFunctionExpression:exit': exitFunction,
+      MemberExpression(node) {
+        needsParensNodes.add(node.object);
+      },
+      TaggedTemplateExpression(node) {
+        needsParensNodes.add(node.tag);
+      },
+      CallExpression(node) {
+        needsParensNodes.add(node.callee);
+      },
+      'CallExpression:exit'(node) {
+        if (skippedFunctions > 0) return;
+        if ('name' in node.callee) {
+          const { name, type } = node.callee;
+          if (type === `Identifier`) {
+            if (name === identifier) {
+              // `await` has lower precedence than member access / call / tagged template,
+              // so we need parens when the parent consumes this node in those positions:
+              //   _TLA_(x()).y   -> (await(x())).y    (MemberExpression.object)
+              //   _TLA_(x())()   -> (await(x()))()    (CallExpression.callee)
+              //   _TLA_(x())`t`  -> (await(x()))`t`   (TaggedTemplateExpression.tag)
+              // Optional chaining (?.  ?.[  ?.() ) is also covered because ESTree
+              // represents it with the same parent node types inside ChainExpression.
+              const needsParens = needsParensNodes.has(node);
+              tlaCallNodes.push({
+                node: { ...node, callee: node.callee },
+                needsParens,
+              });
+            } else if (name === forIdentifier) {
+              forTlaCallNodes.push({ ...node, callee: node.callee });
             }
           }
-        },
+        }
       },
-      {
-        ...acornWalk.base,
-        Function: (node, state, callback) => {
-          if (topFnNodes.length == 0) {
-            topFnNodes.push(node);
-          }
-          if (includes(chunk.code, node.start, node.end, identifier)) {
-            return acornWalk.base.Function?.(node, state, callback);
-          }
-        },
-      },
-    );
+    }).visit(ast);
     if (tlaCallNodes.length > 0 || forTlaCallNodes.length > 0) {
       const ms = new MagicString(chunk.code, {});
       tlaCallNodes.forEach(({ node, needsParens }) => {

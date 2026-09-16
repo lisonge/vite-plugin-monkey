@@ -1,6 +1,7 @@
 node_modules
 dist
 !/playground/*/dist
+/playground/assets-base-url/dist/
 /.vscode/
 .eslintcache
 **/.vitepress/cache/

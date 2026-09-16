@@ -98,6 +98,7 @@ export interface ResolvedMonkeyOption {
     mountGmApi: boolean;
   };
   build: {
+    assetsBaseUrl?: string;
     fileName: string;
     metaFileName?: () => string;
     autoGrant: boolean;
@@ -298,6 +299,12 @@ export interface MonkeyOption {
      * @default true
      */
     autoGrant?: boolean;
+
+    /** Publish emitted static assets under this absolute HTTP(S) directory URL.
+     * Generates resource declarations and loads assets through GM_getResourceURL.
+     * Omit to retain inline assets. JavaScript remains a single userscript.
+     */
+    assetsBaseUrl?: string;
 
     /**
      * @example

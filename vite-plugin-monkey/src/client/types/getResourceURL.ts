@@ -1,7 +1,7 @@
 export interface GmGetResourceURLType {
-  (name: string): string;
+  (name: string, isBlobUrl?: boolean): string;
 }
 
 export interface GmAsyncGetResourceURLType {
-  (name: string): Promise<string>;
+  (name: string, isBlobUrl?: boolean): Promise<string>;
 }

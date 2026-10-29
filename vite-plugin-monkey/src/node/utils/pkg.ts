@@ -29,13 +29,17 @@ export const getProjectPkg = async (root: string): Promise<PackageJson> => {
   let dir = path.resolve(root);
   let rawPkg: RawPackageJson | undefined;
   while (true) {
-    const candidate: RawPackageJson | undefined = await fs
-      .readFile(path.join(dir, 'package.json'), 'utf-8')
-      .then(JSON.parse)
-      .catch(() => {});
-    if (candidate) {
-      rawPkg = candidate;
+    const filename = path.join(dir, 'package.json');
+    try {
+      const source = await fs.readFile(filename, 'utf-8');
+      try {
+        rawPkg = JSON.parse(source);
+      } catch (cause) {
+        throw new Error(`[monkey] Invalid JSON in ${filename}`, { cause });
+      }
       break;
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
     }
     const parent = path.dirname(dir);
     if (parent === dir) break;

@@ -1,56 +1,25 @@
-# CDN and Minification {#cdn-and-minification}
-
-## CDN Utilities {#cdn-utilities}
+# CDN and Minification
 
 ```ts
-import { defineConfig } from 'vite';
-import monkey, { cdn } from 'vite-plugin-monkey';
-export default defineConfig({
-  plugins: [
-    monkey({
-      build: {
-        externalGlobals: {
-          react: cdn.jsdelivr('React', 'umd/react.production.min.js'),
-        },
-        externalResource: {
-          'element-plus/dist/index.css': cdn.jsdelivr(),
-        },
-      },
-    }),
-  ],
-});
+import { npmCdn } from 'vite-plugin-monkey';
+
+const dependencies = {
+  vue: {
+    kind: 'global',
+    global: 'Vue',
+    urls: [npmCdn({ path: 'dist/vue.global.prod.js' })],
+  },
+  'element-plus/dist/index.css': {
+    kind: 'resource',
+    url: npmCdn({ provider: 'unpkg' }),
+  },
+};
 ```
 
-there is the following cdn to use, full detail see [cdn.ts](https://github.com/lisonge/vite-plugin-monkey/blob/main/vite-plugin-monkey/src/node/cdn.ts)
+`npmCdn({ provider, path })` returns a URL resolver using the installed package version. The provider defaults to `jsdelivr`; `unpkg` and `jsdelivr-fastly` are also supported. The optional path overrides the resolved package file. Configure other CDNs with a `DependencyUrlResolver` receiving a `PackageContext` object.
 
-- [jsdelivr](https://www.jsdelivr.com/)
-- [unpkg](https://unpkg.com/)
-- [cdnjs](https://cdnjs.com/libraries)
-- [zhimg](https://unpkg.zhimg.com/)
-- [npmmirror](https://registry.npmmirror.com/)
+For emitted WASM, image and font files, set assets to { publicPath: 'https://example.com/releases/v1/' }. Upload assets before publishing the userscript. Resource names follow emitted filenames; conflicting names or whitespace are rejected. Explicit ?inline and ?raw retain their behavior. These settings only affect production.
 
-if you want use other cdn, you can see [external-scripts](https://greasyfork.org/help/external-scripts)
+Vite build.minify controls minification; the plugin defaults it to false. Keep readable output when required by your distribution site.
 
-## External assets {#external-assets}
-
-Set `monkey({ entry: 'src/main.ts', build: { assetsBaseUrl: 'https://example.com/releases/v1/' } })` to emit static assets such as WASM, images and fonts from the build graph as separate files. JavaScript remains a single userscript. Omit this option to keep the default inline behavior.
-
-`assetsBaseUrl` is the absolute HTTP(S) directory hosting `dist`, without a query or fragment. Asset filenames default to `assets/[name]-[hash][extname]`. For example, `assets/solver-AbCd.wasm` produces an identically named `@resource` pointing to `https://example.com/releases/v1/assets/solver-AbCd.wasm`.
-
-Asset imports, `?url`, statically analyzable `new URL(..., import.meta.url)` expressions and CSS asset URLs use `GM_getResourceURL`. The plugin adds the required grant even with `autoGrant` disabled; explicit `grant: 'none'` is incompatible. Explicit `?inline`, `?raw` and existing `externalResource` mappings retain their behavior. Conflicting resource names with different URLs fail the build.
-
-Emitted asset filenames must not contain whitespace because they also serve as `@resource` names. The build rejects such names.
-
-Upload assets before publishing the userscript and optional metadata file. Use versioned directories and retain older assets for users who have not upgraded. The plugin does not upload files. Userscript managers preload `@resource` entries; these are not on-demand downloads.
-
-Development continues to use Vite's asset server. This option does not fix dependency optimization paths in development, split JS/Workers, transform arbitrary string paths, or register every file in `publicDir`. It uses Vite's experimental `renderBuiltUrl` hook. The plugin handles externalized asset URLs and delegates other URLs to an existing user hook.
-
-## Minification {#minification}
-
-because of the [code-rules](https://greasyfork.org/en/help/code-rules) of greasyfork
-
-> Code posted to Greasy Fork must not be obfuscated or minified
-
-so plugin will change the default value of [viteConfig.build.minify](https://cn.vitejs.dev/config/build-options.html#build-minify) to `false`
-
-if you want to enable minify, just set `viteConfig.build.minify=true`
+Resource mode defaults to `[name]-[hash][extname]`, placing assets beside the userscript. Set `publicPath` to a GitHub Release download directory such as `https://github.com/OWNER/REPO/releases/download/v1.0.0/`, then upload the script and assets individually. An explicit `build.rolldownOptions.output.assetFileNames` takes precedence, including string and function values. Custom subdirectories require matching hosting paths.

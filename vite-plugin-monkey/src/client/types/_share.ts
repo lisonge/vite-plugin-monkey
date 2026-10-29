@@ -16,7 +16,10 @@ export interface GmReponseEventListener<Event> {
 }
 
 export interface GmVoidCallback {
-  (error: any): void;
+  (error: unknown): void;
 }
 
-export type GmAnyFuntion = (...args: any[]) => any;
+export type GmAnyFuntion<
+  Args extends unknown[] = unknown[],
+  Result = unknown,
+> = (...args: Args) => Result;

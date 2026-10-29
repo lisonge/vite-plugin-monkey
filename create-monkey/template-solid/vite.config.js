@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite';
 import solidPlugin from 'vite-plugin-solid';
 import monkey from 'vite-plugin-monkey';
-
 export default defineConfig({
   plugins: [
     solidPlugin(),
@@ -10,7 +9,7 @@ export default defineConfig({
       userscript: {
         icon: 'https://vitejs.dev/logo.svg',
         namespace: 'npm/vite-plugin-monkey',
-        match: ['https://www.google.com/'],
+        match: ['https://songe.li/*'],
       },
     }),
   ],

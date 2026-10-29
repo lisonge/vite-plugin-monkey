@@ -12,7 +12,7 @@ export interface GmOpenInTabOptions {
   /**
    * @available violentmonkey
    */
-  container?: 0 | 1 | 2;
+  container?: number;
   /**
    * @available violentmonkey
    */
@@ -33,11 +33,11 @@ export interface GmAsyncOpenInTabType {
   (
     url: string,
     details?: GmOpenInTabOptions,
-  ): GmTabControl | Promise<GmTabControl>;
+  ): GmTabControl | Promise<GmTabControl> | void;
   (
     url: string,
     openInBackground?: boolean,
-  ): GmTabControl | Promise<GmTabControl>;
+  ): GmTabControl | Promise<GmTabControl> | void;
 }
 
 export interface GmGetTabType {

@@ -1,90 +1,43 @@
-# GM API Usage {#gm-api-usage}
-
-## ESM usage {#esm-usage}
-
-we can use GM_api by esm module
+# GM API Usage
 
 ```ts
-// main.ts
-import { GM_cookie, unsafeWindow, monkeyWindow, GM_addElement } from '$';
-// $ is the default alias of vite-plugin-monkey/dist/client
-// if you want use 'others', set monkeyConfig.clientAlias='others'
+import { GM_getValue, GM_setValue, monkeyWindow, unsafeWindow } from '$';
 
-// whatever it is serve or build mode, monkeyWindow is always the window of [UserScript Scope]
-console.log(monkeyWindow);
-
-GM_addElement(document.body, 'div', { innerHTML: 'hello' });
-
-// whatever it is serve or build mode, unsafeWindow is always host window
-if (unsafeWindow == window) {
-  console.log('scope->host, host esm scope');
-} else {
-  console.log('scope->monkey, userscript scope');
-}
-
-GM_cookie.list({}, (cookies, error) => {
-  if (error) {
-    console.log(error);
-  } else {
-    const [cookie] = cookies;
-    if (cookie) {
-      console.log(cookie);
-    }
-  }
-});
+const value = GM_getValue('count', 0);
+GM_setValue('count', value + 1);
 ```
 
-## Global variables usage {#global-variables-usage}
+The `$` module works in development and production. `monkeyWindow` refers to the userscript sandbox; `unsafeWindow` refers to the host page. Load its declaration with `"types": ["vite/client", "vite-plugin-monkey/client"]` in `tsconfig.json`. The plugin resolves `$` at runtime. `vite-plugin-monkey/client` is only a type declaration entry, not a runtime module. GM APIs are not mounted onto the page window.
 
-set `monkeyConfig.server.mountGmApi=true`
-
-```ts
-// vite.config.ts
-import { defineConfig } from 'vite';
-import monkey from 'vite-plugin-monkey';
-
-export default defineConfig({
-  plugins: [
-    monkey({
-      // ...
-      server: { mountGmApi: true },
-    }),
-  ],
-});
-```
-
-GM_api will mount to the property of `host window/globalThis`
+Omit userscript.grant for production detection and all supported development grants. For dynamic calls, specify the complete grant array. The string none emits @grant none; [] emits no grant.
 
 ```ts
-// main.ts
-console.log(GM_cookie == globalThis.GM_cookie);
-console.log({ GM_cookie, unsafeWindow, monkeyWindow, GM_addElement });
-```
-
-## Auto import usage {#auto-import-usage}
-
-use [unplugin-auto-import](https://github.com/antfu/unplugin-auto-import)
-
-```ts
-// vite.config.ts
-import { defineConfig } from 'vite';
-import monkey, { util } from 'vite-plugin-monkey';
 import AutoImport from 'unplugin-auto-import/vite';
+import { gmAutoImportPreset } from 'vite-plugin-monkey';
 
-export default defineConfig({
-  plugins: [
-    AutoImport({
-      imports: [util.unimportPreset],
-    }),
-    monkey({
-      // ...
-    }),
-  ],
-});
+AutoImport({ imports: [gmAutoImportPreset({ manager: 'tampermonkey' })] });
 ```
+
+## Userscript manager differences
+
+The declarations cover APIs from multiple managers. The plugin does not implement APIs missing from a manager; choose calls supported by your target.
+
+- [Violentmonkey](https://violentmonkey.github.io/api/gm/) supports menu icons, the resource URL isBlobUrl argument, numeric Firefox container IDs, and request upload events and withCredentials.
+- [Greasemonkey](https://wiki.greasespot.net/Greasemonkey_Manual:API) uses GM.\*. GM.xmlHttpRequest, GM.registerMenuCommand, GM.openInTab, and GM.notification may return neither a handle nor a Promise. Use request callbacks for cross-manager code instead of assuming abort or then exists.
+- GM.info is a discriminated union: narrow scriptHandler to Tampermonkey, Violentmonkey or Greasemonkey before accessing manager-specific fields.
+
+Violentmonkey's userscript['top-level-await'] emits a flag and cannot be combined with unwrap. The plugin still handles top-level await in source code without requiring this flag. Greasy Fork's compatible / incompatible accept a string or array. installURL is also emitted, although [Greasy Fork removes update URLs when distributing scripts](https://greasyfork.org/en/help/meta-keys).
+
+## Types and auto-imports
+
+`vite-plugin-monkey/client` is the single declaration entry. It declares the complete `$` API, including `GM`, synchronous `GM_*` exports, `monkeyWindow` and `unsafeWindow`. The available runtime APIs still depend on the userscript manager.
+
+Manager differences are expressed through named types imported from `$`:
 
 ```ts
-// main.ts
-// auto import example
-console.log({ GM_cookie, unsafeWindow, monkeyWindow, GM_addElement });
+import type { TampermonkeyGM, ViolentmonkeyGM, GreasemonkeyGM } from '$';
 ```
+
+These interfaces describe each manager's methods and return values. Corresponding `TampermonkeyInfo`, `ViolentmonkeyInfo`, `GreasemonkeyInfo` and `*Window` types describe metadata and sandbox objects. `CommonGM` describes shared methods. These types do not change the runtime object or supply missing APIs.
+
+`gmAutoImportPreset()` imports shared runtime bindings. Pass `{ manager: 'tampermonkey' }`, `{ manager: 'violentmonkey' }` or `{ manager: 'greasemonkey' }` to select runtime names. Every call returns a fresh preset using the same declaration entry; it does not detect the running manager.

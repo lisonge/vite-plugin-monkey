@@ -49,19 +49,17 @@ ts.forEachChild(source, (node) => {
   }
 });
 
-const clientDtsCode = await format(`
+const clientDtsCode = `
 /**
- * the alias of \`vite-plugin-monkey/dist/client\`
+ * GM API module resolved by vite-plugin-monkey
  */
 declare module '$' {
 
 ${clientNodeList.map((n) => nodeToString(n)).join('\n')}
 
-}`);
-await fs.writeFile(relativeFp('../client.d.ts'), clientDtsCode);
+}`;
+await fs.writeFile(relativeFp('../client.d.ts'), await format(clientDtsCode));
 console.log(`[script] transform ./dist/client/index.d.ts to ./client.d.ts`);
-
-// ------------------
 
 const topNodeList: (ts.Node | string)[] = [];
 const globalNodeList: (ts.Node | string)[] = [];
@@ -110,7 +108,7 @@ ts.forEachChild(source, (node) => {
           identifierNode,
         );
       } else {
-        topNodeList.push(...nodes);
+        topNodeList.push(node);
       }
     }
   }

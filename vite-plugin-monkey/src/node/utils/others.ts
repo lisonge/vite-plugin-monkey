@@ -1,12 +1,10 @@
+import type { GmAddStyleType } from '../../client/types/addStyle.ts';
+declare const GM_addStyle: GmAddStyleType | undefined;
 import { Visitor, type ESTree } from 'vite';
 import { resolve } from 'import-meta-resolve';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-
-export const isFirstBoot = (): boolean => {
-  return (Reflect.get(globalThis, '__vite_start_time') ?? 0) < 1000;
-};
 
 export const compatResolve = (id: string, entry: string) => {
   return resolve(id, pathToFileURL(entry).href);
@@ -21,14 +19,7 @@ export const existFile = async (path: string) => {
 };
 
 export const moduleExportExpressionWrapper = (expression: string) => {
-  let n = 0;
-  let identifier = ``;
-  while (expression.includes(identifier)) {
-    identifier = `_${(n || ``).toString(16)}`;
-    n++;
-  }
-  // https://github.com/lisonge/vite-plugin-monkey/issues/70
-  return `(()=>{const ${identifier}=${expression};('default' in ${identifier})||(${identifier}.default=${identifier});return ${identifier}})()`;
+  return `((value)=>({...Object(value),default: value != null && 'default' in Object(value) ? value.default : value}))(${expression})`;
 };
 
 export async function* walk(dirPath: string) {
@@ -48,41 +39,24 @@ export async function* walk(dirPath: string) {
   }
 }
 
-export const stringifyFunction = <T extends (...args: any[]) => any>(
-  fn: T,
-  ...args: Parameters<T>
+export const stringifyFunction = <Args extends unknown[]>(
+  fn: (...args: Args) => unknown,
+  ...args: NoInfer<Args>
 ) => {
-  return `;(${fn})(${args.map((v) => JSON.stringify(v)).join(',')});`;
+  return `;(${fn})(${args
+    .map((value) =>
+      value === undefined
+        ? 'void 0'
+        : (JSON.stringify(value, (_key, item) => {
+            if (['function', 'symbol', 'bigint'].includes(typeof item))
+              throw new TypeError(
+                '[monkey] Function arguments must be JSON-serializable or undefined',
+              );
+            return item;
+          }) ?? 'void 0'),
+    )
+    .join(',')});`;
 };
-
-export const dataJsUrl = (code: string): string => {
-  return 'data:application/javascript,' + encodeURIComponent(code);
-};
-
-/**
- * string -> javascript data url
- * @example
- * dataUrl('console.log("hello world")')
- * // => data:application/javascript,console.log(%22hello%20world%22)
- */
-export function dataUrl(code: string): string;
-/**
- * function and it parameters -> iife -> mini_iife -> javascript data url
- *
- * @example
- * dataUrl((a)=>{console.log(a)}, 'world')
- * // => data:application/javascript,((z)%3D%3E%7Bconsole.log(a)%7D)('world')
- */
-export function dataUrl<T extends (...args: any[]) => any>(
-  fn: T,
-  ...args: Parameters<T>
-): Promise<string>;
-export function dataUrl(p0: any, ...args: any[]): string | Promise<string> {
-  if (typeof p0 == 'string') {
-    return dataJsUrl(p0);
-  }
-  return dataJsUrl(stringifyFunction(p0, ...args));
-}
 
 import { DomUtils, ElementType, parseDocument } from 'htmlparser2';
 
@@ -106,14 +80,7 @@ export const parserHtmlScriptResult = (html: string): ScriptResult[] => {
     if (textNode?.type == ElementType.Text) {
       text = textNode.data ?? '';
     }
-    if (src) {
-      return { src, text };
-    } else {
-      return {
-        src: '',
-        text,
-      };
-    }
+    return { src, text };
   });
 };
 
@@ -163,41 +130,19 @@ export const getProgramImportNodes = (
   program: ESTree.Program,
 ): ImportNodeItem[] => {
   const nodes: ImportNodeItem[] = [];
+  const collect = (node: ImportNodeItem['node']) => {
+    const source = node.source;
+    const value =
+      source.type === 'Literal'
+        ? source.value
+        : source.type === 'TemplateLiteral' && !source.expressions.length
+          ? source.quasis[0].value.cooked
+          : undefined;
+    if (typeof value === 'string' && value) nodes.push({ node, value });
+  };
   new Visitor({
-    'ImportDeclaration:exit'(node) {
-      const s = node.source;
-      if (s.type === 'Literal') {
-        const value = s.value;
-        if (!value) return;
-        if (typeof value !== 'string') return;
-        nodes.push({
-          node,
-          value,
-        });
-      }
-    },
-    'ImportExpression:exit'(node) {
-      const s = node.source;
-      if (s.type === 'Literal') {
-        const value = s.value;
-        if (!value) return;
-        if (typeof value !== 'string') return;
-        nodes.push({
-          node,
-          value,
-        });
-      } else if (s.type === 'TemplateLiteral') {
-        if (s.expressions.length) return;
-        if (s.quasis.length !== 1) return;
-        const value = s.quasis[0].value.cooked;
-        if (!value) return;
-        if (typeof value !== 'string') return;
-        nodes.push({
-          node,
-          value,
-        });
-      }
-    },
+    'ImportDeclaration:exit': collect,
+    'ImportExpression:exit': collect,
   }).visit(program);
   return nodes;
 };
@@ -223,9 +168,7 @@ export const getUpperCaseName = (
 };
 
 const defaultCssSideEffects = (c: string) => {
-  // @ts-ignore
   if (typeof GM_addStyle === 'function') {
-    // @ts-ignore
     GM_addStyle(c);
   } else {
     // see #262
@@ -236,9 +179,16 @@ const defaultCssSideEffects = (c: string) => {
 };
 
 export const getCssModuleCode = (
-  f: string | ((css: string) => void) | undefined,
+  mode: 'auto' | 'gm' | 'dom' | false,
 ): string => {
-  f ??= defaultCssSideEffects;
+  const f =
+    mode === 'auto'
+      ? defaultCssSideEffects.toString()
+      : mode === 'gm'
+        ? '(css)=>GM_addStyle(css)'
+        : mode === 'dom'
+          ? '(css)=>(document.head||document.documentElement).appendChild(document.createElement("style")).append(css)'
+          : '()=>{}';
   return `
 const s = new Set;
 export const _css = async (t) => {

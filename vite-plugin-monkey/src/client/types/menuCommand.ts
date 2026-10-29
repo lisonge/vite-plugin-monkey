@@ -1,8 +1,12 @@
 export interface GmMenuCommandOptions {
-  id: number | string;
+  id?: number | string;
   accessKey?: string;
   autoClose?: boolean;
   title?: string;
+  /** Violentmonkey 2.31.1+: menu icon URL. */
+  icon?: string;
+  /** Tampermonkey 5.6.6242+: invoke only in the clicked frame. */
+  clickedFrame?: boolean;
 }
 
 export interface GmRegisterMenuCommandType {
@@ -17,7 +21,7 @@ export interface GmAsyncRegisterMenuCommandType {
     caption: string,
     onClick: (event: T) => void,
     optionsOrAccessKey?: string | GmMenuCommandOptions,
-  ): string | number | Promise<string | number>;
+  ): string | number | void | Promise<string | number>;
 }
 
 export interface GmUnregisterMenuCommandType {

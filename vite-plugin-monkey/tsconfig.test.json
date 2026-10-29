@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "client.d.ts",
+    "src",
+    "scripts",
+    "tsdown.config.ts",
+    "test",
+    "../vitest.config.ts",
+    "../playwright.config.ts"
+  ],
+  "exclude": [
+    "test/fixtures",
+    "test/types/client-api.ts",
+    "test/types/manager-profiles.ts",
+    "test/types/global-api.ts"
+  ]
+}

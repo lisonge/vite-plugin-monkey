@@ -7,27 +7,39 @@
     "format": "prettier --cache --write --ignore-unknown .",
     "lint": "eslint --cache --fix .",
     "build": "pnpm -r --filter=./create-monkey --filter=./vite-plugin-monkey --filter=./website build",
-    "build:playground": "pnpm -r --filter=./playground/* build"
+    "build:playground": "pnpm -r --filter=./playground/* build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:types": "tsc -p vite-plugin-monkey/tsconfig.test.json && tsc -p vite-plugin-monkey/test/types/tsconfig.json && tsc -p vite-plugin-monkey/test/types/tsconfig.global.json && pnpm --filter website type-check",
+    "test:coverage": "vitest run --coverage",
+    "playground": "pnpm --filter @playground/lab dev",
+    "test:browser": "node vite-plugin-monkey/scripts/test-browser.ts",
+    "test:browser:dev": "node vite-plugin-monkey/scripts/test-browser.ts dev",
+    "test:browser:build": "node vite-plugin-monkey/scripts/test-browser.ts build",
+    "test:browser:contracts": "node vite-plugin-monkey/scripts/test-browser.ts contracts"
   },
   "dependencies": {
     "@eslint/js": "catalog:",
     "@types/cross-spawn": "catalog:",
     "@types/minimist": "catalog:",
     "@types/node": "catalog:",
-    "@types/postcss-url": "catalog:",
     "@types/prompts": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "catalog:",
     "@vitejs/plugin-vue": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
     "element-plus": "catalog:",
     "esbuild": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
+    "eslint-plugin-prettier": "catalog:",
     "eslint-plugin-unused-imports": "catalog:",
+    "lightningcss": "catalog:",
     "lint-staged": "catalog:",
     "normalize.css": "catalog:",
     "pinia": "catalog:",
+    "playwright": "catalog:",
     "prettier": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
@@ -44,6 +56,7 @@
     "vite": "catalog:",
     "vite-plugin-solid": "catalog:",
     "vitepress": "catalog:",
+    "vitest": "catalog:",
     "vue": "catalog:"
   },
   "simple-git-hooks": {
@@ -51,8 +64,7 @@
   },
   "lint-staged": {
     "*.{js,cjs,mjs,ts}": [
-      "eslint --cache --fix",
-      "prettier --cache --write"
+      "eslint --cache --fix"
     ],
     "*.{json,jsx,tsx,vue}": [
       "prettier --cache --write"
@@ -61,12 +73,12 @@
   "devEngines": {
     "runtime": {
       "name": "node",
-      "version": "24",
+      "version": "26",
       "onFail": "error"
     },
     "packageManager": {
       "name": "pnpm",
-      "version": "11.5.2",
+      "version": "12.16.1",
       "onFail": "error"
     }
   }

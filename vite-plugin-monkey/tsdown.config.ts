@@ -19,5 +19,6 @@ export default defineConfig([
     outDir: 'dist/client',
     format: 'esm',
     platform: 'browser',
+    deps: { neverBundle: ['virtual:monkey-config'] },
   },
 ]);

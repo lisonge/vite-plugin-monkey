@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "../../client.d.ts",
+    "../../global.d.ts",
+    "global-api.ts",
+    "manager-profiles.ts"
+  ]
+}

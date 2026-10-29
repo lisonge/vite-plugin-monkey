@@ -6,21 +6,21 @@
 
 但是这无法让我们通过 npm 等包管理器去管理这个依赖，也不适配 vite-plugin-monkey 的 ESM GM_api 的用法
 
-现在您只需要在您的库代码里正常从 `vite-plugin-monkey/dist/client` 导入 GM_api，然后在打包的时候将 `vite-plugin-monkey/dist/client` 作为排除依赖即可
+现在您只需要在您的库代码里正常从 `$` 导入 GM_api，然后在打包的时候将 `$` 作为排除依赖即可
 
 这样您就能构建一个正常在 vite-plugin-monkey 里使用的库，用户使用这个库只需要使用 npm 安装后正常 `import` 使用即可
 
-当然如果您直接将 `vite-plugin-monkey/dist/client` 打包到构建产物中，这个库也能直接通过 `@require` 引用
+当然如果您直接将 `$` 打包到构建产物中，这个库也能直接通过 `@require` 引用
 
-但是为了使构建产物更加简洁，建议您在构建的时候将 `vite-plugin-monkey/dist/client` 重定向到 `vite-plugin-monkey/dist/native`
+但是为了使构建产物更加简洁，建议您在构建的时候将 `$` 重定向到 `vite-plugin-monkey/dist/native`
 
 以下是一个使用 tsup 同时打包 ESM 和 IIFE 格式的例子，ESM 提供给 vite-plugin-monkey 用户，IIFE 提供给想通过 `@require` 引用的用户
 
-同时 IIFE 格式也能作为 vite-plugin-monkey 的 `externalGlobals` 的配置来减少构建产物的大小
+同时 IIFE 格式也能作为 vite-plugin-monkey 的 `dependencies` 的配置来减少构建产物的大小
 
 ```ts
 // /src/index.ts
-import { GM_setValue } from 'vite-plugin-monkey/dist/client';
+import { GM_setValue } from '$';
 
 export const setValue = (name: string, value: unknown) => {
   console.log('you invoke setValue', name, value);
@@ -46,7 +46,7 @@ export default defineConfig([
     outExtension,
     dts: true,
     format: ['esm'],
-    external: ['vite-plugin-monkey/dist/client'],
+    external: ['$'],
   },
   {
     // for userscript @require
@@ -62,7 +62,7 @@ export default defineConfig([
     target: 'es2015',
     esbuildOptions: (options) => {
       options.alias = {
-        'vite-plugin-monkey/dist/client': 'vite-plugin-monkey/dist/native',
+        $: 'vite-plugin-monkey/dist/native',
       };
     },
   },

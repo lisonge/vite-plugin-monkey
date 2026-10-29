@@ -1,0 +1,16 @@
+{
+  "name": "@playground/solid",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "build:watch": "vite build --watch",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vite-plugin-monkey": "workspace:*",
+    "solid-js": "catalog:"
+  }
+}

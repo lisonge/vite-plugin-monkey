@@ -34,18 +34,31 @@ iife-cdn 使用 `var` 声明的变量在油猴脚本作用域下不会成为 win
 
 详情见 [issues/5](https://github.com/lisonge/vite-plugin-monkey/issues/5) 或 [greasyfork#1084](https://github.com/JasonBarnabe/greasyfork/issues/1084)
 
-解决方法是 在 iife-cdn 后面追加一个 `dataUrl` 脚本，把 iife 声明的变量作为 `window` 的属性
+解决方法是 在 iife-cdn 后面追加一个 `scriptDataUrl` 脚本，把 iife 声明的变量作为 `window` 的属性
 
-```js
-// 解决方案例子
-import { cdn, util } from 'vite-plugin-monkey';
-const buildConfig = {
-  vue: cdn
-    .jsdelivr('Vue', 'dist/vue.global.prod.js')
-    .concat(util.dataUrl(';window.Vue=Vue;')),
-  'element-plus': cdn.jsdelivr('ElementPlus', 'dist/index.full.min.js'),
-};
+```ts
+import monkey, { npmCdn, scriptDataUrl } from 'vite-plugin-monkey';
+monkey({
+  entry: 'src/main.ts',
+  dependencies: {
+    vue: {
+      kind: 'global',
+      global: 'Vue',
+      urls: [
+        npmCdn({ path: 'dist/vue.global.prod.js' }),
+        scriptDataUrl(';window.Vue=Vue;'),
+      ],
+    },
+    'element-plus': {
+      kind: 'global',
+      global: 'ElementPlus',
+      urls: [npmCdn({ path: 'dist/index.full.min.js' })],
+    },
+  },
+});
 ```
+
+`scriptDataUrl(fn, ...args)` 会序列化函数与参数，函数不能捕获配置文件的闭包变量。参数支持 JSON 可序列化值和顶层 `undefined`；`undefined` 保留位置与默认参数语义。嵌套值遵循 JSON 规则，函数、Symbol、BigInt 和循环引用会在生成时抛错。
 
 ## Polyfill {#polyfill}
 

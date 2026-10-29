@@ -16,3 +16,7 @@ export type * from './tab.ts';
 export type * from './value.ts';
 export type * from './webRequest.ts';
 export type * from './xmlhttpRequest.ts';
+
+export type * from './audio.ts';
+
+export type * from './profiles.ts';

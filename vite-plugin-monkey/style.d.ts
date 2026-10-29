@@ -1,4 +1,3 @@
 declare module '*?style' {
-  const style: HTMLStyleElement;
-  export default style;
+  export default function createStyle(): HTMLStyleElement;
 }

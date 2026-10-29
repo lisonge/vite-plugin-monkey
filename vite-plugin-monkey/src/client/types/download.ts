@@ -47,6 +47,8 @@ export interface GmDownloadOptions {
    * Show 'Save As' dialog
    */
   saveAs?: boolean;
+  /** Tampermonkey 5.5+: omit cookies from the download request. */
+  anonymous?: boolean;
   /**
    * @see https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/downloads/FilenameConflictAction
    */

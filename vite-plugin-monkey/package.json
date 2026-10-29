@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-monkey",
-  "version": "8.1.1",
+  "version": "9.0.0-alpha.0",
   "description": "A vite plugin server and build your.user.js for userscript engine like Tampermonkey and Violentmonkey and Greasemonkey",
   "main": "src/node/index.ts",
   "type": "module",
@@ -17,7 +17,7 @@
     "types": "dist/node/index.d.mts"
   },
   "scripts": {
-    "test": "node --test test/*.test.ts",
+    "test": "pnpm --dir .. test --project unit --project build --project serve",
     "prebuild": "tsc",
     "build": "tsdown",
     "postbuild": "node ./scripts/postbuild.ts",
@@ -46,16 +46,15 @@
   },
   "homepage": "https://github.com/lisonge/vite-plugin-monkey#readme",
   "dependencies": {
-    "cross-spawn": "catalog:",
     "htmlparser2": "catalog:",
     "import-meta-resolve": "catalog:",
     "magic-string": "catalog:",
     "mrmime": "catalog:",
-    "open": "catalog:",
     "picocolors": "catalog:",
-    "postcss-url": "catalog:",
     "rollup": "catalog:",
-    "systemjs": "catalog:"
+    "systemjs": "catalog:",
+    "postcss": "catalog:",
+    "postcss-value-parser": "catalog:"
   },
   "peerDependencies": {
     "vite": "catalog:"

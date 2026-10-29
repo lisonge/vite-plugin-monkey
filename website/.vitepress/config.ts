@@ -46,6 +46,7 @@ const chineseSidebar = [
     text: '指南',
     items: [
       { text: '配置', link: '/zh/guide/configuration' },
+      { text: '从 8.x 迁移到 9.x', link: '/zh/guide/migration-v9' },
       { text: 'CDN 与压缩', link: '/zh/guide/cdn-and-minification' },
       { text: 'GM API 用法', link: '/zh/guide/gm-api' },
     ],

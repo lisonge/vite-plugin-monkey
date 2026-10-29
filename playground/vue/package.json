@@ -1,0 +1,19 @@
+{
+  "name": "@playground/vue",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "build:watch": "vite build --watch",
+    "preview": "vite preview",
+    "build:external": "tsc && vite build --mode external"
+  },
+  "dependencies": {
+    "vite-plugin-monkey": "workspace:*",
+    "vue": "catalog:",
+    "pinia": "catalog:",
+    "element-plus": "catalog:"
+  }
+}

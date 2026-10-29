@@ -34,6 +34,10 @@ import type {
 import type { GmWebRequestType } from './webRequest.ts';
 import type { GmXmlhttpRequestType } from './xmlhttpRequest.ts';
 
+export interface GmUrlChangeListener {
+  (event: { url: string }): void;
+}
+
 export interface GmContextType {
   unsafeWindow: typeof window;
   GM: GmType;
@@ -198,7 +202,9 @@ export interface GmContextType {
    * @see https://www.tampermonkey.net/documentation.php#api:GM_cookie.list
    * @see https://www.tampermonkey.net/documentation.php#api:GM_cookie.set
    * @see https://www.tampermonkey.net/documentation.php#api:GM_cookie.delete
+   * @see https://violentmonkey.github.io/api/gm/#gm_cookie
    * @available tampermonkey
+   * @available violentmonkey
    */
   GM_cookie: GmCookieType;
 
@@ -219,11 +225,8 @@ export interface GmContextType {
   /**
    * @see https://www.tampermonkey.net/documentation.php#api:window.onurlchange
    */
-  addEventListener(
-    type: 'urlchange',
-    cb: (data: { url: string }) => void,
-  ): void;
-  removeEventListener(type: 'urlchange', cb: (...args: any[]) => any): void;
+  addEventListener(type: 'urlchange', cb: GmUrlChangeListener): void;
+  removeEventListener(type: 'urlchange', cb: GmUrlChangeListener): void;
 
   /**
    * @see https://www.tampermonkey.net/documentation.php#api:window.focus

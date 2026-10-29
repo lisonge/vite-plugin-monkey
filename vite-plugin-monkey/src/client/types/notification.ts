@@ -1,5 +1,7 @@
-export interface GmNotificationOptions {
-  text: string;
+export type GmNotificationOptions = GmNotificationBaseOptions &
+  ({ text: string; highlight?: boolean } | { text?: string; highlight: true });
+
+export interface GmNotificationBaseOptions {
   title?: string;
   tag?: string;
   image?: string;
@@ -51,10 +53,13 @@ export interface GmNotificationType {
   ): GmNotificationControl | void;
 }
 export interface GmAsyncNotificationType {
-  (details: GmNotificationOptions): Promise<boolean> | GmNotificationControl;
+  (
+    details: GmNotificationOptions,
+  ): Promise<boolean> | GmNotificationControl | void;
   (
     text: string,
     title?: string,
     image?: string,
-  ): Promise<boolean> | GmNotificationControl;
+    onclick?: () => void,
+  ): Promise<boolean> | GmNotificationControl | void;
 }

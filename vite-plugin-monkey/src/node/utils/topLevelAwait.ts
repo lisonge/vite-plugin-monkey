@@ -27,21 +27,6 @@ export const getSafeTlaIdentifier = (rawBundle: Rolldown.OutputBundle) => {
   return identifier;
 };
 
-const startWith = (
-  text: string,
-  searchString: string,
-  position = 0,
-  ignoreString: string,
-) => {
-  for (let i = position; i < text.length; i++) {
-    if (ignoreString.includes(text[i])) {
-      continue;
-    }
-    return text.startsWith(searchString, i);
-  }
-  return false;
-};
-
 const includes = (
   str: string,
   start: number,
@@ -62,7 +47,7 @@ export const transformTlaToIdentifier = (
     if (!code.includes(`await`)) {
       return;
     }
-    const ast = context.parse(code);
+    const ast = context.parse(code, { sourceType: 'module' });
     const tlaNodes: ESTree.AwaitExpression[] = [];
     const tlaForOfNodes: ESTree.ForOfStatement[] = [];
     let functionDepth = 0;
@@ -92,15 +77,9 @@ export const transformTlaToIdentifier = (
     if (tlaNodes.length > 0 || tlaForOfNodes.length > 0) {
       const ms = new MagicString(code);
       tlaNodes.forEach((node) => {
-        if (
-          !startWith(chunk.code, '(', node.start + awaitOffset, '\x20\t\r\n')
-        ) {
-          // await xxx -> await (xxx)
-          ms.appendLeft(node.start + awaitOffset, `(`);
-          ms.appendRight(node.end, `)`);
-        }
-
-        // await (xxx) -> __topLevelAwait__ (xxx)
+        // Wrap the entire operand, including calls or members after parentheses.
+        ms.appendLeft(node.start + awaitOffset, '(');
+        ms.appendRight(node.end, ')');
         ms.update(node.start, node.start + awaitOffset, identifier);
       });
       tlaForOfNodes.forEach((node) => {

@@ -1,248 +1,113 @@
-# Configuration {#configuration}
+# Configuration
+
+Version 9 rejects unknown options without legacy aliases. Vite owns ports, HMR, target, minify and outDir.
 
 ```ts
-export interface MonkeyOption {
-  /**
-   * userscript entry file path
-   */
-  entry: string;
-
-  /**
-   * userscript comment
-   */
-  userscript?: MonkeyUserScript;
-
-  /**
-   * @deprecated use {@link align} or {@link generate} instead
-   */
-  format?: {
-    /**
-     * @deprecated use {@link align} instead
-     */
-    align?: unknown;
-
-    /**
-     * @deprecated use {@link generate} instead
-     */
-    generate?: unknown;
-  };
-
-  /**
-   * align userscript comment
-   * @default 2
-   */
-  align?: number | false;
-
-  /**
-   * custom generate userscript comment
-   */
-  generate?: (options: {
-    userscript: string;
-    mode: `serve` | `build` | `meta`;
-  }) => Thenable<string>;
-
-  /**
-   * alias of vite-plugin-monkey/dist/client
-   * @default '$'
-   * @example
-   * // vite-env.d.ts for type hint
-   *
-   * // if you use default value `$`
-   * /// <reference types="vite-plugin-monkey/client" />
-   *
-   * // if you use other_alias
-   * declare module other_alias {
-   *   export * from 'vite-plugin-monkey/dist/client';
-   * }
-   */
-  clientAlias?: string;
-
-  /**
-   * handle CSS imports as style nodes([HTMLStyleElement](https://developer.mozilla.org/docs/Web/API/HTMLStyleElement))
-   *
-   * If you use [Shadow DOM](https://developer.mozilla.org/docs/Web/API/Web_components/Using_shadow_DOM) (style isolation) to place your interface application, this is very useful.
-   *
-   * Support `.css?style`, `.less?style`, `.sass?style`, `.scss?style`, `.styl?style`, `.stylus?style`, `.pcss?style`, `.postcss?style` and `.sss?style` imports
-   *
-   * add `/// <reference types="vite-plugin-monkey/style" />` to vite-env.d.ts for type hint
-   *
-   * @example
-   * import style1 from './style1.css?style':
-   * import style2 from 'normalize.css?style';
-   * const container = document.createElement('div').attachShadow({ mode: 'open' });
-   * container.append(style1, style2); // with hmr when change style1.css
-   * const style3 = style1.cloneNode(true); // it will still have hmr
-   *
-   * @default
-   * true
-   */
-  styleImport?: boolean;
-
-  server?: {
-    /**
-     * auto open install url in default browser when userscript comment change
-     *
-     * and set `viteConfig.server.open ??= monkeyConfig.server.open`
-     * @default
-     * process.platform == 'win32' || process.platform == 'darwin' // if platform is Win/Mac
-     */
-    open?: boolean;
-
-    /**
-     * name prefix, distinguish server.user.js and build.user.js in monkey extension install list, if you not want prefix, set false
-     * @default 'server:'
-     */
-    prefix?: string | ((name: string) => string) | false;
-
-    /**
-     * mount GM_api to unsafeWindow, not recommend it, you should use GM_api by ESM import, or use [unplugin-auto-import](https://github.com/antfu/unplugin-auto-import)
-     * @default false
-     * @example
-     * // if set true, you can use `vite-plugin-monkey/global` for type hint
-     * // vite-env.d.ts
-     * /// <reference types="vite-plugin-monkey/global" />
-     */
-    mountGmApi?: boolean;
-  };
-  build?: {
-    /**
-     * build bundle userscript file name
-     *
-     * it should end with '.user.js'
-     * @default (package.json.name??'monkey')+'.user.js'
-     */
-    fileName?: string;
-
-    /**
-     * build bundle userscript comment file name, this file is only include comment
-     *
-     * it can be used by userscript.updateURL, when checking for updates, just download this small file instead of downloading the entire script
-     *
-     * it should end with '.meta.js', if set false, will not generate this file
-     *
-     * if set true, will equal to fileName.replace(/\\.user\\.js$/,'.meta.js')
-     *
-     * @default false
-     */
-    metaFileName?: string | boolean | ((fileName: string) => string);
-
-    /**
-     * this config can be array or object, array=Object.entries(object)
-     *
-     * if value is string or function, it or its return value is exportVarName
-     *
-     * if value is Array, the first [item or its return value] is exportVarName, the items after it all are url that is [require url]
-     *
-     * if module is unimported, plugin will not add require url to userscript
-     *
-     * @example
-     * { // map structure
-     *  vue:'Vue',
-     *  // if set this
-     *  // you need manually set userscript.require = ['https://unpkg.com/vue@3.0.0/dist/vue.global.js'], when `vite build`
-     *
-     *  vuex:['Vuex', (version, name)=>`https://unpkg.com/${name}@${version}/dist/vuex.global.js`],
-     *  // plugin will auto add this url to userscript.require
-     *
-     *  'prettier/parser-babel': [
-     *    'prettierPlugins.babel',
-     *    (version, name, importName) => {
-     *      // name == `prettier`
-     *      // importName == `prettier/parser-babel`
-     *      const subpath = `${importName.split('/').at(-1)}.js`;
-     *      return `https://cdn.jsdelivr.net/npm/${name}@${version}/${subpath}`;
-     *    },
-     *  ],
-     *  // sometimes importName deffers from package name
-     * }
-     * @example
-     * [ // array structure, this example come from [playground/ex-vue-demi](https://github.com/lisonge/vite-plugin-monkey/tree/main/playground/ex-vue-demi)
-     *   [
-     *     'vue',
-     *     cdn
-     *       .jsdelivr('Vue', 'dist/vue.global.prod.js')
-     *       .concat('https://unpkg.com/vue-demi@latest/lib/index.iife.js')
-     *       .concat(util.dataUrl('window.Vue=Vue')),
-     *   ],
-     *   ['pinia', cdn.jsdelivr('Pinia', 'dist/pinia.iife.prod.js')],
-     *   [
-     *     'element-plus',
-     *     cdn.jsdelivr('ElementPlus', 'dist/index.full.min.js'),
-     *   ],
-     * ]
-     */
-    externalGlobals?: ExternalGlobals;
-
-    /**
-     * according to final code bundle, auto inject GM_* or GM.* to userscript comment grant
-     *
-     * @default true
-     */
-    autoGrant?: boolean;
-
-    /**
-     * @example
-     * {  // resourceName default value is pkg.importName
-     *   'element-plus/dist/index.css': pkg=>`https://unpkg.com/${pkg.name}@${pkg.version}/${pkg.resolveName}`,
-     *   'element-plus/dist/index.css': {
-     *     resourceName: pkg=>pkg.importName,
-     *     resourceUrl: pkg=>`https://unpkg.com/${pkg.name}@${pkg.version}/${pkg.resolveName}`,
-     *     loader: pkg=>{ // there are default loaders that support [css, json, the assets that vite support, ?url, ?raw] file/name suffix
-     *        const css = GM_getResourceText(pkg.resourceName);
-     *        GM_addStyle(css);
-     *        return css;
-     *     },
-     *     nodeLoader: pkg=>{
-     *        return [
-     *          `export default (()=>{`,
-     *          `const css = GM_getResourceText(${JSON.stringify(pkg.resourceName)});`,
-     *          `GM_addStyle(css);`,
-     *          `return css;`,
-     *          `})();`
-     *        ].join('');
-     *     },
-     *   },
-     *   'element-plus/dist/index.css': [
-     *      (version, name, importName, resolveName)=>importName,
-     *      (version, name, importName, resolveName)=>`https://unpkg.com/${name}@${version}/${resolveName}`,
-     *       // for compat externalGlobals cdn function, if (version/name/importName/resolveName) == '', plugin will use their own default values
-     *   ],
-     *   'element-plus/dist/index.css': cdn.jsdelivr(),
-     * }
-     */
-    externalResource?: ExternalResource;
-    /** Static asset publishing directory; generates @resource, keeping JS bundled */
-    assetsBaseUrl?: string;
-
-    /**
-     * when use dynamic-import, plugin will use systemjs build your code
-     *
-     * `cdn.jsdelivr()[1]` example -> [dynamic-import.user.js](https://github.com/lisonge/vite-plugin-monkey/blob/7645b185605faf9b48c43116db5ea01726188e03/playground/dynamic-import/dist/dynamic-import.user.js)
-     *
-     * `'inline'` exmple -> [test-v3.user.js](https://github.com/lisonge/vite-plugin-monkey/blob/7645b185605faf9b48c43116db5ea01726188e03/playground/test-v3/dist/test-v3.user.js)
-     *
-     * @default
-     * cdn.jsdelivr()[1]
-     */
-    systemjs?: 'inline' | ModuleToUrlFc;
-
-    /**
-     * @default
-     * const _css = (css: string): void => {
-     *   if (typeof GM_addStyle === 'function') {
-     *     GM_addStyle(css);
-     *   } else {
-     *     (document.head || document.documentElement).appendChild(document.createElement('style')).append(css)
-     *   }
-     * };
-     * @example
-     * // example1
-     * _css.toString()
-     *
-     * // example2
-     * `(a)=>GM_addStyle(a)`
-     */
-    cssSideEffects?: string | ((css: string) => void);
-  };
-}
+import monkey, { npmCdn } from 'vite-plugin-monkey';
+monkey({
+  entry: 'src/main.ts',
+  userscript: { name: 'Example', match: ['https://songe.li/*'] },
+  dev: { namePrefix: '[dev] ' },
+  output: { script: 'example.user.js', meta: true },
+  dependencies: {
+    vue: {
+      kind: 'global',
+      global: 'Vue',
+      urls: [npmCdn({ path: 'dist/vue.global.prod.js' })],
+    },
+  },
+  css: { inject: 'auto' },
+});
 ```
+
+| Option         | Contract                                                  |
+| -------------- | --------------------------------------------------------- |
+| entry          | Required file relative to Vite root                       |
+| userscript     | Metadata object; grant is optional, none or a grant array |
+| dev.namePrefix | '[dev] ' by default; empty string disables it             |
+| output.script  | Package name plus .user.js; scoped names use hyphens      |
+| output.meta    | Omitted/false, true for inferred .meta.js, or a filename  |
+| assets         | Omit publicPath to inline; set publicPath for resources   |
+| dependencies   | Production-only global/resource descriptors               |
+| css.inject     | auto (default), gm, dom or false                          |
+
+Output paths must remain inside outDir. Metadata alignment is internal. Public option objects have named exported types.
+
+Development entry URLs preserve spaces, Unicode and `%` in file paths. Entries outside Vite root use `/@fs/` and remain subject to `server.fs.allow`. Vite's module loader currently does not support `#` in source filenames, even when the URL encodes it as `%23`.
+
+## Metadata and permissions
+
+userscript accepts an object only. Compute dynamic or asynchronous metadata in the outer Vite defineConfig function. Package metadata still supplies defaults, and script and meta share the same values. Source watch rebuilds reset collected build state without reevaluating configuration. $extra adds custom fields but cannot set grant.
+
+```ts
+import { defineConfig } from 'vite';
+import monkey from 'vite-plugin-monkey';
+
+export default defineConfig(({ command, mode }) => ({
+  plugins: [
+    monkey({
+      entry: 'src/main.ts',
+      userscript: {
+        description: command === 'serve' ? 'Development' : mode,
+        match: ['https://songe.li/*'],
+      },
+    }),
+  ],
+}));
+```
+
+Automatic detection supports static API references, not full data-flow analysis. For dynamic access or untraceable aliases, set userscript.grant to a complete array, including resource and CSS requirements. Arrays accept supported API names only.
+
+Configure only userscript.grant: omit it for production detection and all supported development grants; use 'none' for @grant none, or an array for the exact list in both environments. An empty array emits no grant. Production rejects required APIs with 'none'. There is no permissions or dev.grant override. Reinstall the development script after changing explicit grants.
+
+## Dependencies and assets
+
+Global dependencies use `{ kind: 'global', global, urls }`. global is an identifier or dotted path. urls are ordered @require URLs; an empty array allows manual userscript.require. URLs can be strings or async functions receiving `{ name, version, importName, resolveName }`.
+
+Resource dependencies use `{ kind: 'resource', name?, url, loader? }`. Loaders are inferred from suffixes or specified as `'css' | 'json' | 'raw' | 'url'` or `{ entry: './src/load-resource.ts' }`. A module loader default-exports a browser function receiving ResourceLoaderContext (package fields, resourceName, resourceUrl, dynamic). Dependencies participate in bundling and permission detection. Async results are awaited; dynamic imports resolve a namespace with default.
+
+`npmCdn({ provider?, path? })` returns a callable `DependencyUrlResolver`. The provider defaults to `jsdelivr`; `unpkg` and `jsdelivr-fastly` are also supported. The path defaults to the resolved package file. It does not return a dependency descriptor.
+
+`assets: { publicPath: 'https://example.com/releases/v1/' }` emits images, fonts, WASM and Worker module chunks as @resource entries. The directory URL must be absolute HTTP(S), without credentials, query or fragment. Upload assets before distribution. Explicit asset ?inline and ?raw retain their semantics.
+
+Resource mode defaults to `[name]-[hash][extname]`, placing assets beside the userscript. Set `publicPath` to a GitHub Release download directory such as `https://github.com/OWNER/REPO/releases/download/v1.0.0/`, then upload the script and assets individually. An explicit `build.rolldownOptions.output.assetFileNames` takes precedence, including string and function values. Custom subdirectories require matching hosting paths.
+
+## Workers
+
+Dedicated Workers support these production entry forms:
+
+```ts
+import TaskWorker from './worker.ts?worker';
+import InlineTaskWorker from './worker.ts?worker&inline';
+
+const worker = new TaskWorker({ name: 'task' });
+const inlineWorker = new InlineTaskWorker();
+const urlWorker = new Worker(new URL('./worker.ts', import.meta.url), {
+  type: 'module',
+});
+```
+
+Write Worker code as ESM, including static imports, dynamic imports and top-level await. Production builds run it as a Classic Worker with an isolated SystemJS module registry. Dynamic imports retain deferred execution and module caching; cycles and live bindings are linked across chunks. The plugin owns the intermediate Worker format, so `worker.format` does not select the runtime format. Vite's Worker plugins and output naming options remain available.
+
+| Asset mode         | Worker code                                            | Worker images, fonts and WASM                                     |
+| ------------------ | ------------------------------------------------------ | ----------------------------------------------------------------- |
+| `inline` (default) | Entire module graph embedded in the userscript         | Embedded resources                                                |
+| `resource`         | Module chunks emitted as `@resource`, loaded on demand | Emitted as `@resource`, prepared before the Worker entry executes |
+
+`?worker&inline` always embeds the Worker module graph; its internal assets still follow `assets.publicPath`. A single output script with embedded assets therefore uses the default `inline` mode. In resource mode, upload all emitted chunks and assets alongside the userscript. Worker output names can be customized through `worker.rolldownOptions.output`; directories and basenames follow those settings, while compiled module filenames end in `.system.js`. Default resource output is flat.
+
+The parent userscript reads resource bytes with `GM_getResourceURL` and sends them through a private `MessageChannel` for each Worker. The Worker creates its own Blob URLs, so it does not need access to GM APIs or Blob URLs created in the userscript sandbox. Static resource imports, `?url`, `new URL('./asset', import.meta.url)` and WASM `?init` can use these local URLs. Resource mode requires `GM_getResourceURL`; include that grant when using explicit permissions.
+
+Messages sent immediately after construction are queued until the entry is ready. Initialization failures dispatch a Worker `error` event; later dynamic-import failures reject the import promise. Missing modules/resources do not fall back to network requests. Call `terminate()` when finished to release the Worker and its bridge.
+
+Production `SharedWorker`, `?worker&url` and nested Workers are currently rejected. The asset bridge does not expose general GM APIs inside Workers. Development continues to use Vite's module server; SystemJS is a production implementation. Browser CSP and userscript-manager restrictions still apply to Worker and Blob creation.
+
+## CSS and runtime
+
+css.inject auto prefers GM_addStyle and falls back to DOM; gm requires GM_addStyle, dom creates a style element, false disables injection. ?style exports a factory: call createStyle() to obtain a new HTMLStyleElement for manual insertion. During development, factory-created elements share HMR updates; native cloneNode() copies do not. Use ?inline for custom injection.
+
+Import APIs from `$` and load the unified `vite-plugin-monkey/client` declaration entry. It declares the complete API; named types such as `TampermonkeyGM`, `ViolentmonkeyGM` and `GreasemonkeyGM` describe manager differences. See [GM API](./gm-api) for usage and auto-import presets. Development uses Vite's regular module server; bundled dev is unsupported. Missing bridges and protocol/project mismatches throw errors without falling back to the page window.
+
+Use Vite `server.open` to open the development installation page automatically, for example `defineConfig({ server: { open: true }, plugins: [monkey({ entry: "src/main.ts" })] })`.
+
+During development, local CSS `url()` resources are embedded as Data URLs after Vite compiles CSS. Both PostCSS and Lightning CSS are supported, including CSS Modules, `?inline` and `?style`. The plugin preserves your PostCSS configuration and does not set `server.origin`; CSS resources do not require separate requests to a fixed development port. Resource changes participate in HMR. Production assets still follow `assets.publicPath`.

@@ -262,8 +262,10 @@ async function init() {
         },
       },
     );
-  } catch (cancelled: any) {
-    console.log(cancelled.message);
+  } catch (cancelled: unknown) {
+    console.log(
+      cancelled instanceof Error ? cancelled.message : String(cancelled),
+    );
     return;
   }
 

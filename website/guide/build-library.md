@@ -6,21 +6,21 @@ The previous practice generally involved accessing GM_api as a global variable d
 
 However, this approach does not allow us to manage this dependency through npm or other package managers, and it is not compatible with the usage of ESM GM_api in vite-plugin-monkey.
 
-Now, you only need to import GM_api normally from `vite-plugin-monkey/dist/client` in your library code. Modify your build config and exclude `vite-plugin-monkey/dist/client`.
+Now, you only need to import GM_api normally from `$` in your library code. Modify your build config and exclude `$`.
 
 This way, you can build a library that can be used in vite-plugin-monkey. Users of this library only need to install it via npm and use it normally with `import`.
 
-Of course, if you directly bundle `vite-plugin-monkey/dist/client` into the build artifact, the library can also be referenced directly through `@require`.
+Of course, if you directly bundle `$` into the build artifact, the library can also be referenced directly through `@require`.
 
-However, to make the build artifact more concise, it is recommended that you redirect `vite-plugin-monkey/dist/client` to `vite-plugin-monkey/dist/native` during the build.
+However, to make the build artifact more concise, it is recommended that you redirect `$` to `vite-plugin-monkey/dist/native` during the build.
 
 Below is an example using tsup to simultaneously package ESM and IIFE formats. ESM is provided to vite-plugin-monkey users, and IIFE is provided to users who want to reference it through `@require`.
 
-Additionally, the IIFE format can also be used as a configuration for vite-plugin-monkey's externalGlobals to reduce the size of the build artifact.
+Additionally, the IIFE format can also be used as a configuration for vite-plugin-monkey's dependencies to reduce the size of the build artifact.
 
 ```ts
 // /src/index.ts
-import { GM_setValue } from 'vite-plugin-monkey/dist/client';
+import { GM_setValue } from '$';
 
 export const setValue = (name: string, value: unknown) => {
   console.log('you invoke setValue', name, value);
@@ -46,7 +46,7 @@ export default defineConfig([
     outExtension,
     dts: true,
     format: ['esm'],
-    external: ['vite-plugin-monkey/dist/client'],
+    external: ['$'],
   },
   {
     // for userscript @require
@@ -62,7 +62,7 @@ export default defineConfig([
     target: 'es2015',
     esbuildOptions: (options) => {
       options.alias = {
-        'vite-plugin-monkey/dist/client': 'vite-plugin-monkey/dist/native',
+        $: 'vite-plugin-monkey/dist/native',
       };
     },
   },

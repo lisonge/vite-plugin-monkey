@@ -1,56 +1,25 @@
-# CDN 与压缩 {#cdn-and-minification}
-
-## CDN 工具 {#cdn-utilities}
+# CDN 与压缩
 
 ```ts
-import { defineConfig } from 'vite';
-import monkey, { cdn } from 'vite-plugin-monkey';
-export default defineConfig({
-  plugins: [
-    monkey({
-      build: {
-        externalGlobals: {
-          react: cdn.jsdelivr('React', 'umd/react.production.min.js'),
-        },
-        externalResource: {
-          'element-plus/dist/index.css': cdn.jsdelivr(),
-        },
-      },
-    }),
-  ],
-});
+import { npmCdn } from 'vite-plugin-monkey';
+
+const dependencies = {
+  vue: {
+    kind: 'global',
+    global: 'Vue',
+    urls: [npmCdn({ path: 'dist/vue.global.prod.js' })],
+  },
+  'element-plus/dist/index.css': {
+    kind: 'resource',
+    url: npmCdn({ provider: 'unpkg' }),
+  },
+};
 ```
 
-有以下 CDN 可使用，详情见 [cdn.ts](https://github.com/lisonge/vite-plugin-monkey/blob/main/vite-plugin-monkey/src/node/cdn.ts)
+`npmCdn({ provider, path })` 返回使用已安装包版本的 URL resolver。provider 默认为 `jsdelivr`，也支持 `unpkg` 和 `jsdelivr-fastly`；path 可覆盖包解析出的文件路径。其他 CDN 可使用接收 `PackageContext` 的 `DependencyUrlResolver` 函数。
 
-- [jsdelivr](https://www.jsdelivr.com/)
-- [unpkg](https://unpkg.com/)
-- [cdnjs](https://cdnjs.com/libraries)
-- [zhimg](https://unpkg.zhimg.com/)
-- [npmmirror](https://registry.npmmirror.com/)
+WASM、图片、字体产物需要外置时，设置 assets 为 { publicPath: 'https://example.com/releases/v1/' }。先上传资源再发布脚本；资源名使用产物文件名，冲突或空白字符会报错。显式 ?inline、?raw 保持原有语义。这些设置仅作用于生产构建。
 
-如果你想使用其他 CDN，请查看 [external-scripts](https://greasyfork.org/zh-CN/help/external-scripts)
+压缩由 Vite build.minify 控制，插件默认 false。发布站要求可读源码时请保持关闭。
 
-## 外置静态资源 {#external-assets}
-
-设置 `monkey({ entry: 'src/main.ts', build: { assetsBaseUrl: 'https://example.com/releases/v1/' } })`，可以将构建图中的 WASM、图片、字体等静态资源独立输出，JavaScript 仍打包为一个用户脚本。未配置时保持默认内联行为。
-
-`assetsBaseUrl` 是 `dist` 对应的绝对 HTTP(S) 发布目录，不能包含查询参数或片段。默认资源文件名为 `assets/[name]-[hash][extname]`；例如 `assets/solver-AbCd.wasm` 会生成同名 `@resource`，地址为 `https://example.com/releases/v1/assets/solver-AbCd.wasm`。
-
-普通资源导入、`?url`、Vite 可静态分析的 `new URL(..., import.meta.url)` 和 CSS 的资源 URL 会使用 `GM_getResourceURL`。插件自动声明所需权限，即使关闭 `autoGrant`；显式 `grant: 'none'` 与资源外置冲突。`?inline`、`?raw` 和已有 `externalResource` 配置保留原有含义。同名资源对应不同发布地址时构建失败。
-
-输出资源文件名也用作 `@resource` 名称，因此不能包含空白字符；遇到此类名称时构建会报错。
-
-先上传资源，再发布 `.user.js` 和可选的 `.meta.js`。建议使用版本目录，并保留旧版本资源供尚未升级的脚本使用。插件不会上传文件。`@resource` 由管理器预加载，并非按需下载。
-
-开发模式仍使用 Vite 的资源服务。此选项不解决依赖预打包导致的开发路径问题，也不提供 JS/Worker 拆包、任意字符串路径转换或 `publicDir` 全目录资源注册。该功能使用 Vite 的实验性 `renderBuiltUrl` 接口；被外置的资源 URL 由插件管理，其余 URL 继续交给用户配置的钩子处理。
-
-## 压缩混淆 {#minification}
-
-由于 greasyfork 的 [代码规则](https://greasyfork.org/zh-CN/help/code-rules)
-
-> 提交到 Greasy Fork 的代码不得混淆或最小化
-
-因此插件将 [viteConfig.build.minify](https://cn.vitejs.dev/config/build-options.html#build-minify) 的默认值更改为 `false`
-
-如果你想启用压缩混淆，只需要手动设置 `viteConfig.build.minify=true`
+resource 模式默认使用 `[name]-[hash][extname]` 将资源平铺到输出目录。只需将 `publicPath` 设置为 GitHub Release 下载目录（例如 `https://github.com/OWNER/REPO/releases/download/v1.0.0/`），然后把脚本与资源分别上传到该 Release。用户设置的 `build.rolldownOptions.output.assetFileNames` 优先，包括字符串和函数；自定义目录时需确保托管地址与输出路径一致。

@@ -5,17 +5,17 @@ packages:
   - playground/*
 
 catalog:
+  vitest: 5.0.1
+  '@vitest/coverage-v8': 5.0.1
   '@eslint/js': ^10.0.1
   '@types/cross-spawn': ^6.0.6
   '@types/minimist': ^1.2.5
   '@types/node': ^25.6.0
-  '@types/postcss-url': ^10.0.4
   '@types/prompts': ^2.4.9
   '@types/react': ^19.2.14
   '@types/react-dom': ^19.2.3
   '@vitejs/plugin-react': ^6.0.1
   '@vitejs/plugin-vue': ^6.0.6
-  cross-spawn: ^7.0.6
   element-plus: ^2.13.7
   esbuild: ^0.27.7
   eslint: ^10.2.0
@@ -30,10 +30,11 @@ catalog:
   minimist: ^1.2.8
   mrmime: ^2.0.1
   normalize.css: ^8.0.1
-  open: ^11.0.0
   picocolors: ^1.1.1
   pinia: ^3.0.4
-  postcss-url: ^10.1.3
+  postcss: ^8.5.28
+  postcss-value-parser: ^4.2.0
+  lightningcss: ^1.33.0
   prettier: ^3.8.2
   prompts: ^2.4.2
   react: ^19.2.5
@@ -54,14 +55,22 @@ catalog:
   vite-plugin-solid: ^2.11.12
   vitepress: ^2.0.0-alpha.20
   vue: ^3.5.32
+  playwright: ^1.63.0
+  eslint-plugin-prettier: ^5.5.7
 
 catalogMode: strict
 cleanupUnusedCatalogs: true
+
+strictPeerDependencies: false
+autoInstallPeers: false
+registry: https://registry.npmjs.org/
 
 ignoredOptionalDependencies:
   - tsx
 
 publicHoistPattern:
+  - '@unocss/cli'
+  - '@unocss/core'
   - rolldown
   - '@oxc-project/types'
 
@@ -77,3 +86,7 @@ allowBuilds:
 minimumReleaseAgeExclude:
   - '@mermaid-js/parser@2.0.0'
   - mermaid@12.0.0
+  - '@vitest/coverage-v8@5.0.1'
+  - '@vitest/mocker@5.0.1'
+  - '@vitest/spy@5.0.1'
+  - vitest@5.0.1

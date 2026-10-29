@@ -48,7 +48,7 @@ interface GmCookieDeleteOptions {
 }
 
 interface GmCookieListCallback {
-  (cookies: GmCallbackCookie[], error: any): void;
+  (cookies: GmCallbackCookie[], error: unknown): void;
 }
 
 export interface GmCookieType {

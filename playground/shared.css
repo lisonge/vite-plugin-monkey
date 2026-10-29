@@ -1,0 +1,40 @@
+.monkey-playground {
+  position: fixed;
+  inset: 24px 24px auto auto;
+  z-index: 2147483647;
+  box-sizing: border-box;
+  width: min(680px, calc(100vw - 48px));
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  padding: 24px;
+  border: 1px solid #c8d2df;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: #173047;
+  box-shadow: 0 8px 32px #17304726;
+  font:
+    14px/1.6 system-ui,
+    sans-serif;
+  overflow-wrap: anywhere;
+}
+.monkey-playground h2 {
+  margin-top: 0;
+}
+.monkey-playground button {
+  margin: 4px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+.monkey-playground section {
+  padding: 12px 0;
+  border-top: 1px solid #c8d2df;
+}
+.monkey-playground .asset-images {
+  display: flex;
+  gap: 16px;
+}
+.monkey-playground .asset-background {
+  width: 80px;
+  height: 80px;
+  background: url('./lab/src/assets/pattern.svg') center / cover;
+}

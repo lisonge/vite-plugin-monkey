@@ -3,9 +3,9 @@ import type { GmWebRequestRule } from './webRequest.ts';
 interface GmInfoResourceType {
   name: string;
   url: string;
-  error: string;
-  content: string;
-  meta: string;
+  error?: string;
+  content?: string;
+  meta?: string;
 }
 
 /**
@@ -19,113 +19,174 @@ interface ViolentInfoType {
   scriptUpdateURL: string;
   scriptWillUpdate: boolean;
   uuid: string;
-  injectInto: string;
+  injectInto: 'auto' | 'page' | 'content';
+  isIncognito: boolean;
+  downloadMode: 'native' | 'browser';
+  userAgent: string;
+  userAgentData?: {
+    brands: { brand: string; version: string }[];
+    mobile: boolean;
+    platform: string;
+    getHighEntropyValues(hints: string[]): Promise<{
+      brands?: { brand: string; version: string }[];
+      mobile?: boolean;
+      platform?: string;
+      architecture?: string;
+      bitness?: string;
+      model?: string;
+      platformVersion?: string;
+      fullVersionList?: { brand: string; version: string }[];
+    }>;
+  };
   platform: {
-    arch: 'arm' | 'mips' | 'mips64' | 'x86-32' | 'x86-64';
+    arch:
+      | 'aarch64'
+      | 'arm'
+      | 'arm64'
+      | 'ppc64'
+      | 's390x'
+      | 'sparc64'
+      | 'mips'
+      | 'mips64'
+      | 'x86-32'
+      | 'x86-64';
     browserName: string;
     browserVersion: string;
-    os: 'android' | 'cros' | 'linux' | 'mac' | 'openbsd' | 'win';
+    fullVersionList?: { brand: string; version: string }[];
+    mobile?: boolean;
+    os: 'android' | 'cros' | 'linux' | 'mac' | 'openbsd' | 'win' | 'fuchsia';
   };
 }
 
 interface ViolentScriptType {
   namespace: string;
   name: string;
-  author: string;
+  author?: string;
   description: string;
-  icon: string;
+  icon?: string;
   excludes: string[];
   includes: string[];
   matches: string[];
   resources: GmInfoResourceType[];
   version: string;
-  noframes: boolean;
-  unwrap: boolean;
-  homepage: string;
+  noframes?: boolean;
+  unwrap?: boolean;
+  homepage?: string;
   excludeMatches: string[];
   runAt: string;
-  homepageURL: string;
-  license: string;
+  homepageURL?: string;
+  license?: string;
   require: string[];
+  antifeature?: string[];
+  compatible?: string[];
+  connect?: string[];
+  grant: string[];
+  downloadURL?: string;
+  supportURL?: string;
+  updateURL?: string;
+  tags?: string[];
+  options: {
+    check_for_updates: boolean;
+    inject_into: 'auto' | 'page' | 'content';
+    noframes: boolean;
+    run_at:
+      | 'document-start'
+      | 'document-body'
+      | 'document-end'
+      | 'document-idle';
+    tags: string[];
+    user_modified: number;
+    override: {
+      merge_exclude_matches: boolean;
+      merge_excludes: boolean;
+      merge_includes: boolean;
+      merge_matches: boolean;
+      merge_tags: boolean;
+      use_exclude_matches: string[];
+      use_excludes: string[];
+      use_includes: string[];
+      use_matches: string[];
+    };
+  };
 }
 
 /**
  * @see https://www.tampermonkey.net/documentation.php#api:GM_info
  */
 interface TamperInfoType {
-  container: {
+  container?: {
     // 5.3+ | Firefox only
     id: string;
-    name: string;
+    name?: string;
   };
   downloadMode: string;
-  isFirstPartyIsolation: boolean;
-  relaxedCsp: string;
+  isFirstPartyIsolation?: boolean;
+  relaxedCsp?: string;
   isIncognito: boolean;
   sandboxMode: 'js' | 'raw' | 'dom'; // 4.18+
   scriptHandler: string;
-  scriptMetaStr: string;
-  scriptUpdateURL: string;
+  scriptMetaStr: string | null;
+  scriptUpdateURL: string | null;
   scriptWillUpdate: boolean;
   userAgentData: {
-    brands: {
+    brands?: {
       brand: string;
       version: string;
     }[];
-    mobile: boolean;
-    platform: string;
-    architecture: string;
-    bitness: string;
+    mobile?: boolean;
+    platform?: string;
+    architecture?: string;
+    bitness?: string;
   }; // 4.19+
-  scriptSource: string;
+  scriptSource?: string;
 }
 
 interface TamperScriptType {
   antifeatures: { [antifeature: string]: { [locale: string]: string } };
-  author: string;
+  author: string | null;
   blockers: string[];
   connects: string[];
-  copyright: string;
-  deleted: number | undefined;
-  description_i18n: { [locale: string]: string };
+  copyright: string | null;
+  deleted?: number;
+  description_i18n: { [locale: string]: string } | null;
   description: string;
-  downloadURL: string;
+  downloadURL: string | null;
   excludes: string[];
-  fileURL: string;
+  fileURL: string | null;
   grant: string[];
-  header: string;
-  homepage: string;
-  icon: string;
-  icon64: string;
+  header: string | null;
+  homepage: string | null;
+  icon: string | null;
+  icon64: string | null;
   includes: string[];
   lastModified: number;
   matches: string[];
-  name_i18n: { [locale: string]: string };
+  name_i18n: { [locale: string]: string } | null;
   name: string;
-  namespace: string;
+  namespace: string | null;
   position: number;
   resources: GmInfoResourceType[];
-  supportURL: string;
-  system: boolean;
-  'run-at': string;
-  'run-in': string[]; // 5.3+
-  unwrap: boolean;
-  updateURL: string;
+  supportURL: string | null;
+  system?: boolean;
+  'run-at': string | null;
+  'run-in': string[] | null; // 5.3+
+  unwrap: boolean | null;
+  updateURL: string | null;
   version: string;
-  webRequest: GmWebRequestRule[];
+  webRequest: GmWebRequestRule[] | null;
   options: {
     check_for_updates: boolean;
-    comment: string;
+    comment: string | null;
     compatopts_for_requires: boolean;
     compat_wrappedjsobject: boolean;
     compat_metadata: boolean;
     compat_foreach: boolean;
-    compat_powerful_this: boolean;
-    sandbox: string;
-    noframes: boolean;
-    unwrap: boolean;
-    run_at: string;
-    run_in: string; // 5.3+
+    compat_powerful_this: boolean | null;
+    sandbox: string | null;
+    noframes: boolean | null;
+    unwrap: boolean | null;
+    run_at: string | null;
+    run_in: string | null; // 5.3+
     override: {
       use_includes: string[];
       orig_includes: string[];
@@ -140,19 +201,45 @@ interface TamperScriptType {
       orig_connects: string[];
       merge_connects: boolean;
       use_blockers: string[];
-      orig_run_at: string;
-      orig_run_in: string[]; // 5.3+
-      orig_noframes: boolean;
+      orig_run_at: string | null;
+      orig_run_in: string[] | null; // 5.3+
+      orig_noframes: boolean | null;
     };
   };
 }
 
-export interface GmInfoScriptType extends TamperScriptType, ViolentScriptType {}
-
-/**
- * @see https://www.tampermonkey.net/documentation.php#api:GM_info
- * @see https://violentmonkey.github.io/api/gm/#gm_info
- */
-export interface GmInfoType extends TamperInfoType, ViolentInfoType {
-  script: GmInfoScriptType;
+export interface GmGreasemonkeyResourceType {
+  name: string;
+  mimetype: string;
+  url: string;
 }
+export interface TampermonkeyInfo extends TamperInfoType {
+  scriptHandler: 'Tampermonkey';
+  version: string;
+  script: TamperScriptType;
+}
+export interface ViolentmonkeyInfo extends ViolentInfoType {
+  scriptHandler: 'Violentmonkey';
+  script: ViolentScriptType;
+}
+export interface GreasemonkeyInfo {
+  scriptHandler: 'Greasemonkey';
+  version: string;
+  scriptMetaStr: string;
+  script: {
+    uuid: string;
+    name: string;
+    namespace: string;
+    description: string;
+    version: string;
+    includes: string[];
+    excludes: string[];
+    matches: string[];
+    resources: Record<string, GmGreasemonkeyResourceType>;
+  };
+}
+export type GmInfoType =
+  | TampermonkeyInfo
+  | ViolentmonkeyInfo
+  | GreasemonkeyInfo;
+export type GmInfoScriptType = GmInfoType['script'];

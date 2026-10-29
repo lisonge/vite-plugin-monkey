@@ -4,7 +4,7 @@ export interface GmAddElementAttributes {
   class?: string;
   style?: string;
   textContent?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface GmAddElementType {

@@ -1,7 +1,8 @@
 node_modules
 dist
-!/playground/*/dist
-/playground/assets-base-url/dist/
+coverage/
+test-results/
+playwright-report/
 /.vscode/
 .eslintcache
 **/.vitepress/cache/

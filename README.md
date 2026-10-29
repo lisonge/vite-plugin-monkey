@@ -76,3 +76,13 @@ pnpm add -D vite-plugin-monkey
 ```
 
 Add `vite-plugin-monkey` as the last item in the Vite plugin list. See the [Getting Started guide](https://vite-plugin-monkey.pages.dev/guide/getting-started) for the basic configuration.
+
+## Development
+
+Run `pnpm install`, then `pnpm test` for Node tests or `pnpm playground` for
+manual userscript development. `pnpm test:browser` runs Playwright Test in real
+Chromium with separate development and production suites. Use `pnpm test:types`
+for type checks and `pnpm test:watch` while editing Node tests.
+
+See the [test architecture](./vite-plugin-monkey/test/README.md) and
+[playground guide](./playground/README.md) for focused commands and browser checks.

@@ -1,2 +1,2 @@
-// @ts-ignore isolatedModules
+export {};
 console.log('hello world');

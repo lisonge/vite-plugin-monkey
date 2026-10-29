@@ -4,9 +4,9 @@ import type {
   GmReponseEventListener,
 } from './_share.ts';
 
-export interface GmResponseTypeMap {
+export interface GmResponseTypeMap<Json = unknown> {
   text: string;
-  json: any;
+  json: Json;
   arraybuffer: ArrayBuffer;
   blob: Blob;
   document: Document;
@@ -15,7 +15,7 @@ export interface GmResponseTypeMap {
 
 export type GmResponseType = keyof GmResponseTypeMap;
 
-export interface GmResponseEventBase<R extends GmResponseType> {
+export interface GmResponseEventBase<R extends GmResponseType, Json = unknown> {
   responseHeaders: string;
   /**
    * 0 = XMLHttpRequest.UNSENT
@@ -29,7 +29,7 @@ export interface GmResponseEventBase<R extends GmResponseType> {
    * 4 = XMLHttpRequest.DONE
    */
   readyState: 0 | 1 | 2 | 3 | 4;
-  response: GmResponseTypeMap[R];
+  response: GmResponseTypeMap<Json>[R];
   responseText: string;
   responseXML: Document | null;
   status: number;
@@ -38,14 +38,16 @@ export interface GmResponseEventBase<R extends GmResponseType> {
 
 interface GmErrorEvent<
   R extends GmResponseType,
-> extends GmResponseEventBase<R> {
-  error: string;
+  Json = unknown,
+> extends GmResponseEventBase<R, Json> {
+  error?: string;
 }
 
 export interface GmResponseEvent<
   R extends GmResponseType,
   C = undefined,
-> extends GmResponseEventBase<R> {
+  Json = unknown,
+> extends GmResponseEventBase<R, Json> {
   finalUrl: string;
   context: C;
 }
@@ -53,18 +55,36 @@ export interface GmResponseEvent<
 export interface GmProgressResponseEvent<
   R extends GmResponseType,
   C = undefined,
+  Json = unknown,
 >
-  extends GmResponseEvent<R, C>, GmProgressEventBase {}
+  extends GmResponseEvent<R, C, Json>, GmProgressEventBase {}
+
+export interface GmRequestProxy {
+  type: 'direct' | 'http' | 'https' | 'socks' | 'socks4';
+  host: string;
+  port: number;
+  username?: string;
+  password?: string;
+  proxyDNS?: boolean;
+  failoverTimeout?: number;
+  proxyAuthorizationHeader?: string;
+  connectionIsolationKey?: string;
+}
 
 export interface GmXmlhttpRequestOption<
   R extends GmResponseType,
   C = undefined,
+  Json = unknown,
 > {
   method?: string;
-  url: string;
+  /** Blob/File URLs require Tampermonkey 5.4.6226+. */
+  url: string | URL | Blob | File;
   headers?: Record<string, string>;
 
-  data?: BodyInit;
+  data?: BodyInit | Record<string, unknown> | unknown[];
+
+  /** Tampermonkey 5.5.6233+, Firefox only. */
+  proxy?: GmRequestProxy;
 
   /**
    * @available tampermonkey
@@ -115,6 +135,22 @@ export interface GmXmlhttpRequestOption<
 
   anonymous?: boolean;
 
+  /** Greasemonkey / Violentmonkey: include credentials with the request. */
+  withCredentials?: boolean;
+
+  /** Violentmonkey 2.32+ / Greasemonkey: upload event handlers. */
+  upload?: Pick<
+    GmXmlhttpRequestOption<R, C, Json>,
+    | 'onabort'
+    | 'onerror'
+    | 'onload'
+    | 'onloadend'
+    | 'onloadstart'
+    | 'onprogress'
+    | 'onreadystatechange'
+    | 'ontimeout'
+  >;
+
   /**
    * @available tampermonkey
    */
@@ -124,24 +160,24 @@ export interface GmXmlhttpRequestOption<
 
   password?: string;
 
-  onabort?: () => void;
+  onabort?: GmReponseEventListener<GmResponseEvent<R, C, Json>>;
 
-  onerror?: GmReponseEventListener<GmErrorEvent<R>>;
+  onerror?: GmReponseEventListener<GmErrorEvent<R, Json>>;
 
   /**
    * @available violentmonkey
    */
-  onloadend?: GmReponseEventListener<GmResponseEvent<R, C>>;
+  onloadend?: GmReponseEventListener<GmResponseEvent<R, C, Json>>;
 
-  onloadstart?: GmReponseEventListener<GmResponseEvent<R, C>>;
+  onloadstart?: GmReponseEventListener<GmResponseEvent<R, C, Json>>;
 
-  onprogress?: GmReponseEventListener<GmProgressResponseEvent<R, C>>;
+  onprogress?: GmReponseEventListener<GmProgressResponseEvent<R, C, Json>>;
 
-  onreadystatechange?: GmReponseEventListener<GmResponseEvent<R, C>>;
+  onreadystatechange?: GmReponseEventListener<GmResponseEvent<R, C, Json>>;
 
-  ontimeout?: () => void;
+  ontimeout?: GmReponseEventListener<GmResponseEvent<R, C, Json>>;
 
-  onload?: GmReponseEventListener<GmResponseEvent<R, C>>;
+  onload?: GmReponseEventListener<GmResponseEvent<R, C, Json>>;
 }
 
 export interface GmXmlhttpRequestExtType {
@@ -152,19 +188,20 @@ export interface GmXmlhttpRequestExtType {
 }
 
 export interface GmXmlhttpRequestType extends GmXmlhttpRequestExtType {
-  <R extends GmResponseType = 'text', C = any>(
-    details: GmXmlhttpRequestOption<R, C>,
+  <R extends GmResponseType = 'text', C = undefined, Json = unknown>(
+    details: GmXmlhttpRequestOption<R, C, Json>,
   ): GmAbortHandle;
 }
 
 export interface GmAsyncXmlhttpRequestReturnType<
   R extends GmResponseType,
-  C = any,
+  C = undefined,
+  Json = unknown,
 >
-  extends GmAbortHandle, Promise<GmResponseEvent<R, C>> {}
+  extends GmAbortHandle, Promise<GmResponseEvent<R, C, Json>> {}
 
 export interface GmAsyncXmlhttpRequestType extends GmXmlhttpRequestExtType {
-  <R extends GmResponseType = 'text', C = any>(
-    details: GmXmlhttpRequestOption<R, C>,
-  ): GmAsyncXmlhttpRequestReturnType<R, C>;
+  <R extends GmResponseType = 'text', C = undefined, Json = unknown>(
+    details: GmXmlhttpRequestOption<R, C, Json>,
+  ): GmAsyncXmlhttpRequestReturnType<R, C, Json> | void;
 }

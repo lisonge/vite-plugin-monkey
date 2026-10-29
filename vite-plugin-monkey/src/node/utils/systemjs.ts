@@ -1,12 +1,7 @@
 import fs from 'node:fs/promises';
 import module from 'node:module';
-import type systemjsPkgT from 'systemjs/package.json';
-import { dataUrl } from './others.ts';
-import type { ModuleToUrlFc } from './types.ts';
 
 const _require = module.createRequire(import.meta.url);
-
-const systemjsPkg: typeof systemjsPkgT = _require(`systemjs/package.json`);
 
 const systemjsSubPaths = [
   'dist/system.min.js',
@@ -20,26 +15,14 @@ const systemjsAbsolutePaths = systemjsSubPaths.map((s) => {
   return _require.resolve(`systemjs/` + s);
 });
 
-export const getSystemjsTexts = async (): Promise<string[]> => {
-  return Promise.all(
-    systemjsAbsolutePaths
-      .map((s) =>
-        fs.readFile(s, 'utf-8').then((s) =>
-          s
-            .trim()
-            .replace(/^\/\*[\s\S]*?\*\//, '')
-            .replace(/\/\/.*map$/, '')
-            .trim(),
-        ),
-      )
-      .concat([Promise.resolve(customSystemInstanceCode)]),
-  );
-};
-
-export const getSystemjsRequireUrls = (fn: ModuleToUrlFc) => {
-  return systemjsSubPaths
-    .map((p) => {
-      return fn(systemjsPkg.version, systemjsPkg.name, p, p);
-    })
-    .concat([dataUrl(customSystemInstanceCode)]);
-};
+let source: Promise<string> | undefined;
+export const getSystemjsSource = (): Promise<string> =>
+  (source ??= Promise.all(
+    systemjsAbsolutePaths.map(async (path) =>
+      (await fs.readFile(path, 'utf-8'))
+        .trim()
+        .replace(/^\/\*[\s\S]*?\*\//, '')
+        .replace(/\/\/.*map$/, '')
+        .trim(),
+    ),
+  ).then((texts) => [...texts, customSystemInstanceCode].join('\n')));

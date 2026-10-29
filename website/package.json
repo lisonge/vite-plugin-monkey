@@ -5,9 +5,10 @@
   "scripts": {
     "type-check": "tsc",
     "dev": "vitepress dev .",
-    "check": "pnpm type-check && node --test .vitepress/markdown/mermaid.test.ts .vitepress/theme/language-preference.test.ts",
+    "check": "pnpm type-check && pnpm test",
     "build": "pnpm check && vitepress build .",
-    "preview": "vitepress preview ."
+    "preview": "vitepress preview .",
+    "test": "pnpm --dir .. test --project website"
   },
   "dependencies": {
     "mermaid": "catalog:"

@@ -27,6 +27,9 @@ jobs:
         run: pnpm -F create-monkey publish --no-git-checks
 
       - if: ${{ startsWith(github.ref_name, 'v') }}
-        uses: softprops/action-gh-release@v3
-        with:
-          body_path: ./vite-plugin-monkey/CHANGELOG.md
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create "$GITHUB_REF_NAME"
+          --title "$GITHUB_REF_NAME"
+          --notes-file ./vite-plugin-monkey/CHANGELOG.md

@@ -2,9 +2,7 @@
 
 ## 和其他插件一起使用 {#work-with-other-plugins}
 
-插件将通过 [generateBundle](https://rollupjs.org/plugin-development/#generatebundle) 重新构建你的代码
-
-请尽量确保插件的顺序是**最后一个**
+插件在 `generateBundle` 阶段将 Vite 输出的 chunk 转为用户脚本，使用直接函数包装或内部模块注册表，不再执行二次打包。请将 `monkey()` 放在修改输出 chunk 的插件之后。
 
 ## [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) {#csp}
 

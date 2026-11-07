@@ -39,11 +39,9 @@ catalog:
   prompts: ^2.4.2
   react: ^19.2.5
   react-dom: ^19.2.5
-  rollup: ^4.60.2
   sass-embedded: ^1.99.0
   simple-git-hooks: ^2.13.1
   solid-js: ^1.9.12
-  systemjs: ^6.15.1
   terser: ^5.46.1
   tsdown: ^0.21.10
   typescript: ^6.0.2

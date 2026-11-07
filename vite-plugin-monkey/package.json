@@ -51,8 +51,6 @@
     "magic-string": "catalog:",
     "mrmime": "catalog:",
     "picocolors": "catalog:",
-    "rollup": "catalog:",
-    "systemjs": "catalog:",
     "postcss": "catalog:",
     "postcss-value-parser": "catalog:"
   },

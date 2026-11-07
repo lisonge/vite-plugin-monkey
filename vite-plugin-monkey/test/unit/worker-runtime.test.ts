@@ -1,21 +1,26 @@
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import { test } from 'vitest';
-import { workerRuntimeModule } from '../../src/node/runtime/worker.ts';
+import {
+  workerBootstrap,
+  workerRuntimeModule,
+} from '../../src/node/workers/runtime.ts';
 
 test.each(['startup', 'resource'])(
   'empty %s errors cross both Worker bridge endpoints',
   async (mode) => {
-    const runtime = workerRuntimeModule('').replace(
-      'export function createWorker',
-      'function createWorker',
-    );
+    const runtime = workerRuntimeModule(
+      workerBootstrap(
+        `() => ({ register() {}, importModule() { throw ''; } })`,
+      ),
+    ).replace('export function createWorker', 'function createWorker');
     const bootstrap = vm.runInNewContext(runtime + '; source;');
     const self = Object.assign(new EventTarget(), { close() {} });
     vm.runInNewContext(bootstrap, {
       self,
       URL,
-      System: { import: () => Promise.reject('') },
+      Blob,
+      atob,
     });
     class Port {
       peer!: Port;
@@ -65,8 +70,8 @@ test.each(['startup', 'resource'])(
       GM_getResourceURL: () => Promise.reject(''),
     });
     const worker: Worker = createWorker({
-      entry: 'entry.js',
-      modules: {},
+      entry: 'entry',
+      modules: { entry: { source: '' } },
       assets:
         mode === 'resource'
           ? { asset: { resource: 'asset', mime: 'image/png' } }
@@ -88,18 +93,17 @@ test.each(['startup', 'resource'])(
 test.each([null, undefined, '', 'failure'])(
   'Worker startup reports thrown %s through its private port',
   async (error) => {
-    const bootstrap = vm.runInNewContext(
-      workerRuntimeModule('').replace(
-        'export function createWorker',
-        'function createWorker',
-      ) + '; source;',
+    const bootstrap = workerBootstrap(
+      `() => ({ register() {}, importModule() { throw error; } })`,
     );
     const reported = Promise.withResolvers<string>();
     const self = Object.assign(new EventTarget(), { close() {} });
     vm.runInNewContext(bootstrap, {
       self,
+      error,
       URL,
-      System: { import: () => Promise.reject(error) },
+      Blob,
+      atob,
     });
     self.dispatchEvent(
       Object.assign(new Event('message'), {
@@ -110,7 +114,11 @@ test.each([null, undefined, '', 'failure'])(
             },
           },
         ],
-        data: { modules: {}, assets: {}, entry: 'entry.js' },
+        data: {
+          entry: 'entry',
+          modules: { entry: { source: '' } },
+          assets: {},
+        },
       }),
     );
     assert.equal(await reported.promise, String(error));
@@ -137,7 +145,7 @@ test.each([null, undefined, ''])(
       postMessage() {}
     }
     const createWorker = vm.runInNewContext(
-      workerRuntimeModule('').replace(
+      workerRuntimeModule().replace(
         'export function createWorker',
         'function createWorker',
       ) + '; createWorker;',
@@ -151,6 +159,7 @@ test.each([null, undefined, ''])(
       },
     );
     const worker = createWorker({
+      entry: 'entry',
       modules: { entry: { resource: 'entry' } },
       assets: {},
     });
@@ -164,11 +173,8 @@ test.each([null, undefined, ''])(
 );
 
 test('Worker queues application messages until the parent acknowledges readiness', async () => {
-  const bootstrap: string = vm.runInNewContext(
-    workerRuntimeModule('').replace(
-      'export function createWorker',
-      'function createWorker',
-    ) + '; source;',
+  const bootstrap = workerBootstrap(
+    `() => ({ register() {}, importModule() { importing.resolve(); return initialized.promise; } })`,
   );
   const importing = Promise.withResolvers<void>();
   const initialized = Promise.withResolvers<void>();
@@ -184,14 +190,12 @@ test('Worker queues application messages until the parent acknowledges readiness
   };
   vm.runInNewContext(bootstrap, {
     self,
+    importing,
+    initialized,
     URL,
     MessageEvent,
-    System: {
-      import() {
-        importing.resolve();
-        return initialized.promise;
-      },
-    },
+    Blob,
+    atob,
   });
   const delivered: string[] = [];
   self.addEventListener('message', (event) => {
@@ -200,7 +204,7 @@ test('Worker queues application messages until the parent acknowledges readiness
   self.dispatchEvent(
     Object.assign(new Event('message'), {
       ports: [port],
-      data: { assets: {}, modules: {}, entry: 'entry.js' },
+      data: { assets: {}, entry: 'entry', modules: { entry: { source: '' } } },
     }),
   );
   await importing.promise;

@@ -4,7 +4,9 @@ import path from 'node:path';
 import { lookup } from 'mrmime';
 import type { Plugin, ResolvedConfig, Rolldown } from 'vite';
 import { createAssetMarker, rewriteAssetMarkers } from '../assets/markers.ts';
-import { createOutputModules } from '../utils/outputModules.ts';
+import { compileModules } from '../modules/compile.ts';
+import { identifierSource } from '../modules/names.ts';
+import { getSafeIdentifier } from '../utils/code.ts';
 
 export interface WorkerBuildAsset {
   source: string | Uint8Array;
@@ -12,9 +14,10 @@ export interface WorkerBuildAsset {
 }
 
 export interface WorkerBuildGraph {
-  /** System.register entry module, separate from the temporary Vite wrapper. */
+  registerName: string;
+  assetName: string;
+  /** Vite entry filename; carries graph metadata until main-bundle finalization. */
   entry: string;
-  wrapper: string;
   chunks: Record<string, string>;
   assets: Record<string, WorkerBuildAsset>;
 }
@@ -26,13 +29,14 @@ function rewriteWorkerAssets(
   pluginContext: Rolldown.PluginContext,
   code: string,
   assets: WorkerBuildGraph['assets'],
+  assetName: string,
 ) {
   return rewriteAssetMarkers(pluginContext, code, {
     marker,
     resolve(name) {
       if (!Object.hasOwn(assets, name))
         throw new Error(`Missing Worker asset: ${name}`);
-      return `globalThis.__MONKEY_WORKER_ASSET_URL__(${JSON.stringify(name)})`;
+      return `globalThis[${JSON.stringify(assetName)}](${JSON.stringify(name)})`;
     },
     newExpression(node) {
       if (
@@ -45,9 +49,6 @@ function rewriteWorkerAssets(
     },
   });
 }
-const modulePrefix = '\0monkey-worker/';
-const systemFilename = (filename: string) =>
-  filename.replace(/(?:\.[^./]+)?$/, '.system.js');
 
 /** Converts Vite's already transformed Worker graph without rebuilding sources. */
 async function createGraph(
@@ -80,61 +81,26 @@ async function createGraph(
     }
     assets[name] = asset;
   }
+  const reserved = chunks
+    .map((chunk) => identifierSource(chunk.code))
+    .join('\n');
+  const registerName = getSafeIdentifier('__monkeyRegister', reserved);
+  const assetName = getSafeIdentifier('__MONKEY_WORKER_ASSET_URL__', reserved);
   const modules = new Map(
     chunks.map((chunk) => [
       chunk.fileName,
-      rewriteWorkerAssets(pluginContext, chunk.code, assets),
+      rewriteWorkerAssets(pluginContext, chunk.code, assets, assetName),
     ]),
   );
-  const outputModules = createOutputModules(modulePrefix, modules);
-  const { rollup } = await import('rollup');
-  const bundle = await rollup({
-    input: modulePrefix + entries[0].fileName,
-    onwarn(warning, warn) {
-      if (warning.code !== 'CIRCULAR_DEPENDENCY') warn(warning);
-    },
-    plugins: [
-      {
-        name: 'monkey:worker-output',
-        resolveId(source, importer) {
-          const resolved = outputModules.resolveId(source, importer);
-          if (resolved) return resolved;
-          throw new Error(
-            `Unresolved Worker module: ${source}${importer ? ` from ${importer.slice(modulePrefix.length)}` : ''}`,
-          );
-        },
-        load(id) {
-          return outputModules.get(id);
-        },
-      },
-    ],
-  });
-  try {
-    const { output } = await bundle.generate({
-      format: 'system',
-      preserveModules: true,
-      entryFileNames(chunk) {
-        assert.ok(chunk.facadeModuleId);
-        assert.ok(chunk.facadeModuleId.startsWith(modulePrefix));
-        return systemFilename(chunk.facadeModuleId.slice(modulePrefix.length));
-      },
-      sourcemap: false,
-      // Vite has already applied the user's chosen minifier to the module code.
-      compact: true,
-    });
-    return {
-      entry: systemFilename(entries[0].fileName),
-      wrapper: entries[0].fileName,
-      chunks: Object.fromEntries(
-        output
-          .filter((item) => item.type === 'chunk')
-          .map((item) => [item.fileName, item.code]),
-      ),
-      assets,
-    };
-  } finally {
-    await bundle.close();
-  }
+  return {
+    registerName,
+    assetName,
+    entry: entries[0].fileName,
+    chunks: await compileModules(modules, {
+      register: `globalThis[${JSON.stringify(registerName)}]`,
+    }),
+    assets,
+  };
 }
 
 /** Install through worker.plugins, after user Worker plugins. */
@@ -253,7 +219,7 @@ export function createWorkerBuildPlugin(
           }
         }
         const graph = await createGraph(this, rawBundle, publicAssets);
-        const entry = rawBundle[graph.wrapper];
+        const entry = rawBundle[graph.entry];
         assert.ok(entry?.type === 'chunk');
         entry.code = await onGraph(graph);
         entry.imports = [];
@@ -264,6 +230,9 @@ export function createWorkerBuildPlugin(
             delete rawBundle[filename];
         }
         for (const [fileName, source] of Object.entries(graph.chunks)) {
+          // The entry transports the graph through Vite. Finalization replaces
+          // it with registered code for resource mode, or removes it for inline mode.
+          if (fileName === graph.entry) continue;
           this.emitFile({ type: 'asset', fileName, source });
         }
         for (const [fileName, asset] of Object.entries(publicAssets)) {

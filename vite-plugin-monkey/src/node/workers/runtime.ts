@@ -1,7 +1,11 @@
+import { createModuleRegistry } from '../modules/runtime.ts';
+
 // Both sides use a private MessagePort. Application messages stay on Worker.
-export function workerRuntimeModule(systemjs: string): string {
-  const bootstrap = `${systemjs}
-const base = 'https://vite-plugin-monkey.invalid/worker/';
+export function workerBootstrap(
+  registrySource = createModuleRegistry.toString(),
+): string {
+  return `(function () {
+const createModuleRegistry = ${registrySource};
 const queued = [];
 let channel;
 let sequence = 0;
@@ -45,22 +49,21 @@ async function initialize(event) {
       const bytes = await read(file);
       assetUrls.set(name, URL.createObjectURL(new Blob([bytes], { type: file.mime })));
     }));
-    self.__MONKEY_WORKER_ASSET_URL__ = (name) => {
+    self[definition.assetName] = (name) => {
       const url = assetUrls.get(name);
       if (!url) throw new Error('[monkey] Unknown Worker asset: ' + name);
       return url;
     };
-    const modules = new Map(Object.entries(definition.modules).map(([name, file]) => [new URL(name, base).href, file]));
-    const instantiate = System.instantiate;
-    System.instantiate = async function(id, parent, meta) {
-      const file = modules.get(id);
+    const registry = createModuleRegistry(async (id) => {
+      const file = definition.modules[id];
       if (!file) throw new Error('[monkey] Unknown Worker module: ' + id);
       const bytes = await read(file);
       const url = URL.createObjectURL(new Blob([bytes], { type: 'text/javascript' }));
-      try { return await instantiate.call(this, url, parent, meta); }
+      try { importScripts(url); }
       finally { URL.revokeObjectURL(url); }
-    };
-    await System.import(new URL(definition.entry, base).href);
+    });
+    globalThis[definition.registerName] = registry.register;
+    await registry.importModule(definition.entry);
     channel.postMessage({ ready: true });
     // Worker errors and MessagePort messages use different task sources.
     // Wait until the parent has changed state before replaying application code.
@@ -76,7 +79,11 @@ async function initialize(event) {
     channel.postMessage({ fatal: String(error?.stack ?? error) });
   }
 }
+})();
 `;
+}
+
+export function workerRuntimeModule(bootstrap = workerBootstrap()): string {
   return `
 const source = ${JSON.stringify(bootstrap)};
 export function createWorker(definition, options) {

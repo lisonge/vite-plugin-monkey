@@ -1,5 +1,5 @@
 import type { Plugin, UserConfig } from 'vite';
-import type { MonkeyContext } from '../../utils/types.ts';
+import type { MonkeyContext } from '../../config/context.ts';
 import { assetMarker } from '../../assets/resolve.ts';
 
 export const configFactory = (
@@ -22,19 +22,17 @@ export const configFactory = (
           }
         }
         return {
-          ...(context.config.assets.publicPath
-            ? ({
-                experimental: {
-                  renderBuiltUrl(filename, context) {
-                    if (context.type === 'asset') {
-                      return assetMarker(filename);
-                    }
-                    const existing = userConfig.experimental?.renderBuiltUrl;
-                    return existing?.(filename, context);
-                  },
-                },
-              } satisfies UserConfig)
-            : {}),
+          ...({
+            experimental: {
+              renderBuiltUrl(filename, context) {
+                if (context.type === 'asset') {
+                  return assetMarker(filename);
+                }
+                const existing = userConfig.experimental?.renderBuiltUrl;
+                return existing?.(filename, context);
+              },
+            },
+          } satisfies UserConfig),
           build: {
             assetsInlineLimit: context.config.assets.publicPath
               ? 0

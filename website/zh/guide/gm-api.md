@@ -7,7 +7,7 @@ const value = GM_getValue('count', 0);
 GM_setValue('count', value + 1);
 ```
 
-`$` 模块适用于开发模式和生产。monkeyWindow 对应用户脚本沙箱，unsafeWindow 对应宿主页面。在 `tsconfig.json` 中配置 `"types": ["vite/client", "vite-plugin-monkey/client"]` 加载 `$` 的声明，由插件负责运行时解析。`vite-plugin-monkey/client` 仅用于类型声明，不能作为运行时导入。GM API 不再挂载到页面 window。
+`$` 模块适用于开发模式和生产。monkeyWindow 对应用户脚本沙箱，unsafeWindow 对应宿主页面。在 `tsconfig.json` 中配置 `"types": ["vite/client", "vite-plugin-monkey/client"]` 加载 `$` 的声明，`$` 导入由插件解析。`vite-plugin-monkey/client` 仅用于类型声明，不能作为运行时导入。GM API 不再挂载到页面 window。
 
 省略 userscript.grant 时生产自动检测、开发开放全部支持的权限；动态调用使用 userscript.grant 数组指定完整列表。none 输出 @grant none，[] 不输出 grant。
 
@@ -17,6 +17,10 @@ import { gmAutoImportPreset } from 'vite-plugin-monkey';
 
 AutoImport({ imports: [gmAutoImportPreset({ manager: 'tampermonkey' })] });
 ```
+
+开发时，`$` 加载通过用户脚本沙箱桥接读取 API 的客户端。生产时，`$` 解析为直接引用管理器 GM 全局变量的虚拟模块，未使用的导出可在打包时删除。生产 Worker 不能导入 `$`，请通过消息向父用户脚本请求数据。
+
+构建库时保留 `$` 为外部依赖，由使用该库的应用插件解析。详见[构建使用 GM API 的库](./build-library)。
 
 ## 脚本管理器差异
 

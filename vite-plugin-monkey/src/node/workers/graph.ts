@@ -5,6 +5,8 @@ export interface WorkerFile {
   resource?: string;
 }
 export interface WorkerDefinition {
+  registerName: string;
+  assetName: string;
   entry: string;
   modules: Record<string, WorkerFile>;
   assets: Record<string, WorkerFile & { mime: string }>;

@@ -56,7 +56,7 @@ pnpm add -D vite-plugin-monkey
 ```mermaid
 graph LR;
     A(your code) -- "others plugins/vite build" -->B(esm)
-    B -- "vite-plugin-monkey/vite build library mode" --> C{has DynamicImport}
-    C -- yes --> D(systemjs)
-    C -- no --> E(iife)
+    B -- "vite-plugin-monkey" --> C{One closed chunk?}
+    C -- yes --> D(Direct function wrapper)
+    C -- no --> E(Module registry)
 ```

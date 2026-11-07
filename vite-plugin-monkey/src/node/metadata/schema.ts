@@ -1,5 +1,5 @@
 import type { Userscript } from '../config/types.ts';
-import type { MonkeyContext } from '../utils/types.ts';
+import type { MonkeyContext } from '../config/context.ts';
 import type { AntifeatureType } from './tampermonkey.ts';
 import { resolveGrants } from './grants.ts';
 

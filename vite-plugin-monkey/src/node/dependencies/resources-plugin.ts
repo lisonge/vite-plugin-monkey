@@ -1,100 +1,32 @@
 import MagicString from 'magic-string';
 import { lookup } from 'mrmime';
 import type { Plugin, ResolvedConfig } from 'vite';
-import {
-  getCssModuleCode,
-  getProgramImportNodes,
-  getSafeIdentifier,
-  getUpperCaseName,
-} from '../utils/others.ts';
+import { getProgramImportNodes } from '../utils/imports.ts';
+import { getSafeIdentifier, getUpperCaseName } from '../utils/code.ts';
 import { getModuleRealInfo } from '../utils/pkg.ts';
-import type { MonkeyContext, PackageContext } from '../utils/types.ts';
+import type { MonkeyContext } from '../config/context.ts';
+import type { PackageContext } from '../config/types.ts';
 import { registerResource } from '../assets/resources.ts';
 
-const loaderModuleCode = (
-  inject: import('../utils/types.ts').NormalizedConfig['css']['inject'],
-) => `
-import { GM_getResourceText, GM_getResourceURL } from '$';
-${getCssModuleCode(inject)}
-export const cssLoader = (name) => { const css = GM_getResourceText(name); _css(css); return css; };
-export const jsonLoader = (name) => JSON.parse(GM_getResourceText(name));
-export const rawLoader = (name) => GM_getResourceText(name);
-export const urlLoader = (name, type) => {
-  return GM_getResourceURL(name, false).replace(
-    /^data:application;base64,/,
-    'data:' + type + ';base64,',
-  );
-};
-`;
-const loaderModId = 'virtual:monkey-loader';
-const virtualloaderModId = '\0' + loaderModId;
-
-interface ResourceModuleOptions {
-  imports: string;
-  expression: string;
-  dynamic: boolean;
-  awaitResult?: boolean;
-}
-const resourceModuleCode = ({
-  imports,
-  expression,
-  dynamic,
-  awaitResult = false,
-}: ResourceModuleOptions): string =>
-  [
-    imports,
-    dynamic
-      ? `let cache; export const _ = () => cache ??= Promise.resolve().then(() => ${expression}).then(value => ({default: value}))`
-      : `export const _ = ${awaitResult ? 'await ' : ''}${expression}`,
-    'export default _',
-  ].join(';');
-
-const getExportModuleCode = (
-  name: string,
-  dynamic: boolean,
-  params: unknown[],
-): string => {
-  return resourceModuleCode({
-    imports: `import {${name}} from '${loaderModId}'`,
-    expression: `${name}(${params.map((v) => JSON.stringify(v)).join(',')})`,
-    dynamic,
-  });
-};
-
-const resPrefix = 'virtual:monkey-resource-';
-const resDynamicPrefix = 'virtual:monkey-resource-dynamic-';
-const isRawResId = (id: string): boolean => {
-  return id.startsWith(resPrefix);
-};
-const getValueResId = (value: string, dynamic = false): string => {
-  return (dynamic ? resDynamicPrefix : resPrefix) + encodeURIComponent(value);
-};
-const getVirtualResId = (id: string): string => {
-  // append end \0 or encodeURIComponent to prevent handler that other plugin, such as css plugin
-  return '\0' + id + '\0';
-};
-
-const getResNameTuple = (
-  id: string,
-): [name: string, dynamic: boolean] | undefined => {
-  if (id.startsWith('\0') && id.endsWith('\0')) {
-    if (id.startsWith(resDynamicPrefix, 1)) {
-      return [
-        decodeURIComponent(id.slice(resDynamicPrefix.length + 1, -1)),
-        true,
-      ];
-    } else if (id.startsWith(resPrefix, 1)) {
-      return [decodeURIComponent(id.slice(resPrefix.length + 1, -1)), false];
-    }
-  }
-};
+import {
+  loaderModuleCode,
+  loaderModId,
+  virtualloaderModId,
+  resourceModuleCode,
+  getExportModuleCode,
+  isRawResId,
+  getValueResId,
+  getVirtualResId,
+  getResNameTuple,
+} from './resource-modules.ts';
 
 export const externalResourceFactory = (
   getContext: (root?: string) => Promise<MonkeyContext>,
 ): Plugin => {
   let context: MonkeyContext;
   let viteConfig: ResolvedConfig;
-  const resourceRecord: Record<
+  // Keep resolved entries across watch builds; emit only dependencies in the current graph.
+  const resourceCache: Record<
     string,
     { resourceName: string; resourceUrl: string }
   > = {};
@@ -172,7 +104,7 @@ export const externalResourceFactory = (
         typeof resOption.url === 'string'
           ? resOption.url
           : await resOption.url(await getPackage());
-      resourceRecord[importName] = {
+      resourceCache[importName] = {
         resourceName,
         resourceUrl,
       };
@@ -227,7 +159,7 @@ export const externalResourceFactory = (
         }
       });
       const collectResource: Record<string, string> = Object.create(null);
-      Object.entries(resourceRecord).forEach(
+      Object.entries(resourceCache).forEach(
         ([importName, { resourceName, resourceUrl }]) => {
           if (usedModIdSet.has(importName)) {
             registerResource(

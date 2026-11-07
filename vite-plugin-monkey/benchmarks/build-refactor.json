@@ -1,0 +1,1066 @@
+{
+  "baselineRevision": "a7d56ae2b58fbb9073edfc1ae893547c9be197a5",
+  "baselineLabel": "Working tree snapshot before the build/state/resource/dev refactor (after Rollup/SystemJS removal)",
+  "date": "2026-11-06T13:34:22.144Z",
+  "environment": {
+    "node": "v26.13.0",
+    "vite": "8.3.0",
+    "rolldown": "1.2.7",
+    "platform": "win32",
+    "arch": "x64"
+  },
+  "method": "Same process and fixture root; two warmups per case, nine samples, alternating implementation order; build.write=false. Gzip totals compress each output file separately. Not a startup/runtime benchmark.",
+  "scope": "Worker and main-thread dynamic-import fixtures comparing the supplied baseline source with the current working tree.",
+  "limitations": [
+    "The adapter depends on the helper protocol emitted by Vite moduleRunnerTransform.",
+    "Emitted chunks must have explicit exports and statically resolvable imports; remaining export-star or computed imports are rejected.",
+    "Source metrics count all src/node TypeScript files, including unchanged code, not third-party implementation size.",
+    "Existing contracts and targeted tests are not an exhaustive ECMAScript module conformance suite."
+  ],
+  "source": {
+    "baseline": {
+      "sourceHash": "e11265a9bf9de9d8a98a38be2718f88f45edf376a8b6f19a748b132b30d0383c",
+      "files": [
+        {
+          "name": "src/node/assets/markers.ts",
+          "bytes": 2693,
+          "nonblankLines": 79
+        },
+        {
+          "name": "src/node/assets/resolve.ts",
+          "bytes": 2822,
+          "nonblankLines": 86
+        },
+        {
+          "name": "src/node/assets/resources.ts",
+          "bytes": 546,
+          "nonblankLines": 16
+        },
+        {
+          "name": "src/node/auto-import.ts",
+          "bytes": 603,
+          "nonblankLines": 25
+        },
+        {
+          "name": "src/node/config/context.ts",
+          "bytes": 492,
+          "nonblankLines": 18
+        },
+        {
+          "name": "src/node/config/resolve.ts",
+          "bytes": 2613,
+          "nonblankLines": 76
+        },
+        {
+          "name": "src/node/config/types.ts",
+          "bytes": 1650,
+          "nonblankLines": 66
+        },
+        {
+          "name": "src/node/config/validate.ts",
+          "bytes": 4595,
+          "nonblankLines": 116
+        },
+        {
+          "name": "src/node/dependencies/globals.ts",
+          "bytes": 1921,
+          "nonblankLines": 61
+        },
+        {
+          "name": "src/node/dependencies/resources.ts",
+          "bytes": 8065,
+          "nonblankLines": 239
+        },
+        {
+          "name": "src/node/index.ts",
+          "bytes": 1460,
+          "nonblankLines": 45
+        },
+        {
+          "name": "src/node/metadata/grants.ts",
+          "bytes": 558,
+          "nonblankLines": 17
+        },
+        {
+          "name": "src/node/metadata/greasemonkey.ts",
+          "bytes": 1444,
+          "nonblankLines": 54
+        },
+        {
+          "name": "src/node/metadata/index.ts",
+          "bytes": 4032,
+          "nonblankLines": 147
+        },
+        {
+          "name": "src/node/metadata/schema.ts",
+          "bytes": 6010,
+          "nonblankLines": 189
+        },
+        {
+          "name": "src/node/metadata/tampermonkey.ts",
+          "bytes": 4078,
+          "nonblankLines": 157
+        },
+        {
+          "name": "src/node/metadata/violentmonkey.ts",
+          "bytes": 2918,
+          "nonblankLines": 94
+        },
+        {
+          "name": "src/node/modules/bundle.ts",
+          "bytes": 934,
+          "nonblankLines": 26
+        },
+        {
+          "name": "src/node/modules/compile.ts",
+          "bytes": 5037,
+          "nonblankLines": 141
+        },
+        {
+          "name": "src/node/modules/runtime.ts",
+          "bytes": 3905,
+          "nonblankLines": 122
+        },
+        {
+          "name": "src/node/npm-cdn.ts",
+          "bytes": 554,
+          "nonblankLines": 17
+        },
+        {
+          "name": "src/node/permissions/bindings.ts",
+          "bytes": 5440,
+          "nonblankLines": 159
+        },
+        {
+          "name": "src/node/permissions/detect.ts",
+          "bytes": 4112,
+          "nonblankLines": 126
+        },
+        {
+          "name": "src/node/permissions/names.ts",
+          "bytes": 1592,
+          "nonblankLines": 72
+        },
+        {
+          "name": "src/node/runtime/templates.ts",
+          "bytes": 3860,
+          "nonblankLines": 146
+        },
+        {
+          "name": "src/node/runtime/worker.ts",
+          "bytes": 5870,
+          "nonblankLines": 140
+        },
+        {
+          "name": "src/node/script-data-url.ts",
+          "bytes": 1142,
+          "nonblankLines": 33
+        },
+        {
+          "name": "src/node/types.ts",
+          "bytes": 40,
+          "nonblankLines": 1
+        },
+        {
+          "name": "src/node/utils/others.ts",
+          "bytes": 5290,
+          "nonblankLines": 182
+        },
+        {
+          "name": "src/node/utils/outputModules.ts",
+          "bytes": 1092,
+          "nonblankLines": 33
+        },
+        {
+          "name": "src/node/utils/pkg.ts",
+          "bytes": 4243,
+          "nonblankLines": 149
+        },
+        {
+          "name": "src/node/utils/topLevelAwait.ts",
+          "bytes": 6664,
+          "nonblankLines": 182
+        },
+        {
+          "name": "src/node/utils/types.ts",
+          "bytes": 1126,
+          "nonblankLines": 36
+        },
+        {
+          "name": "src/node/vite/build/buildBundle.ts",
+          "bytes": 11116,
+          "nonblankLines": 315
+        },
+        {
+          "name": "src/node/vite/build/config.ts",
+          "bytes": 2484,
+          "nonblankLines": 70
+        },
+        {
+          "name": "src/node/vite/build/css.ts",
+          "bytes": 5247,
+          "nonblankLines": 158
+        },
+        {
+          "name": "src/node/vite/build/redirectClient.ts",
+          "bytes": 1191,
+          "nonblankLines": 35
+        },
+        {
+          "name": "src/node/vite/build/removePreload.ts",
+          "bytes": 717,
+          "nonblankLines": 25
+        },
+        {
+          "name": "src/node/vite/dev/fixAssetUrl.ts",
+          "bytes": 2183,
+          "nonblankLines": 62
+        },
+        {
+          "name": "src/node/vite/dev/fixClient.ts",
+          "bytes": 550,
+          "nonblankLines": 17
+        },
+        {
+          "name": "src/node/vite/dev/fixCssUrl.ts",
+          "bytes": 3498,
+          "nonblankLines": 91
+        },
+        {
+          "name": "src/node/vite/dev/fixWorker.ts",
+          "bytes": 1144,
+          "nonblankLines": 37
+        },
+        {
+          "name": "src/node/vite/dev/server.ts",
+          "bytes": 6718,
+          "nonblankLines": 182
+        },
+        {
+          "name": "src/node/vite/dev/virtualHtml.ts",
+          "bytes": 971,
+          "nonblankLines": 31
+        },
+        {
+          "name": "src/node/vite/index.ts",
+          "bytes": 1373,
+          "nonblankLines": 36
+        },
+        {
+          "name": "src/node/vite/shared/preview.ts",
+          "bytes": 1531,
+          "nonblankLines": 47
+        },
+        {
+          "name": "src/node/vite/shared/style.ts",
+          "bytes": 1503,
+          "nonblankLines": 50
+        },
+        {
+          "name": "src/node/workers/build.ts",
+          "bytes": 7711,
+          "nonblankLines": 226
+        },
+        {
+          "name": "src/node/workers/graph.ts",
+          "bytes": 2016,
+          "nonblankLines": 56
+        },
+        {
+          "name": "src/node/workers/plugin.ts",
+          "bytes": 7104,
+          "nonblankLines": 203
+        }
+      ],
+      "nonblankLines": 4691
+    },
+    "prototype": {
+      "sourceHash": "2bd10a8220de86f1d2eb3ea048d002623bf09f965bf0bf6cfe865f5d24e7566a",
+      "files": [
+        {
+          "name": "src/node/assets/markers.ts",
+          "bytes": 2693,
+          "nonblankLines": 79
+        },
+        {
+          "name": "src/node/assets/resolve.ts",
+          "bytes": 2825,
+          "nonblankLines": 86
+        },
+        {
+          "name": "src/node/assets/resources.ts",
+          "bytes": 546,
+          "nonblankLines": 16
+        },
+        {
+          "name": "src/node/auto-import.ts",
+          "bytes": 603,
+          "nonblankLines": 25
+        },
+        {
+          "name": "src/node/build/emit.ts",
+          "bytes": 1556,
+          "nonblankLines": 49
+        },
+        {
+          "name": "src/node/build/iife.ts",
+          "bytes": 3147,
+          "nonblankLines": 103
+        },
+        {
+          "name": "src/node/build/outputModules.ts",
+          "bytes": 1092,
+          "nonblankLines": 33
+        },
+        {
+          "name": "src/node/build/prepare.ts",
+          "bytes": 3480,
+          "nonblankLines": 107
+        },
+        {
+          "name": "src/node/build/registry.ts",
+          "bytes": 765,
+          "nonblankLines": 23
+        },
+        {
+          "name": "src/node/build/state.ts",
+          "bytes": 231,
+          "nonblankLines": 8
+        },
+        {
+          "name": "src/node/build/topLevelAwait.ts",
+          "bytes": 6664,
+          "nonblankLines": 182
+        },
+        {
+          "name": "src/node/config/context.ts",
+          "bytes": 504,
+          "nonblankLines": 15
+        },
+        {
+          "name": "src/node/config/resolve.ts",
+          "bytes": 2643,
+          "nonblankLines": 77
+        },
+        {
+          "name": "src/node/config/resolved.ts",
+          "bytes": 609,
+          "nonblankLines": 20
+        },
+        {
+          "name": "src/node/config/types.ts",
+          "bytes": 1650,
+          "nonblankLines": 66
+        },
+        {
+          "name": "src/node/config/validate.ts",
+          "bytes": 4595,
+          "nonblankLines": 116
+        },
+        {
+          "name": "src/node/dependencies/global-modules.ts",
+          "bytes": 1073,
+          "nonblankLines": 34
+        },
+        {
+          "name": "src/node/dependencies/globals.ts",
+          "bytes": 1052,
+          "nonblankLines": 36
+        },
+        {
+          "name": "src/node/dependencies/resource-modules.ts",
+          "bytes": 2577,
+          "nonblankLines": 74
+        },
+        {
+          "name": "src/node/dependencies/resources.ts",
+          "bytes": 5965,
+          "nonblankLines": 175
+        },
+        {
+          "name": "src/node/dev/bridge.ts",
+          "bytes": 811,
+          "nonblankLines": 25
+        },
+        {
+          "name": "src/node/dev/html.ts",
+          "bytes": 686,
+          "nonblankLines": 23
+        },
+        {
+          "name": "src/node/dev/paths.ts",
+          "bytes": 363,
+          "nonblankLines": 7
+        },
+        {
+          "name": "src/node/dev/routes.ts",
+          "bytes": 2400,
+          "nonblankLines": 69
+        },
+        {
+          "name": "src/node/dev/scripts.ts",
+          "bytes": 1635,
+          "nonblankLines": 53
+        },
+        {
+          "name": "src/node/dev/urls.ts",
+          "bytes": 197,
+          "nonblankLines": 9
+        },
+        {
+          "name": "src/node/index.ts",
+          "bytes": 1539,
+          "nonblankLines": 47
+        },
+        {
+          "name": "src/node/metadata/grants.ts",
+          "bytes": 558,
+          "nonblankLines": 17
+        },
+        {
+          "name": "src/node/metadata/greasemonkey.ts",
+          "bytes": 1437,
+          "nonblankLines": 54
+        },
+        {
+          "name": "src/node/metadata/index.ts",
+          "bytes": 4069,
+          "nonblankLines": 148
+        },
+        {
+          "name": "src/node/metadata/schema.ts",
+          "bytes": 6013,
+          "nonblankLines": 189
+        },
+        {
+          "name": "src/node/metadata/tampermonkey.ts",
+          "bytes": 4071,
+          "nonblankLines": 157
+        },
+        {
+          "name": "src/node/metadata/types.ts",
+          "bytes": 100,
+          "nonblankLines": 2
+        },
+        {
+          "name": "src/node/metadata/violentmonkey.ts",
+          "bytes": 2911,
+          "nonblankLines": 94
+        },
+        {
+          "name": "src/node/modules/bundle.ts",
+          "bytes": 1069,
+          "nonblankLines": 28
+        },
+        {
+          "name": "src/node/modules/compile.ts",
+          "bytes": 5037,
+          "nonblankLines": 141
+        },
+        {
+          "name": "src/node/modules/runtime.ts",
+          "bytes": 3905,
+          "nonblankLines": 122
+        },
+        {
+          "name": "src/node/npm-cdn.ts",
+          "bytes": 554,
+          "nonblankLines": 17
+        },
+        {
+          "name": "src/node/permissions/bindings.ts",
+          "bytes": 5440,
+          "nonblankLines": 159
+        },
+        {
+          "name": "src/node/permissions/detect.ts",
+          "bytes": 4112,
+          "nonblankLines": 126
+        },
+        {
+          "name": "src/node/permissions/names.ts",
+          "bytes": 1592,
+          "nonblankLines": 72
+        },
+        {
+          "name": "src/node/runtime/css.ts",
+          "bytes": 963,
+          "nonblankLines": 33
+        },
+        {
+          "name": "src/node/runtime/serialize.ts",
+          "bytes": 558,
+          "nonblankLines": 18
+        },
+        {
+          "name": "src/node/runtime/templates.ts",
+          "bytes": 3856,
+          "nonblankLines": 146
+        },
+        {
+          "name": "src/node/runtime/worker.ts",
+          "bytes": 5870,
+          "nonblankLines": 140
+        },
+        {
+          "name": "src/node/script-data-url.ts",
+          "bytes": 1147,
+          "nonblankLines": 33
+        },
+        {
+          "name": "src/node/types.ts",
+          "bytes": 40,
+          "nonblankLines": 1
+        },
+        {
+          "name": "src/node/utils/code.ts",
+          "bytes": 838,
+          "nonblankLines": 34
+        },
+        {
+          "name": "src/node/utils/files.ts",
+          "bytes": 664,
+          "nonblankLines": 25
+        },
+        {
+          "name": "src/node/utils/imports.ts",
+          "bytes": 797,
+          "nonblankLines": 25
+        },
+        {
+          "name": "src/node/utils/pkg.ts",
+          "bytes": 4423,
+          "nonblankLines": 154
+        },
+        {
+          "name": "src/node/vite/build/buildBundle.ts",
+          "bytes": 1541,
+          "nonblankLines": 47
+        },
+        {
+          "name": "src/node/vite/build/config.ts",
+          "bytes": 2487,
+          "nonblankLines": 70
+        },
+        {
+          "name": "src/node/vite/build/css.ts",
+          "bytes": 5231,
+          "nonblankLines": 154
+        },
+        {
+          "name": "src/node/vite/build/redirectClient.ts",
+          "bytes": 1191,
+          "nonblankLines": 35
+        },
+        {
+          "name": "src/node/vite/build/removePreload.ts",
+          "bytes": 717,
+          "nonblankLines": 25
+        },
+        {
+          "name": "src/node/vite/dev/fixAssetUrl.ts",
+          "bytes": 2183,
+          "nonblankLines": 62
+        },
+        {
+          "name": "src/node/vite/dev/fixClient.ts",
+          "bytes": 550,
+          "nonblankLines": 17
+        },
+        {
+          "name": "src/node/vite/dev/fixCssUrl.ts",
+          "bytes": 3497,
+          "nonblankLines": 91
+        },
+        {
+          "name": "src/node/vite/dev/fixWorker.ts",
+          "bytes": 1144,
+          "nonblankLines": 37
+        },
+        {
+          "name": "src/node/vite/dev/server.ts",
+          "bytes": 1808,
+          "nonblankLines": 56
+        },
+        {
+          "name": "src/node/vite/dev/virtualHtml.ts",
+          "bytes": 978,
+          "nonblankLines": 31
+        },
+        {
+          "name": "src/node/vite/index.ts",
+          "bytes": 1510,
+          "nonblankLines": 42
+        },
+        {
+          "name": "src/node/vite/shared/preview.ts",
+          "bytes": 1530,
+          "nonblankLines": 47
+        },
+        {
+          "name": "src/node/vite/shared/style.ts",
+          "bytes": 1494,
+          "nonblankLines": 50
+        },
+        {
+          "name": "src/node/vite/types.ts",
+          "bytes": 197,
+          "nonblankLines": 5
+        },
+        {
+          "name": "src/node/workers/build.ts",
+          "bytes": 7711,
+          "nonblankLines": 226
+        },
+        {
+          "name": "src/node/workers/finalize.ts",
+          "bytes": 4936,
+          "nonblankLines": 137
+        },
+        {
+          "name": "src/node/workers/graph.ts",
+          "bytes": 2016,
+          "nonblankLines": 56
+        },
+        {
+          "name": "src/node/workers/plugin.ts",
+          "bytes": 2256,
+          "nonblankLines": 70
+        }
+      ],
+      "nonblankLines": 4750
+    }
+  },
+  "results": [
+    {
+      "fixture": "minimal",
+      "mode": "inline",
+      "minify": false,
+      "sizes": {
+        "baseline": {
+          "outputHash": "4b605f2b6c9d45a94bf2fcbde6585d9b4f1878de278ad42ac7f1e8bbf2deb83d",
+          "scriptBytes": 10108,
+          "totalBytes": 10108,
+          "totalGzipBytes": 3303,
+          "files": 1
+        },
+        "prototype": {
+          "outputHash": "4b605f2b6c9d45a94bf2fcbde6585d9b4f1878de278ad42ac7f1e8bbf2deb83d",
+          "scriptBytes": 10108,
+          "totalBytes": 10108,
+          "totalGzipBytes": 3303,
+          "files": 1
+        }
+      },
+      "timing": {
+        "baseline": {
+          "medianMs": 36.53200000000015,
+          "minMs": 34.560900000000174,
+          "maxMs": 41.2817,
+          "samplesMs": [
+            41.2817, 38.203899999999976, 38.78970000000004, 35.92599999999993,
+            37.93700000000001, 36.209100000000035, 36.17270000000008,
+            36.53200000000015, 34.560900000000174
+          ]
+        },
+        "prototype": {
+          "medianMs": 37.4070999999999,
+          "minMs": 36.23540000000003,
+          "maxMs": 43.34529999999995,
+          "samplesMs": [
+            38.325599999999895, 40.553699999999935, 36.894199999999955,
+            37.78880000000004, 36.23540000000003, 43.34529999999995,
+            36.42039999999997, 37.4070999999999, 36.35140000000001
+          ]
+        }
+      }
+    },
+    {
+      "fixture": "minimal",
+      "mode": "inline",
+      "minify": true,
+      "sizes": {
+        "baseline": {
+          "outputHash": "f9efb7d39b19fdf6951dfb197b38f589d0c815dba0baf1a6761bf4d027775854",
+          "scriptBytes": 8497,
+          "totalBytes": 8497,
+          "totalGzipBytes": 2958,
+          "files": 1
+        },
+        "prototype": {
+          "outputHash": "f9efb7d39b19fdf6951dfb197b38f589d0c815dba0baf1a6761bf4d027775854",
+          "scriptBytes": 8497,
+          "totalBytes": 8497,
+          "totalGzipBytes": 2958,
+          "files": 1
+        }
+      },
+      "timing": {
+        "baseline": {
+          "medianMs": 36.57190000000014,
+          "minMs": 35.78019999999992,
+          "maxMs": 37.389900000000125,
+          "samplesMs": [
+            36.50689999999986, 36.38270000000011, 36.5797, 35.78019999999992,
+            36.80950000000007, 35.89609999999993, 36.57190000000014,
+            37.389900000000125, 36.608600000000024
+          ]
+        },
+        "prototype": {
+          "medianMs": 38.83829999999989,
+          "minMs": 35.07080000000019,
+          "maxMs": 41.497100000000046,
+          "samplesMs": [
+            41.497100000000046, 36.290899999999965, 39.51949999999988,
+            36.80899999999997, 38.83829999999989, 35.475099999999884,
+            39.09960000000001, 35.07080000000019, 39.457900000000336
+          ]
+        }
+      }
+    },
+    {
+      "fixture": "minimal",
+      "mode": "resource",
+      "minify": false,
+      "sizes": {
+        "baseline": {
+          "outputHash": "ddab93edfad045a37eef3df9a0d08fe663b8aa63f335bc145166e69c336a7003",
+          "scriptBytes": 9697,
+          "totalBytes": 10127,
+          "totalGzipBytes": 3180,
+          "files": 2
+        },
+        "prototype": {
+          "outputHash": "ddab93edfad045a37eef3df9a0d08fe663b8aa63f335bc145166e69c336a7003",
+          "scriptBytes": 9697,
+          "totalBytes": 10127,
+          "totalGzipBytes": 3180,
+          "files": 2
+        }
+      },
+      "timing": {
+        "baseline": {
+          "medianMs": 36.659400000000005,
+          "minMs": 34.978999999999814,
+          "maxMs": 39.92000000000007,
+          "samplesMs": [
+            36.659400000000005, 39.92000000000007, 35.227100000000064,
+            39.214100000000144, 35.257500000000164, 38.4353000000001,
+            34.978999999999814, 39.83969999999999, 35.97069999999985
+          ]
+        },
+        "prototype": {
+          "medianMs": 35.971100000000206,
+          "minMs": 34.21379999999999,
+          "maxMs": 36.52399999999989,
+          "samplesMs": [
+            34.21379999999999, 34.285899999999856, 35.971100000000206,
+            36.10109999999986, 36.51539999999977, 36.52399999999989,
+            35.63590000000022, 36.38729999999987, 35.09930000000031
+          ]
+        }
+      }
+    },
+    {
+      "fixture": "minimal",
+      "mode": "resource",
+      "minify": true,
+      "sizes": {
+        "baseline": {
+          "outputHash": "67368a45af2b726ced9a63a025b4a7273bd681aea7ba91e8ce5d7a7452819068",
+          "scriptBytes": 8278,
+          "totalBytes": 8564,
+          "totalGzipBytes": 2903,
+          "files": 2
+        },
+        "prototype": {
+          "outputHash": "67368a45af2b726ced9a63a025b4a7273bd681aea7ba91e8ce5d7a7452819068",
+          "scriptBytes": 8278,
+          "totalBytes": 8564,
+          "totalGzipBytes": 2903,
+          "files": 2
+        }
+      },
+      "timing": {
+        "baseline": {
+          "medianMs": 36.38570000000027,
+          "minMs": 34.197599999999966,
+          "maxMs": 37.82119999999986,
+          "samplesMs": [
+            34.197599999999966, 36.501900000000205, 35.2175000000002,
+            37.159200000000055, 36.07549999999992, 35.76710000000003,
+            36.38570000000027, 37.82119999999986, 36.477400000000216
+          ]
+        },
+        "prototype": {
+          "medianMs": 36.75109999999995,
+          "minMs": 34.459100000000035,
+          "maxMs": 39.677900000000136,
+          "samplesMs": [
+            37.754399999999805, 35.57539999999972, 39.677900000000136,
+            34.459100000000035, 38.67410000000018, 36.408100000000104,
+            39.57099999999991, 36.20190000000002, 36.75109999999995
+          ]
+        }
+      }
+    },
+    {
+      "fixture": "resource-and-modules",
+      "mode": "inline",
+      "minify": false,
+      "sizes": {
+        "baseline": {
+          "outputHash": "b6edda5c81679807d3ce43fdb5419ef83d328ac4ec559921f7ee9b540a8ead85",
+          "scriptBytes": 29999,
+          "totalBytes": 29999,
+          "totalGzipBytes": 9569,
+          "files": 1
+        },
+        "prototype": {
+          "outputHash": "b6edda5c81679807d3ce43fdb5419ef83d328ac4ec559921f7ee9b540a8ead85",
+          "scriptBytes": 29999,
+          "totalBytes": 29999,
+          "totalGzipBytes": 9569,
+          "files": 1
+        }
+      },
+      "timing": {
+        "baseline": {
+          "medianMs": 48.66930000000002,
+          "minMs": 44.035499999999956,
+          "maxMs": 66.40030000000024,
+          "samplesMs": [
+            48.66930000000002, 44.035499999999956, 48.7457000000004,
+            66.40030000000024, 44.726700000000164, 49.579899999999725,
+            45.652000000000044, 46.19759999999951, 49.976300000000265
+          ]
+        },
+        "prototype": {
+          "medianMs": 47.1832000000004,
+          "minMs": 45.71550000000025,
+          "maxMs": 51.57719999999972,
+          "samplesMs": [
+            47.5324999999998, 47.1832000000004, 45.981300000000374,
+            51.57719999999972, 48.43159999999989, 46.10159999999996,
+            45.71550000000025, 48.5566000000008, 45.81460000000061
+          ]
+        }
+      }
+    },
+    {
+      "fixture": "resource-and-modules",
+      "mode": "inline",
+      "minify": true,
+      "sizes": {
+        "baseline": {
+          "outputHash": "10fa2737fd2a1b65c8bd7499e8ea464a4766c34fe4ef0d0af59f4cc45451e5f4",
+          "scriptBytes": 21075,
+          "totalBytes": 21075,
+          "totalGzipBytes": 7683,
+          "files": 1
+        },
+        "prototype": {
+          "outputHash": "10fa2737fd2a1b65c8bd7499e8ea464a4766c34fe4ef0d0af59f4cc45451e5f4",
+          "scriptBytes": 21075,
+          "totalBytes": 21075,
+          "totalGzipBytes": 7683,
+          "files": 1
+        }
+      },
+      "timing": {
+        "baseline": {
+          "medianMs": 45.6877999999997,
+          "minMs": 43.67669999999998,
+          "maxMs": 49.69839999999931,
+          "samplesMs": [
+            45.54539999999997, 49.69839999999931, 45.17360000000008,
+            46.01850000000013, 46.074900000000525, 45.6877999999997,
+            43.67669999999998, 48.85980000000018, 44.73449999999957
+          ]
+        },
+        "prototype": {
+          "medianMs": 46.66369999999915,
+          "minMs": 44.32519999999931,
+          "maxMs": 49.664999999999964,
+          "samplesMs": [
+            48.499399999999696, 45.84699999999975, 44.46470000000045,
+            48.302999999999884, 44.32519999999931, 46.66369999999915,
+            49.5630000000001, 45.197000000000116, 49.664999999999964
+          ]
+        }
+      }
+    },
+    {
+      "fixture": "resource-and-modules",
+      "mode": "resource",
+      "minify": false,
+      "sizes": {
+        "baseline": {
+          "outputHash": "debae4a7da94a5b8fcc9eedd0afb9224b64e0052e3b06b8cca84ebf6ca7c8309",
+          "scriptBytes": 15568,
+          "totalBytes": 27666,
+          "totalGzipBytes": 9473,
+          "files": 12
+        },
+        "prototype": {
+          "outputHash": "debae4a7da94a5b8fcc9eedd0afb9224b64e0052e3b06b8cca84ebf6ca7c8309",
+          "scriptBytes": 15568,
+          "totalBytes": 27666,
+          "totalGzipBytes": 9473,
+          "files": 12
+        }
+      },
+      "timing": {
+        "baseline": {
+          "medianMs": 46.41290000000026,
+          "minMs": 43.8783999999996,
+          "maxMs": 49.40260000000035,
+          "samplesMs": [
+            49.40260000000035, 44.891999999999825, 44.425100000000384,
+            48.46759999999995, 46.41290000000026, 45.225399999999354,
+            47.727100000000064, 48.16539999999986, 43.8783999999996
+          ]
+        },
+        "prototype": {
+          "medianMs": 46.811499999999796,
+          "minMs": 44.48989999999958,
+          "maxMs": 50.399100000000544,
+          "samplesMs": [
+            44.48989999999958, 49.23439999999937, 48.637400000000525,
+            44.567699999999604, 44.56640000000061, 50.399100000000544,
+            46.43119999999999, 48.46529999999984, 46.811499999999796
+          ]
+        }
+      }
+    },
+    {
+      "fixture": "resource-and-modules",
+      "mode": "resource",
+      "minify": true,
+      "sizes": {
+        "baseline": {
+          "outputHash": "18637cc448c4309ed930cfbd0b85f454dfd52ab71b4d87f9e0d609f3063bc8a8",
+          "scriptBytes": 12316,
+          "totalBytes": 20119,
+          "totalGzipBytes": 7662,
+          "files": 12
+        },
+        "prototype": {
+          "outputHash": "18637cc448c4309ed930cfbd0b85f454dfd52ab71b4d87f9e0d609f3063bc8a8",
+          "scriptBytes": 12316,
+          "totalBytes": 20119,
+          "totalGzipBytes": 7662,
+          "files": 12
+        }
+      },
+      "timing": {
+        "baseline": {
+          "medianMs": 48.11250000000018,
+          "minMs": 44.13520000000062,
+          "maxMs": 51.28650000000016,
+          "samplesMs": [
+            51.28650000000016, 45.69419999999991, 47.52530000000024,
+            48.27189999999973, 44.13520000000062, 48.13969999999972,
+            48.11250000000018, 47.80129999999917, 49.74380000000019
+          ]
+        },
+        "prototype": {
+          "medianMs": 44.4975000000004,
+          "minMs": 43.05619999999999,
+          "maxMs": 51.71349999999984,
+          "samplesMs": [
+            47.92590000000018, 51.71349999999984, 43.57690000000002,
+            43.339500000000044, 48.18040000000019, 44.4975000000004,
+            43.866399999999885, 49.621900000000096, 43.05619999999999
+          ]
+        }
+      }
+    },
+    {
+      "fixture": "main-dynamic",
+      "mode": "inline",
+      "minify": false,
+      "sizes": {
+        "baseline": {
+          "outputHash": "bccde424202186613602fae373fe1fa8de459488225fe49730256c2fe6601afa",
+          "scriptBytes": 4915,
+          "totalBytes": 4915,
+          "totalGzipBytes": 1415,
+          "files": 1
+        },
+        "prototype": {
+          "outputHash": "bccde424202186613602fae373fe1fa8de459488225fe49730256c2fe6601afa",
+          "scriptBytes": 4915,
+          "totalBytes": 4915,
+          "totalGzipBytes": 1415,
+          "files": 1
+        }
+      },
+      "timing": {
+        "baseline": {
+          "medianMs": 17.237599999999475,
+          "minMs": 16.372599999999693,
+          "maxMs": 20.760400000001027,
+          "samplesMs": [
+            16.372599999999693, 17.838999999999942, 17.237599999999475,
+            19.741799999999785, 17.3104000000003, 16.878600000000006,
+            16.847599999999147, 16.49239999999918, 20.760400000001027
+          ]
+        },
+        "prototype": {
+          "medianMs": 16.653200000000652,
+          "minMs": 15.852100000000064,
+          "maxMs": 17.576100000000224,
+          "samplesMs": [
+            15.852100000000064, 16.392299999999523, 17.062599999999293,
+            17.23660000000018, 17.576100000000224, 16.749500000001717,
+            16.639400000000023, 16.653200000000652, 15.947500000000218
+          ]
+        }
+      }
+    },
+    {
+      "fixture": "main-dynamic",
+      "mode": "inline",
+      "minify": true,
+      "sizes": {
+        "baseline": {
+          "outputHash": "6326a59b3d26013d322eaa019da11e5949506d9fe76b9ee669c50239fb6a45c2",
+          "scriptBytes": 4802,
+          "totalBytes": 4802,
+          "totalGzipBytes": 1374,
+          "files": 1
+        },
+        "prototype": {
+          "outputHash": "6326a59b3d26013d322eaa019da11e5949506d9fe76b9ee669c50239fb6a45c2",
+          "scriptBytes": 4802,
+          "totalBytes": 4802,
+          "totalGzipBytes": 1374,
+          "files": 1
+        }
+      },
+      "timing": {
+        "baseline": {
+          "medianMs": 16.582000000000335,
+          "minMs": 15.594699999999648,
+          "maxMs": 20.64810000000034,
+          "samplesMs": [
+            16.582000000000335, 20.64810000000034, 17.418800000001283,
+            15.594699999999648, 15.893500000000131, 18.869399999999587,
+            17.530800000000454, 16.289199999999255, 15.978399999999965
+          ]
+        },
+        "prototype": {
+          "medianMs": 16.5015999999996,
+          "minMs": 15.931099999999788,
+          "maxMs": 17.215000000000146,
+          "samplesMs": [
+            16.422699999999168, 15.931099999999788, 16.5015999999996,
+            16.054799999999886, 16.596400000000358, 17.215000000000146,
+            16.93920000000071, 16.3140999999996, 16.79410000000098
+          ]
+        }
+      }
+    }
+  ]
+}

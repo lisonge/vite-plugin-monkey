@@ -13,13 +13,13 @@ Documentation: <https://vite-plugin-monkey.pages.dev/>
 
 - Support Tampermonkey, Violentmonkey, Greasemonkey, ScriptCat, and other userscript engines
 - Inject userscript metadata into the build output
-- Open the development userscript in the default browser when its metadata changes
+- Provide a development installation page, opened through Vite's `server.open` option
 - Load external dependencies through userscript `@require` entries
 - Load external modules through userscript `@resource` entries
 - Import GM APIs through ESM with type hints
 - Collect the GM APIs used by the code and configure `@grant` automatically
 - Support top-level await and dynamic imports in a single userscript file
-- Open the built userscript automatically when running Vite preview
+- Provide a built-userscript installation page through Vite preview
 - Support TypeScript and Vite features
 
 ## Quick Start

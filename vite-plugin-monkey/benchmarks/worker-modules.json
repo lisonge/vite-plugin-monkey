@@ -1,0 +1,395 @@
+{
+  "baselineRevision": "a7d56ae2b58fbb9073edfc1ae893547c9be197a5",
+  "date": "2026-11-06T13:05:12.333Z",
+  "environment": {
+    "node": "v26.13.0",
+    "vite": "8.3.0",
+    "rolldown": "1.2.7",
+    "platform": "win32",
+    "arch": "x64"
+  },
+  "method": "Same process and fixture root; two warmups per case, nine samples, alternating implementation order; build.write=false. Gzip totals compress each output file separately. Not a startup/runtime benchmark.",
+  "scope": "Worker path only; main-thread dynamic imports still use Rollup and SystemJS.",
+  "limitations": [
+    "The adapter depends on the helper protocol emitted by Vite moduleRunnerTransform.",
+    "Emitted chunks must have explicit exports and statically resolvable imports; remaining export-star or computed imports are rejected.",
+    "Source metrics count owned Worker build/runtime files, including unchanged code, not third-party implementation size.",
+    "Existing contracts and targeted tests are not an exhaustive ECMAScript module conformance suite."
+  ],
+  "runtimeModuleBytes": {
+    "baseline": 19394,
+    "prototype": 8953
+  },
+  "source": {
+    "baseline": {
+      "files": [
+        {
+          "name": "src/node/workers/build.ts",
+          "bytes": 9121,
+          "nonblankLines": 270
+        },
+        {
+          "name": "src/node/runtime/worker.ts",
+          "bytes": 5953,
+          "nonblankLines": 139
+        }
+      ],
+      "nonblankLines": 409
+    },
+    "prototype": {
+      "files": [
+        {
+          "name": "src/node/workers/build.ts",
+          "bytes": 7597,
+          "nonblankLines": 224
+        },
+        {
+          "name": "src/node/runtime/worker.ts",
+          "bytes": 5861,
+          "nonblankLines": 140
+        },
+        {
+          "name": "src/node/workers/modules.ts",
+          "bytes": 4774,
+          "nonblankLines": 133
+        },
+        {
+          "name": "src/node/runtime/modules.ts",
+          "bytes": 3725,
+          "nonblankLines": 116
+        }
+      ],
+      "nonblankLines": 613
+    }
+  },
+  "results": [
+    {
+      "fixture": "minimal",
+      "mode": "inline",
+      "minify": false,
+      "sizes": {
+        "baseline": {
+          "scriptBytes": 20138,
+          "totalBytes": 20138,
+          "totalGzipBytes": 7354,
+          "files": 1
+        },
+        "prototype": {
+          "scriptBytes": 9921,
+          "totalBytes": 9921,
+          "totalGzipBytes": 3273,
+          "files": 1
+        }
+      },
+      "timing": {
+        "baseline": {
+          "medianMs": 39.258200000000215,
+          "minMs": 37.50300000000061,
+          "maxMs": 42.426400000000285,
+          "samplesMs": [
+            37.50300000000061, 40.003099999999904, 38.61500000000069,
+            37.690700000000106, 40.021600000000035, 39.258200000000215,
+            38.740599999999176, 42.11580000000049, 42.426400000000285
+          ]
+        },
+        "prototype": {
+          "medianMs": 37.86020000000008,
+          "minMs": 35.46969999999965,
+          "maxMs": 41.01549999999952,
+          "samplesMs": [
+            39.469200000000455, 36.94459999999981, 35.46969999999965,
+            36.121799999999894, 39.40680000000066, 39.30510000000049,
+            41.01549999999952, 37.86020000000008, 37.27570000000014
+          ]
+        }
+      }
+    },
+    {
+      "fixture": "minimal",
+      "mode": "inline",
+      "minify": true,
+      "sizes": {
+        "baseline": {
+          "scriptBytes": 18358,
+          "totalBytes": 18358,
+          "totalGzipBytes": 6914,
+          "files": 1
+        },
+        "prototype": {
+          "scriptBytes": 8316,
+          "totalBytes": 8316,
+          "totalGzipBytes": 2929,
+          "files": 1
+        }
+      },
+      "timing": {
+        "baseline": {
+          "medianMs": 39.44830000000002,
+          "minMs": 36.371799999999894,
+          "maxMs": 45.026700000000346,
+          "samplesMs": [
+            36.371799999999894, 39.44830000000002, 37.789999999999964,
+            36.64249999999993, 41.78790000000026, 41.439800000000105,
+            45.026700000000346, 37.02809999999954, 41.37039999999979
+          ]
+        },
+        "prototype": {
+          "medianMs": 40.759799999999814,
+          "minMs": 36.42860000000019,
+          "maxMs": 48.21050000000014,
+          "samplesMs": [
+            36.948600000000624, 37.98410000000058, 36.42860000000019,
+            40.759799999999814, 42.987199999999575, 46.39629999999943,
+            48.21050000000014, 41.40700000000015, 38.501900000000205
+          ]
+        }
+      }
+    },
+    {
+      "fixture": "minimal",
+      "mode": "resource",
+      "minify": false,
+      "sizes": {
+        "baseline": {
+          "scriptBytes": 19951,
+          "totalBytes": 20213,
+          "totalGzipBytes": 7275,
+          "files": 2
+        },
+        "prototype": {
+          "scriptBytes": 9510,
+          "totalBytes": 9940,
+          "totalGzipBytes": 3152,
+          "files": 2
+        }
+      },
+      "timing": {
+        "baseline": {
+          "medianMs": 38.674300000000585,
+          "minMs": 34.72820000000138,
+          "maxMs": 55.37580000000162,
+          "samplesMs": [
+            40.727600000000166, 40.07709999999861, 37.87950000000092,
+            41.81410000000142, 34.72820000000138, 38.674300000000585,
+            35.71229999999923, 55.37580000000162, 36.88680000000022
+          ]
+        },
+        "prototype": {
+          "medianMs": 35.006100000000515,
+          "minMs": 32.326200000001336,
+          "maxMs": 38.72999999999956,
+          "samplesMs": [
+            36.249400000000605, 38.72999999999956, 35.56290000000081,
+            35.006100000000515, 35.53530000000137, 33.97910000000047,
+            34.089599999999336, 32.326200000001336, 33.55420000000049
+          ]
+        }
+      }
+    },
+    {
+      "fixture": "minimal",
+      "mode": "resource",
+      "minify": true,
+      "sizes": {
+        "baseline": {
+          "scriptBytes": 18363,
+          "totalBytes": 18481,
+          "totalGzipBytes": 6911,
+          "files": 2
+        },
+        "prototype": {
+          "scriptBytes": 8097,
+          "totalBytes": 8383,
+          "totalGzipBytes": 2874,
+          "files": 2
+        }
+      },
+      "timing": {
+        "baseline": {
+          "medianMs": 38.36479999999938,
+          "minMs": 34.95089999999982,
+          "maxMs": 44.98790000000008,
+          "samplesMs": [
+            36.2599999999984, 36.45789999999943, 34.95089999999982,
+            41.21060000000034, 38.36479999999938, 37.241399999998976,
+            44.98790000000008, 44.8041000000012, 43.55479999999989
+          ]
+        },
+        "prototype": {
+          "medianMs": 40.302200000000084,
+          "minMs": 34.221700000000055,
+          "maxMs": 49.64749999999913,
+          "samplesMs": [
+            36.00380000000041, 40.302200000000084, 34.221700000000055,
+            37.99489999999969, 37.43499999999949, 41.99120000000039,
+            43.28150000000096, 48.28909999999996, 49.64749999999913
+          ]
+        }
+      }
+    },
+    {
+      "fixture": "resource-and-modules",
+      "mode": "inline",
+      "minify": false,
+      "sizes": {
+        "baseline": {
+          "scriptBytes": 36901,
+          "totalBytes": 36901,
+          "totalGzipBytes": 13570,
+          "files": 1
+        },
+        "prototype": {
+          "scriptBytes": 29812,
+          "totalBytes": 29812,
+          "totalGzipBytes": 9548,
+          "files": 1
+        }
+      },
+      "timing": {
+        "baseline": {
+          "medianMs": 56.295500000000175,
+          "minMs": 53.51249999999891,
+          "maxMs": 93.11180000000058,
+          "samplesMs": [
+            54.185200000001714, 56.295500000000175, 53.51249999999891,
+            61.99780000000101, 64.4356000000007, 93.11180000000058,
+            60.67559999999867, 54.941899999999805, 56.21609999999964
+          ]
+        },
+        "prototype": {
+          "medianMs": 59.05879999999888,
+          "minMs": 48.60030000000006,
+          "maxMs": 88.9997000000003,
+          "samplesMs": [
+            59.86999999999898, 48.60030000000006, 59.459899999999834,
+            59.05879999999888, 59.437700000000405, 88.9997000000003,
+            50.068999999999505, 53.96700000000055, 52.14969999999994
+          ]
+        }
+      }
+    },
+    {
+      "fixture": "resource-and-modules",
+      "mode": "inline",
+      "minify": true,
+      "sizes": {
+        "baseline": {
+          "scriptBytes": 27840,
+          "totalBytes": 27840,
+          "totalGzipBytes": 11464,
+          "files": 1
+        },
+        "prototype": {
+          "scriptBytes": 20894,
+          "totalBytes": 20894,
+          "totalGzipBytes": 7655,
+          "files": 1
+        }
+      },
+      "timing": {
+        "baseline": {
+          "medianMs": 60.48730000000069,
+          "minMs": 55.99029999999948,
+          "maxMs": 96.67370000000119,
+          "samplesMs": [
+            60.17309999999998, 55.99029999999948, 63.23530000000028,
+            65.73879999999917, 72.85289999999986, 57.88119999999981,
+            96.67370000000119, 60.48730000000069, 58.13619999999901
+          ]
+        },
+        "prototype": {
+          "medianMs": 57.972600000000966,
+          "minMs": 51.64969999999994,
+          "maxMs": 138.6794000000009,
+          "samplesMs": [
+            55.16029999999955, 51.64969999999994, 52.82179999999971,
+            58.49589999999989, 52.82330000000002, 58.876899999999296,
+            138.6794000000009, 94.92160000000149, 57.972600000000966
+          ]
+        }
+      }
+    },
+    {
+      "fixture": "resource-and-modules",
+      "mode": "resource",
+      "minify": false,
+      "sizes": {
+        "baseline": {
+          "scriptBytes": 25822,
+          "totalBytes": 35405,
+          "totalGzipBytes": 13005,
+          "files": 12
+        },
+        "prototype": {
+          "scriptBytes": 15381,
+          "totalBytes": 27479,
+          "totalGzipBytes": 9455,
+          "files": 12
+        }
+      },
+      "timing": {
+        "baseline": {
+          "medianMs": 58.42070000000058,
+          "minMs": 49.62880000000041,
+          "maxMs": 134.67449999999917,
+          "samplesMs": [
+            58.42070000000058, 134.67449999999917, 115.49339999999938,
+            89.82580000000053, 49.62880000000041, 53.229699999999866,
+            63.784600000000864, 54.05160000000069, 58.19260000000031
+          ]
+        },
+        "prototype": {
+          "medianMs": 54.08810000000085,
+          "minMs": 49.40600000000086,
+          "maxMs": 88.58200000000033,
+          "samplesMs": [
+            49.40600000000086, 88.58200000000033, 68.72150000000147,
+            51.6851000000006, 52.7484000000004, 54.08810000000085,
+            54.438099999999395, 56.07799999999952, 51.8799999999992
+          ]
+        }
+      }
+    },
+    {
+      "fixture": "resource-and-modules",
+      "mode": "resource",
+      "minify": true,
+      "sizes": {
+        "baseline": {
+          "scriptBytes": 22401,
+          "totalBytes": 27711,
+          "totalGzipBytes": 11045,
+          "files": 12
+        },
+        "prototype": {
+          "scriptBytes": 12135,
+          "totalBytes": 19938,
+          "totalGzipBytes": 7635,
+          "files": 12
+        }
+      },
+      "timing": {
+        "baseline": {
+          "medianMs": 60.21020000000135,
+          "minMs": 55.722499999999854,
+          "maxMs": 89.96870000000126,
+          "samplesMs": [
+            89.96870000000126, 60.21020000000135, 57.03109999999833,
+            62.2458000000006, 56.69599999999991, 64.18920000000071,
+            58.25959999999941, 61.510700000000725, 55.722499999999854
+          ]
+        },
+        "prototype": {
+          "medianMs": 59.714599999999336,
+          "minMs": 51.389100000000326,
+          "maxMs": 64.16279999999824,
+          "samplesMs": [
+            59.638599999998405, 61.65940000000046, 64.16279999999824,
+            57.73949999999968, 60.60649999999987, 57.48409999999967,
+            60.24150000000009, 51.389100000000326, 59.714599999999336
+          ]
+        }
+      }
+    }
+  ]
+}

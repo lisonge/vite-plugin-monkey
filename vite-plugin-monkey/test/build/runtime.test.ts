@@ -1,6 +1,64 @@
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import { test } from '../support/fixture.ts';
+
+test.for([false, true])(
+  'repeated dynamic imports keep the original evaluation failure with minify=%s',
+  async (minify, { project }) => {
+    await project.write({
+      'main.js': `globalThis.load = () => import('./failure.js');`,
+      'failure.js': `globalThis.executions++; throw new Error('module failed');`,
+    });
+    const script = await project.buildScript({}, { build: { minify } });
+    const context = vm.createContext({ executions: 0 });
+    await vm.runInContext(script.code, context);
+    for (let i = 0; i < 2; i++)
+      await assert.rejects(
+        Promise.resolve().then(() => context.load()),
+        /module failed/,
+      );
+    assert.equal(context.executions, 1);
+  },
+);
+
+test('separate userscripts retain private lazy module caches in the same global scope', async ({
+  project,
+}) => {
+  await project.write({
+    'main.js': `globalThis.entries.push(() => import('./lazy.js'));`,
+    'lazy.js': `globalThis.executions++; export let count = 0; export function increment() { return ++count; }`,
+  });
+  const script = await project.buildScript();
+  type Lazy = { count: number; increment(): number };
+  const entries: (() => Promise<Lazy>)[] = [];
+  const existingRegistry = Object.freeze({ marker: true });
+  const context = vm.createContext({
+    entries,
+    executions: 0,
+    System: existingRegistry,
+    __monkeyRegister: existingRegistry,
+  });
+  await Promise.all([
+    vm.runInContext(script.code, context),
+    vm.runInContext(script.code, context),
+  ]);
+  assert.equal(entries.length, 2);
+  assert.equal(context.executions, 0);
+  const [first, repeated, second] = await Promise.all([
+    entries[0](),
+    entries[0](),
+    entries[1](),
+  ]);
+  assert.equal(first, repeated);
+  assert.notEqual(first, second);
+  assert.equal(context.executions, 2);
+  assert.equal(first.increment(), 1);
+  assert.equal(first.count, 1);
+  assert.equal(second.count, 0);
+  assert.equal(context.System, existingRegistry);
+  assert.equal(context.__monkeyRegister, existingRegistry);
+});
+
 test('client imports collect grants and call the userscript API', async ({
   project,
 }) => {

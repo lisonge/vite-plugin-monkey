@@ -1,97 +1,93 @@
+import {
+  compileModules,
+  chunkModuleId,
+} from '../../src/node/modules/compile.ts';
+import { createModuleRegistry } from '../../src/node/modules/runtime.ts';
 import assert from 'node:assert/strict';
+import { build } from 'vite';
 import path from 'node:path';
-import { rollup } from 'rollup';
-import { getSystemjsSource } from '../../src/node/utils/systemjs.ts';
+import { removePreloadFactory } from '../../src/node/vite/build/removePreload.ts';
 import type { BrowserFixtures } from './browser.ts';
 import type { TestProject } from './project.ts';
 import { createWorkerRequests } from '../fixtures/shared/worker-requests.ts';
 
 export type WorkerTransport = 'registry' | 'blob-chunks';
 
-// Prototype only: stable IDs describe the graph; Blob URLs only transport code.
-export async function buildSystemWorker(
+export async function buildModuleWorker(
   project: TestProject,
   mode: WorkerTransport,
 ) {
-  await project.copy('systemjs-worker');
+  await project.copy('module-worker');
   const { root } = project;
-  const bundle = await rollup({
-    input: path.join(root, 'entry.js'),
-    // Keep the re-export module so live bindings cross a real module boundary.
-    treeshake: false,
-    onwarn(warning, warn) {
-      if (warning.code !== 'CIRCULAR_DEPENDENCY') warn(warning);
+  const result = await build({
+    root,
+    configFile: false,
+    logLevel: 'silent',
+    plugins: [removePreloadFactory()],
+    build: {
+      write: false,
+      target: 'esnext',
+      minify: false,
+      modulePreload: false,
+      rolldownOptions: {
+        input: path.join(root, 'entry.js'),
+        treeshake: false,
+        preserveEntrySignatures: 'strict',
+        output: {
+          format: 'es',
+          preserveModules: true,
+          preserveModulesRoot: root,
+          entryFileNames: '[name].js',
+        },
+      },
     },
   });
-  try {
-    const { output } = await bundle.generate({
-      format: 'system',
-      preserveModules: true,
-      preserveModulesRoot: root,
-      entryFileNames: (chunk) => {
-        assert.ok(chunk.facadeModuleId);
-        return path.basename(chunk.facadeModuleId);
-      },
-      minifyInternalExports: false,
-    });
-    const chunks = output.filter((item) => item.type === 'chunk');
-    const chunk = (name: string) => {
-      const result = chunks.find((item) => item.fileName === name);
-      assert.ok(result, `Missing module ${name}`);
-      return result;
-    };
-    assert.ok(chunk('cycle-a.js').imports.includes('cycle-b.js'));
-    assert.ok(chunk('cycle-b.js').imports.includes('cycle-a.js'));
-    assert.ok(chunk('entry.js').dynamicImports.includes('lazy.js'));
-    assert.ok(chunk('tla-importer.js').imports.includes('tla.js'));
-    assert.ok(chunk('observer.js').imports.includes('reexport.js'));
-
-    const base = 'https://monkey.invalid/worker-prototype/';
-    const sources = Object.fromEntries(
-      chunks.map((item) => [new URL(item.fileName, base).href, item.code]),
-    );
-    const registrations = chunks
-      .map((item) => {
-        assert.ok(item.code.startsWith('System.register('));
-        return item.code.replace(
-          'System.register(',
-          `System.register(${JSON.stringify(new URL(item.fileName, base).href)}, `,
-        );
-      })
-      .join('\n');
-    return `
-${await getSystemjsSource()}
-const sources = ${JSON.stringify(mode === 'blob-chunks' ? sources : Object.fromEntries(Object.keys(sources).map((key) => [key, null])))};
+  assert.ok(!Array.isArray(result) && 'output' in result);
+  const chunks = result.output.filter((item) => item.type === 'chunk');
+  const chunk = (name: string) => {
+    const result = chunks.find((item) => item.fileName === name);
+    assert.ok(result, `Missing module ${name}`);
+    return result;
+  };
+  assert.ok(chunk('cycle-a.js').imports.includes('cycle-b.js'));
+  assert.ok(chunk('cycle-b.js').imports.includes('cycle-a.js'));
+  assert.ok(chunk('entry.js').dynamicImports.includes('lazy.js'));
+  assert.ok(chunk('tla-importer.js').imports.includes('tla.js'));
+  assert.ok(chunk('observer.js').imports.includes('reexport.js'));
+  const compiled = await compileModules(
+    new Map(chunks.map((item) => [item.fileName, item.code])),
+  );
+  const sources = Object.fromEntries(
+    Object.entries(compiled).map(([name, code]) => [chunkModuleId(name), code]),
+  );
+  return `
+const createModuleRegistry = ${createModuleRegistry.toString()};
 const loaded = [];
-const instantiate = System.instantiate;
-System.instantiate = async function(id, parent, meta) {
+const sources = ${JSON.stringify(mode === 'blob-chunks' ? sources : {})};
+const registrations = {${
+    mode === 'registry'
+      ? Object.entries(sources)
+          .map(([id, code]) => `${JSON.stringify(id)}: () => { ${code} }`)
+          .join(',')
+      : ''
+  }};
+const registry = createModuleRegistry(async id => {
+  loaded.push(id);
+  if (${JSON.stringify(mode)} === 'registry') { registrations[id](); return; }
   if (!Object.hasOwn(sources, id)) throw new Error('Unknown Worker module: ' + id);
-  loaded.push(id.slice(${base.length}));
-  if (${JSON.stringify(mode)} === 'registry') return instantiate.call(this, id, parent, meta);
   const url = URL.createObjectURL(new Blob([sources[id]], { type: 'text/javascript' }));
-  try {
-    return await instantiate.call(this, url, parent, meta);
-  } finally {
-    URL.revokeObjectURL(url);
-  }
-};
-${mode === 'registry' ? registrations : ''}
-const ready = System.import(${JSON.stringify(base + 'entry.js')});
+  try { importScripts(url); } finally { URL.revokeObjectURL(url); }
+});
+globalThis.__monkeyRegister = registry.register;
+const ready = registry.importModule('./entry.js');
 ready.catch(error => self.postMessage({ fatal: String(error.stack || error) }));
 self.addEventListener('message', async ({ data }) => {
   const { id, method, args } = data;
   try {
     const entry = await ready;
-    const value = method === 'loaded' ? [...loaded] : await entry[method](...args);
-    self.postMessage({ id, value });
-  } catch (error) {
-    self.postMessage({ id, error: String(error.stack || error) });
-  }
-});
-`;
-  } finally {
-    await bundle.close();
-  }
+    self.postMessage({ id, value: method === 'loaded' ? [...loaded] : await entry[method](...args) });
+  } catch (error) { self.postMessage({ id, error: String(error.stack || error) }); }
+});`;
 }
 
 export async function createWorkerLab(

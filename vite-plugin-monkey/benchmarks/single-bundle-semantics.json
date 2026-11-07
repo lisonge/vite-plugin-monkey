@@ -1,0 +1,45 @@
+{
+  "environment": {
+    "node": "v26.13.0",
+    "vite": "8.3.0",
+    "rolldown": "1.2.7"
+  },
+  "dynamicFailures": [
+    {
+      "name": "baseline",
+      "minify": false,
+      "outcomes": ["Error: failure", "Error: failure"],
+      "calls": ["execute"]
+    },
+    {
+      "name": "baseline",
+      "minify": true,
+      "outcomes": ["Error: failure", "Error: failure"],
+      "calls": ["execute"]
+    },
+    {
+      "name": "prototype",
+      "minify": false,
+      "outcomes": ["Error: failure", "success"],
+      "calls": ["execute"]
+    },
+    {
+      "name": "prototype",
+      "minify": true,
+      "outcomes": ["Error: failure", "success"],
+      "calls": ["execute"]
+    }
+  ],
+  "staticAwait": [
+    {
+      "strictExecutionOrder": false,
+      "beforeGate": ["waiting"],
+      "afterGate": ["waiting", "resolved", "sibling", "entry"]
+    },
+    {
+      "strictExecutionOrder": true,
+      "beforeGate": ["waiting"],
+      "afterGate": ["waiting", "resolved", "sibling", "entry"]
+    }
+  ]
+}

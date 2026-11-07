@@ -1,7 +1,8 @@
 import path from 'node:path';
 import { validateShape, validateUserscript } from './validate.ts';
 import { getProjectPkg } from '../utils/pkg.ts';
-import type { MonkeyOptions, NormalizedConfig } from '../utils/types.ts';
+import type { MonkeyOptions } from './types.ts';
+import type { NormalizedConfig } from './resolved.ts';
 function clone<T>(value: T): T {
   if (value instanceof RegExp) return new RegExp(value) as T;
   if (Array.isArray(value)) return value.map(clone) as T;

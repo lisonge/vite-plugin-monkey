@@ -1,6 +1,7 @@
 import type { GrantType } from '../permissions/names.ts';
 import { serializeMetadata } from './schema.ts';
-import type { MonkeyContext, IArray, LocaleType } from '../utils/types.ts';
+import type { MonkeyContext } from '../config/context.ts';
+import type { IArray, LocaleType } from './types.ts';
 import type { GreasemonkeyUserScript, GreaseRunAt } from './greasemonkey.ts';
 import type { TampermonkeyUserScript, TamperRunAt } from './tampermonkey.ts';
 import type { ViolentmonkeyUserScript, ViolentRunAt } from './violentmonkey.ts';

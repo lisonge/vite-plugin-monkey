@@ -1,4 +1,4 @@
-import type { IArray, LocaleType } from '../utils/types.ts';
+import type { IArray, LocaleType } from './types.ts';
 
 export type ViolentRunAt =
   | 'document-end'

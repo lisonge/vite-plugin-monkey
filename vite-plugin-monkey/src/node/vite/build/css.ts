@@ -2,15 +2,11 @@ import MagicString from 'magic-string';
 import fs from 'node:fs/promises';
 import type { Rolldown } from 'vite';
 import type { Plugin } from 'vite';
-import {
-  getProgramImportNodes,
-  getSafeIdentifier,
-  getUpperCaseName,
-} from '../../utils/others.ts';
-import type { MonkeyContext } from '../../utils/types.ts';
+import { getProgramImportNodes } from '../../utils/imports.ts';
+import { getSafeIdentifier, getUpperCaseName } from '../../utils/code.ts';
+import type { MonkeyContext } from '../../config/context.ts';
 
-export const cssModuleId = 'virtual:monkey-css';
-export const virtualCssModuleId = '\0' + cssModuleId;
+import { cssModuleId, getCssModuleCode } from '../../runtime/css.ts';
 
 // https://github.com/vitejs/vite/blob/main/packages/vite/src/node/constants.ts
 const styleExts = [
@@ -78,19 +74,15 @@ export const cssFactory = (
       order: 'post',
       async handler(config) {
         context = await getContext(config.root);
-        return {
-          build: {
-            rolldownOptions: {
-              external: [cssModuleId],
-            },
-          },
-        };
       },
     },
     resolveId(source) {
+      if (source === cssModuleId) return source;
       if (source.endsWith(staticCssIdSuffix)) return source;
     },
     load(id) {
+      if (id === cssModuleId)
+        return getCssModuleCode(context.config.css.inject);
       // handle static css
       if (!id.endsWith(staticCssIdSuffix)) return;
       const staticId = id.slice(0, -staticCssIdSuffix.length);

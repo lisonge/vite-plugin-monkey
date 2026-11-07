@@ -1,6 +1,6 @@
 import { lookup } from 'mrmime';
 import type { Rolldown } from 'vite';
-import type { MonkeyContext } from '../utils/types.ts';
+import type { MonkeyContext } from '../config/context.ts';
 import { createAssetMarker, rewriteAssetMarkers } from './markers.ts';
 import { registerResource } from './resources.ts';
 
@@ -39,8 +39,16 @@ function resourceExpression(
   context: MonkeyContext,
   bundle: Rolldown.OutputBundle,
 ) {
-  registerAssetResource(name, context, bundle);
   const mime = lookup(name) ?? 'application/octet-stream';
+  if (!context.config.assets.publicPath) {
+    const asset = bundle[name];
+    if (asset?.type !== 'asset')
+      throw new Error(`Missing inline asset: ${name}`);
+    return JSON.stringify(
+      `data:${mime};base64,${Buffer.from(asset.source).toString('base64')}`,
+    );
+  }
+  registerAssetResource(name, context, bundle);
   return `GM_getResourceURL(${JSON.stringify(name)}).replace(/^data:application;base64,/, ${JSON.stringify(`data:${mime};base64,`)})`;
 }
 
@@ -50,11 +58,7 @@ export const assetStringExpression = (
   context: MonkeyContext,
   bundle: Rolldown.OutputBundle,
 ): string =>
-  context.config.assets.publicPath
-    ? marker.expression(value, (name) =>
-        resourceExpression(name, context, bundle),
-      )
-    : JSON.stringify(value);
+  marker.expression(value, (name) => resourceExpression(name, context, bundle));
 
 export const replaceAssetMarkers = (
   pluginContext: Rolldown.PluginContext,
@@ -62,7 +66,6 @@ export const replaceAssetMarkers = (
   context: MonkeyContext,
   bundle: Rolldown.OutputBundle,
 ): string => {
-  if (!context.config.assets.publicPath || !marker.contains(code)) return code;
   const resolve = (name: string) => resourceExpression(name, context, bundle);
   return rewriteAssetMarkers(pluginContext, code, {
     marker,

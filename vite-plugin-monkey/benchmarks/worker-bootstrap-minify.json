@@ -1,0 +1,88 @@
+{
+  "date": "2026-11-07",
+  "scope": "Compress the existing Worker bootstrap before string serialization; execution protocol unchanged.",
+  "method": "Same fixture roots before and after. Vite build.write=false; minify=true uses Oxc. Sizes include complete userscript metadata and all emitted files. Gzip totals compress each file separately. No build-time or runtime-speed claim.",
+  "validation": "All minify=false outputs and all standalone Worker chunks/assets were verified byte-identical by SHA-256. Browser tests cover Oxc and Terser.",
+  "cases": [
+    {
+      "fixture": "minimal",
+      "resource": false,
+      "minify": false,
+      "files": 1,
+      "before": 15092,
+      "after": 15092,
+      "gzipBefore": 3900,
+      "gzipAfter": 3900
+    },
+    {
+      "fixture": "minimal",
+      "resource": false,
+      "minify": true,
+      "files": 1,
+      "before": 10986,
+      "after": 7272,
+      "gzipBefore": 3658,
+      "gzipAfter": 2422
+    },
+    {
+      "fixture": "minimal",
+      "resource": true,
+      "minify": false,
+      "files": 2,
+      "before": 15140,
+      "after": 15140,
+      "gzipBefore": 3857,
+      "gzipAfter": 3857
+    },
+    {
+      "fixture": "minimal",
+      "resource": true,
+      "minify": true,
+      "files": 2,
+      "before": 11070,
+      "after": 7356,
+      "gzipBefore": 3652,
+      "gzipAfter": 2427
+    },
+    {
+      "fixture": "complex",
+      "resource": false,
+      "minify": false,
+      "files": 1,
+      "before": 32359,
+      "after": 32359,
+      "gzipBefore": 10419,
+      "gzipAfter": 10419
+    },
+    {
+      "fixture": "complex",
+      "resource": false,
+      "minify": true,
+      "files": 1,
+      "before": 21711,
+      "after": 17997,
+      "gzipBefore": 8584,
+      "gzipAfter": 7250
+    },
+    {
+      "fixture": "complex",
+      "resource": true,
+      "minify": false,
+      "files": 12,
+      "before": 30393,
+      "after": 30393,
+      "gzipBefore": 9831,
+      "gzipAfter": 9831
+    },
+    {
+      "fixture": "complex",
+      "resource": true,
+      "minify": true,
+      "files": 12,
+      "before": 21014,
+      "after": 17300,
+      "gzipBefore": 8229,
+      "gzipAfter": 6968
+    }
+  ]
+}

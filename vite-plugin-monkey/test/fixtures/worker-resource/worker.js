@@ -29,6 +29,37 @@ const methods = {
       node: process.env.NODE_ENV,
     };
   },
+  names() {
+    return [
+      typeof createModuleRegistry,
+      typeof queued,
+      typeof channel,
+      typeof sequence,
+      typeof pending,
+      typeof assetUrls,
+      typeof decode,
+      typeof read,
+      typeof queue,
+      typeof initialize,
+      typeof registry,
+      typeof register,
+      typeof __monkeyRegister,
+      typeof __MONKEY_WORKER_ASSET_URL__,
+      typeof __vite_ssr_exports__,
+      typeof __vite_ssr_import__,
+      typeof __vite_ssr_import_0__,
+      typeof facade,
+      typeof linkage,
+      typeof acquire,
+      typeof relay,
+      typeof publish,
+      typeof provenance,
+      typeof principal,
+      typeof annex0,
+      typeof catalogue,
+      typeof enroll,
+    ];
+  },
 };
 globalThis.addEventListener('message', ({ data }) => {
   if (data.applicationError) {

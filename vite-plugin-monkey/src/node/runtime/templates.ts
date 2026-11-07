@@ -13,7 +13,7 @@ interface TrustedTypesWindow {
     };
   };
 }
-import { stringifyFunction } from '../utils/others.ts';
+import { stringifyFunction } from './serialize.ts';
 
 const htmlText = /* html */ `
 <!DOCTYPE html>

@@ -1,4 +1,4 @@
-import type { PluginFactory } from '../../utils/types.ts';
+import type { PluginFactory } from '../types.ts';
 
 export const styleFactory: PluginFactory = () => {
   let isServe: boolean;

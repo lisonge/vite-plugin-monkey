@@ -1,14 +1,11 @@
 import { normalizeConfig } from './resolve.ts';
-import type {
-  BuildState,
-  MonkeyOptions,
-  MonkeyContext,
-} from '../utils/types.ts';
-export const createBuildState = (): BuildState => ({
-  collectRequireUrls: [],
-  collectResource: Object.create(null),
-  globalsPkg2VarName: Object.create(null),
-});
+import type { MonkeyOptions } from './types.ts';
+import type { NormalizedConfig } from './resolved.ts';
+import { createBuildState, type BuildState } from '../build/state.ts';
+export interface MonkeyContext {
+  readonly config: NormalizedConfig;
+  state: BuildState;
+}
 export const createContext = async (
   input: MonkeyOptions,
   root: string,

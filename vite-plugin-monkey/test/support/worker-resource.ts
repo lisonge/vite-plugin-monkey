@@ -5,7 +5,11 @@ import type { BrowserFixtures } from './browser.ts';
 import { buildOutput, userScript, type TestProject } from './project.ts';
 
 export const publicPath = 'https://releases.invalid/worker/v1/';
-export type WorkerImport = 'query' | 'inline-query' | 'constructor';
+export type WorkerImport =
+  | 'query'
+  | 'inline-query'
+  | 'dynamic-query'
+  | 'constructor';
 export async function buildWorkerFixture(
   project: TestProject,
   mode: 'inline' | 'resource',
@@ -13,7 +17,7 @@ export async function buildWorkerFixture(
   config: InlineConfig = {},
 ) {
   await project.copy('worker-resource');
-  await project.copy('systemjs-worker', 'semantics');
+  await project.copy('module-worker', 'semantics');
   await project.copy('shared', 'shared');
   const mainFile = `${project.root}/main.js`;
   const main = await fs.readFile(mainFile, 'utf8');
@@ -24,7 +28,9 @@ export async function buildWorkerFixture(
         "import ProbeWorker from './worker.js?worker';",
         form === 'inline-query'
           ? "import ProbeWorker from './worker.js?worker&inline';"
-          : "function ProbeWorker(options) { return new Worker(new URL('./worker.js', import.meta.url), { ...options, type: 'module' }); }",
+          : form === 'dynamic-query'
+            ? "const { default: ProbeWorker } = await import('./worker.js?worker');"
+            : "function ProbeWorker(options) { return new Worker(new URL('./worker.js', import.meta.url), { ...options, type: 'module' }); }",
       ),
     );
   }

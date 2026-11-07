@@ -70,7 +70,7 @@ test('unused global dependencies never resolve packages or run URL callbacks', a
   assert.doesNotMatch(script.code, /@require/);
 });
 
-test('SystemJS external namespaces preserve defaults without mutating values', async ({
+test('external module namespaces preserve defaults without mutating values', async ({
   project,
 }) => {
   await project.write({

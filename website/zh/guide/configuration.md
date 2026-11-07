@@ -94,6 +94,14 @@ loader: {
 
 resource 模式默认使用 `[name]-[hash][extname]` 将资源平铺到输出目录。只需将 `publicPath` 设置为 GitHub Release 下载目录（例如 `https://github.com/OWNER/REPO/releases/download/v1.0.0/`），然后把脚本与资源分别上传到该 Release。用户设置的 `build.rolldownOptions.output.assetFileNames` 优先，包括字符串和函数；自定义目录时需确保托管地址与输出路径一致。
 
+## 模块产物 {#module-output}
+
+主脚本的 JavaScript 保留 Vite 默认拆分行为。单 chunk 无导出和动态导入，且静态导入全部映射到已配置的全局变量时，直接使用函数包装，真实顶层 await 使用 async 包装；其余模块图使用内部模块注册表。两条路径均不执行二次打包。
+
+主脚本中的同步模块图在当前调用栈启动。共享异步依赖的导入者会等待它完成，无关分支可继续执行。仍有一个已知限制：外部模块导入异步循环中已执行完的成员时，可能在整个循环完成前执行，也可能漏掉循环的失败。主脚本和 Worker 均受影响。运行时处理的是输出 chunk，无法恢复已经被 Vite 合并的模块边界。
+
+生产构建中残留的 `import.meta` 表达式会报错。请使用静态资源导入，或 Vite 能在构建时解析的 `new URL('./asset', import.meta.url)`。`import.meta.env` 遵循 Vite 的构建时替换。
+
 ## Worker
 
 生产构建支持以下 Dedicated Worker 入口：
@@ -109,27 +117,29 @@ const urlWorker = new Worker(new URL('./worker.ts', import.meta.url), {
 });
 ```
 
-Worker 源码使用 ESM，可包含静态导入、动态导入和顶层 await。生产构建统一运行在 Classic Worker 中，每个实例拥有独立的 SystemJS 模块注册表。动态导入保留延迟执行和缓存，循环依赖与 live bindings 可跨分块工作。插件接管 Worker 的中间构建格式，`worker.format` 不再决定运行时格式；Vite 的 Worker 插件和输出命名配置仍可使用。
+Worker 源码使用 ESM，可包含静态导入、动态导入和顶层 await。生产构建统一运行在 Classic Worker 中，每个实例拥有独立的 内部模块注册表。动态导入保留延迟执行和缓存，循环依赖与 live bindings 可跨分块工作。插件接管 Worker 的中间构建格式，`worker.format` 不再决定运行时格式；Vite 的 Worker 插件和输出命名配置仍可使用。
 
 | 资源模式         | Worker 代码                          | Worker 内部图片、字体、WASM            |
 | ---------------- | ------------------------------------ | -------------------------------------- |
 | `inline`（默认） | 完整模块图内嵌到用户脚本             | 内嵌资源                               |
 | `resource`       | 模块分块输出为 `@resource`，按需加载 | 输出为 `@resource`，入口执行前准备完成 |
 
-`?worker&inline` 始终内嵌 Worker 模块图，其内部资源仍遵循 `assets.publicPath`；要生成包含全部资源的单文件，使用默认的 inline 模式。resource 模式发布时需同时上传全部 Worker 分块和内部资源。Worker 输出命名使用 `worker.rolldownOptions.output`，目录和基本名称遵循配置，转换后的模块文件统一使用 `.system.js` 后缀；默认资源输出平铺。
+`?worker&inline` 始终内嵌 Worker 模块图，其内部资源仍遵循 `assets.publicPath`；要生成包含全部资源的单文件，使用默认的 inline 模式。resource 模式发布时需同时上传全部 Worker 分块和内部资源。Worker 输出命名使用 `worker.rolldownOptions.output`，转换后保留 Vite 的文件名，包括目录、哈希和扩展名；默认资源输出平铺。
 
 父级用户脚本通过 `GM_getResourceURL` 读取资源字节，再经每个 Worker 独立的 `MessageChannel` 传递。Worker 在自己的上下文中创建 Blob URL，无需访问 GM API，也不会直接使用脚本沙箱创建的 Blob URL。静态资源导入、`?url`、`new URL('./asset', import.meta.url)` 和 WASM `?init` 均可使用这些本地 URL。resource 模式需要 `GM_getResourceURL`；使用显式 userscript.grant 数组时需包含该权限。
 
 构造后立即发送的消息会排队，直到入口准备完成。初始化失败通过 Worker 的 `error` 事件报告；启动后的动态导入加载失败会拒绝 import Promise。缺失模块或资源不会回退到网络加载。使用完毕后调用 `terminate()` 释放 Worker 和桥接。
 
-生产构建暂不支持 `SharedWorker`、`?worker&url` 和嵌套 Worker，会明确报错。资源桥接不会向 Worker 开放通用 GM API。开发仍使用 Vite 模块服务，SystemJS 仅用于生产。Worker 与 Blob 的创建仍受浏览器 CSP 和脚本管理器限制。
+生产构建暂不支持 `SharedWorker`、`?worker&url` 和嵌套 Worker，会明确报错。资源桥接不会向 Worker 开放通用 GM API。开发仍使用 Vite 模块服务，内部模块注册表仅用于生产。Worker 与 Blob 的创建仍受浏览器 CSP 和脚本管理器限制。
 
 ## CSS 与运行时
 
 css.inject 的 auto 优先 GM_addStyle，缺失时用 DOM；gm 强制 GM_addStyle；dom 创建 style；false 关闭自动注入。?style 默认导出创建函数，调用 createStyle() 得到独立 HTMLStyleElement，由调用方插入。开发时工厂创建的元素共享 HMR 更新；原生 cloneNode() 副本不跟随更新。自定义注入使用 ?inline 文本。
 
-GM API 从 `$` 导入，统一使用 `vite-plugin-monkey/client` 声明入口。该入口声明全量 API，管理器差异通过 `TampermonkeyGM`、`ViolentmonkeyGM`、`GreasemonkeyGM` 等具名类型表达；使用方式和自动导入预设见 [GM API](./gm-api)。开发仅使用普通 Vite 模块服务，不支持 bundled dev。桥接缺失、版本或项目不匹配直接报错，不回退到页面 window。
+GM API 从 `$` 导入；类型声明、管理器差异和自动导入预设见 [GM API](./gm-api)。开发仅使用普通 Vite 模块服务，不支持 bundled dev。桥接缺失、版本或项目不匹配直接报错，不回退到页面 window。
 
 自动打开开发安装页面使用 Vite 的 `server.open`，例如 `defineConfig({ server: { open: true }, plugins: [monkey({ entry: "src/main.ts" })] })`。
+
+生产预览安装页面通过 `preview.open` 自动打开。插件不会在元数据变化后重新打开浏览器；需要更新开发脚本的元数据时，请重新安装。
 
 开发时，插件在 Vite 编译 CSS 后将本地 `url()` 资源内联为 Data URL，支持 PostCSS、Lightning CSS、CSS Modules、`?inline` 和 `?style`。保留用户的 PostCSS 配置，不设置 `server.origin`，CSS 资源无需向固定开发端口另发请求。资源文件变更参与 HMR；生产资源仍遵循 `assets.publicPath`。

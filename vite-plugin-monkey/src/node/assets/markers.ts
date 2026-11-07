@@ -39,6 +39,26 @@ export interface RewriteAssetMarkersOptions {
   newExpression?(node: ESTree.NewExpression, result: MagicString): void;
 }
 
+function isImportMetaUrl(node: ESTree.Node): boolean {
+  if (
+    node.type === 'BinaryExpression' &&
+    node.operator === '+' &&
+    ((node.left.type === 'Literal' && node.left.value === '') ||
+      (node.left.type === 'TemplateLiteral' &&
+        !node.left.expressions.length &&
+        node.left.quasis[0].value.cooked === ''))
+  )
+    return isImportMetaUrl(node.right);
+  return (
+    node.type === 'MemberExpression' &&
+    node.object.type === 'MetaProperty' &&
+    node.object.meta.name === 'import' &&
+    (node.computed
+      ? node.property.type === 'Literal' && node.property.value === 'url'
+      : node.property.type === 'Identifier' && node.property.name === 'url')
+  );
+}
+
 /** Share string-node rewriting while leaving host-specific syntax to its adapter. */
 export function rewriteAssetMarkers(
   context: Rolldown.PluginContext,
@@ -76,6 +96,23 @@ export function rewriteAssetMarkers(
         );
     },
     'NewExpression:exit'(node) {
+      const [url, base] = node.arguments;
+      const value =
+        url?.type === 'Literal'
+          ? url.value
+          : url?.type === 'TemplateLiteral' && !url.expressions.length
+            ? url.quasis[0].value.cooked
+            : undefined;
+      // Resolved data/blob/resource URLs do not need a module URL as their base.
+      if (
+        node.callee.type === 'Identifier' &&
+        node.callee.name === 'URL' &&
+        node.arguments.length === 2 &&
+        typeof value === 'string' &&
+        (/^[a-z][a-z\d+.-]*:/i.test(value) || marker.contains(value)) &&
+        isImportMetaUrl(base)
+      )
+        result.remove(url.end, node.end - 1);
       newExpression?.(node, result);
     },
   }).visit(context.parse(code));

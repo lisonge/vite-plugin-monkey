@@ -72,6 +72,14 @@ Resource dependencies use `{ kind: 'resource', name?, url, loader? }`. Loaders a
 
 Resource mode defaults to `[name]-[hash][extname]`, placing assets beside the userscript. Set `publicPath` to a GitHub Release download directory such as `https://github.com/OWNER/REPO/releases/download/v1.0.0/`, then upload the script and assets individually. An explicit `build.rolldownOptions.output.assetFileNames` takes precedence, including string and function values. Custom subdirectories require matching hosting paths.
 
+## Module output {#module-output}
+
+Main-script JavaScript splitting retains Vite's default behavior. A single chunk with no exports or dynamic imports can use a direct function wrapper when its static imports all map to configured globals; actual top-level await uses an async wrapper. Other graphs use the internal module registry. Neither path runs a second bundle build.
+
+Synchronous main-script graphs start in the current call stack. Shared asynchronous dependencies are awaited by their importers while independent branches can run. A known limitation remains: an external importer of a completed member of an asynchronous cycle may run before the whole cycle finishes, and may miss its failure. This affects both main scripts and Workers. The runtime operates on emitted chunks; it cannot restore module boundaries already merged by Vite.
+
+Remaining `import.meta` expressions cause a production build error. Use static asset imports or `new URL('./asset', import.meta.url)` that Vite can resolve at build time. `import.meta.env` follows Vite's build-time replacements.
+
 ## Workers
 
 Dedicated Workers support these production entry forms:
@@ -87,27 +95,29 @@ const urlWorker = new Worker(new URL('./worker.ts', import.meta.url), {
 });
 ```
 
-Write Worker code as ESM, including static imports, dynamic imports and top-level await. Production builds run it as a Classic Worker with an isolated SystemJS module registry. Dynamic imports retain deferred execution and module caching; cycles and live bindings are linked across chunks. The plugin owns the intermediate Worker format, so `worker.format` does not select the runtime format. Vite's Worker plugins and output naming options remain available.
+Write Worker code as ESM, including static imports, dynamic imports and top-level await. Production builds run it as a Classic Worker with an isolated internal module registry. Dynamic imports retain deferred execution and module caching; cycles and live bindings are linked across chunks. The plugin owns the intermediate Worker format, so `worker.format` does not select the runtime format. Vite's Worker plugins and output naming options remain available.
 
 | Asset mode         | Worker code                                            | Worker images, fonts and WASM                                     |
 | ------------------ | ------------------------------------------------------ | ----------------------------------------------------------------- |
 | `inline` (default) | Entire module graph embedded in the userscript         | Embedded resources                                                |
 | `resource`         | Module chunks emitted as `@resource`, loaded on demand | Emitted as `@resource`, prepared before the Worker entry executes |
 
-`?worker&inline` always embeds the Worker module graph; its internal assets still follow `assets.publicPath`. A single output script with embedded assets therefore uses the default `inline` mode. In resource mode, upload all emitted chunks and assets alongside the userscript. Worker output names can be customized through `worker.rolldownOptions.output`; directories and basenames follow those settings, while compiled module filenames end in `.system.js`. Default resource output is flat.
+`?worker&inline` always embeds the Worker module graph; its internal assets still follow `assets.publicPath`. A single output script with embedded assets therefore uses the default `inline` mode. In resource mode, upload all emitted chunks and assets alongside the userscript. Worker output names can be customized through `worker.rolldownOptions.output`; converted modules retain Vite's filenames, including directories, hashes and extensions. Default resource output is flat.
 
 The parent userscript reads resource bytes with `GM_getResourceURL` and sends them through a private `MessageChannel` for each Worker. The Worker creates its own Blob URLs, so it does not need access to GM APIs or Blob URLs created in the userscript sandbox. Static resource imports, `?url`, `new URL('./asset', import.meta.url)` and WASM `?init` can use these local URLs. Resource mode requires `GM_getResourceURL`; include that grant when using explicit permissions.
 
 Messages sent immediately after construction are queued until the entry is ready. Initialization failures dispatch a Worker `error` event; later dynamic-import failures reject the import promise. Missing modules/resources do not fall back to network requests. Call `terminate()` when finished to release the Worker and its bridge.
 
-Production `SharedWorker`, `?worker&url` and nested Workers are currently rejected. The asset bridge does not expose general GM APIs inside Workers. Development continues to use Vite's module server; SystemJS is a production implementation. Browser CSP and userscript-manager restrictions still apply to Worker and Blob creation.
+Production `SharedWorker`, `?worker&url` and nested Workers are currently rejected. The asset bridge does not expose general GM APIs inside Workers. Development continues to use Vite's module server; the module registry is a production implementation. Browser CSP and userscript-manager restrictions still apply to Worker and Blob creation.
 
 ## CSS and runtime
 
 css.inject auto prefers GM_addStyle and falls back to DOM; gm requires GM_addStyle, dom creates a style element, false disables injection. ?style exports a factory: call createStyle() to obtain a new HTMLStyleElement for manual insertion. During development, factory-created elements share HMR updates; native cloneNode() copies do not. Use ?inline for custom injection.
 
-Import APIs from `$` and load the unified `vite-plugin-monkey/client` declaration entry. It declares the complete API; named types such as `TampermonkeyGM`, `ViolentmonkeyGM` and `GreasemonkeyGM` describe manager differences. See [GM API](./gm-api) for usage and auto-import presets. Development uses Vite's regular module server; bundled dev is unsupported. Missing bridges and protocol/project mismatches throw errors without falling back to the page window.
+Import APIs from `$`; declarations, manager-specific types and auto-import presets are covered in [GM API](./gm-api). Development uses Vite's regular module server; bundled dev is unsupported. Missing bridges and protocol/project mismatches throw errors without falling back to the page window.
 
 Use Vite `server.open` to open the development installation page automatically, for example `defineConfig({ server: { open: true }, plugins: [monkey({ entry: "src/main.ts" })] })`.
+
+Use `preview.open` to open the production installation page. The plugin does not reopen the browser when metadata changes; reinstall the development script when its metadata needs updating.
 
 During development, local CSS `url()` resources are embedded as Data URLs after Vite compiles CSS. Both PostCSS and Lightning CSS are supported, including CSS Modules, `?inline` and `?style`. The plugin preserves your PostCSS configuration and does not set `server.origin`; CSS resources do not require separate requests to a fixed development port. Resource changes participate in HMR. Production assets still follow `assets.publicPath`.

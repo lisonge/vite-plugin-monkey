@@ -3,7 +3,7 @@ import { test } from '../support/fixture.ts';
 import { finalMonkeyOptionToComment } from '../../src/node/metadata/index.ts';
 import type { AntifeatureType } from '../../src/node/metadata/tampermonkey.ts';
 import { createContext } from '../../src/node/config/context.ts';
-import type { MonkeyOptions } from '../../src/node/utils/types.ts';
+import type { MonkeyOptions } from '../../src/node/config/types.ts';
 const generate = async (
   root: string,
   userscript: MonkeyOptions['userscript'],

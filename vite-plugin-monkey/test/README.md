@@ -17,7 +17,7 @@ Run from the repository root:
 | `pnpm test:browser`           | Development and production browser suites              |
 | `pnpm test:browser:dev`       | Development browser suite                              |
 | `pnpm test:browser:build`     | Production browser suite                               |
-| `pnpm test:browser:contracts` | Optional SystemJS registry prototype                   |
+| `pnpm test:browser:contracts` | Optional eager-registration module contracts           |
 
 Install the browser once with `pnpm exec playwright install chromium`. An
 installed Edge can be selected by setting `PLAYWRIGHT_CHANNEL=msedge`.
@@ -51,6 +51,22 @@ also checks `global.d.ts`, including its globals and `Window` augmentation.
 
 Vitest projects use forked workers with file isolation. Build tests run with
 `NODE_ENV=production`; serve tests run with `NODE_ENV=development`.
+`build/execution.test.ts` checks synchronous startup and thrown errors before
+the next microtask in both single-chunk and static multi-chunk output, top-level
+await boundaries, cyclic bindings, deferred dynamic imports, CSS injection and
+Terser options. The static async dependency case preserves chunk boundaries to
+distinguish runtime scheduling from upstream module flattening.
+`build/module-evaluation.test.ts` compares the same emitted chunks in native
+Node ESM, inline registration and an asynchronous Worker-style loader. It checks
+shared TLA dependencies, independent branches, cycles and cached success/failure.
+Two expected-failure cases record the missing whole-cycle completion behavior
+for external importers of asynchronous cycle members.
+`build/import-meta.test.ts` checks build-resolvable asset URLs and rejects
+remaining module metadata in main scripts and Workers.
+`build/global-wrapper.test.ts` runs the same live-read, default/namespace,
+frozen-value and call/tag contracts through direct wrappers and module registries,
+with compression disabled and with Oxc/Terser compression. It also checks the
+direct wrapper's top-level await and unused side-effect import behavior.
 `pnpm test:browser` starts two separate Playwright Test processes with those same
 environments. This also separates dependencies loaded by Vite and framework
 plugins; changing `NODE_ENV` between cases in one process would leave their
@@ -96,7 +112,7 @@ For example, open the production report with:
 pnpm exec playwright show-report playwright-report/build
 ```
 
-## Production Workers and SystemJS
+## Production Workers and module registry
 
 `build/workers.test.ts` checks the real Vite pipeline, resource metadata, custom
 output paths, publicDir assets, permission errors and watch rebuild cleanup.
@@ -119,9 +135,10 @@ application error leaves the instance, dynamic imports and resource reads usable
 Initialization failures still terminate the Worker, close its message ports,
 abort resource reads and release the bootstrap Blob URL.
 
-The default production suite also runs isolated SystemJS `blob-chunks` semantic
-tests. `support/systemjs-worker.ts` compiles ESM fixtures with Rollup's `system`
-format and executes them in Classic Workers. It preserves module boundaries so
+The default production suite also runs isolated module-registry `blob-chunks` semantic
+tests. `support/module-worker.ts` builds ESM fixtures with Vite's `preserveModules`
+option, converts them with the production compiler and executes them in Classic Workers.
+It preserves module boundaries so
 the assertions exercise actual cycles, live bindings, dynamic import caching,
 top-level await ordering/rejection and instance isolation. Message-driven gates
 control asynchronous execution.
@@ -130,8 +147,8 @@ The production harness and prototypes share request/event bookkeeping from
 `fixtures/shared/worker-requests.ts`. Their Worker construction and behavior
 assertions remain separate from each other and from the plugin's runtime bridge.
 
-`pnpm test:browser:contracts` runs the alternative `registry` prototype, which
-embeds all named `System.register` declarations in one Worker script. It is not
+`pnpm test:browser:contracts` runs the alternative `registry` transport, which
+registers all module factories in one Worker script. It is not
 part of the default regression run. Both prototype transports use stable module
 IDs and embed all module bytes in the initial payload; only the production
 resource tests exercise retrieval through GM resources. The prototypes do not

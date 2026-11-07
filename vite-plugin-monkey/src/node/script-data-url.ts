@@ -1,4 +1,4 @@
-import { stringifyFunction } from './utils/others.ts';
+import { stringifyFunction } from './runtime/serialize.ts';
 
 const dataJsUrl = (code: string): string => {
   return 'data:application/javascript,' + encodeURIComponent(code);

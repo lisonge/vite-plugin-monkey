@@ -13,9 +13,14 @@ const settle = (promise: Promise<unknown>) =>
   );
 
 const cases = (['inline', 'resource'] as const).flatMap((mode) =>
-  (['query', 'inline-query', 'constructor'] satisfies WorkerImport[]).map(
-    (form) => ({ mode, form }),
-  ),
+  (
+    [
+      'query',
+      'inline-query',
+      'dynamic-query',
+      'constructor',
+    ] satisfies WorkerImport[]
+  ).map((form) => ({ mode, form })),
 );
 for (const { mode, form } of cases) {
   test.describe(`${mode} / ${form}`, () => {
@@ -26,8 +31,11 @@ for (const { mode, form } of cases) {
       userscript,
       disposables,
     }) => {
+      if (form === 'inline-query') await project.linkDependencies(['terser']);
       const { output, script } = await buildWorkerFixture(project, mode, form, {
-        build: { minify: form === 'constructor' },
+        build: {
+          minify: form === 'inline-query' ? 'terser' : form === 'constructor',
+        },
         ...(mode === 'resource' && form === 'constructor'
           ? {
               worker: {
@@ -53,6 +61,9 @@ for (const { mode, form } of cases) {
         prod: true,
         node: 'production',
       };
+      expect(await harness.call(0, 'names')).toEqual(
+        Array(27).fill('undefined'),
+      );
       expect(await harness.environment()).toEqual(productionEnvironment);
       expect(await harness.call(0, 'environment')).toEqual(
         productionEnvironment,

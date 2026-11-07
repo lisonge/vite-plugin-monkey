@@ -10,7 +10,7 @@ import {
 } from 'vite';
 import type { InlineConfig, Rolldown } from 'vite';
 import monkey from '../../src/node/index.ts';
-import type { MonkeyOptions } from '../../src/node/utils/types.ts';
+import type { MonkeyOptions } from '../../src/node/config/types.ts';
 
 export type Cleanup = () => void | Promise<void>;
 export interface Disposables {

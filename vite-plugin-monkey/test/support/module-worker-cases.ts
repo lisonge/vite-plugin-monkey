@@ -1,9 +1,9 @@
 import { test as base, expect } from './browser.ts';
 import {
-  buildSystemWorker,
+  buildModuleWorker,
   createWorkerLab,
   type WorkerTransport,
-} from './systemjs-worker.ts';
+} from './module-worker.ts';
 
 const settle = (promise: Promise<unknown>) =>
   promise.then(
@@ -11,7 +11,7 @@ const settle = (promise: Promise<unknown>) =>
     (error: unknown) => ({ error: String(error) }),
   );
 
-export function registerSystemWorkerTests(mode: WorkerTransport) {
+export function registerModuleWorkerTests(mode: WorkerTransport) {
   const test = base.extend<{
     workerLab: Awaited<ReturnType<typeof createWorkerLab>>;
   }>({
@@ -20,21 +20,21 @@ export function registerSystemWorkerTests(mode: WorkerTransport) {
       use,
     ) => {
       void host;
-      const source = await buildSystemWorker(project, mode);
-      project.artifacts.set('systemjs-worker.js', source);
+      const source = await buildModuleWorker(project, mode);
+      project.artifacts.set('module-worker.js', source);
       await use(
         await createWorkerLab({ page, diagnostics, disposables }, source),
       );
     },
   });
 
-  test.describe(`Worker + SystemJS contract (${mode})`, () => {
+  test.describe(`Worker module contract (${mode})`, () => {
     test('defers dynamic execution and caches concurrent/repeated imports', async ({
       workerLab: lab,
     }) => {
       const worker = await lab.create();
       expect(await worker.call('snapshot')).toMatchObject({ events: [] });
-      expect(await worker.call('loaded')).not.toContain('lazy.js');
+      expect(await worker.call('loaded')).not.toContain('./lazy.js');
       expect(await worker.call('lazy')).toEqual({
         sameNamespace: true,
         sameAsPrevious: true,
@@ -48,9 +48,9 @@ export function registerSystemWorkerTests(mode: WorkerTransport) {
         events: ['lazy:execute'],
       });
       const loaded = await worker.call('loaded');
-      expect(loaded).toEqual(expect.arrayContaining(['lazy.js']));
+      expect(loaded).toEqual(expect.arrayContaining(['./lazy.js']));
       expect(
-        (loaded as string[]).filter((name) => name === 'lazy.js'),
+        (loaded as string[]).filter((name) => name === './lazy.js'),
       ).toHaveLength(1);
       expect(
         lab.requests.filter((url) => url.startsWith('https://monkey.invalid/')),
@@ -132,7 +132,7 @@ export function registerSystemWorkerTests(mode: WorkerTransport) {
         cycle: { a: 'A0', b: 'B0', fromA: 'B0', fromB: 'A0' },
         events: [],
       });
-      expect(await b.call('loaded')).not.toContain('lazy.js');
+      expect(await b.call('loaded')).not.toContain('./lazy.js');
       await b.call('mutate', 2);
       expect(await a.call('snapshot')).toMatchObject({ count: 7 });
       expect(await b.call('lazy')).toMatchObject({

@@ -1,6 +1,6 @@
 import type { Plugin } from 'vite';
 import { installationTemplate, fcToHtml } from '../../runtime/templates.ts';
-import { installUserPath } from './server.ts';
+import { installUserPath } from '../../dev/paths.ts';
 
 export const virtualHtmlFactory = (): Plugin => {
   let base = '/';

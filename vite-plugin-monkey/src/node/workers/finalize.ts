@@ -1,84 +1,18 @@
-import type { Plugin, Rolldown } from 'vite';
+import type { Rolldown } from 'vite';
 import { Visitor } from 'vite';
 import MagicString from 'magic-string';
-import type { MonkeyContext } from '../utils/types.ts';
-import { getSafeIdentifier } from '../utils/others.ts';
+import type { MonkeyContext } from '../config/context.ts';
+import { getSafeIdentifier } from '../utils/code.ts';
 import { assetMarker, registerAssetResource } from '../assets/resolve.ts';
-import { createWorkerBuildPlugin, type WorkerBuildGraph } from './build.ts';
+import { type WorkerBuildGraph } from './build.ts';
+import { chunkModuleId } from '../modules/compile.ts';
 import {
-  encodeWorkerGraph,
   decodeWorkerGraph,
-  getWorkerGraphMarker,
   hasWorkerGraph,
   getWorkerUrl,
-  workerUrlMarker,
   workerRuntimeId,
   type WorkerDefinition,
 } from './graph.ts';
-
-export function workerFactory(): Plugin {
-  const wrappers = new Set<string>();
-  return {
-    name: 'monkey:worker',
-    apply: 'build',
-    enforce: 'post',
-    config: {
-      order: 'post',
-      handler(config) {
-        wrappers.clear();
-        const plugins = config.worker?.plugins;
-        const renderBuiltUrl = config.experimental?.renderBuiltUrl;
-        return {
-          worker: {
-            format: 'es',
-            plugins: () => [
-              ...(plugins?.() ?? []),
-              createWorkerBuildPlugin((graph) => {
-                wrappers.add(graph.wrapper);
-                return encodeWorkerGraph(graph);
-              }),
-            ],
-          },
-          experimental: {
-            renderBuiltUrl(filename, context) {
-              if (context.type === 'asset' && wrappers.has(filename))
-                return workerUrlMarker(filename);
-              return renderBuiltUrl?.(filename, context);
-            },
-          },
-        };
-      },
-    },
-    load: {
-      order: 'pre',
-      handler(id) {
-        const query = new URLSearchParams(id.split('?')[1]);
-        if (query.has('sharedworker'))
-          throw new Error(
-            '[monkey] SharedWorker is not supported in userscript builds',
-          );
-        if (query.has('worker') && query.has('url'))
-          throw new Error(
-            '[monkey] ?worker&url cannot initialize the resource bridge; import ?worker instead',
-          );
-      },
-    },
-    transform: {
-      order: 'post',
-      handler(code, id) {
-        const query = new URLSearchParams(id.split('?')[1]);
-        if (!query.has('worker') || !query.has('inline')) return;
-        const graph = getWorkerGraphMarker(code);
-        if (!graph) throw new Error('[monkey] Missing inline Worker graph');
-        // Replace Vite's module-Worker inline wrapper, including import.meta.url.
-        return {
-          code: `export default function WorkerWrapper(options) { return new Worker(${JSON.stringify(graph)}, options); }`,
-          map: { mappings: '' },
-        };
-      },
-    },
-  };
-}
 
 /** Collect only referenced Worker graphs, including graphs cached by Vite watch. */
 export function finalizeWorkers(
@@ -92,8 +26,7 @@ export function finalizeWorkers(
   const definitions = new Map<string, WorkerDefinition>();
   let used = false;
   const remember = (graph: WorkerBuildGraph) => {
-    graphs.set(graph.wrapper, graph);
-    candidates.add(graph.wrapper);
+    graphs.set(graph.entry, graph);
     Object.keys(graph.chunks).forEach((name) => candidates.add(name));
     Object.keys(graph.assets).forEach((name) => candidates.add(name));
   };
@@ -103,7 +36,7 @@ export function finalizeWorkers(
     if (graph) remember(graph);
   }
   const definition = (graph: WorkerBuildGraph, inline: boolean) => {
-    const key = graph.wrapper + (inline ? ':inline' : ':resource');
+    const key = graph.entry + (inline ? ':inline' : ':resource');
     const existing = definitions.get(key);
     if (existing) return existing;
     remember(graph);
@@ -114,10 +47,12 @@ export function finalizeWorkers(
       return name;
     };
     const value: WorkerDefinition = {
-      entry: graph.entry,
+      registerName: graph.registerName,
+      assetName: graph.assetName,
+      entry: chunkModuleId(graph.entry),
       modules: Object.fromEntries(
         Object.entries(graph.chunks).map(([name, source]) => [
-          name,
+          chunkModuleId(name),
           {
             ...(context.config.assets.publicPath && !inline
               ? { resource: resource(name) }
@@ -188,10 +123,14 @@ export function finalizeWorkers(
       );
   }
   for (const name of candidates) {
-    // Main-thread imports may also reference the same resource asset.
-    if (kept.has(name)) continue;
     const item = bundle[name];
     if (item?.type !== 'asset') continue;
+    if (kept.has(name)) {
+      const source = graphs.get(name)?.chunks[name];
+      if (source !== undefined) item.source = source;
+      continue;
+    }
+    // Main-thread imports may also reference the same resource asset.
     if (
       Object.values(bundle).some(
         (chunk) =>

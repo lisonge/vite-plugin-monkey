@@ -2,9 +2,7 @@
 
 ## Work with other plugins {#work-with-other-plugins}
 
-plugin will rebuild your code by [generateBundle](https://rollupjs.org/plugin-development/#generatebundle) hook
-
-please ensure that the order of the plugin is **the last one**
+The plugin converts Vite's emitted chunks into a userscript in `generateBundle`, using a direct function wrapper or the internal module registry. It does not run a second bundle build. Place `monkey()` after plugins that modify the output chunks.
 
 ## [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) {#csp}
 

@@ -4,7 +4,7 @@ import postcss from 'postcss';
 import valueParser from 'postcss-value-parser';
 import { lookup } from 'mrmime';
 import { isFileServingAllowed, type Plugin, type ResolvedConfig } from 'vite';
-import { existFile } from '../../utils/others.ts';
+import { existFile } from '../../utils/files.ts';
 
 // Normal user transforms run after Vite compiles CSS and before it wraps CSS as JS.
 export const fixCssUrlFactory = (): Plugin => {

@@ -5,6 +5,7 @@ import vm from 'node:vm';
 import { mergeConfig } from 'vite';
 import type { InlineConfig, Rolldown } from 'vite';
 import monkey from '../../src/node/index.ts';
+import { createModuleRegistry } from '../../src/node/modules/runtime.ts';
 import type { MonkeyOptions } from '../../src/node/types.ts';
 import { test } from '../support/fixture.ts';
 import {
@@ -38,6 +39,11 @@ async function buildWorker(
   const output = buildOutput(result);
   const script = userScript(result);
   assert.doesNotMatch(script.code, /__MONKEY_WORKER_(?:GRAPH|URL)__/);
+  for (const item of output) {
+    assert.ok(!item.fileName.endsWith('.monkey.js'), item.fileName);
+    if (item.type === 'asset')
+      assert.doesNotMatch(item.source.toString(), /__MONKEY_WORKER_GRAPH__/);
+  }
   return { output, script };
 }
 
@@ -143,7 +149,7 @@ test('Worker publicDir URL and import resources retain bytes and metadata', asyn
   assert.equal(Buffer.from(asset.source).toString(), svg);
   const workerCode = output
     .filter((item) => item.type === 'asset')
-    .filter((item) => item.fileName.endsWith('.system.js'))
+    .filter((item) => item.fileName.endsWith('.js'))
     .map((item) => item.source.toString())
     .join('\n');
   assert.match(workerCode, /__MONKEY_WORKER_ASSET_URL__/);
@@ -195,15 +201,18 @@ test('Worker assets distinguish emitted filenames containing # from URL fragment
     assert.equal(Buffer.from(asset.source).toString(), svg);
   }
   const modules = output.filter(
-    (item) => item.type === 'asset' && item.fileName.endsWith('.system.js'),
+    (item) => item.type === 'asset' && item.fileName.endsWith('.js'),
   );
   assert.equal(modules.length, 1);
   const worker = modules[0];
   assert.ok(worker.type === 'asset');
   const names: string[] = [];
   let result: string[] = [];
-  let execute: (() => void | Promise<void>) | undefined;
+  const registry = createModuleRegistry(async () => {
+    throw new Error('Unexpected module load');
+  });
   vm.runInNewContext(Buffer.from(worker.source).toString(), {
+    __monkeyRegister: registry.register,
     URL,
     __MONKEY_WORKER_ASSET_URL__(name: string) {
       names.push(name);
@@ -217,23 +226,8 @@ test('Worker assets distinguish emitted filenames containing # from URL fragment
         result = Array.from(values);
       },
     },
-    System: {
-      register(
-        imports: string[],
-        declare: (
-          exports: () => void,
-          context: { meta: { url: string } },
-        ) => { execute: () => void | Promise<void> },
-      ) {
-        assert.equal(imports.length, 0);
-        execute = declare(() => {}, {
-          meta: { url: 'blob:https://example.test/worker' },
-        }).execute;
-      },
-    },
   });
-  assert.ok(execute);
-  await execute();
+  await registry.importModule('./' + worker.fileName);
   assert.deepEqual(new Set(names), new Set([emittedName, 'public.svg']));
   assert.deepEqual(result, [
     'blob:https://example.test/emitted',
@@ -246,6 +240,7 @@ test('Worker assets distinguish emitted filenames containing # from URL fragment
 test.for(['iife', 'es'] as const)(
   'preserves custom worker naming and split modules with worker.format %s',
   async (format, { project }) => {
+    let viteModuleNames: string[] = [];
     await project.write({
       'main.js': `import W from './worker.js?worker'; new W();`,
       'worker.js': `import picture from './picture.svg'; self.onmessage = async () => self.postMessage([picture, (await import('./lazy.js')).answer]);`,
@@ -258,6 +253,17 @@ test.for(['iife', 'es'] as const)(
       {
         worker: {
           format,
+          plugins: () => [
+            {
+              name: 'capture-vite-worker-filenames',
+              generateBundle(_, bundle) {
+                viteModuleNames = Object.values(bundle)
+                  .filter((item) => item.type === 'chunk')
+                  .map((item) => item.fileName)
+                  .sort();
+              },
+            },
+          ],
           rolldownOptions: {
             output: {
               entryFileNames: 'workers/[name]-[hash].mjs',
@@ -271,6 +277,19 @@ test.for(['iife', 'es'] as const)(
     );
     const metadata = resources(script.code);
     assert.equal(metadata.size, 3);
+    assert.equal(viteModuleNames.length, 2);
+    assert.deepEqual(
+      output
+        .filter((item) => item.fileName.endsWith('.mjs'))
+        .map((item) => item.fileName)
+        .sort(),
+      viteModuleNames,
+    );
+    for (const name of viteModuleNames) {
+      const module = output.find((item) => item.fileName === name);
+      assert.ok(module?.type === 'asset');
+      assert.match(module.source.toString(), /__monkeyRegister/);
+    }
     for (const directory of ['workers/', 'chunks/', 'media/']) {
       const filename = [...metadata.keys()].find((name) =>
         name.startsWith(directory),
@@ -283,31 +302,32 @@ test.for(['iife', 'es'] as const)(
   },
 );
 
-test('shared entry inline/regular imports and main-thread assets are not removed or duplicated', async ({
-  project,
-}) => {
-  await project.write({
-    'main.js': `import W from './worker.js?worker'; import Inline from './worker.js?worker&inline'; import picture from './picture.svg'; globalThis.probes = [new W(), new Inline(), picture];`,
-    'worker.js': `import picture from './picture.svg'; self.onmessage = async () => self.postMessage([picture, (await import('./lazy.js')).answer]);`,
-    'lazy.js': `export const answer = 42;`,
-    'picture.svg': '<svg xmlns="http://www.w3.org/2000/svg"/>',
-  });
-  const { output, script } = await buildWorker(project);
-  const metadata = resources(script.code);
-  const files = output.filter((item) => item.type === 'asset');
-  assert.equal(
-    files.filter((item) => item.fileName.endsWith('.svg')).length,
-    1,
-  );
-  assert.equal(
-    files.filter((item) => item.fileName.endsWith('.system.js')).length,
-    2,
-  );
-  assert.equal(metadata.size, 3);
-  assert.equal([...script.code.matchAll(/@resource\s/g)].length, 3);
-  for (const file of files)
-    assert.equal(metadata.get(file.fileName), publicPath + file.fileName);
-});
+test.for([false, true])(
+  'shared entry inline/regular imports and main-thread assets are not removed or duplicated: inlineFirst=%s',
+  async (inlineFirst, { project }) => {
+    await project.write({
+      'main.js': `${inlineFirst ? "import Inline from './worker.js?worker&inline'; import W from './worker.js?worker';" : "import W from './worker.js?worker'; import Inline from './worker.js?worker&inline';"} import picture from './picture.svg'; globalThis.probes = [new W(), new Inline(), picture];`,
+      'worker.js': `import picture from './picture.svg'; self.onmessage = async () => self.postMessage([picture, (await import('./lazy.js')).answer]);`,
+      'lazy.js': `export const answer = 42;`,
+      'picture.svg': '<svg xmlns="http://www.w3.org/2000/svg"/>',
+    });
+    const { output, script } = await buildWorker(project);
+    const metadata = resources(script.code);
+    const files = output.filter((item) => item.type === 'asset');
+    assert.equal(
+      files.filter((item) => item.fileName.endsWith('.svg')).length,
+      1,
+    );
+    assert.equal(
+      files.filter((item) => item.fileName.endsWith('.js')).length,
+      2,
+    );
+    assert.equal(metadata.size, 3);
+    assert.equal([...script.code.matchAll(/@resource\s/g)].length, 3);
+    for (const file of files)
+      assert.equal(metadata.get(file.fileName), publicPath + file.fileName);
+  },
+);
 
 test(
   'watch refreshes public Worker assets and drops removed Worker resources',
@@ -341,10 +361,23 @@ test(
     const script = () => {
       const item = output['worker.user.js'];
       assert.ok(item?.type === 'chunk');
+      for (const asset of Object.values(output)) {
+        if (asset.type !== 'asset' || !asset.fileName.endsWith('.js')) continue;
+        assert.doesNotMatch(asset.source.toString(), /__MONKEY_WORKER_GRAPH__/);
+        assert.match(asset.source.toString(), /__monkeyRegister/);
+      }
       return item.code;
     };
     await nextBuild(watcher);
     assert.ok(resources(script()).has('a.svg'));
+    const initialResources = [...resources(script())];
+    const changedMain = nextBuild(watcher);
+    await fs.writeFile(
+      path.join(root, 'main.js'),
+      `import W from './worker.js?worker'; globalThis.worker = new W({ name: 'updated' });`,
+    );
+    await changedMain;
+    assert.deepEqual([...resources(script())], initialResources);
     const changedAsset = nextBuild(watcher);
     await fs.writeFile(path.join(root, 'public/a.svg'), '<svg>changed</svg>');
     await changedAsset;

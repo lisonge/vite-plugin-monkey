@@ -1,7 +1,12 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { normalizePath } from 'vite';
-import { compatResolve, existFile } from './others.ts';
+import { resolve } from 'import-meta-resolve';
+import { pathToFileURL } from 'node:url';
+import { existFile } from './files.ts';
+const compatResolve = (id: string, entry: string) => {
+  return resolve(id, pathToFileURL(entry).href);
+};
 
 interface RawPackageJson {
   name?: string;

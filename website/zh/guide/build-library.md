@@ -1,70 +1,33 @@
 # 构建使用 GM API 的库 {#build-a-library-using-gm-api}
 
-如果您想封装 GM_api 构建一个库后给其他人使用
-
-以前的做法一般是直接在库代码里将 GM_api 作为全局变量访问，然后通过 `@require` 在脚本里引用加载
-
-但是这无法让我们通过 npm 等包管理器去管理这个依赖，也不适配 vite-plugin-monkey 的 ESM GM_api 的用法
-
-现在您只需要在您的库代码里正常从 `$` 导入 GM_api，然后在打包的时候将 `$` 作为排除依赖即可
-
-这样您就能构建一个正常在 vite-plugin-monkey 里使用的库，用户使用这个库只需要使用 npm 安装后正常 `import` 使用即可
-
-当然如果您直接将 `$` 打包到构建产物中，这个库也能直接通过 `@require` 引用
-
-但是为了使构建产物更加简洁，建议您在构建的时候将 `$` 重定向到 `vite-plugin-monkey/dist/native`
-
-以下是一个使用 tsup 同时打包 ESM 和 IIFE 格式的例子，ESM 提供给 vite-plugin-monkey 用户，IIFE 提供给想通过 `@require` 引用的用户
-
-同时 IIFE 格式也能作为 vite-plugin-monkey 的 `dependencies` 的配置来减少构建产物的大小
+面向 vite-plugin-monkey 项目的库，从 `$` 导入 GM API，并在库的 ESM 产物中将 `$` 保留为外部依赖：
 
 ```ts
-// /src/index.ts
+// src/index.ts
 import { GM_setValue } from '$';
 
 export const setValue = (name: string, value: unknown) => {
-  console.log('you invoke setValue', name, value);
   GM_setValue(name, value);
 };
 ```
+
+例如使用 tsup：
 
 ```ts
 // tsup.config.ts
 import { defineConfig } from 'tsup';
 
-const outExtension = (ctx: { format: 'esm' | 'cjs' | 'iife' }) => ({
-  js: { esm: '.mjs', cjs: '.cjs', iife: '.iife.js' }[ctx.format],
+export default defineConfig({
+  entry: ['src/index.ts'],
+  format: ['esm'],
+  platform: 'browser',
+  dts: true,
+  external: ['$'],
 });
-
-export default defineConfig([
-  {
-    // for vite import
-    entry: ['src/index.ts'],
-    outDir: 'dist',
-    sourcemap: true,
-    platform: 'browser',
-    outExtension,
-    dts: true,
-    format: ['esm'],
-    external: ['$'],
-  },
-  {
-    // for userscript @require
-    entry: ['src/index.ts'],
-    outDir: 'dist',
-    sourcemap: true,
-    platform: 'browser',
-    outExtension,
-    dts: false,
-    format: ['iife'],
-    minify: true,
-    globalName: `GmExtra`,
-    target: 'es2015',
-    esbuildOptions: (options) => {
-      options.alias = {
-        $: 'vite-plugin-monkey/dist/native',
-      };
-    },
-  },
-]);
 ```
+
+在 TypeScript 的 `types` 配置中加载 `vite-plugin-monkey/client`，为 `$` 提供声明；它不是运行时导入入口。详见 [GM API](./gm-api)。
+
+使用者安装库后正常导入，由应用的 vite-plugin-monkey 解析 `$`：开发时通过用户脚本沙箱桥接读取 API，生产时生成直接引用管理器 GM 全局变量的虚拟模块。库无需打包开发客户端。
+
+如果还要发布通过 `@require` 加载的独立 IIFE，请提供直接读取 GM 全局变量的入口或适配模块。旧的 `vite-plugin-monkey/dist/native` 入口已不再提供。该产物不能残留未解析的 `$` 导入，所需权限由使用它的用户脚本配置。

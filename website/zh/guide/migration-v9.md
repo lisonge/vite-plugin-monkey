@@ -95,7 +95,9 @@ assets.publicPath 是托管完整输出目录的绝对 HTTP(S) URL，默认内�
 
 ## Worker 构建
 
-生产 Worker 使用 Classic Worker + SystemJS 执行 ESM 模块图，支持动态导入、分包、循环依赖、live bindings 和顶层 await。插件接管中间构建格式，无需配置 `worker.format`。入口支持 `?worker`、`?worker&inline` 和静态 `new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' })`。
+主脚本与 Worker 的模块执行边界、异步循环限制和 `import.meta` 用法见[模块产物](./configuration#module-output)。
+
+生产 Worker 使用 Classic Worker + 内部模块注册表 执行 ESM 模块图，支持动态导入、分包、循环依赖、live bindings 和顶层 await。插件接管中间构建格式，无需配置 `worker.format`。入口支持 `?worker`、`?worker&inline` 和静态 `new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' })`。
 
 省略 `assets.publicPath` 时 内嵌模块和资源；resource 模式将 Worker 分块及内部图片/WASM 注册为 `@resource`，发布时上传全部产物。父级脚本读取资源，再经每个实例独立的消息端口传给 Worker，由 Worker 创建本地 Blob URL。使用显式 userscript.grant 数组时需包含 `GM_getResourceURL`。无需在 Worker 内导入 GM API。
 

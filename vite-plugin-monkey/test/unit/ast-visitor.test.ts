@@ -4,11 +4,8 @@ import vm from 'node:vm';
 import { parseSync } from 'vite';
 import type { Rolldown } from 'vite';
 import { collectGrant } from '../../src/node/permissions/detect.ts';
-import { getProgramImportNodes } from '../../src/node/utils/others.ts';
-import {
-  transformTlaToIdentifier,
-  transformIdentifierToTla,
-} from '../../src/node/utils/topLevelAwait.ts';
+import { getProgramImportNodes } from '../../src/node/utils/imports.ts';
+import { wrapChunk } from '../../src/node/modules/wrap.ts';
 const context = {
   parse: (code, options) => parseSync('fixture.js', code, options).program,
 } as Rolldown.PluginContext;
@@ -123,34 +120,18 @@ test('redeclared var aliases retain provenance and static blocks isolate var bin
     [],
   );
 });
-test('top-level await traversal leaves nested function awaits unchanged', () => {
-  const source = chunk(`
+test('wrapper preserves nested awaits and top-level for-await', async () => {
+  const code = await wrapChunk(`
     const x = await Promise.resolve(1);
     async function f() { return await Promise.resolve(2); }
     const g = async () => await Promise.resolve(3);
     class C { async method() { return await Promise.resolve(4); } }
-    for await (const item of []) { console.log(item); }
+    globalThis.result = [x, await f(), await g(), await new C().method()];
+    for await (const item of [Promise.resolve(5)]) globalThis.result.push(item);
   `);
-  const result = transformTlaToIdentifier(context, source, '_TLA_');
-  assert.ok(result);
-  assert.equal(result.code.match(/_TLA_\(/g)?.length, 1);
-  assert.equal(result.code.match(/_TLA_FOR/g)?.length, 1);
-  assert.equal(result.code.match(/return await/g)?.length, 2);
-  assert.match(result.code, /=> await Promise/);
-});
-test('restored await preserves member, call and tagged-template precedence', async () => {
-  const output = chunk(`(function () {
-    globalThis.result = [
-      _TLA_(Promise.resolve({ value: 7 })).value,
-      _TLA_(Promise.resolve(() => 8))(),
-      _TLA_(Promise.resolve(() => 9))\`tag\`,
-      _TLA_(Promise.resolve({ value: 10 }))?.value
-    ];
-  })()`);
-  transformIdentifierToTla(context, output, '_TLA_');
   const sandbox = vm.createContext({});
-  await vm.runInContext(output.code, sandbox);
-  assert.deepEqual(Array.from(sandbox.result), [7, 8, 9, 10]);
+  await vm.runInContext(code!, sandbox);
+  assert.deepEqual(Array.from(sandbox.result), [1, 2, 3, 4, 5]);
 });
 test.each([
   '(async () => 42)()',
@@ -160,29 +141,13 @@ test.each([
   '(Promise.resolve(42))',
   '/* operand */ (async () => 42)()',
   'Promise.resolve(await (async () => 42)())',
-])('top-level await round-trip preserves operand %s', async (expression) => {
-  const transformed = transformTlaToIdentifier(
-    context,
-    chunk(
-      `const value = await ${expression}; globalThis.result = [value, typeof value];`,
-    ),
-    '_TLA_',
+])('wrapper preserves await operand %s', async (expression) => {
+  const code = await wrapChunk(
+    `const value = await ${expression}; globalThis.result = [value, typeof value];`,
   );
-  assert.ok(transformed);
-  const output = chunk(`(function () { ${transformed.code} })()`);
-  transformIdentifierToTla(context, output, '_TLA_');
   const sandbox = vm.createContext({});
-  await vm.runInContext(output.code, sandbox);
+  await vm.runInContext(code!, sandbox);
   assert.deepEqual(Array.from(sandbox.result), [42, 'number']);
-});
-test('restored for-await wrapper executes to completion', async () => {
-  const output = chunk(
-    `(function () { globalThis.result = _TLA_FOR((async () => { for await (const x of [1, 2]) { globalThis.sum = (globalThis.sum || 0) + x; } })()); })()`,
-  );
-  transformIdentifierToTla(context, output, '_TLA_');
-  const sandbox = vm.createContext({});
-  await vm.runInContext(output.code, sandbox);
-  assert.equal(sandbox.sum, 3);
 });
 
 test('import traversal ignores empty and computed sources but visits nested imports', () => {

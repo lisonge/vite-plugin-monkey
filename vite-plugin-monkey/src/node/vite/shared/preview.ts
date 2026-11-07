@@ -1,7 +1,7 @@
 import path from 'node:path';
 import type { Plugin, ResolvedConfig } from 'vite';
 import { normalizePath } from 'vite';
-import { walk } from '../../utils/others.ts';
+import { walk } from '../../utils/files.ts';
 import { fcToHtml, installationTemplate } from '../../runtime/templates.ts';
 
 export const previewFactory = (): Plugin => {

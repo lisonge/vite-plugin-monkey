@@ -7,7 +7,7 @@ const value = GM_getValue('count', 0);
 GM_setValue('count', value + 1);
 ```
 
-The `$` module works in development and production. `monkeyWindow` refers to the userscript sandbox; `unsafeWindow` refers to the host page. Load its declaration with `"types": ["vite/client", "vite-plugin-monkey/client"]` in `tsconfig.json`. The plugin resolves `$` at runtime. `vite-plugin-monkey/client` is only a type declaration entry, not a runtime module. GM APIs are not mounted onto the page window.
+The `$` module works in development and production. `monkeyWindow` refers to the userscript sandbox; `unsafeWindow` refers to the host page. Load its declaration with `"types": ["vite/client", "vite-plugin-monkey/client"]` in `tsconfig.json`. The plugin resolves imports from `$`. `vite-plugin-monkey/client` is only a type declaration entry, not a runtime module. GM APIs are not mounted onto the page window.
 
 Omit userscript.grant for production detection and all supported development grants. For dynamic calls, specify the complete grant array. The string none emits @grant none; [] emits no grant.
 
@@ -17,6 +17,10 @@ import { gmAutoImportPreset } from 'vite-plugin-monkey';
 
 AutoImport({ imports: [gmAutoImportPreset({ manager: 'tampermonkey' })] });
 ```
+
+During development, `$` loads the client that reads APIs from the userscript sandbox bridge. Production resolves `$` to a virtual module referencing the manager's GM globals; unused exports can be removed during bundling. Production Workers cannot import `$`; use messages to request data from the parent userscript.
+
+For library output, keep `$` external so the consuming application's plugin can resolve it. See [Build a Library](./build-library).
 
 ## Userscript manager differences
 

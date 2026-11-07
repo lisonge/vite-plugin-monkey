@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import { test } from 'vitest';
 import { serverInjectFn } from '../../src/node/runtime/templates.ts';
-import { stringifyFunction } from '../../src/node/utils/others.ts';
+import { stringifyFunction } from '../../src/node/runtime/serialize.ts';
 
 test.each([false, true])(
   'serialized sandbox injection retains GM access and Trusted Types=%s',
